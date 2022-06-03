@@ -1,0 +1,86 @@
+// Top-level build file where you can add configuration options common to all sub-projects/modules.
+buildscript {
+    // Define versions in a single place
+    ext {
+        // Sdk and tools
+        compileSdkVersion = 31
+        minSdkVersion = 23
+        targetSdkVersion = 31
+
+        // App dependencies
+        appCompatVersion = '1.4.1'
+        composeActivityVersion = '1.4.0'
+        composeAnimationVersion = '1.1.1'
+        composeMaterialVersion = '1.1.1'
+        composeNavigationVersion = '2.4.2'
+        composeViewmodelVersion = '2.4.1'
+        composeUiVersion = '1.1.1'
+        composeUiTestVersion = '1.1.1'
+        constraintLayoutVersion = '2.1.4'
+        coreTestingVersion = '2.1.0'
+        coroutinesVersion = '1.6.2'
+        espressoVersion = '3.4.0'
+        fragmentVersion = '1.4.1'
+        glideVersion = '4.13.2'
+        gradleVersion = '7.2.1'
+        gsonVersion = '2.9.0'
+        hiltVersion = '2.42'
+        junitVersion = '4.13.2'
+        kotlinVersion = '1.6.10' //1.6.21 - compose не поддерживает
+        ktlintVersion = '0.45.2'
+        ktlintGradleVersion = '10.2.1'
+        ktxVersion = '1.7.0'
+        ktxLifecycleVersion = '2.4.1'
+        lifecycleVersion = '2.2.0'
+        materialVersion = '1.6.0'
+        navigationVersion = '2.4.2'
+        okhttpLoggingVersion = '4.9.3'
+        pagingVersion = '3.1.1'
+        recyclerviewVersion = '1.2.1'
+        retrofitVersion = '2.9.0'
+        roomVersion = '2.4.2'
+        runnerVersion = '1.0.1'
+        spotlessVersion = '6.5.1'
+        truthVersion = '1.1.3'
+        testExtJunit = '1.1.3'
+        uiAutomatorVersion = '2.2.0'
+        viewPagerVersion = '1.0.0'
+        workVersion = '2.7.1'
+    }
+
+    repositories {
+        google()
+        mavenCentral()
+    }
+    dependencies {
+        classpath "com.android.tools.build:gradle:$gradleVersion"
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlinVersion"
+        classpath "androidx.navigation:navigation-safe-args-gradle-plugin:$navigationVersion"
+        classpath "com.google.dagger:hilt-android-gradle-plugin:$hiltVersion"
+        classpath "org.jlleitschuh.gradle:ktlint-gradle:$ktlintGradleVersion"
+        classpath "com.diffplug.spotless:spotless-plugin-gradle:$spotlessVersion"
+    }
+}
+
+plugins {
+    id 'com.android.application' version '7.2.1' apply false
+    id 'com.android.library' version '7.2.1' apply false
+    id 'org.jetbrains.kotlin.android' version '1.6.21' apply false
+    id 'org.jlleitschuh.gradle.ktlint' version "$ktlintGradleVersion"
+}
+
+allprojects {
+    apply plugin: "org.jlleitschuh.gradle.ktlint"
+    apply plugin: "com.diffplug.spotless"
+}
+
+spotless {
+    kotlin {
+        target "**/*.kt"
+        ktlint(ktlintVersion).userData(['max_line_length': '100'])
+    }
+}
+
+/*task clean(type: Delete) {
+    delete rootProject.buildDir
+}*/
