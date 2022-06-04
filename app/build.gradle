@@ -59,6 +59,7 @@ android {
 
 dependencies {
     implementation(project(":common"))
+    implementation(project(":domain"))
 
     kapt "androidx.room:room-compiler:$rootProject.roomVersion"
     kapt "com.github.bumptech.glide:compiler:$rootProject.glideVersion"
