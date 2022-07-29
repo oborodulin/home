@@ -13,6 +13,8 @@ dependencyResolutionManagement {
     }
 }
 rootProject.name = "Home"
-include ':app'
+include ':HomeApp'
 include ':common'
 include ':domain'
+include ':HomeApp:core'
+include ':HomeApp:navigation'
