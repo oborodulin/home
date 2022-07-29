@@ -62,6 +62,7 @@ dependencies {
     implementation project(":domain")
     api project(path:':HomeApp:core')
     api project(path:':HomeApp:navigation')
+    implementation project(path: ':data')
 
     kapt deps.room.compiler
     kapt deps.glide.compiler

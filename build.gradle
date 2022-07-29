@@ -12,6 +12,7 @@ buildscript {
                 composeUi        : '1.2.0',
                 composeUiTest    : '1.2.0',
                 constraintLayout : '2.1.4',
+                CoilKt           : '2.1.0',
                 coreTesting      : '2.1.0',
                 coroutines       : '1.6.4',
                 espresso         : '3.4.0',
@@ -27,6 +28,7 @@ buildscript {
                 ktx              : '1.8.0',
                 ktxLifecycle     : '2.5.1',
                 lifecycle        : '2.2.0',
+                lottie           : '5.2.0',
                 material         : '1.6.1',
                 navigation       : '2.5.1',
                 okhttpLogging    : '5.0.0-alpha.10',
@@ -55,6 +57,10 @@ buildscript {
                 activityCompose     : "androidx.activity:activity-compose:$versions.composeActivity",
                 appcompat           : "androidx.appcompat:appcompat:$versions.appCompat",
                 constraintlayout    : "androidx.constraintlayout:constraintlayout:$versions.constraintLayout",
+                // Coil
+                coil                : [compose: "io.coil-kt:coil-compose:$versions.CoilKt"],
+                // Lottie
+                lottie              : [compose: "com.airbnb.android:lottie-compose:$versions.lottie"],
                 core                : [ktx: "androidx.core:core-ktx:$versions.ktx"],
                 room                : [compiler: "androidx.room:room-compiler:$versions.room",
                                        runtime : "androidx.room:room-runtime:$versions.room",
@@ -91,6 +97,7 @@ buildscript {
                                        coroutinesTest   : "org.jetbrains.kotlinx:kotlinx-coroutines-test:$versions.coroutines"],
                 recyclerview        : "androidx.recyclerview:recyclerview:$versions.recyclerview",
                 compose             : [
+                        ui          : "androidx.compose.ui:ui:$versions.composeUi",
                         // Compose Material Design
                         material    : "androidx.compose.material:material:$versions.composeMaterial",
                         // Animations
@@ -128,7 +135,8 @@ buildscript {
 plugins {
     id 'com.android.application' version '7.2.1' apply false
     id 'com.android.library' version '7.2.1' apply false
-    id 'org.jetbrains.kotlin.android' version '1.7.0' apply false // Compose Compiler не поддерживает 1.7.10
+    id 'org.jetbrains.kotlin.android' version '1.7.10' apply false
+    // Compose Compiler не поддерживает 1.7.10
     id 'org.jlleitschuh.gradle.ktlint' version '10.2.1'
 }
 
