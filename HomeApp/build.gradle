@@ -1,9 +1,9 @@
 plugins {
     id 'com.android.application'
     id 'org.jetbrains.kotlin.android'
-    id 'org.jetbrains.kotlin.kapt'
     id 'dagger.hilt.android.plugin'
     id 'androidx.navigation.safeargs.kotlin'
+    id 'org.jetbrains.kotlin.kapt'
 }
 android {
     compileSdk deps.app.compileSdkVersion
@@ -60,6 +60,7 @@ android {
 dependencies {
     implementation project(":common")
     implementation project(":domain")
+    api project(path:'core')
 
     kapt deps.room.compiler
     kapt deps.glide.compiler
