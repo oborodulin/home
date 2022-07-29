@@ -30,6 +30,8 @@ android {
 }
 
 dependencies {
+    api project(path:':HomeApp:core')
+
     implementation deps.core.ktx
     implementation deps.appcompat
     implementation deps.material

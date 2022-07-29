@@ -60,7 +60,8 @@ android {
 dependencies {
     implementation project(":common")
     implementation project(":domain")
-    api project(path:'core')
+    api project(path:':HomeApp:core')
+    api project(path:':HomeApp:navigation')
 
     kapt deps.room.compiler
     kapt deps.glide.compiler
