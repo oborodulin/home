@@ -14,7 +14,7 @@ import androidx.lifecycle.ViewModelProvider
 import com.google.android.material.textfield.TextInputLayout
 import com.oborodulin.home.R
 import com.oborodulin.home.controller.Validator
-import com.oborodulin.home.domain.service.Service
+import com.oborodulin.home.domain.entity.Service
 import com.oborodulin.home.model.service.ServiceViewModel
 import java.util.*
 
@@ -38,7 +38,7 @@ class ServiceFragment : Fragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        vmService.nextDisplayPos().observe(
+  /*      vmService.nextDisplayPos().observe(
             viewLifecycleOwner
         ) { nextPos ->
             nextPos?.let {
@@ -46,9 +46,11 @@ class ServiceFragment : Fragment() {
                 this.service = Service(it)
             }
         }
+
+   */
         val serviceId: UUID = arguments?.getSerializable(ARG_SERVICE_ID) as UUID
         Log.d(TAG, "args bundle service ID: $serviceId")
-        vmService.loadService(serviceId)
+       // vmService.loadService(serviceId)
         validator = Validator(requireContext())
     }
 
@@ -100,7 +102,7 @@ class ServiceFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        vmService.serviceLiveData.observe(
+  /*      vmService.serviceLiveData.observe(
             viewLifecycleOwner
         ) { service ->
             service?.let {
@@ -109,6 +111,8 @@ class ServiceFragment : Fragment() {
                 updateUI()
             }
         }
+
+   */
     }
 
     override fun onStart() {
@@ -120,7 +124,7 @@ class ServiceFragment : Fragment() {
 
     override fun onStop() {
         super.onStop()
-        vmService.saveService(service)
+        //vmService.saveService(service)
     }
 
     private fun updateUI() {

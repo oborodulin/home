@@ -1,14 +1,15 @@
 plugins {
     id 'com.android.library'
     id 'org.jetbrains.kotlin.android'
+    id 'org.jetbrains.kotlin.kapt'
 }
 
 android {
-    compileSdk 32
+    compileSdk deps.app.compileSdkVersion
 
     defaultConfig {
-        minSdk 21
-        targetSdk 32
+        minSdk deps.app.minSdkVersion
+        targetSdk deps.app.targetSdkVersion
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         consumerProguardFiles "consumer-rules.pro"
@@ -30,11 +31,27 @@ android {
 }
 
 dependencies {
+    implementation(project(":domain"))
+    implementation deps.kotlinx.coroutinesAndroid
+    implementation deps.kotlinx.coroutinesCore
+    implementation deps.jvm.inject
 
-    implementation 'androidx.core:core-ktx:1.8.0'
-    implementation 'androidx.appcompat:appcompat:1.4.2'
-    implementation 'com.google.android.material:material:1.6.1'
-    testImplementation 'junit:junit:4.13.2'
-    androidTestImplementation 'androidx.test.ext:junit:1.1.3'
-    androidTestImplementation 'androidx.test.espresso:espresso-core:3.4.0'
+    // Networking
+    implementation deps.retrofit2.retrofit
+    implementation deps.retrofit2.converterGson
+    implementation deps.retrofit2.converterScalars
+    implementation deps.okhttp3
+
+    // Testing
+    testImplementation deps.junit
+    testImplementation deps.kotlinx.coroutinesTest
+    testImplementation deps.kotlinx.coroutinesAndroid
+    testImplementation deps.test.junit
+    testImplementation deps.dagger.testing
+    kaptTest deps.dagger.hiltCompiler
+
+    kaptAndroidTest deps.dagger.hiltCompiler
+    androidTestImplementation deps.dagger.testing
+    androidTestImplementation deps.kotlinx.coroutinesTest
+    androidTestImplementation deps.espresso.core
 }

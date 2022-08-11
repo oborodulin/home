@@ -2,7 +2,7 @@ package com.oborodulin.home.model.rate
 
 import android.util.Log
 import androidx.lifecycle.viewModelScope
-import com.oborodulin.home.domain.rate.Rate
+import com.oborodulin.home.domain.entity.Rate
 import com.oborodulin.home.domain.rate.RateRepository
 import com.oborodulin.home.model.ListViewModel
 import kotlinx.coroutines.launch
@@ -10,7 +10,7 @@ import kotlinx.coroutines.launch
 private const val TAG = "RateListViewModel"
 
 class RateListViewModel : ListViewModel<Rate>() {
-    private val rateRepository = RateRepository.getInstance(viewModelScope)
+ /*   private val rateRepository = RateRepository.getInstance(viewModelScope)
     val ratesLiveData = rateRepository.getAll()
 
     init {
@@ -41,4 +41,6 @@ class RateListViewModel : ListViewModel<Rate>() {
         super.onCleared()
         Log.d(TAG, "ViewModel instance about to be destroyed")
     }
+
+  */
 }

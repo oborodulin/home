@@ -17,11 +17,6 @@ android {
         versionCode deps.app.versionCode
         versionName deps.app.versionName
 
-        kapt {
-            arguments {
-                arg("room.schemaLocation", "$projectDir/schemas")
-            }
-        }
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         javaCompileOptions {
             annotationProcessorOptions {
@@ -52,7 +47,7 @@ android {
         freeCompilerArgs += "-Xopt-in=kotlinx.coroutines.FlowPreview"
     }
     composeOptions {
-        kotlinCompilerExtensionVersion '1.2.0'
+        kotlinCompilerExtensionVersion versions.kotlinExtension
     }
     namespace 'com.oborodulin.home'
 }
@@ -60,11 +55,11 @@ android {
 dependencies {
     implementation project(":common")
     implementation project(":domain")
-    api project(path:':HomeApp:core')
-    api project(path:':HomeApp:navigation')
     implementation project(path: ':data')
+    api project(path: ':HomeApp:core')
+    api project(path: ':HomeApp:navigation')
+    implementation project(path: ':accounting')
 
-    kapt deps.room.compiler
     kapt deps.glide.compiler
     kapt deps.dagger.compiler
     implementation deps.appcompat
@@ -76,9 +71,7 @@ dependencies {
     implementation deps.lifecycle.viewmodelKtx
     implementation deps.navigation.fragmentKtx
     implementation deps.navigation.uiKtx
-    implementation deps.paging
-    implementation deps.room.runtime
-    implementation deps.room.ktx
+    implementation deps.paging.runtimeKtx
     implementation deps.viewpager2
     implementation deps.work.runtimeKtx
     implementation deps.glide.glide
@@ -92,7 +85,7 @@ dependencies {
     implementation deps.dagger.hilt
     implementation deps.recyclerview
     // Integration with activities
-    implementation deps.activityCompose
+    implementation deps.activity.compose
     // Compose Material Design
     implementation deps.compose.material
     // Animations

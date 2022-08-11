@@ -1,4 +1,4 @@
-package com.talhafaki.common.loading
+package com.oborodulin.home.common.loading
 
 import android.content.res.Configuration
 import androidx.compose.foundation.background
@@ -12,7 +12,7 @@ import com.airbnb.lottie.compose.LottieAnimation
 import com.airbnb.lottie.compose.LottieCompositionSpec
 import com.airbnb.lottie.compose.LottieConstants
 import com.airbnb.lottie.compose.rememberLottieComposition
-import com.talhafaki.common.R
+import com.oborodulin.home.common.R
 
 /**
  * Created by tfakioglu on 16.January.2022

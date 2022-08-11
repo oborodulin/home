@@ -21,7 +21,7 @@ import com.oborodulin.home.common.theme.Typography
  */
 @Preview
 @Composable
-fun NxToolbar(clickBackButton: () -> Unit) {
+fun NxToolbar(clickBackButton: () -> Unit = {}) {
     //TODO: hide ripple effect
     Row(
         modifier = Modifier
@@ -41,7 +41,7 @@ fun NxToolbar(clickBackButton: () -> Unit) {
             contentAlignment = Alignment.CenterStart
         ) {
             Icon(
-                painter = painterResource(id = R.drawable.ic_baseline_arrow_back),
+                painter = painterResource(id = R.drawable.ic_launcher_background), //R.drawable.ic_baseline_arrow_back
                 contentDescription = "",
                 tint = Color.LightGray
             )

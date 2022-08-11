@@ -1,4 +1,4 @@
-package com.talhafaki.common.items
+package com.oborodulin.home.common.items
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*

@@ -17,7 +17,7 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import com.google.android.material.textfield.TextInputLayout
 import com.oborodulin.home.R
-import com.oborodulin.home.domain.payer.Payer
+import com.oborodulin.home.domain.entity.Payer
 import com.oborodulin.home.model.payer.PayerViewModel
 import java.math.BigDecimal
 import java.util.*
@@ -163,7 +163,7 @@ class PayerFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        vmPayer.payerLiveData.observe(
+/*        vmPayer.payerLiveData.observe(
             viewLifecycleOwner
         ) { payer ->
             payer?.let {
@@ -171,6 +171,8 @@ class PayerFragment : Fragment() {
                 updateUI()
             }
         }
+
+ */
     }
 
     override fun onStart() {

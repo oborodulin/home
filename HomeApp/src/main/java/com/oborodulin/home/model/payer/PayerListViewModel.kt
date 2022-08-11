@@ -1,14 +1,14 @@
 package com.oborodulin.home.model.payer
 
-import com.oborodulin.home.domain.payer.Payer
-import com.oborodulin.home.domain.payer.PayerRepository
+import com.oborodulin.home.domain.entity.Payer
+import com.oborodulin.home.accounting.AccountingRepository
 import com.oborodulin.home.model.ListViewModel
 
 private const val TAG = "PayerListViewModel"
 
 class PayerListViewModel : ListViewModel<Payer>() {
-    private val payerRepo = PayerRepository.getInstance()
-    val payersLiveData = payerRepo.getAll()
+    private val payerRepo = AccountingRepository.getInstance()
+/*    val payersLiveData = payerRepo.getAll()
 
     fun addPayer(payer: Payer) {
         payerRepo.add(payer)
@@ -25,7 +25,7 @@ class PayerListViewModel : ListViewModel<Payer>() {
     override fun deleteItem(entity: Payer) {
         deletePayer(entity)
     }
-
+*/
 //    val payers = mutableListOf<Payer>()
 
 /*    init {

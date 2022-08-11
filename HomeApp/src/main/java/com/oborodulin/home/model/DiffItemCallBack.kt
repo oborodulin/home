@@ -1,7 +1,7 @@
 package com.oborodulin.home.model
 
 import androidx.recyclerview.widget.DiffUtil
-import com.oborodulin.home.domain.BaseEntity
+import com.oborodulin.home.domain.entity.BaseEntity
 
 class DiffItemCallBack<T : BaseEntity> : DiffUtil.ItemCallback<T>() {
     override fun areItemsTheSame(oldItem: T, newItem: T): Boolean =

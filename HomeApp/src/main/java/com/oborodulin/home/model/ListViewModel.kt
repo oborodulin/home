@@ -2,7 +2,7 @@ package com.oborodulin.home.model
 
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import com.oborodulin.home.domain.BaseEntity
+import com.oborodulin.home.domain.entity.BaseEntity
 
 private const val TAG = "ListViewModel"
 

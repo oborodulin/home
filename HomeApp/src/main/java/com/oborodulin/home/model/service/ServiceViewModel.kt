@@ -1,12 +1,13 @@
 package com.oborodulin.home.model.service
 
 import androidx.lifecycle.*
-import com.oborodulin.home.domain.service.Service
+import com.oborodulin.home.domain.entity.Service
 import com.oborodulin.home.domain.service.ServiceRepository
 import kotlinx.coroutines.launch
 import java.util.*
 
 class ServiceViewModel : ViewModel() {
+    /*
     private val serviceRepo = ServiceRepository.getInstance(viewModelScope)
     private val serviceIdLiveData: MutableLiveData<UUID> by lazy { MutableLiveData<UUID>() }
 
@@ -26,4 +27,6 @@ class ServiceViewModel : ViewModel() {
     }
 
     fun nextDisplayPos(): LiveData<Int> = serviceRepo.nextDisplayPos()
+
+     */
 }

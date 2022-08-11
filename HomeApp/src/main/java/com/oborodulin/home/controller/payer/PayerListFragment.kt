@@ -12,8 +12,8 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.oborodulin.home.R
-import com.oborodulin.home.domain.BaseEntity
-import com.oborodulin.home.domain.payer.Payer
+import com.oborodulin.home.domain.entity.BaseEntity
+import com.oborodulin.home.domain.entity.Payer
 import com.oborodulin.home.controller.ListFragment
 import com.oborodulin.home.model.RVSelHolder
 import com.oborodulin.home.model.RVSelListAdapter
@@ -122,14 +122,14 @@ class PayerListFragment : Fragment(), ListFragment<Payer> {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        lvmPayer.payersLiveData.observe(
+        /*lvmPayer.payersLiveData.observe(
             viewLifecycleOwner
         ) { payers ->
             payers?.let {
                 Log.i(TAG, "Got payers ${it.size}")
                 updateUI(it)
             }
-        }
+        }*/
     }
 
     override fun onDetach() {
@@ -179,7 +179,7 @@ class PayerListFragment : Fragment(), ListFragment<Payer> {
 
     private fun newPayer() {
         val payer = Payer()
-        lvmPayer.addPayer(payer)
+        //lvmPayer.addPayer(payer)
         callbacks?.onPayerEditClick(payer.id)
     }
 }

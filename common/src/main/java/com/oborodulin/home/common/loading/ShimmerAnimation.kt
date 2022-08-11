@@ -1,13 +1,13 @@
-package com.talhafaki.common.loading
+package com.oborodulin.home.common.loading
 
 import androidx.compose.animation.core.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
-import com.talhafaki.common.items.ShimmerGridItem
-import com.talhafaki.common.items.ShimmerRowItem
-import com.talhafaki.common.theme.ShimmerColorShades
+import com.oborodulin.home.common.items.ShimmerGridItem
+import com.oborodulin.home.common.items.ShimmerRowItem
+import com.oborodulin.home.common.theme.ShimmerColorShades
 
 @Composable
 fun ShimmerAnimation(isRowShimmer: Boolean = true) {

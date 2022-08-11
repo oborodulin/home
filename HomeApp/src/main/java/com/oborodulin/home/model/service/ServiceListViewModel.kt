@@ -2,9 +2,8 @@ package com.oborodulin.home.model.service
 
 import android.util.Log
 import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
-import com.oborodulin.home.domain.service.Service
+import com.oborodulin.home.domain.entity.Service
 import com.oborodulin.home.domain.service.ServiceRepository
 import com.oborodulin.home.model.ListViewModel
 import kotlinx.coroutines.launch
@@ -12,7 +11,7 @@ import kotlinx.coroutines.launch
 private const val TAG = "ServiceListViewModel"
 
 class ServiceListViewModel : ListViewModel<Service>() {
-    private val serviceRepo = ServiceRepository.getInstance(viewModelScope)
+ /*   private val serviceRepo = ServiceRepository.getInstance(viewModelScope)
     val servicesLiveData = serviceRepo.getAll()
 
     init {
@@ -45,4 +44,6 @@ class ServiceListViewModel : ListViewModel<Service>() {
         super.onCleared()
         Log.d(TAG, "ServiceListViewModel instance about to be destroyed")
     }
+
+  */
 }

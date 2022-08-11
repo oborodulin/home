@@ -17,22 +17,27 @@ buildscript {
                 coroutines       : '1.6.4',
                 espresso         : '3.4.0',
                 fragment         : '1.5.1',
+                inject           : '1',
                 glide            : '4.13.2',
                 gradle           : '7.2.1',
                 gson             : '2.9.0',
                 hilt             : '2.43',
+                hiltNavCompose   : '1.0.0',
                 junit            : '4.13.2',
                 kotlin           : '1.7.0',
+                kotlinExtension  : '1.2.0',
                 ktlint           : '0.45.2',
                 ktlintGradle     : '10.2.1',
                 ktx              : '1.8.0',
                 ktxLifecycle     : '2.5.1',
                 lifecycle        : '2.2.0',
+                lifecycleRuntime : '2.5.1',
                 lottie           : '5.2.0',
                 material         : '1.6.1',
                 navigation       : '2.5.1',
                 okhttpLogging    : '5.0.0-alpha.10',
                 paging           : '3.1.1',
+                pagingCompose    : '1.0.0-alpha15',
                 recyclerview     : '1.2.1',
                 retrofit         : '2.9.0',
                 room             : '2.4.3',
@@ -54,7 +59,7 @@ buildscript {
                                        versionCode      : 1,
                                        versionName      : "1.0"],
                 // Integration with activities
-                activityCompose     : "androidx.activity:activity-compose:$versions.composeActivity",
+                activity            : [compose: "androidx.activity:activity-compose:$versions.composeActivity"],
                 appcompat           : "androidx.appcompat:appcompat:$versions.appCompat",
                 constraintlayout    : "androidx.constraintlayout:constraintlayout:$versions.constraintLayout",
                 // Coil
@@ -62,18 +67,22 @@ buildscript {
                 // Lottie
                 lottie              : [compose: "com.airbnb.android:lottie-compose:$versions.lottie"],
                 core                : [ktx: "androidx.core:core-ktx:$versions.ktx"],
+                jvm                 : [inject: "javax.inject:javax.inject:$versions.inject"],
                 room                : [compiler: "androidx.room:room-compiler:$versions.room",
                                        runtime : "androidx.room:room-runtime:$versions.room",
                                        ktx     : "androidx.room:room-ktx:$versions.room"],
                 glide               : [compiler: "com.github.bumptech.glide:compiler:$versions.glide",
                                        glide   : "com.github.bumptech.glide:glide:$versions.glide"],
                 ktlintGradle        : "org.jlleitschuh.gradle:ktlint-gradle:$versions.ktlintGradle",
-                dagger              : [compiler    : "com.google.dagger:hilt-android-compiler:$versions.hilt",
+                dagger              : [hiltCompiler    : "com.google.dagger:hilt-compiler:$versions.hilt",
+                                       compiler    : "com.google.dagger:hilt-android-compiler:$versions.hilt",
                                        testing     : "com.google.dagger:hilt-android-testing:$versions.hilt",
                                        gradlePlugin: "com.google.dagger:hilt-android-gradle-plugin:$versions.hilt",
                                        hilt        : "com.google.dagger:hilt-android:$versions.hilt"],
+                hilt                : [navigationCompose: "androidx.hilt:hilt-navigation-compose:$versions.hiltNavCompose"],
                 fragment            : [ktx: "androidx.fragment:fragment-ktx:$versions.fragment"],
-                lifecycle           : [extensions      : "androidx.lifecycle:lifecycle-extensions:$versions.lifecycle",
+                lifecycle           : [runtimeKtx      : "androidx.lifecycle:lifecycle-runtime-ktx:$versions.lifecycleRuntime",
+                                       extensions      : "androidx.lifecycle:lifecycle-extensions:$versions.lifecycle",
                                        livedataKtx     : "androidx.lifecycle:lifecycle-livedata-ktx:$versions.ktxLifecycle",
                                        viewmodelKtx    : "androidx.lifecycle:lifecycle-viewmodel-ktx:$versions.ktxLifecycle",
                                        // Integration with ViewModels
@@ -82,15 +91,17 @@ buildscript {
                                        uiKtx               : "androidx.navigation:navigation-ui-ktx:$versions.navigation",
                                        compose             : "androidx.navigation:navigation-compose:$versions.composeNavigation",
                                        safeArgsGradlePlugin: "androidx.navigation:navigation-safe-args-gradle-plugin:$versions.navigation"],
-                paging              : "androidx.paging:paging-runtime-ktx:$versions.paging",
+                paging              : [runtimeKtx: "androidx.paging:paging-runtime-ktx:$versions.paging",
+                                       compose   : "androidx.paging:paging-compose:$versions.pagingCompose"],
                 viewpager2          : "androidx.viewpager2:viewpager2:$versions.viewPager",
                 work                : [runtimeKtx: "androidx.work:work-runtime-ktx:$versions.work",
                                        testing   : "androidx.work:work-testing:$versions.work"],
                 material            : "com.google.android.material:material:$versions.material",
                 gson                : "com.google.code.gson:gson:$versions.gson",
                 okhttp3             : "com.squareup.okhttp3:logging-interceptor:$versions.okhttpLogging",
-                retrofit2           : [converterGson: "com.squareup.retrofit2:converter-gson:$versions.retrofit",
-                                       retrofit     : "com.squareup.retrofit2:retrofit:$versions.retrofit"],
+                retrofit2           : [converterGson   : "com.squareup.retrofit2:converter-gson:$versions.retrofit",
+                                       converterScalars: "com.squareup.retrofit2:converter-scalars:$versions.retrofit",
+                                       retrofit        : "com.squareup.retrofit2:retrofit:$versions.retrofit"],
                 kotlin              : [gradlePlugin: "org.jetbrains.kotlin:kotlin-gradle-plugin:$versions.kotlin"],
                 kotlinx             : [coroutinesAndroid: "org.jetbrains.kotlinx:kotlinx-coroutines-android:$versions.coroutines",
                                        coroutinesCore   : "org.jetbrains.kotlinx:kotlinx-coroutines-core:$versions.coroutines",
@@ -106,6 +117,8 @@ buildscript {
                         uiTooling   : "androidx.compose.ui:ui-tooling:$versions.composeUi",
                         // UI Tests
                         uiTestJunit4: "androidx.compose.ui:ui-test-junit4:$versions.composeUiTest"],
+                // Sweet Toast
+                TalhaFaki           : [composableSweetToast: 'com.github.tfaki:ComposableSweetToast:1.0.1'],
                 archCore            : "androidx.arch.core:core-testing:$versions.coreTesting",
                 espresso            : [contrib: "androidx.test.espresso:espresso-contrib:$versions.espresso",
                                        core   : "androidx.test.espresso:espresso-core:$versions.espresso",
@@ -135,8 +148,7 @@ buildscript {
 plugins {
     id 'com.android.application' version '7.2.1' apply false
     id 'com.android.library' version '7.2.1' apply false
-    id 'org.jetbrains.kotlin.android' version '1.7.10' apply false
-    // Compose Compiler не поддерживает 1.7.10
+    id 'org.jetbrains.kotlin.android' version '1.7.0' apply false   // Compose Compiler не поддерживает 1.7.10
     id 'org.jlleitschuh.gradle.ktlint' version '10.2.1'
 }
 

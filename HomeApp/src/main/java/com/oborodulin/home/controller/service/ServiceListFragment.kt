@@ -15,8 +15,8 @@ import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.oborodulin.home.R
 import com.oborodulin.home.controller.ListFragment
-import com.oborodulin.home.domain.BaseEntity
-import com.oborodulin.home.domain.service.Service
+import com.oborodulin.home.domain.entity.BaseEntity
+import com.oborodulin.home.domain.entity.Service
 import com.oborodulin.home.model.RVSelHolder
 import com.oborodulin.home.model.RVSelListAdapter
 import com.oborodulin.home.model.service.ServiceListViewModel
@@ -113,14 +113,14 @@ class ServiceListFragment : Fragment(), ListFragment<Service> {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        serviceListViewModel.servicesLiveData.observe(
+  /*      serviceListViewModel.servicesLiveData.observe(
             viewLifecycleOwner
         ) { services ->
             services?.let {
                 Log.i(TAG, "Got services ${it.size}")
                 updateUI(it)
             }
-        }
+        }*/
     }
 
     override fun onDetach() {
@@ -142,7 +142,7 @@ class ServiceListFragment : Fragment(), ListFragment<Service> {
     }
 
     private fun newService() {
-        serviceListViewModel.nextDisplayPos().observe(
+   /*     serviceListViewModel.nextDisplayPos().observe(
             viewLifecycleOwner
         ) { nextPos ->
             nextPos?.let {
@@ -151,5 +151,7 @@ class ServiceListFragment : Fragment(), ListFragment<Service> {
                 callbacks?.onServiceEditClick(service.id)
             }
         }
+
+    */
     }
 }

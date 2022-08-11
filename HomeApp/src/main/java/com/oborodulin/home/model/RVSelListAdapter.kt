@@ -11,7 +11,7 @@ import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.ListAdapter
 import com.oborodulin.home.R
 import com.oborodulin.home.controller.ListFragment
-import com.oborodulin.home.domain.BaseEntity
+import com.oborodulin.home.domain.entity.BaseEntity
 
 private const val TAG = "RVSelListAdapter"
 

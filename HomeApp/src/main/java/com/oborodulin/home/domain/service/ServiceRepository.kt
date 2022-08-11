@@ -2,7 +2,8 @@ package com.oborodulin.home.domain.service
 
 import android.content.Context
 import androidx.lifecycle.LiveData
-import com.oborodulin.home.database.HomeDatabase
+import com.oborodulin.home.domain.database.HomeDatabase
+import com.oborodulin.home.domain.entity.Service
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.withContext
 import java.util.*
@@ -13,7 +14,7 @@ class ServiceRepository private constructor(context: Context) {
         set(value) {
             appScope = value
         }
-    private val database: HomeDatabase = HomeDatabase.newInstance(context.applicationContext)
+ /*   private val database: HomeDatabase = HomeDatabase.newInstance(context.applicationContext)
     private val serviceDao = database.serviceDao()
 
     fun getAll(): LiveData<List<Service>> = serviceDao.getAll()
@@ -59,4 +60,6 @@ class ServiceRepository private constructor(context: Context) {
             return INSTANCE ?: throw IllegalStateException("ServiceRepository must be initialized")
         }
     }
+
+  */
 }
