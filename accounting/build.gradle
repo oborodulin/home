@@ -6,11 +6,11 @@ plugins {
 }
 
 android {
-    compileSdk deps.app.compileSdkVersion
+    compileSdk cfg.sdk.compileVersion
 
     defaultConfig {
-        minSdk deps.app.minSdkVersion
-        targetSdk deps.app.targetSdkVersion
+        minSdk cfg.sdk.minVersion
+        targetSdk cfg.sdk.targetVersion
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         consumerProguardFiles "consumer-rules.pro"
@@ -44,6 +44,7 @@ dependencies {
     implementation project(":common")
     implementation project(":domain")
 
+    implementation deps.logging.timber
     // Room
     implementation deps.room.runtime
     kapt deps.room.compiler
@@ -65,20 +66,20 @@ dependencies {
 
     implementation deps.retrofit2.retrofit
 
-    implementation deps.core.ktx
-    implementation deps.appcompat
-    implementation deps.material
+    implementation deps.androidx.coreKtx
+    implementation deps.androidx.appcompat
+    implementation deps.google.material
     implementation deps.activity.compose
     implementation deps.lifecycle.runtimeKtx
     implementation deps.lifecycle.viewmodelCompose
-    implementation deps.gson
+    implementation deps.google.gson
     implementation deps.retrofit2.converterGson
     implementation deps.navigation.compose
     debugImplementation deps.compose.uiTooling
 
     // Testing dependencies
-    testImplementation deps.junit
-    androidTestImplementation deps.test.junit
-    androidTestImplementation deps.espresso.core
+    testImplementation deps.test.junit
+    androidTestImplementation deps.test.junitExt
+    androidTestImplementation deps.test.espressoCore
     androidTestImplementation deps.compose.uiTestJunit4
 }

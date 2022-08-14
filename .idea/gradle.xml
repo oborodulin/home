@@ -11,10 +11,10 @@
         <option name="modules">
           <set>
             <option value="$PROJECT_DIR$" />
-            <option value="$PROJECT_DIR$/HomeApp" />
-            <option value="$PROJECT_DIR$/HomeApp/core" />
-            <option value="$PROJECT_DIR$/HomeApp/navigation" />
             <option value="$PROJECT_DIR$/accounting" />
+            <option value="$PROJECT_DIR$/app" />
+            <option value="$PROJECT_DIR$/app/core" />
+            <option value="$PROJECT_DIR$/app/navigation" />
             <option value="$PROJECT_DIR$/billing" />
             <option value="$PROJECT_DIR$/common" />
             <option value="$PROJECT_DIR$/data" />

@@ -15,11 +15,11 @@ dependencyResolutionManagement {
     }
 }
 rootProject.name = "Home"
-include ':HomeApp'
+include ':app'
 include ':common'
 include ':domain'
-include ':HomeApp:core'
-include ':HomeApp:navigation'
+include ':app:core'
+include ':app:navigation'
 include ':data'
 include ':accounting'
 include ':reporting'

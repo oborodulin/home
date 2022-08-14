@@ -4,11 +4,11 @@ plugins {
     id 'org.jetbrains.kotlin.kapt'
 }
 android {
-    compileSdk deps.app.compileSdkVersion
+    compileSdk cfg.sdk.compileVersion
 
     defaultConfig {
-        minSdk deps.app.minSdkVersion
-        targetSdk deps.app.targetSdkVersion
+        minSdk cfg.sdk.minVersion
+        targetSdk cfg.sdk.targetVersion
 
         kapt {
             arguments {
@@ -35,6 +35,7 @@ android {
 }
 
 dependencies {
+    implementation deps.logging.timber
     // Room
     kapt deps.room.compiler
     implementation deps.room.runtime
@@ -45,12 +46,12 @@ dependencies {
 
     implementation deps.retrofit2.retrofit
 
-    implementation deps.core.ktx
-    implementation deps.appcompat
-    implementation deps.material
+    implementation deps.androidx.coreKtx
+    implementation deps.androidx.appcompat
+    implementation deps.google.material
 
     // Testing dependencies
-    testImplementation deps.junit
-    androidTestImplementation deps.test.junit
-    androidTestImplementation deps.espresso.core
+    testImplementation deps.test.junit
+    androidTestImplementation deps.test.junitExt
+    androidTestImplementation deps.test.espressoCore
 }

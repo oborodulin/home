@@ -5,11 +5,11 @@ plugins {
 }
 
 android {
-    compileSdk deps.app.compileSdkVersion
+    compileSdk cfg.sdk.compileVersion
 
     defaultConfig {
-        minSdk deps.app.minSdkVersion
-        targetSdk deps.app.targetSdkVersion
+        minSdk cfg.sdk.minVersion
+        targetSdk cfg.sdk.targetVersion
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         consumerProguardFiles "consumer-rules.pro"
@@ -35,23 +35,24 @@ dependencies {
     implementation deps.kotlinx.coroutinesAndroid
     implementation deps.kotlinx.coroutinesCore
     implementation deps.jvm.inject
+    implementation deps.logging.timber
 
     // Networking
     implementation deps.retrofit2.retrofit
     implementation deps.retrofit2.converterGson
     implementation deps.retrofit2.converterScalars
-    implementation deps.okhttp3
+    implementation deps.okhttp3.loggingInterceptor
 
     // Testing
-    testImplementation deps.junit
+    testImplementation deps.test.junit
     testImplementation deps.kotlinx.coroutinesTest
     testImplementation deps.kotlinx.coroutinesAndroid
-    testImplementation deps.test.junit
+    testImplementation deps.test.junitExt
     testImplementation deps.dagger.testing
     kaptTest deps.dagger.hiltCompiler
 
     kaptAndroidTest deps.dagger.hiltCompiler
     androidTestImplementation deps.dagger.testing
     androidTestImplementation deps.kotlinx.coroutinesTest
-    androidTestImplementation deps.espresso.core
+    androidTestImplementation deps.test.espressoCore
 }

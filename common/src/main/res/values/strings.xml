@@ -1,3 +1,9 @@
 <resources>
     <string name="app_name">Home-Common</string>
+    <!--СООБЩЕНИЯ ОБ ОШИБКАХ -->
+    <string name="number_negative_error">Укажите, пожалуйста, положительное число!</string>
+
+    <!--ЕДИНИЦЫ ИЗМЕРЕНИЯ -->
+    <string name="m2_unit">м2</string>
+    <string name="m3_unit">м3</string>
 </resources>

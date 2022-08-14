@@ -1,28 +1,25 @@
 package com.oborodulin.home.accounting
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.paging.LoadState
-import androidx.paging.compose.LazyPagingItems
-import androidx.paging.compose.collectAsLazyPagingItems
-import com.oborodulin.home.common.items.ListItem
-import com.oborodulin.home.common.loading.ShimmerAnimation
-import com.oborodulin.home.common.theme.HomeComposableTheme
+import com.oborodulin.home.common.ui.components.items.ListItem
+import com.oborodulin.home.common.ui.theme.HomeComposableTheme
 import com.oborodulin.home.domain.entity.Payer
-import com.talhafaki.composablesweettoast.util.SweetToastUtil.SweetError
+import timber.log.Timber
+import androidx.lifecycle.viewmodel.compose.viewModel
 
 /**
  * Created by tfakioglu on 12.December.2021
  */
 @Composable
 fun AccountingScreen() {
+    Timber.d("AccountingScreen() called")
     val viewModel = hiltViewModel<AccountingViewModel>()
-    val state = viewModel.state.value
+    val state = viewModel.accountingUiState.value
 
 //    val payersList = viewModel.payersList.collectAsLazyPagingItems()
 
@@ -33,6 +30,7 @@ fun AccountingScreen() {
 
 @Composable
 fun PayersList(list: List<Payer>) {
+    Timber.d("PayersList(...) called")
     LazyColumn(modifier = Modifier.background(color = Color.DarkGray)) {
         items(list.size) { index ->
             list[index]?.let { payer ->

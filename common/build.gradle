@@ -4,11 +4,11 @@ plugins {
 }
 
 android {
-    compileSdk deps.app.compileSdkVersion
+    compileSdk cfg.sdk.compileVersion
 
     defaultConfig {
-        minSdk deps.app.minSdkVersion
-        targetSdk deps.app.targetSdkVersion
+        minSdk cfg.sdk.minVersion
+        targetSdk cfg.sdk.targetVersion
         versionCode 1
         versionName "1.0"
 
@@ -43,18 +43,19 @@ dependencies {
     implementation deps.compose.ui
     implementation deps.compose.material
     implementation deps.compose.uiTooling
+    implementation deps.logging.timber
 
     // Coil
     implementation deps.coil.compose
     // Lottie
     implementation deps.lottie.compose
 
-    implementation deps.core.ktx
-    implementation deps.appcompat
-    implementation deps.material
+    implementation deps.androidx.coreKtx
+    implementation deps.androidx.appcompat
+    implementation deps.google.material
 
     // Testing dependencies
-    testImplementation deps.junit
-    androidTestImplementation deps.test.junit
-    androidTestImplementation deps.espresso.core
+    testImplementation deps.test.junit
+    androidTestImplementation deps.test.junitExt
+    androidTestImplementation deps.test.espressoCore
 }

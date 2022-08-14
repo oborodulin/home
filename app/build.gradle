@@ -1,0 +1,119 @@
+plugins {
+    id 'com.android.application'
+    id 'org.jetbrains.kotlin.android'
+    id 'dagger.hilt.android.plugin'
+    id 'androidx.navigation.safeargs.kotlin'
+    id 'org.jetbrains.kotlin.kapt'
+}
+android {
+    compileSdk cfg.sdk.compileVersion
+    dataBinding {
+        enabled = true
+    }
+    defaultConfig {
+        applicationId cfg.app.applicationId
+        minSdk cfg.sdk.minVersion
+        targetSdk cfg.sdk.targetVersion
+        versionCode cfg.app.versionCode
+        versionName cfg.app.versionName
+
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        javaCompileOptions {
+            annotationProcessorOptions {
+                arguments["dagger.hilt.disableModulesHaveInstallInCheck"] = "true"
+            }
+        }
+    }
+    buildFeatures {
+        // Enables Jetpack Compose for this module
+        compose true
+    }
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+    }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+    kotlinOptions {
+        // work-runtime-ktx 2.1.0 and above now requires Java 8
+        jvmTarget = cfg.jvm.target
+
+        // Enable Coroutines and Flow APIs
+        freeCompilerArgs += "-Xopt-in=kotlinx.coroutines.ExperimentalCoroutinesApi"
+        freeCompilerArgs += "-Xopt-in=kotlinx.coroutines.FlowPreview"
+    }
+    composeOptions {
+        kotlinCompilerExtensionVersion versions.kotlinExtension
+    }
+    namespace 'com.oborodulin.home'
+}
+
+dependencies {
+    implementation project(':common')
+    implementation project(':domain')
+    implementation project(':data')
+    api project(path: ':app:core')
+    api project(path: ':app:navigation')
+    implementation project(':accounting')
+
+    kapt deps.glide.compiler
+    kapt deps.dagger.compiler
+    implementation deps.androidx.appcompat
+    implementation deps.androidx.constraintlayout
+    implementation deps.androidx.coreKtx
+    implementation deps.androidx.fragmentKtx
+    implementation deps.lifecycle.extensions
+    implementation deps.lifecycle.livedataKtx
+    implementation deps.lifecycle.viewmodelKtx
+    implementation deps.navigation.fragmentKtx
+    implementation deps.navigation.uiKtx
+    implementation deps.paging.runtimeKtx
+    implementation deps.viewpager2
+    implementation deps.logging.timber
+    implementation deps.work.runtimeKtx
+    implementation deps.glide.glide
+    implementation deps.google.material
+    implementation deps.google.gson
+    implementation deps.okhttp3.loggingInterceptor
+    implementation deps.retrofit2.converterGson
+    implementation deps.retrofit2.retrofit
+    implementation deps.kotlinx.coroutinesAndroid
+    implementation deps.kotlinx.coroutinesCore
+    implementation deps.dagger.hilt
+    implementation deps.recyclerview
+    // Integration with activities
+    implementation deps.activity.compose
+    // Compose Material Design
+    implementation deps.compose.material
+    // Animations
+    implementation deps.compose.animation
+    // Tooling support (Previews, etc.)
+    implementation deps.compose.uiTooling
+    // Integration with ViewModels
+    implementation deps.lifecycle.viewmodelCompose
+    implementation deps.navigation.compose
+
+    // Testing dependencies
+    kaptAndroidTest deps.dagger.compiler
+    androidTestImplementation deps.test.archCore
+    androidTestImplementation deps.test.espressoContrib
+    androidTestImplementation deps.test.espressoCore
+    androidTestImplementation deps.test.espressoIntents
+    androidTestImplementation deps.test.junitExt
+    androidTestImplementation deps.test.uiautomator
+    androidTestImplementation deps.work.testing
+    androidTestImplementation deps.truth
+    androidTestImplementation deps.dagger.testing
+    androidTestImplementation deps.kotlinx.coroutinesTest
+    testImplementation deps.test.junit
+    // UI Tests
+    androidTestImplementation deps.compose.uiTestJunit4
+}
+
+def getUnsplashAccess() {
+    return project.findProperty("unsplash_access_key")
+}
