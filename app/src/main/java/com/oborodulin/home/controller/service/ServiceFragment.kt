@@ -84,7 +84,7 @@ class ServiceFragment : Fragment() {
                 R.id.display_name_input ->
                     if (validator.isNotEmpty(etDisplayName, s, R.string.display_name_empty_error))
                         service.displayName = s.toString()
-                R.id.service_descr_input -> service.serviceDescr = s?.toString()
+                R.id.service_descr_input -> service.serviceDesc = s?.toString()
             }
         }
 
@@ -95,7 +95,7 @@ class ServiceFragment : Fragment() {
                 R.id.display_pos_input -> service.displayPos =
                     s?.toString()?.toInt() ?: nextDisplayPos
                 R.id.display_name_input -> service.displayName = s?.toString() ?: ""
-                R.id.service_descr_input -> service.serviceDescr = s?.toString()
+                R.id.service_descr_input -> service.serviceDesc = s?.toString()
             }
         }
     }
@@ -130,7 +130,7 @@ class ServiceFragment : Fragment() {
     private fun updateUI() {
         etDisplayPos.setText(service.displayPos)
         etDisplayName.setText(service.displayName)
-        etServiceDescr.setText(service.serviceDescr)
+        etServiceDescr.setText(service.serviceDesc)
         swIsAllocateRate.isChecked = service.isAllocateRate
     }
 

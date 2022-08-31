@@ -2,7 +2,6 @@ package com.oborodulin.home.controller.service
 
 import android.content.Context
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -15,7 +14,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.oborodulin.home.R
 import com.oborodulin.home.controller.ListFragment
-import com.oborodulin.home.domain.entity.BaseEntity
+import com.oborodulin.home.data.local.db.entities.BaseEntity
 import com.oborodulin.home.domain.entity.Service
 import com.oborodulin.home.model.RVSelHolder
 import com.oborodulin.home.model.RVSelListAdapter
@@ -69,7 +68,7 @@ class ServiceListFragment : Fragment(), ListFragment<Service> {
         override fun bind(entity: T) {
             service = entity
             displayNameTextView.text = (service as Service).displayName
-            serviceDescrTextView.text = (service as Service).serviceDescr
+            serviceDescrTextView.text = (service as Service).serviceDesc
         }
 
         override fun onClick(v: View) {

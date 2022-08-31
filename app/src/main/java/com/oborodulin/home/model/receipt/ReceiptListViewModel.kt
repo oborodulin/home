@@ -1,7 +1,7 @@
 package com.oborodulin.home.model.receipt
 
 import androidx.lifecycle.ViewModel
-import com.oborodulin.home.domain.entity.Receipt
+import com.oborodulin.home.data.local.db.entities.Receipt
 import java.util.*
 
 class ReceiptListViewModel : ViewModel() {

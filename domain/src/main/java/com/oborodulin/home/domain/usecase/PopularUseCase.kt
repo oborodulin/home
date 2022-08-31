@@ -1,7 +1,7 @@
 package com.oborodulin.home.domain.usecase
 
-import com.oborodulin.home.domain.entity.Movies
 import com.oborodulin.home.domain.gateway.HomeGateway
+import com.oborodulin.home.domain.model.Movies
 import retrofit2.Response
 import javax.inject.Inject
 

@@ -10,11 +10,6 @@ android {
         minSdk cfg.sdk.minVersion
         targetSdk cfg.sdk.targetVersion
 
-        kapt {
-            arguments {
-                arg("room.schemaLocation", "$projectDir/schemas")
-            }
-        }
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         consumerProguardFiles "consumer-rules.pro"
     }
@@ -30,16 +25,13 @@ android {
         targetCompatibility = JavaVersion.VERSION_11
     }
     kotlinOptions {
-        jvmTarget = '1.8'
+        jvmTarget = cfg.jvm.target
     }
 }
 
 dependencies {
+    // Logger
     implementation deps.logging.timber
-    // Room
-    kapt deps.room.compiler
-    implementation deps.room.runtime
-    implementation deps.room.ktx
 
     implementation deps.kotlinx.coroutinesCore
     implementation deps.jvm.inject
@@ -51,7 +43,9 @@ dependencies {
     implementation deps.google.material
 
     // Testing dependencies
+    kaptAndroidTest deps.dagger.compiler
     testImplementation deps.test.junit
+    androidTestImplementation deps.dagger.testing
     androidTestImplementation deps.test.junitExt
     androidTestImplementation deps.test.espressoCore
 }

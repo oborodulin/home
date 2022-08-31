@@ -1,6 +1,6 @@
 package com.oborodulin.home.domain.usecase
 
-//import com.oborodulin.home.domain.entity.Movies
+//import com.oborodulin.home.data.local.db.entities.Movies
 import com.oborodulin.home.domain.gateway.HomeGateway
 import retrofit2.Response
 import javax.inject.Inject

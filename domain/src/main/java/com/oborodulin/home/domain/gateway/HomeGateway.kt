@@ -1,7 +1,6 @@
 package com.oborodulin.home.domain.gateway
 
-import com.oborodulin.home.domain.entity.Movies
-import kotlinx.coroutines.flow.Flow
+import com.oborodulin.home.domain.model.Movies
 import retrofit2.Response
 
 /**

@@ -1,14 +1,13 @@
 package com.oborodulin.home.model.payer
 
 import com.oborodulin.home.domain.entity.Payer
-import com.oborodulin.home.accounting.payer.PayerRepository
 import com.oborodulin.home.model.ListViewModel
 
 private const val TAG = "PayerListViewModel"
 
 class PayerListViewModel : ListViewModel<Payer>() {
-    private val payerRepo = PayerRepository.getInstance()
-/*    val payersLiveData = payerRepo.getAll()
+ /*   private val payerRepo = PayerRepository.getInstance()
+   val payersLiveData = payerRepo.getAll()
 
     fun addPayer(payer: Payer) {
         payerRepo.add(payer)

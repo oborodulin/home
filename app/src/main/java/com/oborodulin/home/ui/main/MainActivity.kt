@@ -7,6 +7,8 @@ import androidx.activity.compose.setContent
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.tooling.preview.Preview
 import com.oborodulin.home.BuildConfig
 import com.oborodulin.home.common.ui.theme.HomeComposableTheme
 //import com.oborodulin.home.controller.payer.PayerFragment
@@ -15,14 +17,15 @@ import dagger.hilt.android.AndroidEntryPoint
 import timber.log.Timber
 import java.util.*
 
-private const val TAG = "MainActivity"
+private const val TAG = "HomeApp.MainActivity"
 
-class MainActivity : ComponentActivity() {//, PayerListFragment.Callbacks {
-
+@AndroidEntryPoint
+class MainActivity : ComponentActivity() { //, PayerListFragment.Callbacks {
+    @Override
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        Timber.d("onCreate(Bundle?) called")
+        Timber.tag(TAG).d("onCreate(Bundle?) called")
         setContent {
             HomeComposableTheme {
                 Surface(color = MaterialTheme.colors.background) {
@@ -80,26 +83,37 @@ class MainActivity : ComponentActivity() {//, PayerListFragment.Callbacks {
         super.onDestroy()
         Log.d(TAG, "onDestroy() called")
     }
-/*
-    override fun onPayerEditClick(payerId: UUID) {
-        Log.d(TAG, "MainActivity.onPayerEditClick: $payerId")
-        val fragment = PayerFragment.newInstance(payerId)
-        supportFragmentManager
-            .beginTransaction()
-            .replace(R.id.fragment_container, fragment)
-            .addToBackStack(null)
-            .commit()
+
+    /*
+        override fun onPayerEditClick(payerId: UUID) {
+            Log.d(TAG, "MainActivity.onPayerEditClick: $payerId")
+            val fragment = PayerFragment.newInstance(payerId)
+            supportFragmentManager
+                .beginTransaction()
+                .replace(R.id.fragment_container, fragment)
+                .addToBackStack(null)
+                .commit()
+        }
+
+        override fun onPayerListClick(payerId: UUID) {
+            Log.d(TAG, "MainActivity.onPayerListClick: $payerId")
+           // val fragment = ReceiptListFragment.newInstance(payerId)
+           //supportFragmentManager
+           //    .beginTransaction()
+           //    .replace(R.id.fragment_container, fragment)
+           //    .addToBackStack(null)
+           //    .commit()
+
+        }
+     */
+    @Preview(showBackground = true)
+    @Composable
+    fun DefaultPreview() {
+        HomeComposableTheme {
+            Surface(color = MaterialTheme.colors.background) {
+                MainScreen()
+            }
+        }
     }
 
-    override fun onPayerListClick(payerId: UUID) {
-        Log.d(TAG, "MainActivity.onPayerListClick: $payerId")
-       // val fragment = ReceiptListFragment.newInstance(payerId)
-       //supportFragmentManager
-       //    .beginTransaction()
-       //    .replace(R.id.fragment_container, fragment)
-       //    .addToBackStack(null)
-       //    .commit()
-
-    }
- */
 }

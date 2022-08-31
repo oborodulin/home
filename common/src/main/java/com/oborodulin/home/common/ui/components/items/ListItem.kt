@@ -17,12 +17,17 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import coil.compose.rememberImagePainter
 import com.oborodulin.home.common.ui.theme.Typography
+import timber.log.Timber
 
 /**
  * Created by tfakioglu on 12.December.2021
  */
+private const val TAG = "HomeApp.common.UI"
+
 @Composable
 fun ListItem(icon: Int?, title: String, desc: String) {
+    Timber.tag(TAG)
+        .d("ListItem(...) called: {\"listItem\": {\"icon\": $icon, \"title\": \"$title\", \"desc\": \"$desc\"}}")
     Box(
         modifier = Modifier
             .padding(horizontal = 8.dp, vertical = 4.dp)

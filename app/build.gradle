@@ -60,8 +60,16 @@ dependencies {
     api project(path: ':app:navigation')
     implementation project(':accounting')
 
-    kapt deps.glide.compiler
+    // Room
+    kapt deps.room.compiler
+    implementation deps.room.runtime
+    implementation deps.room.ktx
+
+    // Dagger - Hilt
     kapt deps.dagger.compiler
+    implementation deps.dagger.hilt
+
+    kapt deps.glide.compiler
     implementation deps.androidx.appcompat
     implementation deps.androidx.constraintlayout
     implementation deps.androidx.coreKtx
@@ -83,7 +91,6 @@ dependencies {
     implementation deps.retrofit2.retrofit
     implementation deps.kotlinx.coroutinesAndroid
     implementation deps.kotlinx.coroutinesCore
-    implementation deps.dagger.hilt
     implementation deps.recyclerview
     // Integration with activities
     implementation deps.activity.compose

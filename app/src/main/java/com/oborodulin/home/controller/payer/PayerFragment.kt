@@ -54,7 +54,7 @@ class PayerFragment : Fragment() {
         payer = Payer()
         val payerId: UUID = arguments?.getSerializable(ARG_PAYER_ID) as UUID
         Log.d(LOGTAG, "args bundle payer ID: $payerId")
-        vmPayer.loadPayer(payerId)
+        //vmPayer.loadPayer(payerId)
         validator = Validator(requireContext())
     }
 
@@ -175,7 +175,7 @@ class PayerFragment : Fragment() {
 
     override fun onStop() {
         super.onStop()
-        vmPayer.savePayer(payer)
+       // vmPayer.savePayer(payer)
     }
 
     private fun updateUI() {

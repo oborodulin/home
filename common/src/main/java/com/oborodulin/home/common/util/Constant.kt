@@ -4,6 +4,8 @@ package com.oborodulin.home.common.util
  * Created by tfakioglu on 13.December.2021
  */
 object Constants {
+    const val DATABASE_NAME = "home-database"
+
     const val TMDB_BASE_URL = "https://api.themoviedb.org/3/"
 
     private const val IMAGE_BASE_URL = "https://image.tmdb.org/t/p/"

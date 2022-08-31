@@ -1,6 +1,6 @@
 package com.oborodulin.home.data.remote
 
-import com.oborodulin.home.domain.entity.Movies
+import com.oborodulin.home.domain.model.Movies
 import retrofit2.Response
 import javax.inject.Inject
 

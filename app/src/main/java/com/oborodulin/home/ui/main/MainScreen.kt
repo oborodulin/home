@@ -1,8 +1,10 @@
 package com.oborodulin.home.ui.main
 
+import android.widget.Toast
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.runtime.Composable
@@ -16,6 +18,7 @@ import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
 import androidx.compose.ui.input.nestedscroll.NestedScrollSource
 import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
@@ -30,7 +33,8 @@ import androidx.navigation.compose.rememberNavController
 import com.oborodulin.home.common.ui.components.items.NavigationItem
 import com.oborodulin.home.common.ui.theme.SpeechRed
 import com.oborodulin.home.R
-import com.oborodulin.home.accounting.AccountingScreen
+import com.oborodulin.home.accounting.ui.AccountingScreen
+import com.oborodulin.home.common.ui.components.FABComponent
 import timber.log.Timber
 //import com.oborodulin.home.popular.PopularScreen
 //import com.oborodulin.home.upcoming.UpcomingScreen
@@ -39,14 +43,17 @@ import kotlin.math.roundToInt
 /**
  * Created by tfakioglu on 12.December.2021
  */
+private const val TAG = "HomeApp.MainScreen"
+
 @Composable
 fun MainScreen() {
-    Timber.d("MainScreen() called")
+    Timber.tag(TAG).d("MainScreen() called")
     SettingUpBottomNavigationBarAndCollapsing()
 }
 
 @Composable
 fun SettingUpBottomNavigationBarAndCollapsing() {
+    Timber.tag(TAG).d("SettingUpBottomNavigationBarAndCollapsing() called")
 
     val bottomBarHeight = 56.dp
     val bottomBarHeightPx = with(LocalDensity.current) {
@@ -71,6 +78,14 @@ fun SettingUpBottomNavigationBarAndCollapsing() {
     val navController = rememberNavController()
     Scaffold(modifier = Modifier.nestedScroll(nestedScrollConnection),
         scaffoldState = scaffoldState,
+        floatingActionButtonPosition = FabPosition.End,
+        floatingActionButton = {
+            val context = LocalContext.current
+            FABComponent(text = "SAVE_TODO", onClick = {
+                Toast.makeText(context, "Added Todo", Toast.LENGTH_SHORT).show()
+            }
+            )
+        },
         bottomBar = {
             BottomNavigationBar(
                 modifier = Modifier
@@ -89,10 +104,13 @@ private fun MainScreenNavigationConfigurations(
     navController: NavHostController,
     paddingValues: PaddingValues
 ) {
-    Timber.d("MainScreenNavigationConfigurations(...) called")
-    NavHost(navController, startDestination = NavigationItem.Accounting.route) {
+    Timber.tag(TAG).d("MainScreenNavigationConfigurations(...) called")
+    NavHost(
+        navController, startDestination = NavigationItem.Accounting.route,
+        modifier = Modifier.padding(paddingValues)
+    ) {
         composable(NavigationItem.Accounting.route) {
-            AccountingScreen()
+            AccountingScreen() //setFabOnClick = setFabOnClick
         }
         composable(NavigationItem.Billing.route) {
             //PopularScreen()

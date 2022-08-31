@@ -4,7 +4,7 @@ import android.view.View
 import android.widget.ImageView
 import androidx.annotation.IdRes
 import androidx.recyclerview.widget.RecyclerView
-import com.oborodulin.home.domain.entity.BaseEntity
+import com.oborodulin.home.data.local.db.entities.BaseEntity
 
 open class RVSelHolder<T : BaseEntity>(view: View, @IdRes val checkBoxId: Int) :
     RecyclerView.ViewHolder(view),

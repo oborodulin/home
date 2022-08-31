@@ -4,13 +4,15 @@ import android.app.Application
 import android.content.Context
 import androidx.work.Configuration
 import com.oborodulin.home.di.AppInjector
-import com.oborodulin.home.accounting.payer.PayerRepository
 import com.oborodulin.home.common.util.ReleaseTree
+import dagger.hilt.android.HiltAndroidApp
 //import com.oborodulin.home.domain.rate.RateRepository
 //import com.oborodulin.home.domain.service.ServiceRepository
 import timber.log.Timber
 
-//@HiltAndroidApp
+private const val TAG = "HomeApp"
+
+@HiltAndroidApp
 class HomeApplication : Application(), Configuration.Provider {
     init {
         app = this
@@ -24,6 +26,7 @@ class HomeApplication : Application(), Configuration.Provider {
 
         if (BuildConfig.DEBUG) {
             Timber.plant(object : Timber.DebugTree() {
+                @Override
                 override fun createStackElementTag(element: StackTraceElement): String? {
                     return String.format(
                         "Class:%s: Line: %s, Method: %s",
@@ -36,20 +39,14 @@ class HomeApplication : Application(), Configuration.Provider {
         } else {
             Timber.plant(ReleaseTree())
         }
-        Timber.i("Home application version ${BuildConfig.VERSION_NAME} is starting")
-
+        Timber.tag(TAG).i("Version ${BuildConfig.VERSION_NAME} is starting")
         initialiseDagger()
-
-        PayerRepository.initialize(this)
-/*
-        ServiceRepository.initialize(this)
-        RateRepository.initialize(this)
- */
-        Timber.i("Home application initialized")
+        Timber.tag(TAG).i("Initialized")
     }
 
     private fun initialiseDagger() {
         AppInjector.initialise(this)
+        Timber.tag(TAG).i("Initialise Dagger")
     }
 
     override fun getWorkManagerConfiguration(): Configuration =

@@ -1,8 +1,9 @@
 package com.oborodulin.home.data.remote
 
+import com.oborodulin.home.domain.model.Movies
+import com.oborodulin.home.domain.model.NetworkMovie
 import com.oborodulin.home.data.remote.response.Movie
 import com.oborodulin.home.data.remote.response.MoviesResponse
-import com.oborodulin.home.domain.entity.*
 import retrofit2.Response
 
 /**
