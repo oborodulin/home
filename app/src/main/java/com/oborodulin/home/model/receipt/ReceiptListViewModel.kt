@@ -1,20 +1,20 @@
 package com.oborodulin.home.model.receipt
 
 import androidx.lifecycle.ViewModel
-import com.oborodulin.home.data.local.db.entities.Receipt
+import com.oborodulin.home.data.local.db.entities.ReceiptEntity
 import java.util.*
 
 class ReceiptListViewModel : ViewModel() {
-    val receipts = mutableListOf<Receipt>()
+    val receiptEntities = mutableListOf<ReceiptEntity>()
 
     init {
         var year: Int = 2021
         for (i in 0 until 15) {
-            val receipt = Receipt()
+            val receiptEntity = ReceiptEntity()
             if (i % 12 == 0) year++
-            receipt.receiptDate = getDate(year, i % 12, 1)
-            receipt.isPaid = i % 2 == 0
-            receipts += receipt
+            receiptEntity.receiptDate = getDate(year, i % 12, 1)
+            receiptEntity.isPaid = i % 2 == 0
+            receiptEntities += receiptEntity
         }
     }
 

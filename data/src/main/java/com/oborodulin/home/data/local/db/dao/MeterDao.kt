@@ -1,26 +1,30 @@
 package com.oborodulin.home.data.local.db.dao
 
-import androidx.lifecycle.LiveData
 import androidx.room.*
-import com.oborodulin.home.data.local.db.entities.Meter
+import com.oborodulin.home.data.local.db.entities.MeterEntity
+import com.oborodulin.home.data.local.db.entities.PayerEntity
+import kotlinx.coroutines.flow.Flow
 import java.util.*
 
 @Dao
 interface MeterDao {
     @Query("SELECT * FROM meters")
-    fun getAll(): LiveData<List<com.oborodulin.home.data.local.db.entities.Meter>>
+    fun getAll(): Flow<List<MeterEntity>>
 
-    @Query("SELECT * FROM meters WHERE id=(:id)")
-    fun get(id: UUID): LiveData<com.oborodulin.home.data.local.db.entities.Meter?>
+    @Query("SELECT * FROM meters WHERE id=:id")
+    fun get(id: UUID): Flow<MeterEntity>
 
-    @Insert
-    fun add(payer: com.oborodulin.home.data.local.db.entities.Meter)
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun add(meter: MeterEntity)
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun addAll(meters: List<MeterEntity>)
 
     @Update
-    fun update(payer: com.oborodulin.home.data.local.db.entities.Meter)
+    suspend fun update(meter: MeterEntity)
 
     @Delete
-    fun delete(payer: com.oborodulin.home.data.local.db.entities.Meter)
+    suspend fun delete(meter: MeterEntity)
 
     @Query("DELETE FROM meters")
     fun deleteAll()

@@ -5,8 +5,7 @@ import com.oborodulin.home.accounting.domain.model.Payer
 
 class PayerEntityMapper {
     fun toPayer(payerEntity: PayerEntity): Payer {
-        return Payer(
-            id = payerEntity.id,
+        val payer = Payer(
             ercCode = payerEntity.ercCode,
             fullName = payerEntity.fullName,
             address = payerEntity.address,
@@ -14,8 +13,11 @@ class PayerEntityMapper {
             livingSpace = payerEntity.livingSpace,
             heatedVolume = payerEntity.heatedVolume,
             paymentDay = payerEntity.paymentDay,
-            personsNum = payerEntity.personsNum
+            personsNum = payerEntity.personsNum,
+            isFavorite = payerEntity.isFavorite,
         )
+        payer.id = payerEntity.id
+        return payer
     }
 
     fun toPayerEntity(payer: Payer): PayerEntity {
@@ -27,9 +29,10 @@ class PayerEntityMapper {
             livingSpace = payer.livingSpace,
             heatedVolume = payer.heatedVolume,
             paymentDay = payer.paymentDay,
-            personsNum = payer.personsNum
+            personsNum = payer.personsNum,
+            isFavorite = payer.isFavorite,
         )
-        payerEntity.id = payer.id!!
+        payerEntity.id = payer.id
         return payerEntity
     }
 }

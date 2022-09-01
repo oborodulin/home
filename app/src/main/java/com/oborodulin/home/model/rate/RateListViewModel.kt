@@ -1,15 +1,11 @@
 package com.oborodulin.home.model.rate
 
-import android.util.Log
-import androidx.lifecycle.viewModelScope
-import com.oborodulin.home.domain.entity.Rate
-import com.oborodulin.home.domain.rate.RateRepository
+import com.oborodulin.home.data.local.db.entities.RateEntity
 import com.oborodulin.home.model.ListViewModel
-import kotlinx.coroutines.launch
 
 private const val TAG = "RateListViewModel"
 
-class RateListViewModel : ListViewModel<Rate>() {
+class RateListViewModel : ListViewModel<RateEntity>() {
  /*   private val rateRepository = RateRepository.getInstance(viewModelScope)
     val ratesLiveData = rateRepository.getAll()
 

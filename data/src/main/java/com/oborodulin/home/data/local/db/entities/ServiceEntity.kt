@@ -4,21 +4,18 @@ import androidx.room.Entity
 import androidx.room.Index
 import com.oborodulin.home.domain.model.Service
 
-@Entity(tableName = "services", indices = [Index(value = ["displayName"], unique = true)])
+@Entity(tableName = "services", indices = [Index(value = ["name"], unique = true)])
 class ServiceEntity(
-    var displayPos: Int,
-    var displayName: String = "",
-    var serviceDesc: String? = null,
-    var isAllocateRate: Boolean = false,
+    var pos: Int,
+    var name: String = "",
+    var descr: String? = null,
 ) : BaseEntity()
 
 fun ServiceEntity.toService(): Service {
     return Service(
-        id = id,
-        pos = displayPos,
-        name = displayName,
-        desc = serviceDesc,
-        isAllocateRate = isAllocateRate
+        pos = pos,
+        name = name,
+        descr = descr,
     )
 }
 

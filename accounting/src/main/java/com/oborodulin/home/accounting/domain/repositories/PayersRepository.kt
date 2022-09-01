@@ -5,9 +5,9 @@ import kotlinx.coroutines.flow.Flow
 import java.util.*
 
 interface PayersRepository {
-    suspend fun getAll(): Flow<List<Payer>>
+    fun getAll(): Flow<List<Payer>>
 
-    suspend fun get(id: UUID): Payer?
+    fun get(id: UUID): Flow<Payer>
 
     suspend fun add(payer: Payer)
 

@@ -7,6 +7,7 @@ import dagger.hilt.components.SingletonComponent
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import javax.inject.Qualifier
+// https://www.valueof.io/blog/injecting-coroutines-dispatchers-with-dagger
 
 @Module
 @InstallIn(SingletonComponent::class)

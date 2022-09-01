@@ -5,6 +5,7 @@ import androidx.paging.PagingState
 import com.oborodulin.home.accounting.data.mappers.PayerEntityMapper
 import com.oborodulin.home.accounting.domain.model.Payer
 import com.oborodulin.home.common.di.IoDispatcher
+import com.oborodulin.home.common.di.MainDispatcher
 import com.oborodulin.home.data.local.db.dao.PayerDao
 //import com.oborodulin.home.domain.model.NetworkMovie
 import com.oborodulin.home.domain.usecase.AccountingUseCase
@@ -21,22 +22,22 @@ import javax.inject.Inject
  */
 class AccountingDataSourceImpl @Inject constructor(
     private val payerDao: PayerDao,
-    @IoDispatcher private val dispatcher: CoroutineDispatcher,
+    @MainDispatcher private val dispatcher: CoroutineDispatcher,
     private val payerEntityMapper: PayerEntityMapper
 /*private val nowPlayingUseCase: NowPlayingUseCase*/
 ) : AccountingDataSource
 //    :    PagingSource<Int, NetworkMovie>()
 {
-    override suspend fun getPayers(): Flow<List<Payer>> {
+    override fun getPayers(): Flow<List<Payer>> {
         return payerDao.getAll().map { list ->
-            list.map { element ->
-                payerEntityMapper.toPayer(element)
+            list.map {
+                payerEntityMapper.toPayer(it)
             }
         }
     }
 
-    override suspend fun getPayer(id: UUID): Payer? =
-        payerDao.get(id)?.let { payerEntityMapper.toPayer(it) }
+    override fun getPayer(id: UUID): Flow<Payer> =
+        payerDao.get(id).map { payerEntityMapper.toPayer(it) }
 
     override suspend fun addPayer(payer: Payer) = withContext(dispatcher) {
         payerDao.add(payerEntityMapper.toPayerEntity(payer))

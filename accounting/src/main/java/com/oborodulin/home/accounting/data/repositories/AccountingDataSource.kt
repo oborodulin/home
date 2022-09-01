@@ -5,8 +5,8 @@ import kotlinx.coroutines.flow.Flow
 import java.util.*
 
 interface AccountingDataSource {
-    suspend fun getPayers(): Flow<List<Payer>>
-    suspend fun getPayer(id: UUID): Payer?
+    fun getPayers(): Flow<List<Payer>>
+    fun getPayer(id: UUID): Flow<Payer>
     suspend fun addPayer(payer: Payer)
     suspend fun updatePayer(payer: Payer)
     suspend fun deletePayer(payer: Payer)

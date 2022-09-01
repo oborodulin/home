@@ -1,23 +1,30 @@
 package com.oborodulin.home.data.local.db.dao
 
-//import androidx.lifecycle.LiveData
 import androidx.room.*
 import com.oborodulin.home.data.local.db.entities.PayerEntity
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import java.util.*
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.distinctUntilChanged
 
 @Dao
 interface PayerDao {
     @Query("SELECT * FROM payers")
-    fun getAll(): Flow<List<PayerEntity>>
+    fun _getAll(): Flow<List<PayerEntity>>
 
-    @Query("SELECT * FROM payers WHERE id=(:id)")
-    suspend fun get(id: UUID): PayerEntity?
+    @ExperimentalCoroutinesApi
+    fun getAll() = _getAll().distinctUntilChanged()
 
-    @Insert
+    @Query("SELECT * FROM payers WHERE id=:id")
+    fun _get(id: UUID): Flow<PayerEntity>
+
+    @ExperimentalCoroutinesApi
+    fun get(id: UUID) = _get(id).distinctUntilChanged()
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun add(payer: PayerEntity)
 
-    @Insert
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun addAll(payers: List<PayerEntity>)
 
     @Update

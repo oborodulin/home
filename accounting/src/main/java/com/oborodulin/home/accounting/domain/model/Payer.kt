@@ -5,7 +5,6 @@ import java.math.BigDecimal
 import java.util.*
 
 data class Payer(
-    var id: UUID? = null,
     var ercCode: String = "",
     var fullName: String = "",
     var address: String = "",
@@ -14,4 +13,5 @@ data class Payer(
     var heatedVolume: BigDecimal? = null,
     var paymentDay: Int? = null,
     var personsNum: Int? = null,
+    var isFavorite: Boolean = false,
 ) : DomainModel()

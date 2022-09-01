@@ -11,9 +11,9 @@ import javax.inject.Inject
 class PayersRepositoryImp @Inject constructor(
     private val accountingDataSource: AccountingDataSource
 ) : PayersRepository {
-    override suspend fun getAll() = accountingDataSource.getPayers()
+    override fun getAll() = accountingDataSource.getPayers()
 
-    override suspend fun get(id: UUID) = accountingDataSource.getPayer(id)
+    override fun get(id: UUID) = accountingDataSource.getPayer(id)
 
     override suspend fun add(payer: Payer) = accountingDataSource.addPayer(payer)
 

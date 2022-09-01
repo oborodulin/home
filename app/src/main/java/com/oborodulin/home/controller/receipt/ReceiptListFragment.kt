@@ -19,7 +19,7 @@ class ReceiptListFragment : Fragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        Log.d(TAG, "Total receipts: ${receiptListViewModel.receipts.size}")
+        Log.d(TAG, "Total receipts: ${receiptListViewModel.receiptEntities.size}")
     }
 
     companion object {

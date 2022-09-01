@@ -12,13 +12,12 @@ import com.oborodulin.home.data.local.db.dao.MeterDao
 import com.oborodulin.home.data.local.db.dao.PayerDao
 import com.oborodulin.home.data.local.db.dao.RateDao
 import com.oborodulin.home.data.local.db.dao.ServiceDao
-import com.oborodulin.home.data.local.db.entities.PayerEntity
-import com.oborodulin.home.data.local.db.entities.RateEntity
-import com.oborodulin.home.data.local.db.entities.ServiceEntity
+import com.oborodulin.home.data.local.db.entities.*
 import com.oborodulin.home.data.util.Constants
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import java.math.BigDecimal
 
 private val MIGRATION_1_2 = object : Migration(1, 2) {
     override fun migrate(database: SupportSQLiteDatabase) {
@@ -41,10 +40,17 @@ private val MIGRATION_3_4 = object : Migration(3, 4) {
         )
     }
 }
+private val MIGRATION_4_5 = object : Migration(4, 5) {
+    override fun migrate(database: SupportSQLiteDatabase) {
+        database.execSQL(
+            "ALTER TABLE meters ADD COLUMN payersId TEXT"
+        )
+    }
+}
 
 @Database(
-    entities = [PayerEntity::class, ServiceEntity::class, RateEntity::class, com.oborodulin.home.data.local.db.entities.Meter::class],
-    version = 4
+    entities = [PayerEntity::class, ServiceEntity::class, PayerServiceEntity::class, RateEntity::class, MeterEntity::class],
+    version = 5
 )
 @TypeConverters(HomeTypeConverters::class)
 abstract class HomeDatabase : RoomDatabase() {
@@ -73,22 +79,18 @@ abstract class HomeDatabase : RoomDatabase() {
                             HomeDatabase::class.java,
                             Constants.DATABASE_NAME
                         )
-                            .addMigrations(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4)
+                            .addMigrations(
+                                MIGRATION_1_2,
+                                MIGRATION_2_3,
+                                MIGRATION_3_4,
+                                MIGRATION_4_5
+                            )
                             // Wipes and rebuilds instead of migrating if no Migration object.
                             // Migration is not part of this lesson. You can learn more about
                             // migration with Room in this blog post:
                             // https://medium.com/androiddevelopers/understanding-migrations-with-room-f01e04b07929
                             //.fallbackToDestructiveMigration()
-                            .addCallback(object : RoomDatabase.Callback() {
-                                override fun onCreate(db: SupportSQLiteDatabase) {
-                                    super.onCreate(db)
-                                    // moving to a new thread
-                                    // Executors.newSingleThreadExecutor().execute{f}
-                                    CoroutineScope(Dispatchers.IO).launch {
-                                        instance?.payerDao()?.add(PayerEntity())
-                                    }
-                                }
-                            })
+                            .addCallback(DatabaseCallback())
                             .build()
                     // Assign INSTANCE to the newly created database.
                     INSTANCE = instance
@@ -105,10 +107,29 @@ abstract class HomeDatabase : RoomDatabase() {
             if (instance == null) {
                 instance =
                     Room.inMemoryDatabaseBuilder(context, HomeDatabase::class.java)
-                        .addMigrations(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4).build()
+                        .addMigrations(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4, MIGRATION_4_5)
+                        .addCallback(DatabaseCallback())
+                        .build()
                 INSTANCE = instance
             }
             return instance
+        }
+    }
+}
+
+class DatabaseCallback : RoomDatabase.Callback() {
+    override fun onCreate(db: SupportSQLiteDatabase) {
+        super.onCreate(db)
+        // moving to a new thread
+        // Executors.newSingleThreadExecutor().execute{f}
+        CoroutineScope(Dispatchers.IO).launch()
+        {
+            val payerEntity = PayerEntity(
+                ercCode = "000000000000000",
+                fullName = "Собственник жилья",
+                address = "Адрес не указан"
+            )
+            (db as HomeDatabase).payerDao()?.add(payerEntity)
         }
     }
 }

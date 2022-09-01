@@ -7,11 +7,11 @@ import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface ServiceDao {
-    @Query("SELECT * FROM services ORDER BY displayPos")
+    @Query("SELECT * FROM services ORDER BY pos")
     fun getAll(): Flow<List<ServiceEntity>>
 
     @Query("SELECT * FROM services WHERE id=:id")
-    fun get(id: UUID): ServiceEntity?
+    fun get(id: UUID): Flow<ServiceEntity>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun add(service: ServiceEntity)
@@ -25,10 +25,10 @@ interface ServiceDao {
     @Query("DELETE FROM services")
     suspend fun deleteAll()
 
-    @Query("SELECT IFNULL(MAX(displayPos), 0) FROM services")
+    @Query("SELECT IFNULL(MAX(pos), 0) FROM services")
     fun maxDisplayPos(): Int
 
-    @Query("SELECT IFNULL(MAX(displayPos), 0) + 1 FROM services")
+    @Query("SELECT IFNULL(MAX(pos), 0) + 1 FROM services")
     fun nextDisplayPos(): Int
 
 }

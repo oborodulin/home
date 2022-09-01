@@ -1,16 +1,11 @@
 package com.oborodulin.home.model.service
 
-import android.util.Log
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.viewModelScope
-import com.oborodulin.home.domain.entity.Service
-import com.oborodulin.home.domain.service.ServiceRepository
+import com.oborodulin.home.data.local.db.entities.ServiceEntity
 import com.oborodulin.home.model.ListViewModel
-import kotlinx.coroutines.launch
 
 private const val TAG = "ServiceListViewModel"
 
-class ServiceListViewModel : ListViewModel<Service>() {
+class ServiceListViewModel : ListViewModel<ServiceEntity>() {
  /*   private val serviceRepo = ServiceRepository.getInstance(viewModelScope)
     val servicesLiveData = serviceRepo.getAll()
 

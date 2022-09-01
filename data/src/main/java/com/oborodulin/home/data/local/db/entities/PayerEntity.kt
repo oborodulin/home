@@ -13,4 +13,5 @@ class PayerEntity(
     var heatedVolume: BigDecimal? = null,
     var paymentDay: Int? = null,
     var personsNum: Int? = null,
+    var isFavorite: Boolean = false,
 ) : BaseEntity()

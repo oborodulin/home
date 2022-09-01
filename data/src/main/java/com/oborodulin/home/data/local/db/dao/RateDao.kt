@@ -1,27 +1,32 @@
 package com.oborodulin.home.data.local.db.dao
 
-//import androidx.lifecycle.LiveData
 import androidx.room.*
-import com.oborodulin.home.domain.model.Rate
+import com.oborodulin.home.data.local.db.entities.RateEntity
 import kotlinx.coroutines.flow.Flow
 import java.util.*
 
 @Dao
 interface RateDao {
     @Query("SELECT * FROM rates")
-    fun getAll(): Flow<List<Rate>>
+    fun getAll(): Flow<List<RateEntity>>
 
     @Query("SELECT * FROM rates WHERE id=:id")
-    fun get(id: UUID): Rate?
+    fun get(id: UUID): RateEntity
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun add(rate: Rate)
+    suspend fun add(rate: RateEntity)
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun addAll(rates: List<RateEntity>)
 
     @Update
-    suspend fun update(rate: Rate)
+    suspend fun update(rate: RateEntity)
 
     @Delete
-    suspend fun delete(rate: Rate)
+    suspend fun delete(rate: RateEntity)
+
+    @Delete
+    suspend fun delete(rates: List<RateEntity>)
 
     @Query("DELETE FROM rates")
     fun deleteAll()
