@@ -1,11 +1,10 @@
-package com.oborodulin.home.accounting.ui.payer.list
+package com.oborodulin.home.accounting.ui.payer
 
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.oborodulin.home.accounting.domain.usecase.GetPayersUseCase
-import com.oborodulin.home.accounting.ui.AccountingScreenState
+import com.oborodulin.home.accounting.domain.usecases.PayerUseCases
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.launch
@@ -14,14 +13,14 @@ import timber.log.Timber
 private const val TAG = "HomeApp.PayersListViewModel"
 
 @HiltViewModel
-class PayersListViewModel(private val getPayersUseCase: GetPayersUseCase) : ViewModel() {
+class PayersListViewModel(private val payerUseCases: PayerUseCases) : ViewModel() {
     private val _uiState = mutableStateOf(
-        AccountingScreenState(
+        PayersListUiState(
             payers = listOf(),
             isLoading = true
         )
     )
-    val uiState: State<AccountingScreenState>
+    val uiState: State<PayersListUiState>
         get() = _uiState
 
     private val errorHandler = CoroutineExceptionHandler { _, exception ->
@@ -37,13 +36,31 @@ class PayersListViewModel(private val getPayersUseCase: GetPayersUseCase) : View
 
     private fun getPayers() {
         viewModelScope.launch(errorHandler) {
-            getPayersUseCase.invoke().collect {
+            payerUseCases.getPayers().collect {
                 Timber.tag(TAG).i("Get payers for list {\"payers\": {\"count\" : ${it?.size}}}")
                 _uiState.value = _uiState.value.copy(
                     payers = it,
                     isLoading = false
                 )
             }
+        }
+    }
+
+    fun onEvent(event: PayersListEvent) {
+        when (event) {
+            is PayersListEvent.DeletePayer ->
+                viewModelScope.launch { payerUseCases.deletePayer(event.payer) }
+/*        is PayersListEvent.ShowCompletedPayers -> viewModelScope.launch {
+            userPreferenceUseCases.updateShowCompleted(event.show)
+        }
+        is PayersListEvent.ChangeSortByDeadline -> viewModelScope.launch {
+            userPreferenceUseCases.enableSortByDeadline(event.enable)
+        }
+        is PayersListEvent.ChangeSortByPriority -> viewModelScope.launch {
+            userPreferenceUseCases.enableSortByPriority(event.enable)
+        }
+
+ */
         }
     }
 }

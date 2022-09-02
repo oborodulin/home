@@ -2,13 +2,13 @@ package com.oborodulin.home.accounting.ui
 
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
-import androidx.lifecycle.viewModelScope
-import kotlinx.coroutines.*
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.oborodulin.home.accounting.data.repositories.PayersRepositoryImp
+import com.oborodulin.home.accounting.domain.model.Payer
 import com.oborodulin.home.accounting.ui.payer.PayerViewState
-import com.oborodulin.home.domain.entity.Payer
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.*
 import timber.log.Timber
 import java.util.*
 import javax.inject.Inject
@@ -62,9 +62,9 @@ class AccountingViewModel @Inject constructor(
     private fun getPayers() {
         viewModelScope.launch(accountingErrorHandler) {
             val payers = payersRepositoryImp.getAll()
-            Timber.tag(TAG).i("Get payers for list {\"payers\": {\"count\" : ${payers?.size}}}")
+           // Timber.tag(TAG).i("Get payers for list {\"payers\": {\"count\" : ${payers?.size}}}")
             _accountingUiState.value = _accountingUiState.value.copy(
-                payers = payers,
+               // payers = payers,
                 isLoading = false
             )
         }
@@ -73,9 +73,9 @@ class AccountingViewModel @Inject constructor(
     fun getPayer(payerId: UUID) {
         viewModelScope.launch(payerErrorHandler) {
             payersRepositoryImp.get(payerId)?.let {
-                Timber.tag(TAG).i("Get payer for edit {\"payer\": {\"id\" : ${it?.id}}}")
+              //  Timber.tag(TAG).i("Get payer for edit {\"payer\": {\"id\" : ${it?.id}}}")
                 _payerUiState.value = _payerUiState.value.copy(
-                    payer = it,
+                //    payer = it,
                     isLoading = false
                 )
             }
@@ -86,7 +86,7 @@ class AccountingViewModel @Inject constructor(
         viewModelScope.launch(payerErrorHandler) {
             _payerUiState.value.payer?.let {
                 payersRepositoryImp.update(it)
-                Timber.tag(TAG).i("Save payer changes {\"payer\": {\"id\" : ${it?.id}}}")
+               // Timber.tag(TAG).i("Save payer changes {\"payer\": {\"id\" : ${it?.id}}}")
             }
         }
     }

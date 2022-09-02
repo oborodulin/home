@@ -3,9 +3,9 @@ package com.oborodulin.home.data.local.db.dao
 import androidx.room.*
 import com.oborodulin.home.data.local.db.entities.PayerEntity
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import java.util.*
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.distinctUntilChanged
+import java.util.*
 
 @Dao
 interface PayerDao {
@@ -29,6 +29,9 @@ interface PayerDao {
 
     @Update
     suspend fun update(payer: PayerEntity)
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insert(payer: PayerEntity)
 
     @Delete
     suspend fun delete(payer: PayerEntity)

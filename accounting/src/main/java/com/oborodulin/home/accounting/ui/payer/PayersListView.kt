@@ -1,4 +1,4 @@
-package com.oborodulin.home.accounting.ui.payer.list
+package com.oborodulin.home.accounting.ui.payer
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.lazy.LazyColumn

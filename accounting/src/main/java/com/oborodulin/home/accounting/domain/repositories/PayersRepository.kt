@@ -13,6 +13,8 @@ interface PayersRepository {
 
     suspend fun update(payer: Payer)
 
+    suspend fun save(payer: Payer)
+
     suspend fun delete(payer: Payer)
 
     suspend fun deleteAll()

@@ -4,6 +4,8 @@ import com.oborodulin.home.accounting.data.mappers.PayerEntityMapper
 import com.oborodulin.home.accounting.data.repositories.AccountingDataSource
 import com.oborodulin.home.accounting.data.repositories.AccountingDataSourceImpl
 import com.oborodulin.home.accounting.data.repositories.PayersRepositoryImp
+import com.oborodulin.home.accounting.domain.repositories.PayersRepository
+import com.oborodulin.home.accounting.domain.usecases.*
 import com.oborodulin.home.data.local.db.dao.PayerDao
 import dagger.Module
 import dagger.Provides
@@ -33,4 +35,16 @@ object AccountingModule {
     @Provides
     fun providePayerRepository(accountingDataSource: AccountingDataSource) =
         PayersRepositoryImp(accountingDataSource)
+
+    @Singleton
+    @Provides
+    fun providePayerUseCases(repository: PayersRepository): PayerUseCases {
+        return PayerUseCases(
+            getPayer = GetPayer(repository),
+            getPayers = GetPayers(repository),
+            savePayer = SavePayer(repository),
+            deletePayer = DeletePayer(repository)
+        )
+    }
+
 }

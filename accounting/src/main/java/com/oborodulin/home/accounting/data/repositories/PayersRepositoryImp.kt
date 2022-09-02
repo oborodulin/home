@@ -19,6 +19,8 @@ class PayersRepositoryImp @Inject constructor(
 
     override suspend fun update(payer: Payer) = accountingDataSource.updatePayer(payer)
 
+    override suspend fun save(payer: Payer)  = accountingDataSource.savePayer(payer)
+
     override suspend fun delete(payer: Payer) = accountingDataSource.deletePayer(payer)
 
     override suspend fun deleteAll() = accountingDataSource.deletePayers()

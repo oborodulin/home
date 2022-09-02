@@ -1,19 +1,14 @@
 package com.oborodulin.home.accounting.data.repositories
 
-import androidx.paging.PagingSource
-import androidx.paging.PagingState
+//import com.oborodulin.home.domain.model.NetworkMovie
 import com.oborodulin.home.accounting.data.mappers.PayerEntityMapper
 import com.oborodulin.home.accounting.domain.model.Payer
 import com.oborodulin.home.common.di.IoDispatcher
-import com.oborodulin.home.common.di.MainDispatcher
 import com.oborodulin.home.data.local.db.dao.PayerDao
-//import com.oborodulin.home.domain.model.NetworkMovie
-import com.oborodulin.home.domain.usecase.AccountingUseCase
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
-import java.lang.IllegalStateException
 import java.util.*
 import javax.inject.Inject
 
@@ -22,7 +17,7 @@ import javax.inject.Inject
  */
 class AccountingDataSourceImpl @Inject constructor(
     private val payerDao: PayerDao,
-    @MainDispatcher private val dispatcher: CoroutineDispatcher,
+    @IoDispatcher private val dispatcher: CoroutineDispatcher,
     private val payerEntityMapper: PayerEntityMapper
 /*private val nowPlayingUseCase: NowPlayingUseCase*/
 ) : AccountingDataSource
@@ -45,6 +40,10 @@ class AccountingDataSourceImpl @Inject constructor(
 
     override suspend fun updatePayer(payer: Payer) = withContext(dispatcher) {
         payerDao.update(payerEntityMapper.toPayerEntity(payer))
+    }
+
+    override suspend fun savePayer(payer: Payer) = withContext(dispatcher) {
+        payerDao.insert(payerEntityMapper.toPayerEntity(payer))
     }
 
     override suspend fun deletePayer(payer: Payer) = withContext(dispatcher) {

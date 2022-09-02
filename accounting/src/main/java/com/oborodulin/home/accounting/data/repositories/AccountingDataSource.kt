@@ -9,6 +9,7 @@ interface AccountingDataSource {
     fun getPayer(id: UUID): Flow<Payer>
     suspend fun addPayer(payer: Payer)
     suspend fun updatePayer(payer: Payer)
+    suspend fun savePayer(payer: Payer)
     suspend fun deletePayer(payer: Payer)
     suspend fun deletePayers(payers: List<Payer>)
     suspend fun deletePayers()

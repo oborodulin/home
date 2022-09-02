@@ -1,4 +1,4 @@
-package com.oborodulin.home.accounting.ui.payer.list
+package com.oborodulin.home.accounting.ui.payer
 
 import com.oborodulin.home.accounting.domain.model.Payer
 
