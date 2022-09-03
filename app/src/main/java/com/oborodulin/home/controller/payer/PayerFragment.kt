@@ -1,10 +1,7 @@
 package com.oborodulin.home.controller.payer
 
 import android.os.Bundle
-import com.oborodulin.home.common.util.Validator
 import android.text.*
-import android.text.style.RelativeSizeSpan
-import android.text.style.SuperscriptSpan
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -12,13 +9,12 @@ import android.view.ViewGroup
 import android.widget.ArrayAdapter
 import android.widget.AutoCompleteTextView
 import android.widget.EditText
-import androidx.annotation.StringRes
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import com.google.android.material.textfield.TextInputLayout
 import com.oborodulin.home.R
-import com.oborodulin.home.domain.entity.Payer
-import com.oborodulin.home.model.payer.PayerViewModel
+import com.oborodulin.home.accounting.domain.model.Payer
+import com.oborodulin.home.common.util.Validator
 import java.math.BigDecimal
 import java.util.*
 
@@ -45,7 +41,7 @@ class PayerFragment : Fragment() {
     private lateinit var tilPaymentDay: TextInputLayout
     private lateinit var tilPersonsNum: TextInputLayout
     private lateinit var validator: Validator
-    private val vmPayer: PayerViewModel by lazy {
+/*    private val vmPayer: PayerViewModel by lazy {
         ViewModelProvider(this).get(PayerViewModel::class.java)
     }
 
@@ -199,4 +195,5 @@ class PayerFragment : Fragment() {
             }
         }
     }
+ */
 }

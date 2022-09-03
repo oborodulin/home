@@ -1,7 +1,9 @@
 package com.oborodulin.home.accounting.ui
 
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavHostController
 import com.oborodulin.home.accounting.ui.payer.PayersList
 import com.oborodulin.home.common.ui.theme.HomeComposableTheme
 import timber.log.Timber
@@ -12,7 +14,7 @@ import timber.log.Timber
 private const val TAG = "HomeApp.AccountingScreen"
 
 @Composable
-fun AccountingScreen() { //setFabOnClick: (() -> Unit) -> Unit
+fun AccountingScreen(navController: NavHostController) { //setFabOnClick: (() -> Unit) -> Unit
     Timber.tag(TAG).d("AccountingScreen() called")
     val viewModel = hiltViewModel<AccountingViewModel>()
     val state = viewModel.accountingUiState.value
@@ -20,7 +22,7 @@ fun AccountingScreen() { //setFabOnClick: (() -> Unit) -> Unit
 //    val payersList = viewModel.payersList.collectAsLazyPagingItems()
 
     HomeComposableTheme(darkTheme = true) {
-        PayersList(list = state.payers)
+        PayersList()
     }
     /*LaunchedEffect(Unit) {
         setFabOnClick { println("") }

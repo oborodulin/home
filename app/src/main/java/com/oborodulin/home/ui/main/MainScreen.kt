@@ -30,11 +30,11 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
-import com.oborodulin.home.common.ui.components.items.NavigationItem
+import com.oborodulin.home.common.ui.navigation.NavItem
 import com.oborodulin.home.common.ui.theme.SpeechRed
 import com.oborodulin.home.R
 import com.oborodulin.home.accounting.ui.AccountingScreen
-import com.oborodulin.home.common.ui.components.FABComponent
+import com.oborodulin.home.common.ui.components.FabComponent
 import timber.log.Timber
 //import com.oborodulin.home.popular.PopularScreen
 //import com.oborodulin.home.upcoming.UpcomingScreen
@@ -81,7 +81,7 @@ fun SettingUpBottomNavigationBarAndCollapsing() {
         floatingActionButtonPosition = FabPosition.End,
         floatingActionButton = {
             val context = LocalContext.current
-            FABComponent(text = "SAVE_TODO", onClick = {
+            FabComponent(text = "SAVE_TODO", onClick = {
                 Toast.makeText(context, "Added Todo", Toast.LENGTH_SHORT).show()
             }
             )
@@ -106,27 +106,27 @@ private fun MainScreenNavigationConfigurations(
 ) {
     Timber.tag(TAG).d("MainScreenNavigationConfigurations(...) called")
     NavHost(
-        navController, startDestination = NavigationItem.Accounting.route,
+        navController, startDestination = NavItem.Accounting.route,
         modifier = Modifier.padding(paddingValues)
     ) {
-        composable(NavigationItem.Accounting.route) {
-            AccountingScreen() //setFabOnClick = setFabOnClick
+        composable(NavItem.Accounting.route) {
+            AccountingScreen(navController) //setFabOnClick = setFabOnClick
         }
-        composable(NavigationItem.Billing.route) {
-            //PopularScreen()
+        composable(NavItem.Billing.route) {
+            //BillingScreen(navController)
         }
-        composable(NavigationItem.Metering.route) {
-            //UpcomingScreen()
+        composable(NavItem.Metering.route) {
+            //MeteringScreen(navController)
         }
     }
 }
 
 @Composable
 fun BottomNavigationBar(modifier: Modifier, navController: NavController) {
-    val bottomNavigationItems = listOf(
-        NavigationItem.Accounting,
-        NavigationItem.Billing,
-        NavigationItem.Metering
+    val bottomNavItems = listOf(
+        NavItem.Accounting,
+        NavItem.Billing,
+        NavItem.Metering
     )
     BottomNavigation(
         modifier
@@ -142,10 +142,10 @@ fun BottomNavigationBar(modifier: Modifier, navController: NavController) {
     ) {
         val navBackStackEntry by navController.currentBackStackEntryAsState()
         val currentRoute = navBackStackEntry?.destination?.route
-        bottomNavigationItems.forEach { item ->
+        bottomNavItems.forEach { item ->
             BottomNavigationItem(
-                icon = { Icon(painterResource(id = item.icon), contentDescription = item.route) },
-                label = { Text(text = item.route) },
+                icon = { Icon(painterResource(id = item.icon), contentDescription = item.title) },
+                label = { Text(text = item.title) },
                 selectedContentColor = SpeechRed,
                 unselectedContentColor = Color.White.copy(0.4f),
                 alwaysShowLabel = true,

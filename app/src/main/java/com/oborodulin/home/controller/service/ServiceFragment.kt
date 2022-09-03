@@ -14,7 +14,7 @@ import androidx.lifecycle.ViewModelProvider
 import com.google.android.material.textfield.TextInputLayout
 import com.oborodulin.home.R
 import com.oborodulin.home.common.util.Validator
-import com.oborodulin.home.domain.entity.Service
+import com.oborodulin.home.domain.model.Service
 import com.oborodulin.home.model.service.ServiceViewModel
 import java.util.*
 
@@ -80,11 +80,11 @@ class ServiceFragment : Fragment() {
                     if (validator.isNotEmpty(
                             etDisplayPos, s, R.string.display_pos_empty_error
                         ) && validator.isEmptyOrNumber(etDisplayPos, s)
-                    ) service.displayPos = s.toString().toInt()
+                    ) service.pos = s.toString().toInt()
                 R.id.display_name_input ->
                     if (validator.isNotEmpty(etDisplayName, s, R.string.display_name_empty_error))
-                        service.displayName = s.toString()
-                R.id.service_descr_input -> service.serviceDesc = s?.toString()
+                        service.name = s.toString()
+                R.id.service_descr_input -> service.descr = s?.toString()
             }
         }
 
@@ -92,10 +92,10 @@ class ServiceFragment : Fragment() {
         override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
             // checking ids of each text field and applying functions accordingly.
             when (view.id) {
-                R.id.display_pos_input -> service.displayPos =
+                R.id.display_pos_input -> service.pos =
                     s?.toString()?.toInt() ?: nextDisplayPos
-                R.id.display_name_input -> service.displayName = s?.toString() ?: ""
-                R.id.service_descr_input -> service.serviceDesc = s?.toString()
+                R.id.display_name_input -> service.name = s?.toString() ?: ""
+                R.id.service_descr_input -> service.descr = s?.toString()
             }
         }
     }
@@ -128,9 +128,9 @@ class ServiceFragment : Fragment() {
     }
 
     private fun updateUI() {
-        etDisplayPos.setText(service.displayPos)
-        etDisplayName.setText(service.displayName)
-        etServiceDescr.setText(service.serviceDesc)
+        etDisplayPos.setText(service.pos)
+        etDisplayName.setText(service.name)
+        etServiceDescr.setText(service.descr)
         swIsAllocateRate.isChecked = service.isAllocateRate
     }
 

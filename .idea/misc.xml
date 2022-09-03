@@ -23,10 +23,11 @@
         <entry key="..\:/Work/Projects.android/Home/app/src/main/res/menu/list_item.xml" value="0.1" />
         <entry key="..\:/Work/Projects.android/Home/app/src/main/res/menu/payer_list_fragment.xml" value="0.1" />
         <entry key="HomeApp/src/main/res/layout/list_item_payer.xml" value="0.1" />
+        <entry key="app/src/main/res/layout/list_item_payer.xml" value="0.14791666666666667" />
       </map>
     </option>
   </component>
-  <component name="ProjectRootManager" version="2" languageLevel="JDK_16" project-jdk-name="11" project-jdk-type="JavaSDK">
+  <component name="ProjectRootManager" version="2" languageLevel="JDK_X" project-jdk-name="11" project-jdk-type="JavaSDK">
     <output url="file://$PROJECT_DIR$/build/classes" />
   </component>
   <component name="ProjectType">

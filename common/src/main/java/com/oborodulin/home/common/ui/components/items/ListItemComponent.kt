@@ -25,7 +25,7 @@ import timber.log.Timber
 private const val TAG = "HomeApp.common.UI"
 
 @Composable
-fun ListItem(icon: Int?, title: String, desc: String) {
+fun ListItemComponent(icon: Int?, title: String, desc: String) {
     Timber.tag(TAG)
         .d("ListItem(...) called: {\"listItem\": {\"icon\": $icon, \"title\": \"$title\", \"desc\": \"$desc\"}}")
     Box(

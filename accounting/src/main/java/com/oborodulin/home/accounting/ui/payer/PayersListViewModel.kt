@@ -9,11 +9,13 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.launch
 import timber.log.Timber
+import javax.inject.Inject
 
 private const val TAG = "HomeApp.PayersListViewModel"
 
 @HiltViewModel
-class PayersListViewModel(private val payerUseCases: PayerUseCases) : ViewModel() {
+class PayersListViewModel @Inject constructor(private val payerUseCases: PayerUseCases) :
+    ViewModel() {
     private val _uiState = mutableStateOf(
         PayersListUiState(
             payers = listOf(),

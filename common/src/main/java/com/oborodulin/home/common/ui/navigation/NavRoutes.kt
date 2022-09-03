@@ -1,4 +1,4 @@
-package com.oborodulin.home.common.navigation
+package com.oborodulin.home.common.ui.navigation
 
 import androidx.navigation.NamedNavArgument
 import androidx.navigation.NavBackStackEntry

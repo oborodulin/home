@@ -2,8 +2,8 @@ package com.oborodulin.home.domain.rate
 
 import android.content.Context
 import androidx.lifecycle.LiveData
-import com.oborodulin.home.domain.database.HomeDatabase
-import com.oborodulin.home.domain.entity.Rate
+//import com.oborodulin.home.domain.database.HomeDatabase
+//import com.oborodulin.home.domain.entity.Rate
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.withContext
 import java.util.*

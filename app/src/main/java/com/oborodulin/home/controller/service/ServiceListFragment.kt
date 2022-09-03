@@ -15,7 +15,7 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.oborodulin.home.R
 import com.oborodulin.home.controller.ListFragment
 import com.oborodulin.home.data.local.db.entities.BaseEntity
-import com.oborodulin.home.domain.entity.Service
+import com.oborodulin.home.data.local.db.entities.ServiceEntity
 import com.oborodulin.home.model.RVSelHolder
 import com.oborodulin.home.model.RVSelListAdapter
 import com.oborodulin.home.model.service.ServiceListViewModel
@@ -23,7 +23,7 @@ import java.util.*
 
 private const val TAG = "ServiceListFragment"
 
-class ServiceListFragment : Fragment(), ListFragment<Service> {
+class ServiceListFragment : Fragment(), ListFragment<ServiceEntity> {
     /**
      * Интерфейс обратных вызовов
      */
@@ -37,7 +37,7 @@ class ServiceListFragment : Fragment(), ListFragment<Service> {
     private lateinit var serviceListEmptyText: TextView
     private lateinit var serviceListFab: FloatingActionButton
 
-    private var adapter: RVSelListAdapter<Service>? =
+    private var adapter: RVSelListAdapter<ServiceEntity>? =
         RVSelListAdapter(
             this,
             emptyList(),
@@ -67,8 +67,8 @@ class ServiceListFragment : Fragment(), ListFragment<Service> {
 
         override fun bind(entity: T) {
             service = entity
-            displayNameTextView.text = (service as Service).displayName
-            serviceDescrTextView.text = (service as Service).serviceDesc
+            displayNameTextView.text = (service as ServiceEntity).name
+            serviceDescrTextView.text = (service as ServiceEntity).descr
         }
 
         override fun onClick(v: View) {
@@ -79,7 +79,7 @@ class ServiceListFragment : Fragment(), ListFragment<Service> {
         }
     }
 
-    override fun getViewHolder(view: View): RVSelHolder<Service> {
+    override fun getViewHolder(view: View): RVSelHolder<ServiceEntity> {
         return ServiceHolder(view)
     }
 
@@ -112,14 +112,14 @@ class ServiceListFragment : Fragment(), ListFragment<Service> {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-  /*      serviceListViewModel.servicesLiveData.observe(
-            viewLifecycleOwner
-        ) { services ->
-            services?.let {
-                Log.i(TAG, "Got services ${it.size}")
-                updateUI(it)
-            }
-        }*/
+        /*      serviceListViewModel.servicesLiveData.observe(
+                  viewLifecycleOwner
+              ) { services ->
+                  services?.let {
+                      Log.i(TAG, "Got services ${it.size}")
+                      updateUI(it)
+                  }
+              }*/
     }
 
     override fun onDetach() {
@@ -127,7 +127,7 @@ class ServiceListFragment : Fragment(), ListFragment<Service> {
         callbacks = null
     }
 
-    private fun updateUI(services: List<Service>) {
+    private fun updateUI(services: List<ServiceEntity>) {
         adapter = RVSelListAdapter(
             this,
             services,
@@ -141,16 +141,16 @@ class ServiceListFragment : Fragment(), ListFragment<Service> {
     }
 
     private fun newService() {
-   /*     serviceListViewModel.nextDisplayPos().observe(
-            viewLifecycleOwner
-        ) { nextPos ->
-            nextPos?.let {
-                val service = Service(it)
-                serviceListViewModel.addService(service)
-                callbacks?.onServiceEditClick(service.id)
-            }
-        }
+        /*     serviceListViewModel.nextDisplayPos().observe(
+                 viewLifecycleOwner
+             ) { nextPos ->
+                 nextPos?.let {
+                     val service = Service(it)
+                     serviceListViewModel.addService(service)
+                     callbacks?.onServiceEditClick(service.id)
+                 }
+             }
 
-    */
+         */
     }
 }

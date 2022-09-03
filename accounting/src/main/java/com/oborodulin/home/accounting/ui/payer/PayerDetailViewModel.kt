@@ -6,17 +6,16 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.oborodulin.home.accounting.domain.model.Payer
 import com.oborodulin.home.accounting.domain.usecases.PayerUseCases
-import com.oborodulin.home.accounting.ui.AccountingScreenState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
-import timber.log.Timber
-import kotlinx.coroutines.flow.Flow
 import java.util.*
+import javax.inject.Inject
 
 private const val TAG = "HomeApp.PayerDetailViewModel"
 
 @HiltViewModel
-class PayerDetailViewModel(private val payerUseCases: PayerUseCases) : ViewModel() {
+class PayerDetailViewModel @Inject constructor(private val payerUseCases: PayerUseCases) :
+    ViewModel() {
     private val _payerState = mutableStateOf(Payer())
 
     private val payerState: State<Payer>

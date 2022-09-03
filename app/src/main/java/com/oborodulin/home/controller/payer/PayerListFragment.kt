@@ -6,22 +6,21 @@ import android.view.*
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.oborodulin.home.R
-import com.oborodulin.home.data.local.db.entities.BaseEntity
-import com.oborodulin.home.domain.entity.Payer
+import com.oborodulin.home.accounting.domain.model.Payer
 import com.oborodulin.home.controller.ListFragment
+import com.oborodulin.home.data.local.db.entities.BaseEntity
+import com.oborodulin.home.data.local.db.entities.PayerEntity
 import com.oborodulin.home.model.RVSelHolder
 import com.oborodulin.home.model.RVSelListAdapter
-import com.oborodulin.home.model.payer.PayerListViewModel
 import java.util.*
 
 private const val TAG = "PayerListFragment"
 
-class PayerListFragment : Fragment(), ListFragment<Payer> {
+class PayerListFragment : Fragment(), ListFragment<PayerEntity> {
     /**
      * Интерфейс обратных вызовов
      */
@@ -35,7 +34,7 @@ class PayerListFragment : Fragment(), ListFragment<Payer> {
     private lateinit var tvPayerListEmpty: TextView
     private lateinit var fabPayerList: FloatingActionButton
 
-    private var adapter: RVSelListAdapter<Payer>? =
+    private var adapter: RVSelListAdapter<PayerEntity>? =
         RVSelListAdapter(
             this,
             emptyList(),
@@ -46,10 +45,10 @@ class PayerListFragment : Fragment(), ListFragment<Payer> {
         )
 
     //private lateinit var newPayerButton: Button
-    private val lvmPayer: PayerListViewModel by lazy {
+/*    private val lvmPayer: PayerListViewModel by lazy {
         ViewModelProvider(this).get(PayerListViewModel::class.java)
     }
-
+*/
     private inner class PayerHolder<T : BaseEntity>(view: View) :
         RVSelHolder<T>(view, R.id.iv_item_payer_select) {
         private lateinit var payer: T
@@ -77,7 +76,7 @@ class PayerListFragment : Fragment(), ListFragment<Payer> {
         }
     }
 
-    override fun getViewHolder(view: View): RVSelHolder<Payer> {
+    override fun getViewHolder(view: View): RVSelHolder<PayerEntity> {
         return PayerHolder(view)
     }
 
@@ -153,11 +152,12 @@ class PayerListFragment : Fragment(), ListFragment<Payer> {
         }
     }
 
-    private fun updateUI(payers: List<Payer>) {
+    private fun updateUI(payers: List<PayerEntity>) {
         adapter = RVSelListAdapter(
             this,
             payers,
-            lvmPayer,
+            null,
+//            lvmPayer,
             R.layout.list_item_payer,
             R.menu.list_items,
             tvPayerListEmpty

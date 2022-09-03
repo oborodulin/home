@@ -6,6 +6,7 @@ import com.oborodulin.home.accounting.data.repositories.AccountingDataSourceImpl
 import com.oborodulin.home.accounting.data.repositories.PayersRepositoryImp
 import com.oborodulin.home.accounting.domain.repositories.PayersRepository
 import com.oborodulin.home.accounting.domain.usecases.*
+import com.oborodulin.home.common.di.IoDispatcher
 import com.oborodulin.home.data.local.db.dao.PayerDao
 import dagger.Module
 import dagger.Provides
@@ -20,31 +21,29 @@ object AccountingModule {
 
     @Singleton
     @Provides
-    fun providePayerEntityMapper() = PayerEntityMapper()
+    fun providePayerEntityMapper(): PayerEntityMapper = PayerEntityMapper()
 
     @Singleton
     @Provides
     fun provideAccountingDataSource(
         payerDao: PayerDao,
-        dispatcher: CoroutineDispatcher,
+        @IoDispatcher dispatcher: CoroutineDispatcher,
         payerEntityMapper: PayerEntityMapper
-    ) =
+    ): AccountingDataSource =
         AccountingDataSourceImpl(payerDao, dispatcher, payerEntityMapper)
 
     @Singleton
     @Provides
-    fun providePayerRepository(accountingDataSource: AccountingDataSource) =
+    fun providePayersRepository(accountingDataSource: AccountingDataSource): PayersRepository =
         PayersRepositoryImp(accountingDataSource)
 
     @Singleton
     @Provides
-    fun providePayerUseCases(repository: PayersRepository): PayerUseCases {
-        return PayerUseCases(
+    fun providePayerUseCases(repository: PayersRepository): PayerUseCases =
+        PayerUseCases(
             getPayer = GetPayer(repository),
             getPayers = GetPayers(repository),
             savePayer = SavePayer(repository),
             deletePayer = DeletePayer(repository)
         )
-    }
-
 }

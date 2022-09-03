@@ -4,8 +4,8 @@ import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.oborodulin.home.accounting.data.repositories.PayersRepositoryImp
 import com.oborodulin.home.accounting.domain.model.Payer
+import com.oborodulin.home.accounting.domain.repositories.PayersRepository
 import com.oborodulin.home.accounting.ui.payer.PayerViewState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.*
@@ -20,7 +20,7 @@ private const val TAG = "HomeApp.AccountingViewModel"
  */
 @HiltViewModel
 class AccountingViewModel @Inject constructor(
-    private val payersRepositoryImp: PayersRepositoryImp,
+    private val payersRepository: PayersRepository,
 ) : ViewModel() {
 
     private val _accountingUiState = mutableStateOf(
@@ -61,10 +61,10 @@ class AccountingViewModel @Inject constructor(
 
     private fun getPayers() {
         viewModelScope.launch(accountingErrorHandler) {
-            val payers = payersRepositoryImp.getAll()
-           // Timber.tag(TAG).i("Get payers for list {\"payers\": {\"count\" : ${payers?.size}}}")
+            val payers = payersRepository.getAll()
+            // Timber.tag(TAG).i("Get payers for list {\"payers\": {\"count\" : ${payers?.size}}}")
             _accountingUiState.value = _accountingUiState.value.copy(
-               // payers = payers,
+                // payers = payers,
                 isLoading = false
             )
         }
@@ -72,10 +72,10 @@ class AccountingViewModel @Inject constructor(
 
     fun getPayer(payerId: UUID) {
         viewModelScope.launch(payerErrorHandler) {
-            payersRepositoryImp.get(payerId)?.let {
-              //  Timber.tag(TAG).i("Get payer for edit {\"payer\": {\"id\" : ${it?.id}}}")
+            payersRepository.get(payerId)?.let {
+                //  Timber.tag(TAG).i("Get payer for edit {\"payer\": {\"id\" : ${it?.id}}}")
                 _payerUiState.value = _payerUiState.value.copy(
-                //    payer = it,
+                    //    payer = it,
                     isLoading = false
                 )
             }
@@ -85,8 +85,8 @@ class AccountingViewModel @Inject constructor(
     fun savePayer(payer: Payer) {
         viewModelScope.launch(payerErrorHandler) {
             _payerUiState.value.payer?.let {
-                payersRepositoryImp.update(it)
-               // Timber.tag(TAG).i("Save payer changes {\"payer\": {\"id\" : ${it?.id}}}")
+                payersRepository.update(it)
+                // Timber.tag(TAG).i("Save payer changes {\"payer\": {\"id\" : ${it?.id}}}")
             }
         }
     }
