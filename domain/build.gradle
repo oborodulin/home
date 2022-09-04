@@ -30,8 +30,9 @@ android {
 }
 
 dependencies {
-    // Logger
+    // Logging
     implementation deps.logging.timber
+    implementation deps.logging.logger
 
     implementation deps.kotlinx.coroutinesCore
     implementation deps.jvm.inject

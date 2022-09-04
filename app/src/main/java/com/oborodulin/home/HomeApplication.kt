@@ -5,6 +5,10 @@ import android.content.Context
 import androidx.work.Configuration
 import com.oborodulin.home.di.AppInjector
 import com.oborodulin.home.common.util.ReleaseTree
+import com.orhanobut.logger.AndroidLogAdapter
+import com.orhanobut.logger.FormatStrategy
+import com.orhanobut.logger.Logger
+import com.orhanobut.logger.PrettyFormatStrategy
 import dagger.hilt.android.HiltAndroidApp
 //import com.oborodulin.home.domain.rate.RateRepository
 //import com.oborodulin.home.domain.service.ServiceRepository
@@ -24,8 +28,19 @@ class HomeApplication : Application(), Configuration.Provider {
     override fun onCreate() {
         super.onCreate()
 
+        val formatStrategy: FormatStrategy =
+            PrettyFormatStrategy.newBuilder().showThreadInfo(true).methodCount(1).methodOffset(5)
+                .tag("")
+                .build()
+        Logger.addLogAdapter(AndroidLogAdapter(formatStrategy))
+
         if (BuildConfig.DEBUG) {
             Timber.plant(object : Timber.DebugTree() {
+                @Override
+                override fun log(priority: Int, tag: String?, message: String, t: Throwable?) {
+                    Logger.log(priority, tag, message, t)
+                }
+
                 @Override
                 override fun createStackElementTag(element: StackTraceElement): String? {
                     return String.format(

@@ -4,7 +4,7 @@ package com.oborodulin.home.data.util
  * Created by tfakioglu on 13.December.2021
  */
 object Constants {
-    const val DATABASE_NAME = "home-database"
+    const val DATABASE_NAME = "home-database.sqlite"
 
     const val TMDB_BASE_URL = "https://api.themoviedb.org/3/"
 

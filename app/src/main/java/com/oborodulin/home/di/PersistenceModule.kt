@@ -1,6 +1,7 @@
 package com.oborodulin.home.di
 
 import android.content.Context
+import com.google.gson.Gson
 import com.oborodulin.home.accounting.data.repositories.PayersRepositoryImp
 import com.oborodulin.home.data.local.db.HomeDatabase
 import com.oborodulin.home.data.local.db.dao.PayerDao
@@ -17,9 +18,8 @@ object PersistenceModule {
 
     @Singleton
     @Provides
-    fun provideHomeDatabase(@ApplicationContext appContext: Context) = HomeDatabase.getInstance(
-        appContext
-    )
+    fun provideHomeDatabase(@ApplicationContext appContext: Context, jsonLogger: Gson) =
+        HomeDatabase.getInstance(appContext, jsonLogger)
 
     @Singleton
     @Provides

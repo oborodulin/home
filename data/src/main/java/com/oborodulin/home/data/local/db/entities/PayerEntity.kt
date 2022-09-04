@@ -3,7 +3,7 @@ package com.oborodulin.home.data.local.db.entities
 import androidx.room.Entity
 import java.math.BigDecimal
 
-@Entity(tableName = "payers")
+@Entity(tableName = PayerEntity.TABLE_NAME)
 class PayerEntity(
     var ercCode: String = "",
     var fullName: String = "",
@@ -14,4 +14,8 @@ class PayerEntity(
     var paymentDay: Int? = null,
     var personsNum: Int? = null,
     var isFavorite: Boolean = false,
-) : BaseEntity()
+) : BaseEntity() {
+    companion object {
+        const val TABLE_NAME = "payers"
+    }
+}

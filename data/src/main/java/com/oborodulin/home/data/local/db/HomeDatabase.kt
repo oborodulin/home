@@ -1,12 +1,15 @@
 package com.oborodulin.home.data.local.db
 
+import android.content.ContentValues
 import android.content.Context
+import android.database.sqlite.SQLiteDatabase
 import androidx.room.Database
 import androidx.room.Room
-import androidx.room.TypeConverters
 import androidx.room.RoomDatabase
+import androidx.room.TypeConverters
 import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
+import com.google.gson.Gson
 import com.oborodulin.home.data.local.db.converters.HomeTypeConverters
 import com.oborodulin.home.data.local.db.dao.MeterDao
 import com.oborodulin.home.data.local.db.dao.PayerDao
@@ -17,12 +20,16 @@ import com.oborodulin.home.data.util.Constants
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import java.math.BigDecimal
+import timber.log.Timber
+import java.util.*
+import javax.inject.Inject
 
+
+private const val TAG = "HomeApp.HomeDatabase"
 private val MIGRATION_1_2 = object : Migration(1, 2) {
     override fun migrate(database: SupportSQLiteDatabase) {
         database.execSQL(
-            "ALTER TABLE payer RENAME TO payers"
+            "ALTER TABLE payer RENAME TO ${PayerEntity.TABLE_NAME}"
         )
     }
 }
@@ -63,7 +70,7 @@ abstract class HomeDatabase : RoomDatabase() {
         @Volatile
         private var INSTANCE: HomeDatabase? = null
 
-        fun getInstance(context: Context): HomeDatabase {
+        fun getInstance(context: Context, jsonLogger: Gson): HomeDatabase {
             // Multiple threads can ask for the database at the same time, ensure we only initialize
             // it once by using synchronized. Only one thread may enter a synchronized block at a
             // time.
@@ -90,7 +97,7 @@ abstract class HomeDatabase : RoomDatabase() {
                             // migration with Room in this blog post:
                             // https://medium.com/androiddevelopers/understanding-migrations-with-room-f01e04b07929
                             //.fallbackToDestructiveMigration()
-                            .addCallback(DatabaseCallback())
+                            .addCallback(DatabaseCallback(instance, jsonLogger))
                             .build()
                     // Assign INSTANCE to the newly created database.
                     INSTANCE = instance
@@ -101,14 +108,14 @@ abstract class HomeDatabase : RoomDatabase() {
         }
     }
 
-    fun getTestInstance(context: Context): HomeDatabase {
+    fun getTestInstance(context: Context, jsonLogger: Gson): HomeDatabase {
         synchronized(this) {
             var instance = INSTANCE
             if (instance == null) {
                 instance =
                     Room.inMemoryDatabaseBuilder(context, HomeDatabase::class.java)
                         .addMigrations(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4, MIGRATION_4_5)
-                        .addCallback(DatabaseCallback())
+                        .addCallback(DatabaseCallback(instance, jsonLogger))
                         .build()
                 INSTANCE = instance
             }
@@ -117,19 +124,44 @@ abstract class HomeDatabase : RoomDatabase() {
     }
 }
 
-class DatabaseCallback : RoomDatabase.Callback() {
+class DatabaseCallback(val instance: HomeDatabase?, private val jsonLogger: Gson) :
+    RoomDatabase.Callback() {
+
     override fun onCreate(db: SupportSQLiteDatabase) {
         super.onCreate(db)
+        Timber.tag(TAG).i("Database onCreate() called")
         // moving to a new thread
         // Executors.newSingleThreadExecutor().execute{f}
         CoroutineScope(Dispatchers.IO).launch()
         {
-            val payerEntity = PayerEntity(
+            try {
+                db.beginTransaction()
+                val payerValues = ContentValues()
+                payerValues.put("id", UUID.randomUUID().toString())
+                payerValues.put("ercCode", "000000000000000")
+                payerValues.put("fullName", "Собственник жилья")
+                payerValues.put("address", "Адрес не указан")
+                payerValues.put("isFavorite", false)
+
+                db.insert(PayerEntity.TABLE_NAME, SQLiteDatabase.CONFLICT_REPLACE, payerValues)
+
+                db.setTransactionSuccessful()
+/*            val payerEntity = PayerEntity(
                 ercCode = "000000000000000",
                 fullName = "Собственник жилья",
                 address = "Адрес не указан"
             )
-            (db as HomeDatabase).payerDao()?.add(payerEntity)
+            val isImport: Boolean = true
+            if (isImport) {
+            instance?.payerDao()?.add(payerEntity)
+            }
+
+ */
+                Timber.tag(TAG)
+                    .i("Default PayerEntity added: {\"payer\": {${jsonLogger.toJson(payerValues)}}}")
+            } finally {
+                db.endTransaction()
+            }
         }
     }
 }

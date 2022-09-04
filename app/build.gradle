@@ -35,8 +35,8 @@ android {
         }
     }
     compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_8
-        targetCompatibility JavaVersion.VERSION_1_8
+        sourceCompatibility JavaVersion.VERSION_11
+        targetCompatibility JavaVersion.VERSION_11
     }
     kotlinOptions {
         // work-runtime-ktx 2.1.0 and above now requires Java 8
@@ -60,6 +60,10 @@ dependencies {
     api project(path: ':app:navigation')
     implementation project(':accounting')
 
+    // Logging
+    implementation deps.logging.timber
+    implementation deps.logging.logger
+
     // Room
     kapt deps.room.compiler
     implementation deps.room.runtime
@@ -81,7 +85,6 @@ dependencies {
     implementation deps.navigation.uiKtx
     implementation deps.paging.runtimeKtx
     implementation deps.viewpager2
-    implementation deps.logging.timber
     implementation deps.work.runtimeKtx
     implementation deps.glide.glide
     implementation deps.google.material

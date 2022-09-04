@@ -40,6 +40,7 @@ dependencies {
 
     // Logging
     implementation deps.logging.timber
+    implementation deps.logging.logger
     // Room
     kapt deps.room.compiler
     implementation deps.room.runtime

@@ -24,8 +24,8 @@ android {
         }
     }
     compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_8
-        targetCompatibility JavaVersion.VERSION_1_8
+        sourceCompatibility JavaVersion.VERSION_11
+        targetCompatibility JavaVersion.VERSION_11
     }
     kotlinOptions {
         jvmTarget = cfg.jvm.target
@@ -35,13 +35,13 @@ android {
     }
     composeOptions {
         kotlinCompilerExtensionVersion '1.2.0'
-        kotlinCompilerVersion '1.7.0'
     }
 }
 
 dependencies {
-    // Logger
+    // Logging
     implementation deps.logging.timber
+    implementation deps.logging.logger
 
     // Hilt
     implementation deps.dagger.hilt
