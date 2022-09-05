@@ -1,13 +1,12 @@
 package com.oborodulin.home.data.local.db.entities
 
 import androidx.room.PrimaryKey
-import java.util.UUID
+import java.util.*
 
 open class BaseEntity(
     @PrimaryKey
     var id: UUID = UUID.randomUUID(),
 ) {
-
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (javaClass != other?.javaClass) return false
@@ -22,5 +21,4 @@ open class BaseEntity(
     override fun hashCode(): Int {
         return id.hashCode()
     }
-
 }

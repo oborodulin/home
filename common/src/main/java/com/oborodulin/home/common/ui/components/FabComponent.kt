@@ -46,5 +46,5 @@ fun FabComponent(
 )
 @Composable
 fun PreviewFABComponent() {
-    FabComponent(text = "Save", onClick = {})
+    FabComponent(text = "Demo", onClick = {})
 }

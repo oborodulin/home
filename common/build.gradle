@@ -50,10 +50,13 @@ dependencies {
 
     implementation deps.kotlinx.coroutinesCore
     implementation deps.jvm.inject
+    implementation deps.kotlin.reflect
 
+    // Compose
     implementation deps.compose.ui
     implementation deps.compose.material
     implementation deps.compose.uiTooling
+    implementation deps.compose.uiPreview
 
     // Coil
     implementation deps.coil.compose
@@ -63,6 +66,9 @@ dependencies {
     implementation deps.androidx.coreKtx
     implementation deps.androidx.appcompat
     implementation deps.google.material
+
+    // Compose preview
+    debugImplementation deps.androidx.poolingcontainer
 
     // Testing dependencies
     testImplementation deps.test.junit

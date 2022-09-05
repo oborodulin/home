@@ -2,15 +2,20 @@ package com.oborodulin.home.accounting.ui.payer
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.material.MaterialTheme
+import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.oborodulin.home.accounting.R
 import com.oborodulin.home.common.ui.components.items.ListItemComponent
 import timber.log.Timber
 
-private const val TAG = "HomeApp.PayersListView"
+private const val TAG = "PayersListView"
 
 @Composable
 fun PayersList(viewModel: PayersListViewModel = hiltViewModel()) {
@@ -20,7 +25,7 @@ fun PayersList(viewModel: PayersListViewModel = hiltViewModel()) {
     Timber.tag(TAG).d("PayersList(...) called")
     LazyColumn(modifier = Modifier.background(color = Color.DarkGray)) {
         items(payers.size) { index ->
-            payers[index]?.let { payer ->
+            payers[index].let { payer ->
                 ListItemComponent(
                     icon = null,
                     title = payer.fullName,
@@ -62,5 +67,12 @@ fun PayersList(viewModel: PayersListViewModel = hiltViewModel()) {
                 item { SweetError(message = error.error.localizedMessage ?: "Error") }
             }
         }*/
+    }
+    if (payers.isEmpty()) {
+        Text(
+            text = stringResource(R.string.payer_list_empty_text),
+            style = MaterialTheme.typography.subtitle1,
+            fontWeight = FontWeight.Bold
+        )
     }
 }

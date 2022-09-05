@@ -1,6 +1,6 @@
 package com.oborodulin.home.common.ui.components.items
 
-import androidx.compose.foundation.Image
+import android.content.res.Configuration
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.layout.Arrangement.Top
@@ -11,18 +11,17 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import coil.compose.rememberImagePainter
 import com.oborodulin.home.common.ui.theme.Typography
 import timber.log.Timber
 
 /**
  * Created by tfakioglu on 12.December.2021
  */
-private const val TAG = "HomeApp.common.UI"
+private const val TAG = "Common.UI"
 
 @Composable
 fun ListItemComponent(icon: Int?, title: String, desc: String) {
@@ -79,4 +78,19 @@ fun ListItemComponent(icon: Int?, title: String, desc: String) {
             }
         }
     }
+}
+
+@Preview(
+    name = "Night Mode",
+    showSystemUi = true, showBackground = true,
+    uiMode = Configuration.UI_MODE_NIGHT_YES
+)
+@Preview(
+    name = "Day Mode",
+    showSystemUi = true, showBackground = true,
+    uiMode = Configuration.UI_MODE_NIGHT_NO
+)
+@Composable
+fun PreviewListItemComponent() {
+    ListItemComponent(icon = null, title = "Title", desc = "Description")
 }

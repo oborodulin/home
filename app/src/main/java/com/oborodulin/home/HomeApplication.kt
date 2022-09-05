@@ -28,11 +28,11 @@ class HomeApplication : Application(), Configuration.Provider {
     override fun onCreate() {
         super.onCreate()
 
-        val formatStrategy: FormatStrategy =
+        val logFormatStrategy: FormatStrategy =
             PrettyFormatStrategy.newBuilder().showThreadInfo(true).methodCount(1).methodOffset(5)
-                .tag("")
+                .tag(TAG)
                 .build()
-        Logger.addLogAdapter(AndroidLogAdapter(formatStrategy))
+        Logger.addLogAdapter(AndroidLogAdapter(logFormatStrategy))
 
         if (BuildConfig.DEBUG) {
             Timber.plant(object : Timber.DebugTree() {

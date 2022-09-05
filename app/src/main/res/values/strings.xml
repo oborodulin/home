@@ -27,23 +27,9 @@
     <!--услуги -->
     <string name="new_service_menu_item">Новая услуга</string>
     <!--СПИСОК: -->
-    <!--плательщиков -->
-    <string name="payer_list_empty_text">Плательщиков пока нет. Добавте, пожалуйста, хотя бы одного</string>
     <!--услуги -->
     <string name="service_list_empty_text">Услуг пока нет. Добавте, пожалуйста, хотя бы одну</string>
     <!--ФОРМА: -->
-    <!--плательщика -->
-    <string name="payer_subheader">Данные плательщика</string>
-    <string name="erc_code_hint">Код ЕРЦ</string>
-    <string name="full_name_hint">Фамилия и инициалы</string>
-    <string name="address_hint">Адрес</string>
-    <string name="total_area_hint">Общая площадь</string>
-    <string name="living_space_hint">Жилая площадь</string>
-    <string name="heated_volume_hint">Отапливаемый объём</string>
-    <string name="payment_day_hint">Крайнее число оплаты услуг</string>
-    <string name="payment_day_helper">Любое число месяца с 1-го по 28-е</string>
-    <string name="payer_properties_label">Дополнительные параметры</string>
-    <string name="persons_num_hint">Кол-во прописанных человек</string>
     <!--услуги -->
     <string name="service_subtitle">Данные услуги</string>
     <string name="display_pos_hint">№ п/п</string>
@@ -52,11 +38,6 @@
     <string name="is_allocate_rate_hint">Распределять тариф</string>
 
     <!--СООБЩЕНИЯ ОБ ОШИБКАХ -->
-    <string name="erc_code_empty_error">Укажите, пожалуйста, код ЕРЦ!</string>
-    <string name="full_name_empty_error">Укажите, пожалуйста, фамилию и инициалы!</string>
-    <string name="address_empty_error">Укажите, пожалуйста, адрес!</string>
-    <string name="persons_num_empty_error">Укажите, пожалуйста, кол-во прописанных человек!</string>
-    <string name="payment_day_empty_error">Укажите, пожалуйста, крайнее число оплаты!</string>
     <string name="display_pos_empty_error">Укажите, пожалуйста, порядковый номер услуги!</string>
     <string name="display_name_empty_error">Укажите, пожалуйста, наименование услуги!</string>
 </resources>

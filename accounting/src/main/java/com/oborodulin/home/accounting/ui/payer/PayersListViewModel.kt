@@ -11,7 +11,7 @@ import kotlinx.coroutines.launch
 import timber.log.Timber
 import javax.inject.Inject
 
-private const val TAG = "HomeApp.PayersListViewModel"
+private const val TAG = "PayersListViewModel"
 
 @HiltViewModel
 class PayersListViewModel @Inject constructor(private val payerUseCases: PayerUseCases) :
@@ -39,7 +39,7 @@ class PayersListViewModel @Inject constructor(private val payerUseCases: PayerUs
     private fun getPayers() {
         viewModelScope.launch(errorHandler) {
             payerUseCases.getPayers().collect {
-                Timber.tag(TAG).i("Get payers for list {\"payers\": {\"count\" : ${it?.size}}}")
+                Timber.tag(TAG).i("Get payers for list {\"payers\": {\"count\" : ${it.size}}}")
                 _uiState.value = _uiState.value.copy(
                     payers = it,
                     isLoading = false

@@ -1,6 +1,5 @@
 package com.oborodulin.home.data.local.db
 
-import android.content.ContentValues
 import android.content.Context
 import android.database.sqlite.SQLiteDatabase
 import androidx.room.Database
@@ -10,6 +9,7 @@ import androidx.room.TypeConverters
 import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
 import com.google.gson.Gson
+import com.oborodulin.home.common.util.Mapper
 import com.oborodulin.home.data.local.db.converters.HomeTypeConverters
 import com.oborodulin.home.data.local.db.dao.MeterDao
 import com.oborodulin.home.data.local.db.dao.PayerDao
@@ -21,11 +21,9 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import timber.log.Timber
-import java.util.*
-import javax.inject.Inject
 
+private const val TAG = "HomeDatabase"
 
-private const val TAG = "HomeApp.HomeDatabase"
 private val MIGRATION_1_2 = object : Migration(1, 2) {
     override fun migrate(database: SupportSQLiteDatabase) {
         database.execSQL(
@@ -124,6 +122,9 @@ abstract class HomeDatabase : RoomDatabase() {
     }
 }
 
+/**
+ * https://stackoverflow.com/questions/5955202/how-to-remove-database-from-emulator
+ */
 class DatabaseCallback(val instance: HomeDatabase?, private val jsonLogger: Gson) :
     RoomDatabase.Callback() {
 
@@ -134,23 +135,21 @@ class DatabaseCallback(val instance: HomeDatabase?, private val jsonLogger: Gson
         // Executors.newSingleThreadExecutor().execute{f}
         CoroutineScope(Dispatchers.IO).launch()
         {
+            db.beginTransaction()
             try {
-                db.beginTransaction()
-                val payerValues = ContentValues()
-                payerValues.put("id", UUID.randomUUID().toString())
-                payerValues.put("ercCode", "000000000000000")
-                payerValues.put("fullName", "Собственник жилья")
-                payerValues.put("address", "Адрес не указан")
-                payerValues.put("isFavorite", false)
-
-                db.insert(PayerEntity.TABLE_NAME, SQLiteDatabase.CONFLICT_REPLACE, payerValues)
+                val payerEntity = PayerEntity(
+                    ercCode = "000000000000000",
+                    fullName = "Собственник жилья",
+                    address = "Адрес не указан"
+                )
+                db.insert(
+                    PayerEntity.TABLE_NAME,
+                    SQLiteDatabase.CONFLICT_REPLACE,
+                    Mapper.toContentValues(payerEntity)
+                )
 
                 db.setTransactionSuccessful()
-/*            val payerEntity = PayerEntity(
-                ercCode = "000000000000000",
-                fullName = "Собственник жилья",
-                address = "Адрес не указан"
-            )
+/*
             val isImport: Boolean = true
             if (isImport) {
             instance?.payerDao()?.add(payerEntity)
@@ -158,7 +157,7 @@ class DatabaseCallback(val instance: HomeDatabase?, private val jsonLogger: Gson
 
  */
                 Timber.tag(TAG)
-                    .i("Default PayerEntity added: {\"payer\": {${jsonLogger.toJson(payerValues)}}}")
+                    .i("Default PayerEntity imported: {${jsonLogger.toJson(payerEntity)}}")
             } finally {
                 db.endTransaction()
             }

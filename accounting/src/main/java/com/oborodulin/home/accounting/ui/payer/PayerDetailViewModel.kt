@@ -11,7 +11,7 @@ import kotlinx.coroutines.launch
 import java.util.*
 import javax.inject.Inject
 
-private const val TAG = "HomeApp.PayerDetailViewModel"
+private const val TAG = "PayerDetailViewModel"
 
 @HiltViewModel
 class PayerDetailViewModel @Inject constructor(private val payerUseCases: PayerUseCases) :

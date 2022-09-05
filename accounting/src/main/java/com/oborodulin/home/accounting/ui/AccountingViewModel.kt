@@ -13,7 +13,7 @@ import timber.log.Timber
 import java.util.*
 import javax.inject.Inject
 
-private const val TAG = "HomeApp.AccountingViewModel"
+private const val TAG = "AccountingViewModel"
 
 /**
  * Created by tfakioglu on 12.December.2021

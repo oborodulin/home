@@ -13,6 +13,9 @@ import javax.inject.Singleton
 @Module
 @InstallIn(SingletonComponent::class)
 object AppModule {
+    /**
+     * https://www.codegrepper.com/code-examples/javascript/android+object+to+json+string
+     */
     @Singleton
     @Provides
     fun provideJsonLogger(): Gson = Gson()

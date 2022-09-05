@@ -43,7 +43,7 @@ import kotlin.math.roundToInt
 /**
  * Created by tfakioglu on 12.December.2021
  */
-private const val TAG = "HomeApp.MainScreen"
+private const val TAG = "MainScreen"
 
 @Composable
 fun MainScreen() {

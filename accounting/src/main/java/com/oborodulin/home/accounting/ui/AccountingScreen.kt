@@ -11,7 +11,7 @@ import timber.log.Timber
 /**
  * Created by tfakioglu on 12.December.2021
  */
-private const val TAG = "HomeApp.AccountingScreen"
+private const val TAG = "AccountingScreen"
 
 @Composable
 fun AccountingScreen(navController: NavHostController) { //setFabOnClick: (() -> Unit) -> Unit

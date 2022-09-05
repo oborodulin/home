@@ -3,7 +3,7 @@ buildscript {
     // Define versions in a single place
     ext {
         versions = [
-                appCompat           : '1.4.2',
+                appCompat           : '1.5.0',
                 composeActivity     : '1.5.1',
                 composeAnimation    : '1.2.1',
                 composeMaterial     : '1.2.1',
@@ -13,13 +13,13 @@ buildscript {
                 composeUiTest       : '1.2.1',
                 composableSweetToast: '1.0.1',
                 constraintLayout    : '2.1.4',
-                coilKt              : '2.1.0',
+                coilKt              : '2.2.0',
                 coreTesting         : '2.1.0',
                 coroutines          : '1.6.4',
                 espresso            : '3.4.0',
                 fragment            : '1.5.2',
                 glide               : '4.13.2',
-                gradle              : '7.2.1',
+                gradle              : '7.2.2',
                 gson                : '2.9.1',
                 hilt                : '2.43.2',
                 hiltNavCompose      : '1.0.0',
@@ -27,6 +27,7 @@ buildscript {
                 junit               : '4.13.2',
                 junitExt            : '1.1.3',
                 kotlin              : '1.7.0',
+                kotlinReflect       : '1.7.10',
                 kotlinExtension     : '1.2.0',
                 ktlint              : '0.45.2',
                 ktlintGradle        : '10.2.1',
@@ -41,6 +42,7 @@ buildscript {
                 okhttpLogging       : '5.0.0-alpha.10',
                 paging              : '3.1.1',
                 pagingCompose       : '1.0.0-alpha16',
+                poolingcontainer    : '1.0.0',
                 recyclerview        : '1.2.1',
                 retrofit            : '2.9.0',
                 room                : '2.4.3',
@@ -69,52 +71,10 @@ buildscript {
                 androidx            : [appcompat       : "androidx.appcompat:appcompat:$versions.appCompat",
                                        coreKtx         : "androidx.core:core-ktx:$versions.ktx",
                                        constraintlayout: "androidx.constraintlayout:constraintlayout:$versions.constraintLayout",
-                                       fragmentKtx     : "androidx.fragment:fragment-ktx:$versions.fragment"],
+                                       fragmentKtx     : "androidx.fragment:fragment-ktx:$versions.fragment",
+                                       poolingcontainer: "androidx.customview:customview-poolingcontainer:$versions.poolingcontainer"],
                 // Coil
                 coil                : [compose: "io.coil-kt:coil-compose:$versions.coilKt"],
-                // Lottie
-                lottie              : [compose: "com.airbnb.android:lottie-compose:$versions.lottie"],
-                jvm                 : [inject: "javax.inject:javax.inject:$versions.inject"],
-                room                : [compiler: "androidx.room:room-compiler:$versions.room",
-                                       runtime : "androidx.room:room-runtime:$versions.room",
-                                       ktx     : "androidx.room:room-ktx:$versions.room"],
-                glide               : [compiler: "com.github.bumptech.glide:compiler:$versions.glide",
-                                       glide   : "com.github.bumptech.glide:glide:$versions.glide"],
-                ktlint              : [gradle: "org.jlleitschuh.gradle:ktlint-gradle:$versions.ktlintGradle"],
-                logging             : [timber: "com.jakewharton.timber:timber:$versions.timber",
-                                       logger: "com.orhanobut:logger:$versions.logger"],
-                dagger              : [hiltCompiler: "com.google.dagger:hilt-compiler:$versions.hilt",
-                                       compiler    : "com.google.dagger:hilt-android-compiler:$versions.hilt",
-                                       testing     : "com.google.dagger:hilt-android-testing:$versions.hilt",
-                                       gradlePlugin: "com.google.dagger:hilt-android-gradle-plugin:$versions.hilt",
-                                       hilt        : "com.google.dagger:hilt-android:$versions.hilt"],
-                hilt                : [navigationCompose: "androidx.hilt:hilt-navigation-compose:$versions.hiltNavCompose"],
-                lifecycle           : [runtimeKtx      : "androidx.lifecycle:lifecycle-runtime-ktx:$versions.lifecycleRuntime",
-                                       extensions      : "androidx.lifecycle:lifecycle-extensions:$versions.lifecycle",
-                                       livedataKtx     : "androidx.lifecycle:lifecycle-livedata-ktx:$versions.ktxLifecycle",
-                                       viewmodelKtx    : "androidx.lifecycle:lifecycle-viewmodel-ktx:$versions.ktxLifecycle",
-                                       // Integration with ViewModels
-                                       viewmodelCompose: "androidx.lifecycle:lifecycle-viewmodel-compose:$versions.composeViewmodel"],
-                navigation          : [fragmentKtx         : "androidx.navigation:navigation-fragment-ktx:$versions.navigation",
-                                       uiKtx               : "androidx.navigation:navigation-ui-ktx:$versions.navigation",
-                                       compose             : "androidx.navigation:navigation-compose:$versions.composeNavigation",
-                                       safeArgsGradlePlugin: "androidx.navigation:navigation-safe-args-gradle-plugin:$versions.navigation"],
-                paging              : [runtimeKtx: "androidx.paging:paging-runtime-ktx:$versions.paging",
-                                       compose   : "androidx.paging:paging-compose:$versions.pagingCompose"],
-                viewpager2          : "androidx.viewpager2:viewpager2:$versions.viewPager",
-                work                : [runtimeKtx: "androidx.work:work-runtime-ktx:$versions.work",
-                                       testing   : "androidx.work:work-testing:$versions.work"],
-                google              : [material: "com.google.android.material:material:$versions.material",
-                                       gson    : "com.google.code.gson:gson:$versions.gson"],
-                okhttp3             : [loggingInterceptor: "com.squareup.okhttp3:logging-interceptor:$versions.okhttpLogging"],
-                retrofit2           : [converterGson   : "com.squareup.retrofit2:converter-gson:$versions.retrofit",
-                                       converterScalars: "com.squareup.retrofit2:converter-scalars:$versions.retrofit",
-                                       retrofit        : "com.squareup.retrofit2:retrofit:$versions.retrofit"],
-                kotlin              : [gradlePlugin: "org.jetbrains.kotlin:kotlin-gradle-plugin:$versions.kotlin"],
-                kotlinx             : [coroutinesAndroid: "org.jetbrains.kotlinx:kotlinx-coroutines-android:$versions.coroutines",
-                                       coroutinesCore   : "org.jetbrains.kotlinx:kotlinx-coroutines-core:$versions.coroutines",
-                                       coroutinesTest   : "org.jetbrains.kotlinx:kotlinx-coroutines-test:$versions.coroutines"],
-                recyclerview        : "androidx.recyclerview:recyclerview:$versions.recyclerview",
                 compose             : [
                         ui          : "androidx.compose.ui:ui:$versions.composeUi",
                         // Compose Material Design
@@ -123,8 +83,50 @@ buildscript {
                         animation   : "androidx.compose.animation:animation:$versions.composeAnimation",
                         // Tooling support (Previews, etc.)
                         uiTooling   : "androidx.compose.ui:ui-tooling:$versions.composeUi",
+                        uiPreview   : "androidx.compose.ui:ui-tooling-preview:$versions.composeUi",
                         // UI Tests
                         uiTestJunit4: "androidx.compose.ui:ui-test-junit4:$versions.composeUiTest"],
+                dagger              : [hiltCompiler: "com.google.dagger:hilt-compiler:$versions.hilt",
+                                       compiler    : "com.google.dagger:hilt-android-compiler:$versions.hilt",
+                                       testing     : "com.google.dagger:hilt-android-testing:$versions.hilt",
+                                       gradlePlugin: "com.google.dagger:hilt-android-gradle-plugin:$versions.hilt",
+                                       hilt        : "com.google.dagger:hilt-android:$versions.hilt"],
+                glide               : [compiler: "com.github.bumptech.glide:compiler:$versions.glide",
+                                       glide   : "com.github.bumptech.glide:glide:$versions.glide"],
+                google              : [material: "com.google.android.material:material:$versions.material",
+                                       gson    : "com.google.code.gson:gson:$versions.gson"],
+                hilt                : [navigationCompose: "androidx.hilt:hilt-navigation-compose:$versions.hiltNavCompose"],
+                jvm                 : [inject: "javax.inject:javax.inject:$versions.inject"],
+                kotlin              : [gradlePlugin: "org.jetbrains.kotlin:kotlin-gradle-plugin:$versions.kotlin",
+                                       reflect     : "org.jetbrains.kotlin:kotlin-reflect:$versions.kotlinReflect"],
+                kotlinx             : [coroutinesAndroid: "org.jetbrains.kotlinx:kotlinx-coroutines-android:$versions.coroutines",
+                                       coroutinesCore   : "org.jetbrains.kotlinx:kotlinx-coroutines-core:$versions.coroutines",
+                                       coroutinesTest   : "org.jetbrains.kotlinx:kotlinx-coroutines-test:$versions.coroutines"],
+                ktlint              : [gradle: "org.jlleitschuh.gradle:ktlint-gradle:$versions.ktlintGradle"],
+                lifecycle           : [runtimeKtx      : "androidx.lifecycle:lifecycle-runtime-ktx:$versions.lifecycleRuntime",
+                                       extensions      : "androidx.lifecycle:lifecycle-extensions:$versions.lifecycle",
+                                       livedataKtx     : "androidx.lifecycle:lifecycle-livedata-ktx:$versions.ktxLifecycle",
+                                       viewmodelKtx    : "androidx.lifecycle:lifecycle-viewmodel-ktx:$versions.ktxLifecycle",
+                                       // Integration with ViewModels
+                                       viewmodelCompose: "androidx.lifecycle:lifecycle-viewmodel-compose:$versions.composeViewmodel"],
+                logging             : [timber: "com.jakewharton.timber:timber:$versions.timber",
+                                       logger: "com.orhanobut:logger:$versions.logger"],
+                // Lottie
+                lottie              : [compose: "com.airbnb.android:lottie-compose:$versions.lottie"],
+                navigation          : [fragmentKtx         : "androidx.navigation:navigation-fragment-ktx:$versions.navigation",
+                                       uiKtx               : "androidx.navigation:navigation-ui-ktx:$versions.navigation",
+                                       compose             : "androidx.navigation:navigation-compose:$versions.composeNavigation",
+                                       safeArgsGradlePlugin: "androidx.navigation:navigation-safe-args-gradle-plugin:$versions.navigation"],
+                okhttp3             : [loggingInterceptor: "com.squareup.okhttp3:logging-interceptor:$versions.okhttpLogging"],
+                paging              : [runtimeKtx: "androidx.paging:paging-runtime-ktx:$versions.paging",
+                                       compose   : "androidx.paging:paging-compose:$versions.pagingCompose"],
+                retrofit2           : [converterGson   : "com.squareup.retrofit2:converter-gson:$versions.retrofit",
+                                       converterScalars: "com.squareup.retrofit2:converter-scalars:$versions.retrofit",
+                                       retrofit        : "com.squareup.retrofit2:retrofit:$versions.retrofit"],
+                recyclerview        : "androidx.recyclerview:recyclerview:$versions.recyclerview",
+                room                : [compiler: "androidx.room:room-compiler:$versions.room",
+                                       runtime : "androidx.room:room-runtime:$versions.room",
+                                       ktx     : "androidx.room:room-ktx:$versions.room"],
                 // Sweet Toast
                 TalhaFaki           : [composableSweetToast: "com.github.tfaki:ComposableSweetToast:$versions.composableSweetToast"],
                 test                : [junit          : "junit:junit:$versions.junit",
@@ -134,9 +136,12 @@ buildscript {
                                        espressoIntents: "androidx.test.espresso:espresso-intents:$versions.espresso",
                                        archCore       : "androidx.arch.core:core-testing:$versions.coreTesting",
                                        uiautomator    : "androidx.test.uiautomator:uiautomator:$versions.uiAutomator"],
-                truth               : "com.google.truth:truth:$versions.truth",
                 spotlessPluginGradle: "com.diffplug.spotless:spotless-plugin-gradle:$versions.spotless",
-                tools               : [buildGradle: "com.android.tools.build:gradle:$versions.gradle"]
+                tools               : [buildGradle: "com.android.tools.build:gradle:$versions.gradle"],
+                truth               : "com.google.truth:truth:$versions.truth",
+                viewpager2          : "androidx.viewpager2:viewpager2:$versions.viewPager",
+                work                : [runtimeKtx: "androidx.work:work-runtime-ktx:$versions.work",
+                                       testing   : "androidx.work:work-testing:$versions.work"],
         ]
     }
     repositories {
@@ -154,8 +159,8 @@ buildscript {
 }
 
 plugins {
-    id 'com.android.application' version '7.2.1' apply false
-    id 'com.android.library' version '7.2.1' apply false
+    id 'com.android.application' version '7.2.2' apply false
+    id 'com.android.library' version '7.2.2' apply false
     id 'org.jetbrains.kotlin.android' version '1.7.0' apply false
     // Compose Compiler не поддерживает 1.7.10
     id 'org.jlleitschuh.gradle.ktlint' version '10.2.1'
