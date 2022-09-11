@@ -27,11 +27,11 @@ interface PayerDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun addAll(payers: List<PayerEntity>)
 
-    @Update
-    suspend fun update(payer: PayerEntity)
-
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insert(payer: PayerEntity)
+
+    @Update
+    suspend fun update(payer: PayerEntity)
 
     @Delete
     suspend fun delete(payer: PayerEntity)

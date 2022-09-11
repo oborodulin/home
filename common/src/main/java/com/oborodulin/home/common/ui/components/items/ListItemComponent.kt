@@ -80,16 +80,8 @@ fun ListItemComponent(icon: Int?, title: String, desc: String) {
     }
 }
 
-@Preview(
-    name = "Night Mode",
-    showSystemUi = true, showBackground = true,
-    uiMode = Configuration.UI_MODE_NIGHT_YES
-)
-@Preview(
-    name = "Day Mode",
-    showSystemUi = true, showBackground = true,
-    uiMode = Configuration.UI_MODE_NIGHT_NO
-)
+@Preview(name = "Night Mode", showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
+@Preview(name = "Day Mode", showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_NO)
 @Composable
 fun PreviewListItemComponent() {
     ListItemComponent(icon = null, title = "Title", desc = "Description")

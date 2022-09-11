@@ -1,5 +1,6 @@
 package com.oborodulin.home.ui.main
 
+import android.content.res.Configuration
 import android.widget.Toast
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.height
@@ -22,6 +23,8 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
@@ -30,7 +33,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
-import com.oborodulin.home.common.ui.navigation.NavItem
+import com.oborodulin.home.navigation.NavRoutes
 import com.oborodulin.home.common.ui.theme.SpeechRed
 import com.oborodulin.home.R
 import com.oborodulin.home.accounting.ui.AccountingScreen
@@ -106,16 +109,16 @@ private fun MainScreenNavigationConfigurations(
 ) {
     Timber.tag(TAG).d("MainScreenNavigationConfigurations(...) called")
     NavHost(
-        navController, startDestination = NavItem.Accounting.route,
+        navController, startDestination = NavRoutes.AccountingScreen.route,
         modifier = Modifier.padding(paddingValues)
     ) {
-        composable(NavItem.Accounting.route) {
+        composable(NavRoutes.AccountingScreen.route) {
             AccountingScreen(navController) //setFabOnClick = setFabOnClick
         }
-        composable(NavItem.Billing.route) {
+        composable(NavRoutes.BillingScreen.route) {
             //BillingScreen(navController)
         }
-        composable(NavItem.Metering.route) {
+        composable(NavRoutes.MeteringScreen.route) {
             //MeteringScreen(navController)
         }
     }
@@ -123,10 +126,11 @@ private fun MainScreenNavigationConfigurations(
 
 @Composable
 fun BottomNavigationBar(modifier: Modifier, navController: NavController) {
-    val bottomNavItems = listOf(
-        NavItem.Accounting,
-        NavItem.Billing,
-        NavItem.Metering
+    val bottomNavRoutes = listOf(
+        NavRoutes.AccountingScreen,
+        NavRoutes.BillingScreen,
+        NavRoutes.MeteringScreen,
+        NavRoutes.ReportingScreen
     )
     BottomNavigation(
         modifier
@@ -142,10 +146,15 @@ fun BottomNavigationBar(modifier: Modifier, navController: NavController) {
     ) {
         val navBackStackEntry by navController.currentBackStackEntryAsState()
         val currentRoute = navBackStackEntry?.destination?.route
-        bottomNavItems.forEach { item ->
+        bottomNavRoutes.forEach { item ->
             BottomNavigationItem(
-                icon = { Icon(painterResource(id = item.icon), contentDescription = item.title) },
-                label = { Text(text = item.title) },
+                icon = {
+                    Icon(
+                        painterResource(id = item.iconResId),
+                        contentDescription = stringResource(item.titleResId)
+                    )
+                },
+                label = { Text(text = stringResource(item.titleResId)) },
                 selectedContentColor = SpeechRed,
                 unselectedContentColor = Color.White.copy(0.4f),
                 alwaysShowLabel = true,
@@ -180,4 +189,11 @@ fun BottomNavigationBar(modifier: Modifier, navController: NavController) {
             )
         }
     }
+}
+
+@Preview(name = "Night Mode", showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
+@Preview(name = "Day Mode", showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_NO)
+@Composable
+fun PreviewMainScreen() {
+    MainScreen()
 }

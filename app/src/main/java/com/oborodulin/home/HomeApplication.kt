@@ -3,8 +3,10 @@ package com.oborodulin.home
 import android.app.Application
 import android.content.Context
 import androidx.work.Configuration
-import com.oborodulin.home.di.AppInjector
+import com.oborodulin.home.common.util.Constants
+import com.oborodulin.home.di.ApplicationInjector
 import com.oborodulin.home.common.util.ReleaseTree
+import com.oborodulin.home.common.util.setLocale
 import com.orhanobut.logger.AndroidLogAdapter
 import com.orhanobut.logger.FormatStrategy
 import com.orhanobut.logger.Logger
@@ -13,6 +15,7 @@ import dagger.hilt.android.HiltAndroidApp
 //import com.oborodulin.home.domain.rate.RateRepository
 //import com.oborodulin.home.domain.service.ServiceRepository
 import timber.log.Timber
+import java.util.*
 
 private const val TAG = "HomeApp"
 
@@ -27,6 +30,7 @@ class HomeApplication : Application(), Configuration.Provider {
      */
     override fun onCreate() {
         super.onCreate()
+        setLocale(locale = Locale(Constants.LANGUAGE_RU))
 
         val logFormatStrategy: FormatStrategy =
             PrettyFormatStrategy.newBuilder().showThreadInfo(true).methodCount(1).methodOffset(5)
@@ -54,13 +58,14 @@ class HomeApplication : Application(), Configuration.Provider {
         } else {
             Timber.plant(ReleaseTree())
         }
-        Timber.tag(TAG).i("Version ${BuildConfig.VERSION_NAME} is starting")
+        Timber.tag(TAG)
+            .i("Version ${BuildConfig.VERSION_NAME} is starting [${Locale.getDefault().language}]")
         initialiseDagger()
         Timber.tag(TAG).i("Initialized")
     }
 
     private fun initialiseDagger() {
-        AppInjector.initialise(this)
+        ApplicationInjector.initialise(this)
         Timber.tag(TAG).i("Initialise Dagger")
     }
 

@@ -6,26 +6,25 @@ import java.math.BigDecimal
 import java.util.*
 
 @Entity(
-    tableName = "meters", indices = [Index(value = ["num", "payersId", "servicesId"], unique = true)],
+    tableName = MeterEntity.TABLE_NAME,
+    indices = [Index(value = ["num", "payerServicesId"], unique = true)],
     foreignKeys = [ForeignKey(
-        entity = PayerEntity::class,
+        entity = PayerServiceEntity::class,
         parentColumns = arrayOf("id"),
-        childColumns = arrayOf("payersId"),
-        onDelete = ForeignKey.CASCADE
-    ), ForeignKey(
-        entity = ServiceEntity::class,
-        parentColumns = arrayOf("id"),
-        childColumns = arrayOf("servicesId"),
+        childColumns = arrayOf("payerServicesId"),
         onDelete = ForeignKey.CASCADE
     )]
 )
 class MeterEntity(
     var num: String,
     val maxValue: BigDecimal,
-    var measureUnit: String,
-    @TypeConverters(DateTypeConverter::class) val passportDate: Date?,
-    val verificationPeriod: Int?,
-    var descr: String?,
-    @ColumnInfo(index = true) var payersId: UUID,
-    @ColumnInfo(index = true) var servicesId: UUID,
-) : BaseEntity()
+    //var measureUnit: String? = null,
+    @TypeConverters(DateTypeConverter::class) val passportDate: Date? = null,
+    val verificationPeriod: Int? = null,
+    //var descr: String? = null,
+    @ColumnInfo(index = true) var payerServicesId: UUID,
+) : BaseEntity() {
+    companion object {
+        const val TABLE_NAME = "meters"
+    }
+}

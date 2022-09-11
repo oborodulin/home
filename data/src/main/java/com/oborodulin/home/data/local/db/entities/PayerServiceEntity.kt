@@ -7,7 +7,7 @@ import androidx.room.Index
 import java.util.*
 
 @Entity(
-    tableName = "payer_services",
+    tableName = PayerServiceEntity.TABLE_NAME,
     indices = [Index(value = ["payersId", "servicesId"], unique = true)],
     foreignKeys = [ForeignKey(
         entity = PayerEntity::class,
@@ -25,4 +25,8 @@ class PayerServiceEntity(
     @ColumnInfo(index = true) var payersId: UUID,
     @ColumnInfo(index = true) var servicesId: UUID,
     var isAllocateRate: Boolean = false,
-) : BaseEntity()
+) : BaseEntity() {
+    companion object {
+        const val TABLE_NAME = "payer_services"
+    }
+}
