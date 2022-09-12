@@ -3,10 +3,7 @@ package com.oborodulin.home.data.local.db
 import android.content.Context
 import android.database.sqlite.SQLiteDatabase
 import androidx.annotation.StringRes
-import androidx.room.Database
-import androidx.room.Room
-import androidx.room.RoomDatabase
-import androidx.room.TypeConverters
+import androidx.room.*
 import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
 import com.google.gson.Gson
@@ -136,6 +133,9 @@ class DatabaseCallback(
     private val jsonLogger: Gson
 ) :
     RoomDatabase.Callback() {
+
+    class PayerServiceId(val serviceId: UUID, val payerServiceId: UUID)
+
     private val res = context.resources
 
     override fun onCreate(db: SupportSQLiteDatabase) {
@@ -185,69 +185,69 @@ class DatabaseCallback(
                     .i("Default PayerEntity imported: {${jsonLogger.toJson(payerEntity)}}")
                 // Default services:
                 // rent
-                insertDefService(
+                val rentServiceId = insertDefService(
                     db = db, payer = payerEntity, nameResId = R.string.service_rent,
                     pos = 1, type = ServiceType.RENT, language = langRuEntity
                 )
                 // electricity
-                val payerElectricityId = insertDefService(
+                val electricityServiceId = insertDefService(
                     db = db, payer = payerEntity, nameResId = R.string.service_electricity, pos = 2,
                     type = ServiceType.ELECRICITY,
                     measureUnitResId = com.oborodulin.home.common.R.string.kWh_unit,
                     language = langRuEntity
                 )
                 // gas
-                val payerGasId = insertDefService(
+                val gasServiceId = insertDefService(
                     db = db, payer = payerEntity, nameResId = R.string.service_gas, pos = 3,
                     type = ServiceType.GAS,
                     measureUnitResId = com.oborodulin.home.common.R.string.m3_unit,
                     language = langRuEntity
                 )
                 // cold water
-                val payerColdWaterId = insertDefService(
+                val coldWaterServiceId = insertDefService(
                     db = db, payer = payerEntity, nameResId = R.string.service_cold_water, pos = 4,
                     type = ServiceType.COLD_WATER,
                     measureUnitResId = com.oborodulin.home.common.R.string.m3_unit,
                     language = langRuEntity
                 )
                 // waste
-                insertDefService(
+                val wasteServiceId = insertDefService(
                     db = db, payer = payerEntity, nameResId = R.string.service_waste, pos = 5,
                     type = ServiceType.WASTE,
                     measureUnitResId = com.oborodulin.home.common.R.string.m3_unit,
                     language = langRuEntity
                 )
                 // heating
-                val payerHeatingId = insertDefService(
+                val heatingServiceId = insertDefService(
                     db = db, payer = payerEntity, nameResId = R.string.service_heating, pos = 6,
                     type = ServiceType.HEATING,
                     measureUnitResId = com.oborodulin.home.common.R.string.Gcal_unit,
                     language = langRuEntity
                 )
                 // hot water
-                val payerHotWaterId = insertDefService(
+                val hotWaterServiceId = insertDefService(
                     db = db, payer = payerEntity, nameResId = R.string.service_hot_water, pos = 7,
                     type = ServiceType.HOT_WATER,
                     measureUnitResId = com.oborodulin.home.common.R.string.m3_unit,
                     language = langRuEntity
                 )
                 // garbage
-                insertDefService(
+                val garbageServiceId = insertDefService(
                     db = db, payer = payerEntity, nameResId = R.string.service_garbage, pos = 8,
                     type = ServiceType.GARBAGE, language = langRuEntity
                 )
                 // doorphone
-                insertDefService(
+                val doorphoneServiceId = insertDefService(
                     db = db, payer = payerEntity, nameResId = R.string.service_doorphone,
                     pos = 9, type = ServiceType.DOORPHONE, language = langRuEntity
                 )
                 // phone
-                insertDefService(
+                val phoneServiceId = insertDefService(
                     db = db, payer = payerEntity, nameResId = R.string.service_phone, pos = 10,
                     type = ServiceType.PHONE, language = langRuEntity
                 )
                 // ugso
-                insertDefService(
+                val ugsoServiceId = insertDefService(
                     db = db, payer = payerEntity, nameResId = R.string.service_ugso, pos = 10,
                     type = ServiceType.USGO, language = langRuEntity
                 )
@@ -255,22 +255,88 @@ class DatabaseCallback(
                 // electricity
                 insertDefMeter(
                     db = db,
-                    payerServicesId = payerElectricityId,
+                    payerServicesId = electricityServiceId.payerServiceId,
                     maxValue = BigDecimal.valueOf(9999)
                 )
                 // cold water
                 insertDefMeter(
                     db = db,
-                    payerServicesId = payerColdWaterId,
+                    payerServicesId = coldWaterServiceId.payerServiceId,
                     maxValue = BigDecimal.valueOf(99999.999)
                 )
                 // hot water
                 insertDefMeter(
                     db = db,
-                    payerServicesId = payerHotWaterId,
+                    payerServicesId = hotWaterServiceId.payerServiceId,
                     maxValue = BigDecimal.valueOf(99999.999)
                 )
-
+                // Default rates:
+                // rent
+                insertDefRate(
+                    db = db, servicesId = rentServiceId.serviceId,
+                    payerServicesId = rentServiceId.payerServiceId,
+                    rateValue = BigDecimal.valueOf(4.62)
+                )
+                // electricity
+                insertDefRate(
+                    db = db, servicesId = electricityServiceId.serviceId,
+                    fromMeterValue = BigDecimal.ZERO, toMeterValue = BigDecimal.valueOf(150),
+                    rateValue = BigDecimal.valueOf(1.56)
+                )
+                insertDefRate(
+                    db = db,
+                    servicesId = electricityServiceId.serviceId,
+                    fromMeterValue = BigDecimal.valueOf(150),
+                    toMeterValue = BigDecimal.valueOf(800),
+                    rateValue = BigDecimal.valueOf(2.12)
+                )
+                insertDefRate(
+                    db = db, servicesId = electricityServiceId.serviceId,
+                    fromMeterValue = BigDecimal.valueOf(800),
+                    rateValue = BigDecimal.valueOf(3.21)
+                )
+                insertDefRate(
+                    db = db, servicesId = electricityServiceId.serviceId,
+                    isPrivileges = true,
+                    rateValue = BigDecimal.valueOf(0.92),
+                )
+                // gas
+                insertDefRate(
+                    db = db, servicesId = gasServiceId.serviceId,
+                    isPerPerson = true,
+                    rateValue = BigDecimal.valueOf(18.05)
+                )
+                // cold water
+                insertDefRate(
+                    db = db, servicesId = coldWaterServiceId.serviceId,
+                    rateValue = BigDecimal.valueOf(25.02)
+                )
+                // waste
+                insertDefRate(
+                    db = db, servicesId = wasteServiceId.serviceId,
+                    rateValue = BigDecimal.valueOf(11.61)
+                )
+                // heating
+                insertDefRate(
+                    db = db, servicesId = heatingServiceId.serviceId,
+                    payerServicesId = heatingServiceId.payerServiceId,
+                    rateValue = BigDecimal.valueOf(14.76)
+                )
+                // hot water
+                insertDefRate(
+                    db = db, servicesId = hotWaterServiceId.serviceId,
+                    rateValue = BigDecimal.valueOf(77.67)
+                )
+                // garbage
+                insertDefRate(
+                    db = db, servicesId = garbageServiceId.serviceId,
+                    payerServicesId = garbageServiceId.payerServiceId,
+                    isPerPerson = true,
+                    rateValue = BigDecimal.valueOf(15.73)
+                )
+                // doorphone
+                // phone
+                // ugso
                 db.setTransactionSuccessful()
 /*
             val isImport: Boolean = true
@@ -288,7 +354,7 @@ class DatabaseCallback(
     private fun insertDefService(
         db: SupportSQLiteDatabase, payer: PayerEntity, @StringRes nameResId: Int, pos: Int,
         type: ServiceType, @StringRes measureUnitResId: Int? = null, language: LanguageEntity
-    ): UUID {
+    ): PayerServiceId {
         val service = ServiceEntity(pos = pos, type = type)
         val serviceTl =
             ServiceTlEntity(
@@ -321,7 +387,7 @@ class DatabaseCallback(
                         "\"tl\": {${jsonLogger.toJson(serviceTl)}}, " +
                         "\"payerService\": {${jsonLogger.toJson(payerService)}}}"
             )
-        return payerService.id
+        return PayerServiceId(service.id, payerService.id)
     }
 
     private fun insertDefMeter(
@@ -338,5 +404,29 @@ class DatabaseCallback(
             Mapper.toContentValues(meter)
         )
         Timber.tag(TAG).i("Default meter imported: {${jsonLogger.toJson(meter)}}")
+    }
+
+    private fun insertDefRate(
+        db: SupportSQLiteDatabase, servicesId: UUID, payerServicesId: UUID? = null,
+        fromMeterValue: BigDecimal? = null, toMeterValue: BigDecimal? = null,
+        rateValue: BigDecimal,
+        isPerPerson: Boolean = false,
+        isPrivileges: Boolean = false,
+    ) {
+        val rate = RateEntity(
+            servicesId = servicesId,
+            payerServicesId = payerServicesId,
+            fromMeterValue = fromMeterValue,
+            toMeterValue = toMeterValue,
+            rateValue = rateValue,
+            isPerPerson = isPerPerson,
+            isPrivileges = isPrivileges,
+        )
+        db.insert(
+            RateEntity.TABLE_NAME,
+            SQLiteDatabase.CONFLICT_REPLACE,
+            Mapper.toContentValues(rate)
+        )
+        Timber.tag(TAG).i("Default rate imported: {${jsonLogger.toJson(rate)}}")
     }
 }
