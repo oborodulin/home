@@ -29,7 +29,6 @@ class RateEntity(
     val fromMeterValue: BigDecimal? = null,
     val toMeterValue: BigDecimal? = null,
     val rateValue: BigDecimal,
-    val paymentPeriod: Int = 1, // период оплаты - кол-во месяцев в году
     val isPerPerson: Boolean = false, // считаем по норме на 1 человека, но приоритет для тарифов по счётчику
     val isPrivileges: Boolean = false, // считаем по счётчику, но по льготному тарифу
     @ColumnInfo(index = true) var servicesId: UUID,

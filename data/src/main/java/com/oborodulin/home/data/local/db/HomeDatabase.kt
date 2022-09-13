@@ -56,7 +56,9 @@ private val MIGRATION_4_5 = object : Migration(4, 5) {
 }
 
 @Database(
-    entities = [PayerEntity::class, ServiceEntity::class, PayerServiceEntity::class, RateEntity::class, MeterEntity::class],
+    entities = [LanguageEntity::class, PayerEntity::class, ServiceEntity::class, ServiceTlEntity::class,
+        PayerServiceEntity::class, RateEntity::class, RatePromotionEntity::class, MeterEntity::class,
+        ReceiptEntity::class],
     version = 5
 )
 @TypeConverters(HomeTypeConverters::class)
@@ -297,14 +299,12 @@ class DatabaseCallback(
                 )
                 insertDefRate(
                     db = db, servicesId = electricityServiceId.serviceId,
-                    isPrivileges = true,
-                    rateValue = BigDecimal.valueOf(0.92),
+                    isPrivileges = true, rateValue = BigDecimal.valueOf(0.92),
                 )
                 // gas
                 insertDefRate(
                     db = db, servicesId = gasServiceId.serviceId,
-                    isPerPerson = true,
-                    rateValue = BigDecimal.valueOf(18.05)
+                    isPerPerson = true, rateValue = BigDecimal.valueOf(18.05)
                 )
                 // cold water
                 insertDefRate(
@@ -331,12 +331,29 @@ class DatabaseCallback(
                 insertDefRate(
                     db = db, servicesId = garbageServiceId.serviceId,
                     payerServicesId = garbageServiceId.payerServiceId,
-                    isPerPerson = true,
-                    rateValue = BigDecimal.valueOf(15.73)
+                    isPerPerson = true, rateValue = BigDecimal.valueOf(15.73)
                 )
                 // doorphone
+                val doorphoneRateId = insertDefRate(
+                    db = db, servicesId = garbageServiceId.serviceId,
+                    payerServicesId = garbageServiceId.payerServiceId,
+                    isPerPerson = true, rateValue = BigDecimal.valueOf(15.73)
+                )
                 // phone
                 // ugso
+
+                // Rate promotions:
+                val doorphoneRatePromotion = RatePromotionEntity(
+                    ratesId = doorphoneRateId, paymentMonths = 10,
+                    isPrevRate = true
+                )
+                db.insert(
+                    RatePromotionEntity.TABLE_NAME,
+                    SQLiteDatabase.CONFLICT_REPLACE,
+                    Mapper.toContentValues(doorphoneRatePromotion)
+                )
+                Timber.tag(TAG)
+                    .i("Default rate promotion imported: {${jsonLogger.toJson(doorphoneRatePromotion)}}")
                 db.setTransactionSuccessful()
 /*
             val isImport: Boolean = true
@@ -412,7 +429,7 @@ class DatabaseCallback(
         rateValue: BigDecimal,
         isPerPerson: Boolean = false,
         isPrivileges: Boolean = false,
-    ) {
+    ): UUID {
         val rate = RateEntity(
             servicesId = servicesId,
             payerServicesId = payerServicesId,
@@ -428,5 +445,6 @@ class DatabaseCallback(
             Mapper.toContentValues(rate)
         )
         Timber.tag(TAG).i("Default rate imported: {${jsonLogger.toJson(rate)}}")
+        return rate.id
     }
 }

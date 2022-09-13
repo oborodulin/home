@@ -64,7 +64,7 @@ fun AccountingScreen(
                     .clip(RoundedCornerShape(30.dp))
                     .weight(2f)
             ) {
-                //PayersList()
+                PayersList()
             }
         }
     }
@@ -72,11 +72,12 @@ fun AccountingScreen(
         setFabOnClick { println("") }
     }*/
 }
-
+/*
 @Preview(name = "Night Mode", showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
 @Preview(name = "Day Mode", showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_NO)
 @Composable
 fun PreviewAccountingScreen() {
     AccountingScreen(navController = rememberNavController())
 }
+ */
 

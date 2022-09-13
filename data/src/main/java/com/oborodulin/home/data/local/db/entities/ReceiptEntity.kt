@@ -19,8 +19,8 @@ import java.util.*
     )]
 )
 class ReceiptEntity(
-    var receiptMonth: Month,
-    var receiptYear: Year,
+    var receiptMonth: Int,
+    var receiptYear: Int,
     var isPaid: Boolean = false,
     @ColumnInfo(index = true) var payersId: UUID,
 ) : BaseEntity() {

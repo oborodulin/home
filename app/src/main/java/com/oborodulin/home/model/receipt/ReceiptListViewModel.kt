@@ -9,13 +9,15 @@ class ReceiptListViewModel : ViewModel() {
 
     init {
         var year: Int = 2021
-        for (i in 0 until 15) {
+/*        for (i in 0 until 15) {
             val receiptEntity = ReceiptEntity()
             if (i % 12 == 0) year++
             receiptEntity.receiptDate = getDate(year, i % 12, 1)
             receiptEntity.isPaid = i % 2 == 0
             receiptEntities += receiptEntity
+
         }
+ */
     }
 
     private fun getDate(year: Int, month: Int, day: Int): Date {

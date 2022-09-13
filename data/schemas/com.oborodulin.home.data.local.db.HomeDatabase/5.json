@@ -2,8 +2,50 @@
   "formatVersion": 1,
   "database": {
     "version": 5,
-    "identityHash": "2d7d1a0bb31be21b0dff227f335c763b",
+    "identityHash": "eb7b7e57d9d6a634b0c6ffa47093fe73",
     "entities": [
+      {
+        "tableName": "languages",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`localeCode` TEXT NOT NULL, `name` TEXT NOT NULL, `id` TEXT NOT NULL, PRIMARY KEY(`id`))",
+        "fields": [
+          {
+            "fieldPath": "localeCode",
+            "columnName": "localeCode",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "name",
+            "columnName": "name",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "TEXT",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "columnNames": [
+            "id"
+          ],
+          "autoGenerate": false
+        },
+        "indices": [
+          {
+            "name": "index_languages_localeCode",
+            "unique": true,
+            "columnNames": [
+              "localeCode"
+            ],
+            "orders": [],
+            "createSql": "CREATE UNIQUE INDEX IF NOT EXISTS `index_languages_localeCode` ON `${TABLE_NAME}` (`localeCode`)"
+          }
+        ],
+        "foreignKeys": []
+      },
       {
         "tableName": "payers",
         "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`ercCode` TEXT NOT NULL, `fullName` TEXT NOT NULL, `address` TEXT NOT NULL, `totalArea` INTEGER, `livingSpace` INTEGER, `heatedVolume` INTEGER, `paymentDay` INTEGER, `personsNum` INTEGER, `isFavorite` INTEGER NOT NULL, `id` TEXT NOT NULL, PRIMARY KEY(`id`))",
@@ -80,14 +122,40 @@
       },
       {
         "tableName": "services",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`pos` INTEGER NOT NULL, `name` TEXT NOT NULL, `descr` TEXT, `id` TEXT NOT NULL, PRIMARY KEY(`id`))",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`pos` INTEGER, `type` TEXT NOT NULL, `id` TEXT NOT NULL, PRIMARY KEY(`id`))",
         "fields": [
           {
             "fieldPath": "pos",
             "columnName": "pos",
             "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
+            "fieldPath": "type",
+            "columnName": "type",
+            "affinity": "TEXT",
             "notNull": true
           },
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "TEXT",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "columnNames": [
+            "id"
+          ],
+          "autoGenerate": false
+        },
+        "indices": [],
+        "foreignKeys": []
+      },
+      {
+        "tableName": "services_tl",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`name` TEXT NOT NULL, `measureUnit` TEXT, `descr` TEXT, `servicesId` TEXT NOT NULL, `languagesId` TEXT NOT NULL, `id` TEXT NOT NULL, PRIMARY KEY(`id`), FOREIGN KEY(`servicesId`) REFERENCES `services`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE , FOREIGN KEY(`languagesId`) REFERENCES `languages`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE )",
+        "fields": [
           {
             "fieldPath": "name",
             "columnName": "name",
@@ -95,10 +163,28 @@
             "notNull": true
           },
           {
+            "fieldPath": "measureUnit",
+            "columnName": "measureUnit",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
             "fieldPath": "descr",
             "columnName": "descr",
             "affinity": "TEXT",
             "notNull": false
+          },
+          {
+            "fieldPath": "servicesId",
+            "columnName": "servicesId",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "languagesId",
+            "columnName": "languagesId",
+            "affinity": "TEXT",
+            "notNull": true
           },
           {
             "fieldPath": "id",
@@ -115,16 +201,58 @@
         },
         "indices": [
           {
-            "name": "index_services_name",
+            "name": "index_services_tl_languagesId_servicesId",
             "unique": true,
             "columnNames": [
-              "name"
+              "languagesId",
+              "servicesId"
             ],
             "orders": [],
-            "createSql": "CREATE UNIQUE INDEX IF NOT EXISTS `index_services_name` ON `${TABLE_NAME}` (`name`)"
+            "createSql": "CREATE UNIQUE INDEX IF NOT EXISTS `index_services_tl_languagesId_servicesId` ON `${TABLE_NAME}` (`languagesId`, `servicesId`)"
+          },
+          {
+            "name": "index_services_tl_servicesId",
+            "unique": false,
+            "columnNames": [
+              "servicesId"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_services_tl_servicesId` ON `${TABLE_NAME}` (`servicesId`)"
+          },
+          {
+            "name": "index_services_tl_languagesId",
+            "unique": false,
+            "columnNames": [
+              "languagesId"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_services_tl_languagesId` ON `${TABLE_NAME}` (`languagesId`)"
           }
         ],
-        "foreignKeys": []
+        "foreignKeys": [
+          {
+            "table": "services",
+            "onDelete": "CASCADE",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "servicesId"
+            ],
+            "referencedColumns": [
+              "id"
+            ]
+          },
+          {
+            "table": "languages",
+            "onDelete": "CASCADE",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "languagesId"
+            ],
+            "referencedColumns": [
+              "id"
+            ]
+          }
+        ]
       },
       {
         "tableName": "payer_services",
@@ -218,7 +346,7 @@
       },
       {
         "tableName": "rates",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`startDate` INTEGER NOT NULL, `fromMeterValue` INTEGER, `toMeterValue` INTEGER, `rateValue` INTEGER NOT NULL, `servicesId` TEXT NOT NULL, `id` TEXT NOT NULL, PRIMARY KEY(`id`), FOREIGN KEY(`servicesId`) REFERENCES `services`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE )",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`startDate` INTEGER NOT NULL, `fromMeterValue` INTEGER, `toMeterValue` INTEGER, `rateValue` INTEGER NOT NULL, `isPerPerson` INTEGER NOT NULL, `isPrivileges` INTEGER NOT NULL, `servicesId` TEXT NOT NULL, `payerServicesId` TEXT, `id` TEXT NOT NULL, PRIMARY KEY(`id`), FOREIGN KEY(`servicesId`) REFERENCES `services`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE , FOREIGN KEY(`payerServicesId`) REFERENCES `payer_services`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE )",
         "fields": [
           {
             "fieldPath": "startDate",
@@ -245,8 +373,126 @@
             "notNull": true
           },
           {
+            "fieldPath": "isPerPerson",
+            "columnName": "isPerPerson",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "isPrivileges",
+            "columnName": "isPrivileges",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
             "fieldPath": "servicesId",
             "columnName": "servicesId",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "payerServicesId",
+            "columnName": "payerServicesId",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "TEXT",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "columnNames": [
+            "id"
+          ],
+          "autoGenerate": false
+        },
+        "indices": [
+          {
+            "name": "index_rates_startDate_fromMeterValue_isPerPerson_isPrivileges_servicesId_payerServicesId",
+            "unique": true,
+            "columnNames": [
+              "startDate",
+              "fromMeterValue",
+              "isPerPerson",
+              "isPrivileges",
+              "servicesId",
+              "payerServicesId"
+            ],
+            "orders": [],
+            "createSql": "CREATE UNIQUE INDEX IF NOT EXISTS `index_rates_startDate_fromMeterValue_isPerPerson_isPrivileges_servicesId_payerServicesId` ON `${TABLE_NAME}` (`startDate`, `fromMeterValue`, `isPerPerson`, `isPrivileges`, `servicesId`, `payerServicesId`)"
+          },
+          {
+            "name": "index_rates_servicesId",
+            "unique": false,
+            "columnNames": [
+              "servicesId"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_rates_servicesId` ON `${TABLE_NAME}` (`servicesId`)"
+          },
+          {
+            "name": "index_rates_payerServicesId",
+            "unique": false,
+            "columnNames": [
+              "payerServicesId"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_rates_payerServicesId` ON `${TABLE_NAME}` (`payerServicesId`)"
+          }
+        ],
+        "foreignKeys": [
+          {
+            "table": "services",
+            "onDelete": "CASCADE",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "servicesId"
+            ],
+            "referencedColumns": [
+              "id"
+            ]
+          },
+          {
+            "table": "payer_services",
+            "onDelete": "CASCADE",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "payerServicesId"
+            ],
+            "referencedColumns": [
+              "id"
+            ]
+          }
+        ]
+      },
+      {
+        "tableName": "rate_promotions",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`paymentMonths` INTEGER NOT NULL, `isPrevRate` INTEGER NOT NULL, `isActive` INTEGER NOT NULL, `ratesId` TEXT NOT NULL, `id` TEXT NOT NULL, PRIMARY KEY(`id`), FOREIGN KEY(`ratesId`) REFERENCES `rates`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE )",
+        "fields": [
+          {
+            "fieldPath": "paymentMonths",
+            "columnName": "paymentMonths",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "isPrevRate",
+            "columnName": "isPrevRate",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "isActive",
+            "columnName": "isActive",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "ratesId",
+            "columnName": "ratesId",
             "affinity": "TEXT",
             "notNull": true
           },
@@ -265,32 +511,22 @@
         },
         "indices": [
           {
-            "name": "index_rates_startDate_servicesId",
-            "unique": true,
-            "columnNames": [
-              "startDate",
-              "servicesId"
-            ],
-            "orders": [],
-            "createSql": "CREATE UNIQUE INDEX IF NOT EXISTS `index_rates_startDate_servicesId` ON `${TABLE_NAME}` (`startDate`, `servicesId`)"
-          },
-          {
-            "name": "index_rates_servicesId",
+            "name": "index_rate_promotions_ratesId",
             "unique": false,
             "columnNames": [
-              "servicesId"
+              "ratesId"
             ],
             "orders": [],
-            "createSql": "CREATE INDEX IF NOT EXISTS `index_rates_servicesId` ON `${TABLE_NAME}` (`servicesId`)"
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_rate_promotions_ratesId` ON `${TABLE_NAME}` (`ratesId`)"
           }
         ],
         "foreignKeys": [
           {
-            "table": "services",
+            "table": "rates",
             "onDelete": "CASCADE",
             "onUpdate": "NO ACTION",
             "columns": [
-              "servicesId"
+              "ratesId"
             ],
             "referencedColumns": [
               "id"
@@ -300,7 +536,7 @@
       },
       {
         "tableName": "meters",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`num` TEXT NOT NULL, `maxValue` INTEGER NOT NULL, `measureUnit` TEXT NOT NULL, `passportDate` INTEGER, `verificationPeriod` INTEGER, `descr` TEXT, `payersId` TEXT NOT NULL, `servicesId` TEXT NOT NULL, `id` TEXT NOT NULL, PRIMARY KEY(`id`), FOREIGN KEY(`payersId`) REFERENCES `payers`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE , FOREIGN KEY(`servicesId`) REFERENCES `services`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE )",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`num` TEXT NOT NULL, `maxValue` INTEGER NOT NULL, `passportDate` INTEGER, `verificationPeriod` INTEGER, `payerServicesId` TEXT NOT NULL, `id` TEXT NOT NULL, PRIMARY KEY(`id`), FOREIGN KEY(`payerServicesId`) REFERENCES `payer_services`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE )",
         "fields": [
           {
             "fieldPath": "num",
@@ -312,12 +548,6 @@
             "fieldPath": "maxValue",
             "columnName": "maxValue",
             "affinity": "INTEGER",
-            "notNull": true
-          },
-          {
-            "fieldPath": "measureUnit",
-            "columnName": "measureUnit",
-            "affinity": "TEXT",
             "notNull": true
           },
           {
@@ -333,20 +563,8 @@
             "notNull": false
           },
           {
-            "fieldPath": "descr",
-            "columnName": "descr",
-            "affinity": "TEXT",
-            "notNull": false
-          },
-          {
-            "fieldPath": "payersId",
-            "columnName": "payersId",
-            "affinity": "TEXT",
-            "notNull": true
-          },
-          {
-            "fieldPath": "servicesId",
-            "columnName": "servicesId",
+            "fieldPath": "payerServicesId",
+            "columnName": "payerServicesId",
             "affinity": "TEXT",
             "notNull": true
           },
@@ -365,33 +583,100 @@
         },
         "indices": [
           {
-            "name": "index_meters_num_payersId_servicesId",
+            "name": "index_meters_num_payerServicesId",
             "unique": true,
             "columnNames": [
               "num",
-              "payersId",
-              "servicesId"
+              "payerServicesId"
             ],
             "orders": [],
-            "createSql": "CREATE UNIQUE INDEX IF NOT EXISTS `index_meters_num_payersId_servicesId` ON `${TABLE_NAME}` (`num`, `payersId`, `servicesId`)"
+            "createSql": "CREATE UNIQUE INDEX IF NOT EXISTS `index_meters_num_payerServicesId` ON `${TABLE_NAME}` (`num`, `payerServicesId`)"
           },
           {
-            "name": "index_meters_payersId",
+            "name": "index_meters_payerServicesId",
+            "unique": false,
+            "columnNames": [
+              "payerServicesId"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_meters_payerServicesId` ON `${TABLE_NAME}` (`payerServicesId`)"
+          }
+        ],
+        "foreignKeys": [
+          {
+            "table": "payer_services",
+            "onDelete": "CASCADE",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "payerServicesId"
+            ],
+            "referencedColumns": [
+              "id"
+            ]
+          }
+        ]
+      },
+      {
+        "tableName": "receipts",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`receiptMonth` INTEGER NOT NULL, `receiptYear` INTEGER NOT NULL, `isPaid` INTEGER NOT NULL, `payersId` TEXT NOT NULL, `id` TEXT NOT NULL, PRIMARY KEY(`id`), FOREIGN KEY(`payersId`) REFERENCES `payers`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE )",
+        "fields": [
+          {
+            "fieldPath": "receiptMonth",
+            "columnName": "receiptMonth",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "receiptYear",
+            "columnName": "receiptYear",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "isPaid",
+            "columnName": "isPaid",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "payersId",
+            "columnName": "payersId",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "TEXT",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "columnNames": [
+            "id"
+          ],
+          "autoGenerate": false
+        },
+        "indices": [
+          {
+            "name": "index_receipts_payersId_receiptYear_receiptMonth",
+            "unique": true,
+            "columnNames": [
+              "payersId",
+              "receiptYear",
+              "receiptMonth"
+            ],
+            "orders": [],
+            "createSql": "CREATE UNIQUE INDEX IF NOT EXISTS `index_receipts_payersId_receiptYear_receiptMonth` ON `${TABLE_NAME}` (`payersId`, `receiptYear`, `receiptMonth`)"
+          },
+          {
+            "name": "index_receipts_payersId",
             "unique": false,
             "columnNames": [
               "payersId"
             ],
             "orders": [],
-            "createSql": "CREATE INDEX IF NOT EXISTS `index_meters_payersId` ON `${TABLE_NAME}` (`payersId`)"
-          },
-          {
-            "name": "index_meters_servicesId",
-            "unique": false,
-            "columnNames": [
-              "servicesId"
-            ],
-            "orders": [],
-            "createSql": "CREATE INDEX IF NOT EXISTS `index_meters_servicesId` ON `${TABLE_NAME}` (`servicesId`)"
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_receipts_payersId` ON `${TABLE_NAME}` (`payersId`)"
           }
         ],
         "foreignKeys": [
@@ -405,17 +690,6 @@
             "referencedColumns": [
               "id"
             ]
-          },
-          {
-            "table": "services",
-            "onDelete": "CASCADE",
-            "onUpdate": "NO ACTION",
-            "columns": [
-              "servicesId"
-            ],
-            "referencedColumns": [
-              "id"
-            ]
           }
         ]
       }
@@ -423,7 +697,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '2d7d1a0bb31be21b0dff227f335c763b')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'eb7b7e57d9d6a634b0c6ffa47093fe73')"
     ]
   }
 }

@@ -90,7 +90,7 @@ dependencies {
     implementation deps.lifecycle.viewmodelCompose
     implementation deps.google.gson
     implementation deps.navigation.compose
-    debugImplementation deps.compose.uiTooling
+    //debugImplementation deps.compose.uiTooling
 
     // Testing dependencies
     testImplementation deps.test.junit

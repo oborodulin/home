@@ -67,8 +67,8 @@ class ServiceListFragment : Fragment(), ListFragment<ServiceEntity> {
 
         override fun bind(entity: T) {
             service = entity
-            displayNameTextView.text = (service as ServiceEntity).name
-            serviceDescrTextView.text = (service as ServiceEntity).descr
+          //  displayNameTextView.text = (service as ServiceEntity).name
+          //  serviceDescrTextView.text = (service as ServiceEntity).descr
         }
 
         override fun onClick(v: View) {
