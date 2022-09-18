@@ -1,9 +1,11 @@
 package com.oborodulin.home.data.local.db.converters
 
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.room.TypeConverter
 import com.oborodulin.home.data.util.ServiceType
 import java.math.BigDecimal
-import java.time.Year
+import java.time.*
 import java.util.*
 
 class HomeTypeConverters {
@@ -18,6 +20,32 @@ class HomeTypeConverters {
 
     @TypeConverter
     fun toDateTime(millisSinceEpoch: Long?): Date? = millisSinceEpoch?.let { Date(it) }
+
+    @RequiresApi(Build.VERSION_CODES.O)
+    @TypeConverter
+    fun fromLocalDate(date: LocalDate?): Long? =
+        date?.atStartOfDay(ZoneId.systemDefault())?.toEpochSecond()
+
+    @RequiresApi(Build.VERSION_CODES.O)
+    @TypeConverter
+    fun toLocalDate(millisSinceEpoch: Long?): LocalDate? = millisSinceEpoch?.let {
+        Instant.ofEpochMilli(millisSinceEpoch).atZone(ZoneId.systemDefault()).toLocalDate()
+    }
+
+    @RequiresApi(Build.VERSION_CODES.O)
+    @TypeConverter
+    fun fromLocalDateTime(time: LocalDateTime?): Long? =
+        time?.atZone(ZoneId.systemDefault())?.toInstant()?.toEpochMilli()
+
+    @RequiresApi(Build.VERSION_CODES.O)
+    @TypeConverter
+    fun toLocalDateTime(millisSinceEpoch: Long?): LocalDateTime? =
+        millisSinceEpoch?.let {
+            LocalDateTime.ofInstant(
+                Instant.ofEpochMilli(millisSinceEpoch),
+                ZoneId.systemDefault()
+            )
+        }
 
     @TypeConverter
     fun toBigDecimal(value: Long?): BigDecimal? =

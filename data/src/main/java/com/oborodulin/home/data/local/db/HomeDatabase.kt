@@ -57,7 +57,8 @@ private val MIGRATION_4_5 = object : Migration(4, 5) {
 
 @Database(
     entities = [LanguageEntity::class, PayerEntity::class, ServiceEntity::class, ServiceTlEntity::class,
-        PayerServiceEntity::class, RateEntity::class, RatePromotionEntity::class, MeterEntity::class,
+        PayerServiceCrossRefEntity::class, RateEntity::class, RatePromotionEntity::class,
+        MeterEntity::class, MeterTlEntity::class, MeterValueEntity::class,
         ReceiptEntity::class],
     version = 5
 )
@@ -65,8 +66,8 @@ private val MIGRATION_4_5 = object : Migration(4, 5) {
 abstract class HomeDatabase : RoomDatabase() {
     abstract fun payerDao(): PayerDao
     abstract fun serviceDao(): ServiceDao
-    abstract fun rateDao(): RateDao
     abstract fun meterDao(): MeterDao
+    abstract fun rateDao(): RateDao
 
     companion object {
         @Volatile
@@ -253,24 +254,30 @@ class DatabaseCallback(
                     db = db, payer = payerEntity, nameResId = R.string.service_ugso, pos = 10,
                     type = ServiceType.USGO, language = langRuEntity
                 )
-                // Meters
+                // Meters:
                 // electricity
                 insertDefMeter(
                     db = db,
                     payerServicesId = electricityServiceId.payerServiceId,
-                    maxValue = BigDecimal.valueOf(9999)
+                    maxValue = BigDecimal.valueOf(9999),
+                    measureUnitResId = com.oborodulin.home.common.R.string.kWh_unit,
+                    language = langRuEntity
                 )
                 // cold water
                 insertDefMeter(
                     db = db,
                     payerServicesId = coldWaterServiceId.payerServiceId,
-                    maxValue = BigDecimal.valueOf(99999.999)
+                    maxValue = BigDecimal.valueOf(99999.999),
+                    measureUnitResId = com.oborodulin.home.common.R.string.m3_unit,
+                    language = langRuEntity
                 )
                 // hot water
                 insertDefMeter(
                     db = db,
                     payerServicesId = hotWaterServiceId.payerServiceId,
-                    maxValue = BigDecimal.valueOf(99999.999)
+                    maxValue = BigDecimal.valueOf(99999.999),
+                    measureUnitResId = com.oborodulin.home.common.R.string.m3_unit,
+                    language = langRuEntity
                 )
                 // Default rates:
                 // rent
@@ -382,7 +389,7 @@ class DatabaseCallback(
                 servicesId = service.id,
                 languagesId = language.id
             )
-        val payerService = PayerServiceEntity(payersId = payer.id, servicesId = service.id)
+        val payerService = PayerServiceCrossRefEntity(payersId = payer.id, servicesId = service.id)
         db.insert(
             ServiceEntity.TABLE_NAME,
             SQLiteDatabase.CONFLICT_REPLACE,
@@ -394,7 +401,7 @@ class DatabaseCallback(
             Mapper.toContentValues(serviceTl)
         )
         db.insert(
-            PayerServiceEntity.TABLE_NAME,
+            PayerServiceCrossRefEntity.TABLE_NAME,
             SQLiteDatabase.CONFLICT_REPLACE,
             Mapper.toContentValues(payerService)
         )
@@ -408,19 +415,35 @@ class DatabaseCallback(
     }
 
     private fun insertDefMeter(
-        db: SupportSQLiteDatabase, payerServicesId: UUID, maxValue: BigDecimal
+        db: SupportSQLiteDatabase, payerServicesId: UUID, maxValue: BigDecimal,
+        @StringRes measureUnitResId: Int? = null, language: LanguageEntity
     ) {
         val meter = MeterEntity(
             payerServicesId = payerServicesId,
             num = res.getString(R.string.def_meter_num),
             maxValue = maxValue
         )
+        val meterTl = MeterTlEntity(
+            metersId = meter.id,
+            measureUnit = measureUnitResId?.let {
+                res.getString(it)
+            },
+            languagesId = language.id
+        )
         db.insert(
             MeterEntity.TABLE_NAME,
             SQLiteDatabase.CONFLICT_REPLACE,
             Mapper.toContentValues(meter)
         )
-        Timber.tag(TAG).i("Default meter imported: {${jsonLogger.toJson(meter)}}")
+        db.insert(
+            MeterTlEntity.TABLE_NAME,
+            SQLiteDatabase.CONFLICT_REPLACE,
+            Mapper.toContentValues(meterTl)
+        )
+        Timber.tag(TAG).i(
+            "Default meter imported: {\"meter\": {${jsonLogger.toJson(meter)}}, " +
+                    "\"tl\": {${jsonLogger.toJson(meterTl)}}}"
+        )
     }
 
     private fun insertDefRate(

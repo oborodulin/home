@@ -34,7 +34,7 @@ android {
         compose true
     }
     composeOptions {
-        kotlinCompilerExtensionVersion '1.2.0'
+        kotlinCompilerExtensionVersion versions.composeKotlinExt
     }
 }
 
@@ -51,6 +51,8 @@ dependencies {
     implementation deps.kotlinx.coroutinesCore
     implementation deps.jvm.inject
     implementation deps.kotlin.reflect
+    // XML-parser
+    implementation deps.xml.xmlpull
 
     // Compose
     implementation deps.compose.ui

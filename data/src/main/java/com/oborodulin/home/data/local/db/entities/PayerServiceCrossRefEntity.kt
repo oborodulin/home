@@ -1,14 +1,12 @@
 package com.oborodulin.home.data.local.db.entities
 
-import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.ForeignKey
-import androidx.room.Index
 import java.util.*
 
 @Entity(
-    tableName = PayerServiceEntity.TABLE_NAME,
-    indices = [Index(value = ["payersId", "servicesId"], unique = true)],
+    tableName = PayerServiceCrossRefEntity.TABLE_NAME,
+    primaryKeys = ["payersId", "servicesId"],
     foreignKeys = [ForeignKey(
         entity = PayerEntity::class,
         parentColumns = arrayOf("id"),
@@ -21,9 +19,9 @@ import java.util.*
         onDelete = ForeignKey.CASCADE
     )]
 )
-class PayerServiceEntity(
-    @ColumnInfo(index = true) var payersId: UUID,
-    @ColumnInfo(index = true) var servicesId: UUID,
+class PayerServiceCrossRefEntity(
+    val payersId: UUID,
+    val servicesId: UUID,
     var isAllocateRate: Boolean = false,
 ) : BaseEntity() {
     companion object {

@@ -47,7 +47,7 @@ android {
         freeCompilerArgs += "-Xopt-in=kotlinx.coroutines.FlowPreview"
     }
     composeOptions {
-        kotlinCompilerExtensionVersion versions.kotlinExtension
+        kotlinCompilerExtensionVersion versions.composeKotlinExt
     }
     namespace 'com.oborodulin.home'
 }

@@ -18,7 +18,7 @@ import java.util.*
         childColumns = arrayOf("servicesId"),
         onDelete = CASCADE
     ), ForeignKey(
-        entity = PayerServiceEntity::class,
+        entity = PayerServiceCrossRefEntity::class,
         parentColumns = arrayOf("id"),
         childColumns = arrayOf("payerServicesId"),
         onDelete = CASCADE

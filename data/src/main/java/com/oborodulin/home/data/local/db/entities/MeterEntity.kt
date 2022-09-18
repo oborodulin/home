@@ -9,7 +9,7 @@ import java.util.*
     tableName = MeterEntity.TABLE_NAME,
     indices = [Index(value = ["num", "payerServicesId"], unique = true)],
     foreignKeys = [ForeignKey(
-        entity = PayerServiceEntity::class,
+        entity = PayerServiceCrossRefEntity::class,
         parentColumns = arrayOf("id"),
         childColumns = arrayOf("payerServicesId"),
         onDelete = ForeignKey.CASCADE

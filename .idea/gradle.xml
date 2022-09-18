@@ -21,6 +21,7 @@
             <option value="$PROJECT_DIR$/domain" />
             <option value="$PROJECT_DIR$/metering" />
             <option value="$PROJECT_DIR$/reporting" />
+            <option value="$PROJECT_DIR$/servicing" />
           </set>
         </option>
       </GradleProjectSettings>

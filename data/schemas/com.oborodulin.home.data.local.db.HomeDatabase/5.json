@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 5,
-    "identityHash": "eb7b7e57d9d6a634b0c6ffa47093fe73",
+    "identityHash": "9af7afc048b6d10132a38fdc421df2eb",
     "entities": [
       {
         "tableName": "languages",
@@ -617,6 +617,162 @@
         ]
       },
       {
+        "tableName": "meters_tl",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`measureUnit` TEXT, `descr` TEXT, `metersId` TEXT NOT NULL, `languagesId` TEXT NOT NULL, `id` TEXT NOT NULL, PRIMARY KEY(`id`), FOREIGN KEY(`metersId`) REFERENCES `meters`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE , FOREIGN KEY(`languagesId`) REFERENCES `languages`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE )",
+        "fields": [
+          {
+            "fieldPath": "measureUnit",
+            "columnName": "measureUnit",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "descr",
+            "columnName": "descr",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "metersId",
+            "columnName": "metersId",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "languagesId",
+            "columnName": "languagesId",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "TEXT",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "columnNames": [
+            "id"
+          ],
+          "autoGenerate": false
+        },
+        "indices": [
+          {
+            "name": "index_meters_tl_languagesId_metersId",
+            "unique": true,
+            "columnNames": [
+              "languagesId",
+              "metersId"
+            ],
+            "orders": [],
+            "createSql": "CREATE UNIQUE INDEX IF NOT EXISTS `index_meters_tl_languagesId_metersId` ON `${TABLE_NAME}` (`languagesId`, `metersId`)"
+          },
+          {
+            "name": "index_meters_tl_metersId",
+            "unique": false,
+            "columnNames": [
+              "metersId"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_meters_tl_metersId` ON `${TABLE_NAME}` (`metersId`)"
+          },
+          {
+            "name": "index_meters_tl_languagesId",
+            "unique": false,
+            "columnNames": [
+              "languagesId"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_meters_tl_languagesId` ON `${TABLE_NAME}` (`languagesId`)"
+          }
+        ],
+        "foreignKeys": [
+          {
+            "table": "meters",
+            "onDelete": "CASCADE",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "metersId"
+            ],
+            "referencedColumns": [
+              "id"
+            ]
+          },
+          {
+            "table": "languages",
+            "onDelete": "CASCADE",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "languagesId"
+            ],
+            "referencedColumns": [
+              "id"
+            ]
+          }
+        ]
+      },
+      {
+        "tableName": "meter_values",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`valueDate` INTEGER NOT NULL, `meterValue` INTEGER, `metersId` TEXT NOT NULL, `id` TEXT NOT NULL, PRIMARY KEY(`id`), FOREIGN KEY(`metersId`) REFERENCES `meters`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE )",
+        "fields": [
+          {
+            "fieldPath": "valueDate",
+            "columnName": "valueDate",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "meterValue",
+            "columnName": "meterValue",
+            "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
+            "fieldPath": "metersId",
+            "columnName": "metersId",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "TEXT",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "columnNames": [
+            "id"
+          ],
+          "autoGenerate": false
+        },
+        "indices": [
+          {
+            "name": "index_meter_values_metersId",
+            "unique": false,
+            "columnNames": [
+              "metersId"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_meter_values_metersId` ON `${TABLE_NAME}` (`metersId`)"
+          }
+        ],
+        "foreignKeys": [
+          {
+            "table": "meters",
+            "onDelete": "CASCADE",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "metersId"
+            ],
+            "referencedColumns": [
+              "id"
+            ]
+          }
+        ]
+      },
+      {
         "tableName": "receipts",
         "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`receiptMonth` INTEGER NOT NULL, `receiptYear` INTEGER NOT NULL, `isPaid` INTEGER NOT NULL, `payersId` TEXT NOT NULL, `id` TEXT NOT NULL, PRIMARY KEY(`id`), FOREIGN KEY(`payersId`) REFERENCES `payers`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE )",
         "fields": [
@@ -697,7 +853,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'eb7b7e57d9d6a634b0c6ffa47093fe73')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '9af7afc048b6d10132a38fdc421df2eb')"
     ]
   }
 }

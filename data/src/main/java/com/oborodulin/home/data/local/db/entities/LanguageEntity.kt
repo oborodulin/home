@@ -8,8 +8,8 @@ import androidx.room.Index
     indices = [Index(value = ["localeCode"], unique = true)]
 )
 class LanguageEntity(
-    var localeCode: String,
-    var name: String
+    val localeCode: String,
+    val name: String
 ) : BaseEntity() {
     companion object {
         const val TABLE_NAME = "languages"

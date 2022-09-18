@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <map linked="true">
+        <entry key="ru">Russian</entry>
+        <entry key="en">English</entry>
+    </map>
+</resources>

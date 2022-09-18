@@ -3,7 +3,8 @@ package com.oborodulin.home.data.local.db.dao
 import androidx.room.*
 import com.oborodulin.home.data.local.db.entities.ServiceEntity
 import com.oborodulin.home.data.local.db.entities.ServiceTlEntity
-import com.oborodulin.home.data.local.db.entities.TranslateServiceEntity
+import com.oborodulin.home.data.local.db.entities.pojo.PrevServiceMeterValuePojo
+import com.oborodulin.home.data.local.db.entities.pojo.ServicePojo
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.distinctUntilChanged
@@ -24,29 +25,44 @@ interface ServiceDao {
     fun get(id: UUID) = _get(id).distinctUntilChanged()
 
     @Transaction
-    @Query(
-        "SELECT * FROM services JOIN services_tl ON services_tl.servicesId = services.id " +
-                "JOIN languages ON languages.id = services_tl.languagesId " +
-                "WHERE languages.localeCode = :locale ORDER BY services.pos"
-    )
-    fun _getAllContent(locale: String? = Locale.getDefault().language.toString()): Flow<List<TranslateServiceEntity>>
+    @Query("SELECT * FROM languages WHERE localeCode = :locale")
+    fun _getAllContent(locale: String? = Locale.getDefault().language.toString()): Flow<List<ServicePojo>>
 
     @ExperimentalCoroutinesApi
     fun getAllContent() = _getAllContent().distinctUntilChanged()
 
-    @Transaction
     @Query(
-        "SELECT * FROM services JOIN services_tl ON services_tl.servicesId = services.id " +
+        "SELECT services.*, services_tl.* FROM services JOIN services_tl ON services_tl.servicesId = services.id " +
                 "JOIN languages ON languages.id = services_tl.languagesId " +
                 "WHERE services.id = :id and languages.localeCode = :locale"
     )
     fun _getContent(
-        id: UUID,
-        locale: String? = Locale.getDefault().language.toString()
-    ): Flow<TranslateServiceEntity>
+        id: UUID, locale: String? = Locale.getDefault().language.toString()
+    ): Flow<ServicePojo>
 
     @ExperimentalCoroutinesApi
     fun getContent(id: UUID) = _getContent(id).distinctUntilChanged()
+
+    @Query(
+        "SELECT s.type, stl.name, IFNULL(mtl.measureUnit, stl.measureUnit) AS measureUnit " +
+                "FROM payer_services AS ps JOIN services AS s ON ps.servicesId = s.Id " +
+                "JOIN services_tl AS stl ON stl.servicesId = s.id " +
+                "JOIN languages AS l ON l.id = stl.languagesId " +
+                "JOIN meters m ON m.payerServicesId = ps.id " +
+                "JOIN meters_tl AS mtl ON mtl.metersId = m.id " +
+                "JOIN meter_values AS mvl ON mvl.metersId = m.id " +
+                "WHERE ps.payersId = :payerId AND l.localeCode = :locale " +
+                "AND mvl.valueDate = (SELECT max(mv.valueDate) FROM meter_values mv " +
+                "WHERE  ) " +
+                "ORDER BY s.pos "
+    )
+    fun _getPrevMetersValuesByPayer(
+        payerId: UUID, locale: String? = Locale.getDefault().language.toString()
+    ): Flow<List<PrevServiceMeterValuePojo>>
+
+    @ExperimentalCoroutinesApi
+    fun getPrevMetersValuesByPayer(payerId: UUID) =
+        _getPrevMetersValuesByPayer(payerId).distinctUntilChanged()
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun _insert(textContent: ServiceTlEntity)
