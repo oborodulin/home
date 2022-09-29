@@ -2,6 +2,7 @@ package com.oborodulin.home.common.util
 
 import android.content.ContentValues
 import timber.log.Timber
+import java.util.*
 import kotlin.reflect.full.memberProperties
 
 class Mapper {
@@ -17,7 +18,11 @@ class Mapper {
                         it.getter.call(instance)?.toString()
                     }"
                 )
-                contentValues.put(it.name, it.getter.call(instance)?.toString())
+                when (it.returnType.toString()) {
+                    "java.util.Date" -> contentValues.put(it.name, (it.getter.call(instance) as Date).time)
+                    "java.util.Date?" -> contentValues.put(it.name, (it.getter.call(instance) as? Date)?.time)
+                    else -> contentValues.put(it.name, it.getter.call(instance)?.toString())
+                }
             }
             return contentValues
         }

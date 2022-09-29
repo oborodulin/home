@@ -27,6 +27,7 @@ android {
     kotlinOptions {
         jvmTarget = cfg.jvm.target
     }
+    namespace 'com.oborodulin.home.domain'
 }
 
 dependencies {

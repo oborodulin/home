@@ -6,6 +6,7 @@ import androidx.work.Configuration
 import com.oborodulin.home.common.util.Constants
 import com.oborodulin.home.di.ApplicationInjector
 import com.oborodulin.home.common.util.ReleaseTree
+import com.oborodulin.home.common.util.ResourceUtils
 import com.oborodulin.home.common.util.setLocale
 import com.orhanobut.logger.AndroidLogAdapter
 import com.orhanobut.logger.FormatStrategy
@@ -58,6 +59,7 @@ class HomeApplication : Application(), Configuration.Provider {
         } else {
             Timber.plant(ReleaseTree())
         }
+        val languages = ResourceUtils.getHashMapResource(this, com.oborodulin.home.common.R.xml.languages)
         Timber.tag(TAG)
             .i("Version ${BuildConfig.VERSION_NAME} is starting [${Locale.getDefault().language}]")
         initialiseDagger()

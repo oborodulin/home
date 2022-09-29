@@ -2,50 +2,8 @@
   "formatVersion": 1,
   "database": {
     "version": 5,
-    "identityHash": "9af7afc048b6d10132a38fdc421df2eb",
+    "identityHash": "a0f2fdb0257f397ed1b3fe85d202bece",
     "entities": [
-      {
-        "tableName": "languages",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`localeCode` TEXT NOT NULL, `name` TEXT NOT NULL, `id` TEXT NOT NULL, PRIMARY KEY(`id`))",
-        "fields": [
-          {
-            "fieldPath": "localeCode",
-            "columnName": "localeCode",
-            "affinity": "TEXT",
-            "notNull": true
-          },
-          {
-            "fieldPath": "name",
-            "columnName": "name",
-            "affinity": "TEXT",
-            "notNull": true
-          },
-          {
-            "fieldPath": "id",
-            "columnName": "id",
-            "affinity": "TEXT",
-            "notNull": true
-          }
-        ],
-        "primaryKey": {
-          "columnNames": [
-            "id"
-          ],
-          "autoGenerate": false
-        },
-        "indices": [
-          {
-            "name": "index_languages_localeCode",
-            "unique": true,
-            "columnNames": [
-              "localeCode"
-            ],
-            "orders": [],
-            "createSql": "CREATE UNIQUE INDEX IF NOT EXISTS `index_languages_localeCode` ON `${TABLE_NAME}` (`localeCode`)"
-          }
-        ],
-        "foreignKeys": []
-      },
       {
         "tableName": "payers",
         "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`ercCode` TEXT NOT NULL, `fullName` TEXT NOT NULL, `address` TEXT NOT NULL, `totalArea` INTEGER, `livingSpace` INTEGER, `heatedVolume` INTEGER, `paymentDay` INTEGER, `personsNum` INTEGER, `isFavorite` INTEGER NOT NULL, `id` TEXT NOT NULL, PRIMARY KEY(`id`))",
@@ -154,8 +112,14 @@
       },
       {
         "tableName": "services_tl",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`name` TEXT NOT NULL, `measureUnit` TEXT, `descr` TEXT, `servicesId` TEXT NOT NULL, `languagesId` TEXT NOT NULL, `id` TEXT NOT NULL, PRIMARY KEY(`id`), FOREIGN KEY(`servicesId`) REFERENCES `services`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE , FOREIGN KEY(`languagesId`) REFERENCES `languages`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE )",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`localeCode` TEXT NOT NULL, `name` TEXT NOT NULL, `measureUnit` TEXT, `descr` TEXT, `servicesId` TEXT NOT NULL, `id` TEXT NOT NULL, PRIMARY KEY(`id`), FOREIGN KEY(`servicesId`) REFERENCES `services`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE )",
         "fields": [
+          {
+            "fieldPath": "localeCode",
+            "columnName": "localeCode",
+            "affinity": "TEXT",
+            "notNull": true
+          },
           {
             "fieldPath": "name",
             "columnName": "name",
@@ -181,12 +145,6 @@
             "notNull": true
           },
           {
-            "fieldPath": "languagesId",
-            "columnName": "languagesId",
-            "affinity": "TEXT",
-            "notNull": true
-          },
-          {
             "fieldPath": "id",
             "columnName": "id",
             "affinity": "TEXT",
@@ -201,14 +159,14 @@
         },
         "indices": [
           {
-            "name": "index_services_tl_languagesId_servicesId",
+            "name": "index_services_tl_localeCode_servicesId",
             "unique": true,
             "columnNames": [
-              "languagesId",
+              "localeCode",
               "servicesId"
             ],
             "orders": [],
-            "createSql": "CREATE UNIQUE INDEX IF NOT EXISTS `index_services_tl_languagesId_servicesId` ON `${TABLE_NAME}` (`languagesId`, `servicesId`)"
+            "createSql": "CREATE UNIQUE INDEX IF NOT EXISTS `index_services_tl_localeCode_servicesId` ON `${TABLE_NAME}` (`localeCode`, `servicesId`)"
           },
           {
             "name": "index_services_tl_servicesId",
@@ -218,15 +176,6 @@
             ],
             "orders": [],
             "createSql": "CREATE INDEX IF NOT EXISTS `index_services_tl_servicesId` ON `${TABLE_NAME}` (`servicesId`)"
-          },
-          {
-            "name": "index_services_tl_languagesId",
-            "unique": false,
-            "columnNames": [
-              "languagesId"
-            ],
-            "orders": [],
-            "createSql": "CREATE INDEX IF NOT EXISTS `index_services_tl_languagesId` ON `${TABLE_NAME}` (`languagesId`)"
           }
         ],
         "foreignKeys": [
@@ -236,17 +185,6 @@
             "onUpdate": "NO ACTION",
             "columns": [
               "servicesId"
-            ],
-            "referencedColumns": [
-              "id"
-            ]
-          },
-          {
-            "table": "languages",
-            "onDelete": "CASCADE",
-            "onUpdate": "NO ACTION",
-            "columns": [
-              "languagesId"
             ],
             "referencedColumns": [
               "id"
@@ -618,8 +556,14 @@
       },
       {
         "tableName": "meters_tl",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`measureUnit` TEXT, `descr` TEXT, `metersId` TEXT NOT NULL, `languagesId` TEXT NOT NULL, `id` TEXT NOT NULL, PRIMARY KEY(`id`), FOREIGN KEY(`metersId`) REFERENCES `meters`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE , FOREIGN KEY(`languagesId`) REFERENCES `languages`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE )",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`localeCode` TEXT NOT NULL, `measureUnit` TEXT, `descr` TEXT, `metersId` TEXT NOT NULL, `id` TEXT NOT NULL, PRIMARY KEY(`id`), FOREIGN KEY(`metersId`) REFERENCES `meters`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE )",
         "fields": [
+          {
+            "fieldPath": "localeCode",
+            "columnName": "localeCode",
+            "affinity": "TEXT",
+            "notNull": true
+          },
           {
             "fieldPath": "measureUnit",
             "columnName": "measureUnit",
@@ -639,12 +583,6 @@
             "notNull": true
           },
           {
-            "fieldPath": "languagesId",
-            "columnName": "languagesId",
-            "affinity": "TEXT",
-            "notNull": true
-          },
-          {
             "fieldPath": "id",
             "columnName": "id",
             "affinity": "TEXT",
@@ -659,14 +597,14 @@
         },
         "indices": [
           {
-            "name": "index_meters_tl_languagesId_metersId",
+            "name": "index_meters_tl_localeCode_metersId",
             "unique": true,
             "columnNames": [
-              "languagesId",
+              "localeCode",
               "metersId"
             ],
             "orders": [],
-            "createSql": "CREATE UNIQUE INDEX IF NOT EXISTS `index_meters_tl_languagesId_metersId` ON `${TABLE_NAME}` (`languagesId`, `metersId`)"
+            "createSql": "CREATE UNIQUE INDEX IF NOT EXISTS `index_meters_tl_localeCode_metersId` ON `${TABLE_NAME}` (`localeCode`, `metersId`)"
           },
           {
             "name": "index_meters_tl_metersId",
@@ -676,15 +614,6 @@
             ],
             "orders": [],
             "createSql": "CREATE INDEX IF NOT EXISTS `index_meters_tl_metersId` ON `${TABLE_NAME}` (`metersId`)"
-          },
-          {
-            "name": "index_meters_tl_languagesId",
-            "unique": false,
-            "columnNames": [
-              "languagesId"
-            ],
-            "orders": [],
-            "createSql": "CREATE INDEX IF NOT EXISTS `index_meters_tl_languagesId` ON `${TABLE_NAME}` (`languagesId`)"
           }
         ],
         "foreignKeys": [
@@ -694,17 +623,6 @@
             "onUpdate": "NO ACTION",
             "columns": [
               "metersId"
-            ],
-            "referencedColumns": [
-              "id"
-            ]
-          },
-          {
-            "table": "languages",
-            "onDelete": "CASCADE",
-            "onUpdate": "NO ACTION",
-            "columns": [
-              "languagesId"
             ],
             "referencedColumns": [
               "id"
@@ -853,7 +771,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '9af7afc048b6d10132a38fdc421df2eb')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'a0f2fdb0257f397ed1b3fe85d202bece')"
     ]
   }
 }

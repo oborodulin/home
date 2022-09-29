@@ -24,17 +24,20 @@ interface ServiceDao {
     @ExperimentalCoroutinesApi
     fun get(id: UUID) = _get(id).distinctUntilChanged()
 
-    @Transaction
-    @Query("SELECT * FROM languages WHERE localeCode = :locale")
+    @Query(
+        "SELECT s.id, s.pos, s.type, stl.name, stl.measureUnit, stl.descr " +
+                "FROM services AS s JOIN services_tl AS stl ON stl.servicesId = s.id " +
+                "WHERE stl.localeCode = :locale ORDER BY s.pos"
+    )
     fun _getAllContent(locale: String? = Locale.getDefault().language.toString()): Flow<List<ServicePojo>>
 
     @ExperimentalCoroutinesApi
     fun getAllContent() = _getAllContent().distinctUntilChanged()
 
     @Query(
-        "SELECT services.*, services_tl.* FROM services JOIN services_tl ON services_tl.servicesId = services.id " +
-                "JOIN languages ON languages.id = services_tl.languagesId " +
-                "WHERE services.id = :id and languages.localeCode = :locale"
+        "SELECT s.id, s.pos, s.type, stl.name, stl.measureUnit, stl.descr " +
+                "FROM services AS s JOIN services_tl AS stl ON stl.servicesId = s.id " +
+                "WHERE s.id = :id AND stl.localeCode = :locale ORDER BY s.pos"
     )
     fun _getContent(
         id: UUID, locale: String? = Locale.getDefault().language.toString()
@@ -44,17 +47,23 @@ interface ServiceDao {
     fun getContent(id: UUID) = _getContent(id).distinctUntilChanged()
 
     @Query(
-        "SELECT s.type, stl.name, IFNULL(mtl.measureUnit, stl.measureUnit) AS measureUnit " +
+        "SELECT s.type, stl.name, IFNULL(mtl.measureUnit, stl.measureUnit) AS measureUnit, " +
+                "mvl.valueDate AS prevLastDate, mvl.meterValue AS prevValue " +
                 "FROM payer_services AS ps JOIN services AS s ON ps.servicesId = s.Id " +
                 "JOIN services_tl AS stl ON stl.servicesId = s.id " +
-                "JOIN languages AS l ON l.id = stl.languagesId " +
                 "JOIN meters m ON m.payerServicesId = ps.id " +
                 "JOIN meters_tl AS mtl ON mtl.metersId = m.id " +
                 "JOIN meter_values AS mvl ON mvl.metersId = m.id " +
-                "WHERE ps.payersId = :payerId AND l.localeCode = :locale " +
-                "AND mvl.valueDate = (SELECT max(mv.valueDate) FROM meter_values mv " +
-                "WHERE  ) " +
-                "ORDER BY s.pos "
+                "JOIN (SELECT v.metersId, MAX(v.valueDate) maxValueDate " +
+                "FROM meter_values v JOIN meters m ON m.id = v.metersId " +
+                "JOIN payer_services AS ps ON ps.id = m.payerServicesId " +
+                "JOIN payers AS p ON p.id = ps.payersId " +
+                "WHERE v.valueDate <= IIF(strftime('%s', 'now') > strftime('%s', 'now', 'start of month', 'start of month', '+' || IFNULL(p.paymentDay, 20) || ' days')," +
+                "strftime('%s', 'now', 'start of month', '+' || IFNULL(p.paymentDay, 20) || ' days')," +
+                "strftime('%s', 'now', '-1 months', 'start of month', '+' || IFNULL(p.paymentDay, 20) || ' days')) * 1000 " +
+                "GROUP BY v.metersId) mv ON mvl.metersId = mv.metersId AND mvl.valueDate = mv.maxValueDate " +
+                "WHERE ps.payersId = :payerId AND stl.localeCode = :locale AND mtl.localeCode = :locale " +
+                "ORDER BY s.pos"
     )
     fun _getPrevMetersValuesByPayer(
         payerId: UUID, locale: String? = Locale.getDefault().language.toString()

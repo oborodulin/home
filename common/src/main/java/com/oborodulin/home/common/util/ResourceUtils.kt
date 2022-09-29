@@ -9,6 +9,9 @@ private const val TAG = "ResourceUtils"
 
 class ResourceUtils {
     companion object {
+        /**
+         * https://techhelpnotes.com/android-creating-hashmap-map-from-xml-resources/
+         */
         fun getHashMapResource(c: Context, hashMapResId: Int): Map<String, String>? {
             var map: MutableMap<String, String>? = null
             val parser: XmlResourceParser = c.resources.getXml(hashMapResId)
@@ -36,18 +39,13 @@ class ResourceUtils {
                                 }
                             }
                         }
-                        XmlPullParser.END_TAG -> {
+                        XmlPullParser.END_TAG ->
                             if (parser.name.equals("entry")) {
                                 map?.put(key!!, value!!)
                                 key = null
                                 value = null
                             }
-                        }
-                        XmlPullParser.TEXT -> {
-                            if (null != key) {
-                                value = parser.text
-                            }
-                        }
+                        XmlPullParser.TEXT -> key?.let { value = parser.text }
                     }
                     eventType = parser.next()
                 }

@@ -16,10 +16,10 @@ class HomeTypeConverters {
     fun fromUUID(uuid: UUID?): String? = uuid?.toString()
 
     @TypeConverter
-    fun fromDateTime(date: Date?): Long? = date?.time
+    fun fromDate(date: Date?): Long? = date?.time
 
     @TypeConverter
-    fun toDateTime(millisSinceEpoch: Long?): Date? = millisSinceEpoch?.let { Date(it) }
+    fun toDate(millisSinceEpoch: Long?): Date? = millisSinceEpoch?.let { Date(it) }
 
     @RequiresApi(Build.VERSION_CODES.O)
     @TypeConverter

@@ -8,24 +8,19 @@ import java.util.*
 
 @Entity(
     tableName = MeterTlEntity.TABLE_NAME,
-    indices = [Index(value = ["languagesId", "metersId"], unique = true)],
+    indices = [Index(value = ["localeCode", "metersId"], unique = true)],
     foreignKeys = [ForeignKey(
         entity = MeterEntity::class,
         parentColumns = arrayOf("id"),
         childColumns = arrayOf("metersId"),
         onDelete = ForeignKey.CASCADE
-    ), ForeignKey(
-        entity = LanguageEntity::class,
-        parentColumns = arrayOf("id"),
-        childColumns = arrayOf("languagesId"),
-        onDelete = ForeignKey.CASCADE
     )]
 )
 class MeterTlEntity(
+    val localeCode: String,
     var measureUnit: String? = null,
     val descr: String? = null,
     @ColumnInfo(index = true) var metersId: UUID,
-    @ColumnInfo(index = true) var languagesId: UUID,
 ) : BaseEntity() {
     companion object {
         const val TABLE_NAME = "meters_tl"
