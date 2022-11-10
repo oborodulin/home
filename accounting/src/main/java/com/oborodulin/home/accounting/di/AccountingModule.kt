@@ -41,9 +41,9 @@ object AccountingModule {
     @Provides
     fun providePayerUseCases(repository: PayersRepository): PayerUseCases =
         PayerUseCases(
-            getPayer = GetPayer(repository),
-            getPayers = GetPayers(repository),
-            savePayer = SavePayer(repository),
-            deletePayer = DeletePayer(repository)
+            getPayer = GetPayerUseCase(repository),
+            getPayersUseCase = GetPayersUseCase(repository),
+            savePayerUseCase = SavePayerUseCase(repository),
+            deletePayerUseCase = DeletePayerUseCase(repository)
         )
 }

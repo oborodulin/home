@@ -2,9 +2,9 @@ package com.oborodulin.home.common.domain.usecases
 
 sealed class UseCaseException(cause: Throwable) : Throwable(cause) {
 
-    class PostException(cause: Throwable) : UseCaseException(cause)
+    class PayerException(cause: Throwable) : UseCaseException(cause)
 
-    class UserException(cause: Throwable) : UseCaseException(cause)
+    class ServiceException(cause: Throwable) : UseCaseException(cause)
 
     class UnknownException(cause: Throwable) : UseCaseException(cause)
 

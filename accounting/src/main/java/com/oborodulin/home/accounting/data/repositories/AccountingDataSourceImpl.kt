@@ -5,6 +5,7 @@ import com.oborodulin.home.accounting.data.mappers.PayerEntityMapper
 import com.oborodulin.home.accounting.domain.model.Payer
 import com.oborodulin.home.common.di.IoDispatcher
 import com.oborodulin.home.data.local.db.dao.PayerDao
+import com.oborodulin.home.data.local.db.entities.PayerEntity
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
@@ -23,16 +24,17 @@ class AccountingDataSourceImpl @Inject constructor(
 ) : AccountingDataSource
 //    :    PagingSource<Int, NetworkMovie>()
 {
-    override fun getPayers(): Flow<List<Payer>> {
-        return payerDao.getAll().map { list ->
+    override fun getPayers(): Flow<List<PayerEntity>> {
+        return payerDao.getAll()
+            /*.map { list ->
             list.map {
                 payerEntityMapper.toPayer(it)
             }
-        }
+        }*/
     }
 
-    override fun getPayer(id: UUID): Flow<Payer> =
-        payerDao.get(id).map { payerEntityMapper.toPayer(it) }
+    override fun getPayer(id: UUID): Flow<PayerEntity> =
+        payerDao.get(id)//.map { payerEntityMapper.toPayer(it) }
 
     override suspend fun addPayer(payer: Payer) = withContext(dispatcher) {
         payerDao.add(payerEntityMapper.toPayerEntity(payer))

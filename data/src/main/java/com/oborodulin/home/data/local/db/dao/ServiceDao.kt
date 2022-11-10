@@ -29,7 +29,7 @@ interface ServiceDao {
                 "FROM services AS s JOIN services_tl AS stl ON stl.servicesId = s.id " +
                 "WHERE stl.localeCode = :locale ORDER BY s.pos"
     )
-    fun _getAllContent(locale: String? = Locale.getDefault().language.toString()): Flow<List<ServicePojo>>
+    fun _getAllContent(locale: String? = Locale.getDefault().language): Flow<List<ServicePojo>>
 
     @ExperimentalCoroutinesApi
     fun getAllContent() = _getAllContent().distinctUntilChanged()
@@ -39,9 +39,7 @@ interface ServiceDao {
                 "FROM services AS s JOIN services_tl AS stl ON stl.servicesId = s.id " +
                 "WHERE s.id = :id AND stl.localeCode = :locale ORDER BY s.pos"
     )
-    fun _getContent(
-        id: UUID, locale: String? = Locale.getDefault().language.toString()
-    ): Flow<ServicePojo>
+    fun _getContent(id: UUID, locale: String? = Locale.getDefault().language): Flow<ServicePojo>
 
     @ExperimentalCoroutinesApi
     fun getContent(id: UUID) = _getContent(id).distinctUntilChanged()
@@ -66,7 +64,7 @@ interface ServiceDao {
                 "ORDER BY s.pos"
     )
     fun _getPrevMetersValuesByPayer(
-        payerId: UUID, locale: String? = Locale.getDefault().language.toString()
+        payerId: UUID, locale: String? = Locale.getDefault().language
     ): Flow<List<PrevServiceMeterValuePojo>>
 
     @ExperimentalCoroutinesApi

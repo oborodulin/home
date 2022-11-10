@@ -1,4 +1,4 @@
-package com.oborodulin.home.navigation
+package com.oborodulin.home.common.ui.navigation
 
 private val classMap = mutableMapOf<String, Class<*>>()
 

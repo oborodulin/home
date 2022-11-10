@@ -65,7 +65,8 @@ buildscript {
                 sdk: [compileVersion: 33,
                       minVersion    : 22,
                       targetVersion : 33],
-                jvm: [target: "11"]
+                jvm: [target       : JavaVersion.VERSION_11,
+                      compatibility: [source: JavaVersion.VERSION_11, target: JavaVersion.VERSION_11]],
         ]
         // App dependencies
         deps = [
@@ -157,7 +158,7 @@ buildscript {
         mavenCentral()
     }
     dependencies {
-        classpath deps.tools.buildGradle
+        classpath "com.android.tools.build:gradle:$versions.gradle"
         classpath deps.kotlin.gradlePlugin
         classpath deps.navigation.safeArgsGradlePlugin
         classpath deps.dagger.gradlePlugin

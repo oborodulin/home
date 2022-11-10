@@ -1,5 +1,7 @@
 package com.oborodulin.home.ui.main
 
+//import com.oborodulin.home.popular.PopularScreen
+//import com.oborodulin.home.upcoming.UpcomingScreen
 import android.content.res.Configuration
 import android.widget.Toast
 import androidx.compose.foundation.layout.PaddingValues
@@ -33,14 +35,12 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
-import com.oborodulin.home.navigation.NavRoutes
-import com.oborodulin.home.common.ui.theme.SpeechRed
 import com.oborodulin.home.R
 import com.oborodulin.home.accounting.ui.AccountingScreen
 import com.oborodulin.home.common.ui.components.FabComponent
+import com.oborodulin.home.common.ui.navigation.NavRoutes
+import com.oborodulin.home.common.ui.theme.SpeechRed
 import timber.log.Timber
-//import com.oborodulin.home.popular.PopularScreen
-//import com.oborodulin.home.upcoming.UpcomingScreen
 import kotlin.math.roundToInt
 
 /**
@@ -77,6 +77,29 @@ fun SettingUpBottomNavigationBarAndCollapsing() {
             }
         }
     }
+    val navAccountingScreen = NavRoutes.NavAccountingScreen(
+        R.drawable.outline_account_balance_wallet_black_24,
+        com.oborodulin.home.navigation.R.string.nav_item_accounting
+    )
+    val navBillingScreen = NavRoutes.NavBillingScreen(
+        R.drawable.outline_monetization_on_black_24,
+        com.oborodulin.home.navigation.R.string.nav_item_billing
+    )
+    val navMeteringScreen = NavRoutes.NavMeteringScreen(
+        R.drawable.outline_electric_meter_black_24,
+        com.oborodulin.home.navigation.R.string.nav_item_metering
+    )
+    val navReportingScreen = NavRoutes.NavReportingScreen(
+        R.drawable.outline_receipt_black_24,
+        com.oborodulin.home.navigation.R.string.nav_item_reporting
+    )
+    val bottomNavRoutes = listOf(
+        navAccountingScreen,
+        navBillingScreen,
+        navMeteringScreen,
+        navReportingScreen
+    )
+
     val scaffoldState = rememberScaffoldState()
     val navController = rememberNavController()
     Scaffold(modifier = Modifier.nestedScroll(nestedScrollConnection),
@@ -94,44 +117,53 @@ fun SettingUpBottomNavigationBarAndCollapsing() {
                 modifier = Modifier
                     .height(bottomBarHeight)
                     .offset { IntOffset(x = 0, y = -bottomBarOffsetHeightPx.value.roundToInt()) },
-                navController
+                navController,
+                bottomNavRoutes
             )
         }
     ) {
-        MainScreenNavigationConfigurations(navController, it)
+        MainScreenNavigationConfigurations(
+            navController,
+            navAccountingScreen,
+            navBillingScreen,
+            navMeteringScreen,
+            it
+        )
     }
 }
 
 @Composable
 private fun MainScreenNavigationConfigurations(
     navController: NavHostController,
+    navAccountingScreen: NavRoutes,
+    navBillingScreen: NavRoutes,
+    navMeteringScreen: NavRoutes,
     paddingValues: PaddingValues
 ) {
     Timber.tag(TAG).d("MainScreenNavigationConfigurations(...) called")
     NavHost(
-        navController, startDestination = NavRoutes.AccountingScreen.route,
+        navController, startDestination = navAccountingScreen.route,
         modifier = Modifier.padding(paddingValues)
     ) {
-        composable(NavRoutes.AccountingScreen.route) {
+        composable(navAccountingScreen.route) {
             AccountingScreen(navController) //setFabOnClick = setFabOnClick
         }
-        composable(NavRoutes.BillingScreen.route) {
+        composable(navBillingScreen.route) {
             //BillingScreen(navController)
         }
-        composable(NavRoutes.MeteringScreen.route) {
+        composable(navMeteringScreen.route) {
             //MeteringScreen(navController)
         }
     }
 }
 
 @Composable
-fun BottomNavigationBar(modifier: Modifier, navController: NavController) {
-    val bottomNavRoutes = listOf(
-        NavRoutes.AccountingScreen,
-        NavRoutes.BillingScreen,
-        NavRoutes.MeteringScreen,
-        NavRoutes.ReportingScreen
-    )
+fun BottomNavigationBar(
+    modifier: Modifier,
+    navController: NavController,
+    bottomNavRoutes: List<NavRoutes>
+) {
+    Timber.tag(TAG).d("BottomNavigationBar() called")
     BottomNavigation(
         modifier
             .graphicsLayer {
