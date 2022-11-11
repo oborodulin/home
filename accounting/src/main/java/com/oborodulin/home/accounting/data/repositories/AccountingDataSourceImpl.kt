@@ -8,7 +8,6 @@ import com.oborodulin.home.data.local.db.dao.PayerDao
 import com.oborodulin.home.data.local.db.entities.PayerEntity
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
 import java.util.*
 import javax.inject.Inject
@@ -24,14 +23,15 @@ class AccountingDataSourceImpl @Inject constructor(
 ) : AccountingDataSource
 //    :    PagingSource<Int, NetworkMovie>()
 {
-    override fun getPayers(): Flow<List<PayerEntity>> {
+    override fun getPayers(): Flow<List<PayerEntity>> = payerDao.getAll()
+    /*{
         return payerDao.getAll()
-            /*.map { list ->
+            .map { list ->
             list.map {
                 payerEntityMapper.toPayer(it)
             }
-        }*/
-    }
+        }
+    }*/
 
     override fun getPayer(id: UUID): Flow<PayerEntity> =
         payerDao.get(id)//.map { payerEntityMapper.toPayer(it) }

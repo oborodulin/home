@@ -1,8 +1,7 @@
 package com.oborodulin.home.accounting.domain.model
 
-import com.oborodulin.home.domain.model.DomainModel
+import com.oborodulin.home.common.domain.model.ListItemModel
 import java.math.BigDecimal
-import java.util.*
 
 data class Payer(
     var ercCode: String = "",
@@ -14,4 +13,4 @@ data class Payer(
     var paymentDay: Int? = null,
     var personsNum: Int? = null,
     var isFavorite: Boolean = false,
-) : DomainModel()
+) : ListItemModel(fullName, address)

@@ -1,37 +1,74 @@
 package com.oborodulin.home.accounting.ui.payer.list
 
-import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavController
 import com.oborodulin.home.accounting.R
+import com.oborodulin.home.accounting.domain.model.Payer
 import com.oborodulin.home.common.ui.components.items.ListItemComponent
+import com.oborodulin.home.common.ui.state.CommonScreen
+import kotlinx.coroutines.flow.collectLatest
 import timber.log.Timber
 
 private const val TAG = "PayersListView"
 
 @Composable
-fun PayersList(viewModel: PayersListViewModel = hiltViewModel()) {
-    val payersUiState = viewModel.uiState.value
-    val payers = payersUiState.payers
-
-    Timber.tag(TAG).d("PayersList(...) called")
-    LazyColumn(modifier = Modifier.background(color = Color.DarkGray)) {
-        items(payers.size) { index ->
-            payers[index].let { payer ->
-                ListItemComponent(
-                    icon = null,
-                    title = payer.fullName,
-                    desc = payer.address
-                )
+fun PayersListView(
+    viewModel: PayersListViewModel = hiltViewModel(),
+    navController: NavController
+) {
+    Timber.tag(TAG).d("PayersListView(...) called")
+    LaunchedEffect(Unit) {
+        viewModel.submitAction(PayersListUiAction.Load)
+    }
+    viewModel.uiStateFlow.collectAsState().value.let { state ->
+        CommonScreen(state = state) {
+            PayersList(it) { payer ->
+                viewModel.submitAction(PayersListUiAction.PayerClick(payer.id))
             }
         }
+    }
+    LaunchedEffect(Unit) {
+        viewModel.singleEventFlow.collectLatest {
+            when (it) {
+                is PayersListUiSingleEvent.OpenPayerDetailScreen -> {
+                    navController.navigate(it.navRoute)
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun PayersList(
+    payers: List<Payer>,
+    onClick: (Payer) -> Unit
+) {
+    Timber.tag(TAG).d("PayersList(...) called")
+    if (payers.isNotEmpty()) {
+        LazyColumn(modifier = Modifier.padding(16.dp)) {
+            items(payers.size) { index ->
+                payers[index].let { payer ->
+                    ListItemComponent(
+                        icon = null,
+                        item = payer
+                    ) {
+                        onClick(payer)
+                    }
+                }
+            }
+        }
+    }
 /*
         list.apply {
             val error = when {
@@ -66,8 +103,7 @@ fun PayersList(viewModel: PayersListViewModel = hiltViewModel()) {
                 item { SweetError(message = error.error.localizedMessage ?: "Error") }
             }
         }*/
-    }
-    if (payers.isEmpty()) {
+    else {
         Text(
             text = stringResource(R.string.payer_list_empty_text),
             style = MaterialTheme.typography.subtitle1,
@@ -75,3 +111,4 @@ fun PayersList(viewModel: PayersListViewModel = hiltViewModel()) {
         )
     }
 }
+

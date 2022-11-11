@@ -1,6 +1,7 @@
 package com.oborodulin.home.domain.model
 
 import java.util.*
+import com.oborodulin.home.common.domain.model.DomainModel
 
 data class MeterVerification(
     var meter: Meter,

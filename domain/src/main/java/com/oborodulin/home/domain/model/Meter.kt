@@ -2,6 +2,7 @@ package com.oborodulin.home.domain.model
 
 import java.math.BigDecimal
 import java.util.*
+import com.oborodulin.home.common.domain.model.DomainModel
 
 data class Meter(
     var num: String,

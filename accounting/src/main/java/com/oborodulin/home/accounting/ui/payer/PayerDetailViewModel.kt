@@ -24,7 +24,7 @@ class PayerDetailViewModel @Inject constructor(private val payerUseCases: PayerU
     fun onEvent(event: PayerDetailEvent) {
         when (event) {
             is PayerDetailEvent.SavePayer -> viewModelScope.launch {
-                payerUseCases.savePayerUseCase(payerState.value)
+                //payerUseCases.savePayerUseCase(payerState.value)
             }
             is PayerDetailEvent.ChangeErcCode -> _payerState.value =
                 payerState.value.copy(ercCode = event.newErcCode)
@@ -47,9 +47,9 @@ class PayerDetailViewModel @Inject constructor(private val payerUseCases: PayerU
 
     fun fetchPayer(id: UUID) {
         viewModelScope.launch() {
-            payerUseCases.getPayer(id).collect {
+            /*payerUseCases.getPayer(id).collect {
                 _payerState.value = it
-            }
+            }*/
         }
     }
 }

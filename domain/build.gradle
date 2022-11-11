@@ -31,6 +31,8 @@ android {
 }
 
 dependencies {
+    implementation(project(":common"))
+
     // Logging
     implementation deps.logging.timber
     implementation deps.logging.logger

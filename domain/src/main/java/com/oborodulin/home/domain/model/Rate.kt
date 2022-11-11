@@ -1,5 +1,6 @@
 package com.oborodulin.home.domain.model
 
+import com.oborodulin.home.common.domain.model.DomainModel
 import java.math.BigDecimal
 import java.util.*
 

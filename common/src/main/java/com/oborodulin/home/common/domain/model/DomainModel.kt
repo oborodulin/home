@@ -1,4 +1,4 @@
-package com.oborodulin.home.domain.model;
+package com.oborodulin.home.common.domain.model;
 
 import java.io.Serializable
 import java.util.UUID

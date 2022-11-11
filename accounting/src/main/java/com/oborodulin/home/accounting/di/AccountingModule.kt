@@ -37,13 +37,4 @@ object AccountingModule {
     fun providePayersRepository(accountingDataSource: AccountingDataSource): PayersRepository =
         PayersRepositoryImp(accountingDataSource)
 
-    @Singleton
-    @Provides
-    fun providePayerUseCases(repository: PayersRepository): PayerUseCases =
-        PayerUseCases(
-            getPayer = GetPayerUseCase(repository),
-            getPayersUseCase = GetPayersUseCase(repository),
-            savePayerUseCase = SavePayerUseCase(repository),
-            deletePayerUseCase = DeletePayerUseCase(repository)
-        )
 }

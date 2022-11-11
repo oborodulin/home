@@ -2,6 +2,7 @@ package com.oborodulin.home.common.ui.components.items
 
 import android.content.res.Configuration
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.layout.Arrangement.Top
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -15,6 +16,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.oborodulin.home.common.domain.model.ListItemModel
 import com.oborodulin.home.common.ui.theme.Typography
 import timber.log.Timber
 
@@ -24,9 +26,9 @@ import timber.log.Timber
 private const val TAG = "Common.UI"
 
 @Composable
-fun ListItemComponent(icon: Int?, title: String, desc: String) {
+fun ListItemComponent(icon: Int?, item: ListItemModel, onClick: (ListItemModel) -> Unit) {
     Timber.tag(TAG)
-        .d("ListItem(...) called: {\"listItem\": {\"icon\": $icon, \"title\": \"$title\", \"desc\": \"$desc\"}}")
+        .d("ListItemComponent(...) called: {\"listItem\": {\"icon\": $icon, \"title\": \"${item.title}\", \"desc\": \"${item.descr}\"}}")
     Box(
         modifier = Modifier
             .padding(horizontal = 8.dp, vertical = 4.dp)
@@ -39,6 +41,9 @@ fun ListItemComponent(icon: Int?, title: String, desc: String) {
             Modifier
                 .padding(all = 4.dp)
                 .fillMaxSize()
+                .clickable {
+                    onClick(item)
+                }
         ) {
 /*            Image(
                 modifier = Modifier
@@ -59,14 +64,14 @@ fun ListItemComponent(icon: Int?, title: String, desc: String) {
                     .fillMaxHeight()
             ) {
                 Text(
-                    text = title,
+                    text = item.title,
                     style = Typography.body1.copy(
                         color = Color.White,
                         fontWeight = FontWeight.Bold
                     )
                 )
                 Text(
-                    text = desc,
+                    text = item.descr ?: "",
                     modifier = Modifier
                         .padding(vertical = 8.dp),
                     maxLines = 2,
@@ -84,5 +89,8 @@ fun ListItemComponent(icon: Int?, title: String, desc: String) {
 @Preview(name = "Day Mode", showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_NO)
 @Composable
 fun PreviewListItemComponent() {
-    ListItemComponent(icon = null, title = "Title", desc = "Description")
+    ListItemComponent(
+        icon = null,
+        item = ListItemModel(title = "Title", descr = "Description"),
+        onClick = {})
 }

@@ -13,7 +13,7 @@ import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
-import com.oborodulin.home.accounting.ui.payer.list.PayersList
+import com.oborodulin.home.accounting.ui.payer.list.PayersListView
 import com.oborodulin.home.common.ui.theme.HomeComposableTheme
 import timber.log.Timber
 
@@ -60,7 +60,7 @@ fun AccountingScreen(
                     .clip(RoundedCornerShape(30.dp))
                     .weight(2f)
             ) {
-                PayersList()
+                PayersListView(navController = navController)
             }
         }
     }

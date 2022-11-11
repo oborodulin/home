@@ -19,11 +19,13 @@ import kotlinx.coroutines.launch
 import timber.log.Timber
 import javax.inject.Inject
 
-private const val TAG = "PayersListViewModel"
+private const val TAG = "ViewModel.PayersListViewModel"
 
 @HiltViewModel
-class PayersListViewModel @Inject constructor(private val payerUseCases: PayerUseCases, private val converter: PayersListConverter)
-    : MviViewModel<List<Payer>, UiState<List<Payer>>, PayersListUiAction, PayersListUiSingleEvent>()  {
+class PayersListViewModel @Inject constructor(
+    private val payerUseCases: PayerUseCases,
+    private val converter: PayersListConverter
+) : MviViewModel<List<Payer>, UiState<List<Payer>>, PayersListUiAction, PayersListUiSingleEvent>() {
     private val _uiState = mutableStateOf(
         PayersListUiState(
             payers = listOf(),
@@ -31,17 +33,12 @@ class PayersListViewModel @Inject constructor(private val payerUseCases: PayerUs
         )
     )
     val uiState: State<PayersListUiState>
-    get() = _uiState
+        get() = _uiState
 
     private val errorHandler = CoroutineExceptionHandler { _, exception ->
         Timber.tag(TAG).e(exception, exception.message)
         _uiState.value =
             _uiState.value.copy(error = exception.message, isLoading = false)
-    }
-
-    init {
-        Timber.tag(TAG).d("Init payers list")
-        getPayers()
     }
 
     override fun initState(): UiState<List<Payer>> = UiState.Loading
@@ -54,8 +51,10 @@ class PayersListViewModel @Inject constructor(private val payerUseCases: PayerUs
             is PayersListUiAction.PayerClick -> {
                 submitSingleEvent(
                     PayersListUiSingleEvent.OpenPayerDetailScreen(
-                        NavRoutes.NavPayerDetailScreen(R.drawable.outline_person_black_24,
-                            R.string.nav_item_payer_detail).routeForPayerDetail(
+                        NavRoutes.NavPayerDetailScreen(
+                            R.drawable.outline_person_black_24,
+                            R.string.nav_item_payer_detail
+                        ).routeForPayerDetail(
                             InputModel(action.payerId)
                         )
                     )
@@ -78,33 +77,31 @@ class PayersListViewModel @Inject constructor(private val payerUseCases: PayerUs
     private fun getPayers() {
         viewModelScope.launch {
             payerUseCases.getPayersUseCase.execute(GetPayersUseCase.Request).map {
-                    converter.convert(it)
-                }
+                converter.convert(it)
+            }
                 .collect {
-                    Timber.tag(TAG).i("Get payers for list {\"payers\": {\"count\" : ${it.size}}}")
                     submitState(it)
                 }
         }
-
     }
 
 
-/*    private fun getPayers() {
-        viewModelScope.launch(errorHandler) {
-            payerUseCases.getPayersUseCase().collect {
-                _uiState.value = _uiState.value.copy(
-                    payers = it,
-                    isLoading = false
-                )
+    /*    private fun getPayers() {
+            viewModelScope.launch(errorHandler) {
+                payerUseCases.getPayersUseCase().collect {
+                    _uiState.value = _uiState.value.copy(
+                        payers = it,
+                        isLoading = false
+                    )
+                }
             }
         }
-    }
-*/
+    */
     fun onEvent(event: PayersListEvent) {
-        when (event) {
+/*        when (event) {
             is PayersListEvent.DeletePayer ->
                 viewModelScope.launch { payerUseCases.deletePayerUseCase(event.payer) }
-/*        is PayersListEvent.ShowCompletedPayers -> viewModelScope.launch {
+        is PayersListEvent.ShowCompletedPayers -> viewModelScope.launch {
             userPreferenceUseCases.updateShowCompleted(event.show)
         }
         is PayersListEvent.ChangeSortByDeadline -> viewModelScope.launch {
@@ -114,7 +111,8 @@ class PayersListViewModel @Inject constructor(private val payerUseCases: PayerUs
             userPreferenceUseCases.enableSortByPriority(event.enable)
         }
 
- */
+
         }
+ */
     }
 }
