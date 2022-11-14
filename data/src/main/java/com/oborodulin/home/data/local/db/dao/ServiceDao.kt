@@ -3,7 +3,6 @@ package com.oborodulin.home.data.local.db.dao
 import androidx.room.*
 import com.oborodulin.home.data.local.db.entities.ServiceEntity
 import com.oborodulin.home.data.local.db.entities.ServiceTlEntity
-import com.oborodulin.home.data.local.db.entities.pojo.PrevServiceMeterValuePojo
 import com.oborodulin.home.data.local.db.entities.pojo.ServicePojo
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
@@ -13,77 +12,53 @@ import java.util.*
 @Dao
 interface ServiceDao {
     @Query("SELECT * FROM services ORDER BY pos")
-    fun _getAll(): Flow<List<ServiceEntity>>
+    fun getAll(): Flow<List<ServiceEntity>>
 
     @ExperimentalCoroutinesApi
-    fun getAll() = _getAll().distinctUntilChanged()
+    fun getAllDistinctUntilChanged() = getAll().distinctUntilChanged()
 
     @Query("SELECT * FROM services WHERE id=:id")
-    fun _get(id: UUID): Flow<ServiceEntity>
+    fun get(id: UUID): Flow<ServiceEntity>
 
     @ExperimentalCoroutinesApi
-    fun get(id: UUID) = _get(id).distinctUntilChanged()
+    fun getDistinctUntilChanged(id: UUID) = get(id).distinctUntilChanged()
 
     @Query(
         "SELECT s.id, s.pos, s.type, stl.name, stl.measureUnit, stl.descr " +
                 "FROM services AS s JOIN services_tl AS stl ON stl.servicesId = s.id " +
                 "WHERE stl.localeCode = :locale ORDER BY s.pos"
     )
-    fun _getAllContent(locale: String? = Locale.getDefault().language): Flow<List<ServicePojo>>
+    fun getServices(locale: String? = Locale.getDefault().language): Flow<List<ServicePojo>>
 
     @ExperimentalCoroutinesApi
-    fun getAllContent() = _getAllContent().distinctUntilChanged()
+    fun getServicesDistinctUntilChanged() = getServices().distinctUntilChanged()
 
     @Query(
         "SELECT s.id, s.pos, s.type, stl.name, stl.measureUnit, stl.descr " +
                 "FROM services AS s JOIN services_tl AS stl ON stl.servicesId = s.id " +
                 "WHERE s.id = :id AND stl.localeCode = :locale ORDER BY s.pos"
     )
-    fun _getContent(id: UUID, locale: String? = Locale.getDefault().language): Flow<ServicePojo>
+    fun getService(
+        id: UUID,
+        locale: String? = Locale.getDefault().language
+    ): Flow<ServicePojo>
 
     @ExperimentalCoroutinesApi
-    fun getContent(id: UUID) = _getContent(id).distinctUntilChanged()
-
-    @Query(
-        "SELECT s.type, stl.name, IFNULL(mtl.measureUnit, stl.measureUnit) AS measureUnit, " +
-                "mvl.valueDate AS prevLastDate, mvl.meterValue AS prevValue " +
-                "FROM payer_services AS ps JOIN services AS s ON ps.servicesId = s.Id " +
-                "JOIN services_tl AS stl ON stl.servicesId = s.id " +
-                "JOIN meters m ON m.payerServicesId = ps.id " +
-                "JOIN meters_tl AS mtl ON mtl.metersId = m.id " +
-                "JOIN meter_values AS mvl ON mvl.metersId = m.id " +
-                "JOIN (SELECT v.metersId, MAX(v.valueDate) maxValueDate " +
-                "FROM meter_values v JOIN meters m ON m.id = v.metersId " +
-                "JOIN payer_services AS ps ON ps.id = m.payerServicesId " +
-                "JOIN payers AS p ON p.id = ps.payersId " +
-                "WHERE v.valueDate <= IIF(strftime('%s', 'now') > strftime('%s', 'now', 'start of month', 'start of month', '+' || IFNULL(p.paymentDay, 20) || ' days')," +
-                "strftime('%s', 'now', 'start of month', '+' || IFNULL(p.paymentDay, 20) || ' days')," +
-                "strftime('%s', 'now', '-1 months', 'start of month', '+' || IFNULL(p.paymentDay, 20) || ' days')) * 1000 " +
-                "GROUP BY v.metersId) mv ON mvl.metersId = mv.metersId AND mvl.valueDate = mv.maxValueDate " +
-                "WHERE ps.payersId = :payerId AND stl.localeCode = :locale AND mtl.localeCode = :locale " +
-                "ORDER BY s.pos"
-    )
-    fun _getPrevMetersValuesByPayer(
-        payerId: UUID, locale: String? = Locale.getDefault().language
-    ): Flow<List<PrevServiceMeterValuePojo>>
-
-    @ExperimentalCoroutinesApi
-    fun getPrevMetersValuesByPayer(payerId: UUID) =
-        _getPrevMetersValuesByPayer(payerId).distinctUntilChanged()
+    fun getServiceDistinctUntilChanged(id: UUID) = getService(id).distinctUntilChanged()
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun _insert(textContent: ServiceTlEntity)
+    suspend fun insert(textContent: ServiceTlEntity)
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun _insert(service: ServiceEntity)
+    suspend fun insert(service: ServiceEntity)
 
     @Transaction
     suspend fun insert(service: ServiceEntity, textContent: ServiceTlEntity) {
         service.pos = service.pos ?: nextPos()
         updatePos(service.pos!!)
-        _insert(service)
+        insert(service)
         textContent.servicesId = service.id
-        _insert(textContent)
+        insert(textContent)
     }
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
@@ -93,17 +68,17 @@ interface ServiceDao {
     suspend fun addAll(services: List<ServiceEntity>)
 
     @Update
-    suspend fun _update(textContent: ServiceTlEntity)
+    suspend fun update(textContent: ServiceTlEntity)
 
     @Update
-    suspend fun _update(service: ServiceEntity)
+    suspend fun update(service: ServiceEntity)
 
     @Transaction
     suspend fun update(service: ServiceEntity, textContent: ServiceTlEntity) {
         service.pos = service.pos ?: nextPos()
         updatePos(service.pos!!)
-        _update(service)
-        _update(textContent)
+        update(service)
+        update(textContent)
     }
 
     @Delete

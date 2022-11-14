@@ -1,11 +1,10 @@
-package com.oborodulin.home.domain.model
+package com.oborodulin.home.metering.domain.model
 
 import java.util.*
 import com.oborodulin.home.common.domain.model.DomainModel
 
 data class MeterVerification(
-    var meter: Meter,
-    val startDate: Date,
+    val startDate: Date = Date(),
     val endDate: Date?,
-    val isOk: Boolean = true,
+    val isOk: Boolean = false,
 ) : DomainModel()

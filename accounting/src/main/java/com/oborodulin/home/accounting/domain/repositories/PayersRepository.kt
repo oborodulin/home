@@ -10,13 +10,13 @@ interface PayersRepository {
 
     fun get(id: UUID): Flow<PayerEntity>
 
-    suspend fun add(payer: Payer)
+    fun add(payer: Payer): Flow<Payer>
 
-    suspend fun update(payer: Payer)
+    fun update(payer: Payer): Flow<Payer>
 
-    suspend fun save(payer: Payer)
+    fun save(payer: Payer): Flow<Payer>
 
-    suspend fun delete(payer: Payer)
+    fun delete(payer: Payer): Flow<Payer>
 
     suspend fun deleteAll()
 }

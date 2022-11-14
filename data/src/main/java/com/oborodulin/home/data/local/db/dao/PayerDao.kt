@@ -10,16 +10,16 @@ import java.util.*
 @Dao
 interface PayerDao {
     @Query("SELECT * FROM payers")
-    fun _getAll(): Flow<List<PayerEntity>>
+    fun getAll(): Flow<List<PayerEntity>>
 
     @ExperimentalCoroutinesApi
-    fun getAll() = _getAll().distinctUntilChanged()
+    fun getAllDistinctUntilChanged() = getAll().distinctUntilChanged()
 
     @Query("SELECT * FROM payers WHERE id=:id")
-    fun _get(id: UUID): Flow<PayerEntity>
+    fun get(id: UUID): Flow<PayerEntity>
 
     @ExperimentalCoroutinesApi
-    fun get(id: UUID) = _get(id).distinctUntilChanged()
+    fun getDistinctUntilChanged(id: UUID) = get(id).distinctUntilChanged()
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun add(payer: PayerEntity)

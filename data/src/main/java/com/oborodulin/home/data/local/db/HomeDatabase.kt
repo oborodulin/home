@@ -58,8 +58,9 @@ private val MIGRATION_4_5 = object : Migration(4, 5) {
 
 @Database(
     entities = [PayerEntity::class, ServiceEntity::class, ServiceTlEntity::class,
-        PayerServiceCrossRefEntity::class, RateEntity::class, RatePromotionEntity::class,
-        MeterEntity::class, MeterTlEntity::class, MeterValueEntity::class,
+        PayerServiceCrossRefEntity::class,
+        RateEntity::class, RatePromotionEntity::class,
+        MeterEntity::class, MeterTlEntity::class, MeterValueEntity::class, MeterVerificationEntity::class,
         ReceiptEntity::class],
     version = 5
 )

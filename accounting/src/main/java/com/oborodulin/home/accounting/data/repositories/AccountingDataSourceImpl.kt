@@ -23,7 +23,8 @@ class AccountingDataSourceImpl @Inject constructor(
 ) : AccountingDataSource
 //    :    PagingSource<Int, NetworkMovie>()
 {
-    override fun getPayers(): Flow<List<PayerEntity>> = payerDao.getAll()
+    override fun getPayers(): Flow<List<PayerEntity>> =
+        payerDao.getAllDistinctUntilChanged()
     /*{
         return payerDao.getAll()
             .map { list ->
@@ -34,7 +35,7 @@ class AccountingDataSourceImpl @Inject constructor(
     }*/
 
     override fun getPayer(id: UUID): Flow<PayerEntity> =
-        payerDao.get(id)//.map { payerEntityMapper.toPayer(it) }
+        payerDao.getDistinctUntilChanged(id)//.map { payerEntityMapper.toPayer(it) }
 
     override suspend fun addPayer(payer: Payer) = withContext(dispatcher) {
         payerDao.add(payerEntityMapper.toPayerEntity(payer))

@@ -15,6 +15,8 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.oborodulin.home.accounting.R
 import com.oborodulin.home.accounting.domain.model.Payer
+import com.oborodulin.home.accounting.ui.AccountingUiAction
+import com.oborodulin.home.accounting.ui.AccountingViewModel
 import com.oborodulin.home.common.ui.components.items.ListItemComponent
 import com.oborodulin.home.common.ui.state.CommonScreen
 import kotlinx.coroutines.flow.collectLatest
@@ -25,6 +27,7 @@ private const val TAG = "PayersListView"
 @Composable
 fun PayersListView(
     viewModel: PayersListViewModel = hiltViewModel(),
+    accountingViewModel: AccountingViewModel = hiltViewModel(),
     navController: NavController
 ) {
     Timber.tag(TAG).d("PayersListView(...) called")
@@ -34,7 +37,7 @@ fun PayersListView(
     viewModel.uiStateFlow.collectAsState().value.let { state ->
         CommonScreen(state = state) {
             PayersList(it) { payer ->
-                viewModel.submitAction(PayersListUiAction.PayerClick(payer.id))
+                accountingViewModel.submitAction(AccountingUiAction.PayerClick(payer.id))
             }
         }
     }

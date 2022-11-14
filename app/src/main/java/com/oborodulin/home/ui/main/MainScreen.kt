@@ -107,7 +107,7 @@ fun SettingUpBottomNavigationBarAndCollapsing() {
         floatingActionButtonPosition = FabPosition.End,
         floatingActionButton = {
             val context = LocalContext.current
-            FabComponent(text = "SAVE_TODO", onClick = {
+            FabComponent(text = "TODO", onClick = {
                 Toast.makeText(context, "Added Todo", Toast.LENGTH_SHORT).show()
             }
             )

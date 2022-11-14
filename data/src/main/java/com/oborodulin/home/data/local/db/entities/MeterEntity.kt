@@ -18,10 +18,8 @@ import java.util.*
 class MeterEntity(
     var num: String,
     val maxValue: BigDecimal,
-    //var measureUnit: String? = null,
     @TypeConverters(DateTypeConverter::class) val passportDate: Date? = null,
     val verificationPeriod: Int? = null,
-    //var descr: String? = null,
     @ColumnInfo(index = true) var payerServicesId: UUID,
 ) : BaseEntity() {
     companion object {

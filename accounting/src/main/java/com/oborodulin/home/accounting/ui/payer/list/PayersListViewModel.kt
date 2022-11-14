@@ -1,13 +1,13 @@
 package com.oborodulin.home.accounting.ui.payer.list
 
-import androidx.compose.runtime.State
-import androidx.compose.runtime.mutableStateOf
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.viewModelScope
 import com.oborodulin.home.accounting.R
 import com.oborodulin.home.accounting.domain.converters.PayersListConverter
 import com.oborodulin.home.accounting.domain.model.Payer
 import com.oborodulin.home.accounting.domain.usecases.GetPayersUseCase
 import com.oborodulin.home.accounting.domain.usecases.PayerUseCases
+import com.oborodulin.home.accounting.ui.AccountingViewModel
 import com.oborodulin.home.common.ui.navigation.InputModel
 import com.oborodulin.home.common.ui.navigation.NavRoutes
 import com.oborodulin.home.common.ui.state.MviViewModel
@@ -19,26 +19,27 @@ import kotlinx.coroutines.launch
 import timber.log.Timber
 import javax.inject.Inject
 
-private const val TAG = "ViewModel.PayersListViewModel"
+private const val TAG = "Accounting.AccountingViewModel"
 
 @HiltViewModel
 class PayersListViewModel @Inject constructor(
+    private val accountingViewModel: AccountingViewModel,
     private val payerUseCases: PayerUseCases,
     private val converter: PayersListConverter
 ) : MviViewModel<List<Payer>, UiState<List<Payer>>, PayersListUiAction, PayersListUiSingleEvent>() {
-    private val _uiState = mutableStateOf(
-        PayersListUiState(
-            payers = listOf(),
-            isLoading = true
+    /*
+        private val _uiState = mutableStateOf(
+             PayersListUiState(
+                payers = listOf(),
+                isLoading = true
+            )
         )
-    )
-    val uiState: State<PayersListUiState>
-        get() = _uiState
-
+        val uiState: State<PayersListUiState>
+            get() = _uiState
+    */
     private val errorHandler = CoroutineExceptionHandler { _, exception ->
         Timber.tag(TAG).e(exception, exception.message)
-        _uiState.value =
-            _uiState.value.copy(error = exception.message, isLoading = false)
+        //_uiState.value = _uiState.value.copy(error = exception.message, isLoading = false)
     }
 
     override fun initState(): UiState<List<Payer>> = UiState.Loading
@@ -48,7 +49,7 @@ class PayersListViewModel @Inject constructor(
             is PayersListUiAction.Load -> {
                 getPayers()
             }
-            is PayersListUiAction.PayerClick -> {
+            is PayersListUiAction.EditPayer -> {
                 submitSingleEvent(
                     PayersListUiSingleEvent.OpenPayerDetailScreen(
                         NavRoutes.NavPayerDetailScreen(
@@ -59,6 +60,9 @@ class PayersListViewModel @Inject constructor(
                         )
                     )
                 )
+            }
+            is PayersListUiAction.DeletePayer -> {
+
             }
             /*is PostListUiAction.UserClick -> {
                 updateInteraction(action.interaction)
@@ -71,7 +75,6 @@ class PayersListViewModel @Inject constructor(
                 )
             }*/
         }
-
     }
 
     private fun getPayers() {
@@ -85,7 +88,6 @@ class PayersListViewModel @Inject constructor(
         }
     }
 
-
     /*    private fun getPayers() {
             viewModelScope.launch(errorHandler) {
                 payerUseCases.getPayersUseCase().collect {
@@ -96,9 +98,8 @@ class PayersListViewModel @Inject constructor(
                 }
             }
         }
-    */
     fun onEvent(event: PayersListEvent) {
-/*        when (event) {
+        when (event) {
             is PayersListEvent.DeletePayer ->
                 viewModelScope.launch { payerUseCases.deletePayerUseCase(event.payer) }
         is PayersListEvent.ShowCompletedPayers -> viewModelScope.launch {
@@ -113,6 +114,7 @@ class PayersListViewModel @Inject constructor(
 
 
         }
- */
-    }
+     }
+
+     */
 }

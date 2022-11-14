@@ -24,4 +24,8 @@ object PersistenceModule {
     @Singleton
     @Provides
     fun providePayerDao(db: HomeDatabase) = db.payerDao()
+
+    @Singleton
+    @Provides
+    fun provideMeterDao(db: HomeDatabase) = db.meterDao()
 }

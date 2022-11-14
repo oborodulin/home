@@ -3,10 +3,8 @@ package com.oborodulin.home.accounting.domain.usecases
 import com.oborodulin.home.accounting.domain.model.Payer
 import com.oborodulin.home.accounting.domain.repositories.PayersRepository
 import com.oborodulin.home.common.domain.usecases.UseCase
-import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.emptyFlow
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.flow.map
 
 class DeletePayerUseCase(
     configuration: Configuration,
@@ -14,8 +12,10 @@ class DeletePayerUseCase(
 ) : UseCase<DeletePayerUseCase.Request, DeletePayerUseCase.Response>(configuration) {
 
     override fun process(request: Request): Flow<Response> {
-        GlobalScope.launch { payersRepository.delete(request.payer) }
-        return emptyFlow()
+        return payersRepository.delete(request.payer)
+            .map {
+                Response
+            }
     }
 
     data class Request(val payer: Payer) : UseCase.Request
