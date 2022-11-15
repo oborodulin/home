@@ -56,11 +56,11 @@ sealed class NavRoutes constructor(
             type = NavType.StringType
         })
     ) {
-        fun routeForPayerDetail(payerInput: InputModel) =
-            String.format(ROUTE_PAYER_DETAIL, payerInput.id)
+        fun routeForPayerDetail(payerInput: PayerInput) =
+            String.format(ROUTE_PAYER_DETAIL, payerInput.payerId)
 
-        fun fromEntry(entry: NavBackStackEntry): InputModel {
-            return InputModel(
+        fun fromEntry(entry: NavBackStackEntry): PayerInput {
+            return PayerInput(
                 UUID.fromString(
                     entry.arguments?.getString(
                         ARG_PAYER_ID

@@ -2,9 +2,7 @@ package com.oborodulin.home.di
 
 import android.content.Context
 import com.google.gson.Gson
-import com.oborodulin.home.accounting.data.repositories.PayersRepositoryImp
 import com.oborodulin.home.data.local.db.HomeDatabase
-import com.oborodulin.home.data.local.db.dao.PayerDao
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn

@@ -1,4 +1,4 @@
-package com.oborodulin.home.accounting.ui.navigation
+package com.oborodulin.home.common.ui.navigation
 
 import java.util.UUID
 

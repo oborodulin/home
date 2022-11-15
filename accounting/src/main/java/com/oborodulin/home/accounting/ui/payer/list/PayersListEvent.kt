@@ -1,6 +1,6 @@
 package com.oborodulin.home.accounting.ui.payer.list
 
-import com.oborodulin.home.accounting.domain.model.Payer
+import com.oborodulin.home.domain.model.Payer
 
 sealed class PayersListEvent {
     data class DeletePayer(val payer: Payer) : PayersListEvent()

@@ -52,16 +52,16 @@ fun AccountingScreen(
                     Box(
                         modifier = Modifier
                             .clip(RoundedCornerShape(30.dp))
-                            .weight(1f)
+                            .weight(2f)
                     ) {
-                        PrevServiceMeterVals(it)
+                        PayersListView(navController = navController)
                     }
                     Box(
                         modifier = Modifier
                             .clip(RoundedCornerShape(30.dp))
-                            .weight(2f)
+                            .weight(1f)
                     ) {
-                        PayersListView(navController = navController)
+                        PrevServiceMeterVals(it)
                     }
                 }
             }

@@ -10,7 +10,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.oborodulin.home.R
-import com.oborodulin.home.accounting.domain.model.Payer
+import com.oborodulin.home.domain.model.Payer
 import com.oborodulin.home.controller.ListFragment
 import com.oborodulin.home.data.local.db.entities.BaseEntity
 import com.oborodulin.home.data.local.db.entities.PayerEntity

@@ -1,13 +1,12 @@
-package com.oborodulin.home.accounting.data.repositories
+package com.oborodulin.home.data.local.db.repositories
 
 //import com.oborodulin.home.domain.model.NetworkMovie
-import com.oborodulin.home.accounting.data.mappers.PayerEntityMapper
-import com.oborodulin.home.accounting.domain.model.Payer
+import com.oborodulin.home.data.local.db.mappers.PayerEntityMapper
+import com.oborodulin.home.domain.model.Payer
 import com.oborodulin.home.common.di.IoDispatcher
 import com.oborodulin.home.data.local.db.dao.PayerDao
-import com.oborodulin.home.data.local.db.entities.PayerEntity
 import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
 import java.util.*
 import javax.inject.Inject
@@ -15,27 +14,23 @@ import javax.inject.Inject
 /**
  * Created by tfakioglu on 12.December.2021
  */
-class AccountingDataSourceImpl @Inject constructor(
+class PayerDataSourceImpl @Inject constructor(
     private val payerDao: PayerDao,
     @IoDispatcher private val dispatcher: CoroutineDispatcher,
     private val payerEntityMapper: PayerEntityMapper
 /*private val nowPlayingUseCase: NowPlayingUseCase*/
-) : AccountingDataSource
+) : PayerDataSource
 //    :    PagingSource<Int, NetworkMovie>()
 {
-    override fun getPayers(): Flow<List<PayerEntity>> =
-        payerDao.getAllDistinctUntilChanged()
-    /*{
-        return payerDao.getAll()
-            .map { list ->
+    override fun getPayers() = payerDao.getAllDistinctUntilChanged()
+        .map { list ->
             list.map {
                 payerEntityMapper.toPayer(it)
             }
         }
-    }*/
 
-    override fun getPayer(id: UUID): Flow<PayerEntity> =
-        payerDao.getDistinctUntilChanged(id)//.map { payerEntityMapper.toPayer(it) }
+    override fun getPayer(id: UUID) =
+        payerDao.getDistinctUntilChanged(id).map { payerEntityMapper.toPayer(it) }
 
     override suspend fun addPayer(payer: Payer) = withContext(dispatcher) {
         payerDao.add(payerEntityMapper.toPayerEntity(payer))

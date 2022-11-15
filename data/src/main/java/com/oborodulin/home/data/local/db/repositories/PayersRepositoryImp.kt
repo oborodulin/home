@@ -1,40 +1,40 @@
-package com.oborodulin.home.accounting.data.repositories
+package com.oborodulin.home.data.local.db.repositories
 
-import com.oborodulin.home.accounting.domain.model.Payer
-import com.oborodulin.home.accounting.domain.repositories.PayersRepository
+import com.oborodulin.home.domain.model.Payer
+import com.oborodulin.home.domain.repositories.PayersRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import java.util.*
 import javax.inject.Inject
 
 class PayersRepositoryImp @Inject constructor(
-    private val accountingDataSource: AccountingDataSource
+    private val payerDataSource: PayerDataSource
 ) : PayersRepository {
-    override fun getAll() = accountingDataSource.getPayers()
+    override fun getAll() = payerDataSource.getPayers()
 
-    override fun get(id: UUID) = accountingDataSource.getPayer(id)
+    override fun get(id: UUID) = payerDataSource.getPayer(id)
 
     override fun add(payer: Payer): Flow<Payer> = flow {
-        accountingDataSource.addPayer(payer)
+        payerDataSource.addPayer(payer)
         emit(payer)
     }
 
     override fun update(payer: Payer): Flow<Payer> = flow {
-        accountingDataSource.updatePayer(payer)
+        payerDataSource.updatePayer(payer)
         emit(payer)
     }
 
     override fun save(payer: Payer): Flow<Payer> = flow {
-        accountingDataSource.savePayer(payer)
+        payerDataSource.savePayer(payer)
         emit(payer)
     }
 
     override fun delete(payer: Payer): Flow<Payer> = flow {
-        accountingDataSource.deletePayer(payer)
+        payerDataSource.deletePayer(payer)
         this.emit(payer)
     }
 
-    override suspend fun deleteAll() = accountingDataSource.deletePayers()
+    override suspend fun deleteAll() = payerDataSource.deletePayers()
 
     /*
         fun nowPlaying(): Flow<PagingData<NetworkMovie>> {

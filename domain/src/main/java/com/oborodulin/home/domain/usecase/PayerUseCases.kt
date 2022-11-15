@@ -1,4 +1,4 @@
-package com.oborodulin.home.accounting.domain.usecases
+package com.oborodulin.home.domain.usecase
 
 data class PayerUseCases(
     val getPayerUseCase: GetPayerUseCase,

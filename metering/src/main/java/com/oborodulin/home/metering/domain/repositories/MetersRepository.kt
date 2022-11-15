@@ -10,9 +10,9 @@ import kotlinx.coroutines.flow.Flow
 import java.util.*
 
 interface MetersRepository {
-    fun getAll(): Flow<List<MeterPojo>>
-    fun get(id: UUID): Flow<MeterPojo>
-    fun getMeters(payerId: UUID): Flow<List<MeterPojo>>
+    fun getAll(): Flow<List<Meter>>
+    fun get(id: UUID): Flow<Meter>
+    fun getMeters(payerId: UUID): Flow<List<Meter>>
     fun getMeterAndValues(payerId: UUID): Flow<Map<MeterEntity, List<MeterValueEntity>>>
     fun getMeterAndVerifications(payerId: UUID): Flow<Map<MeterEntity, List<MeterVerificationEntity>>>
     fun getPrevServiceMeterValues(payerId: UUID): Flow<List<PrevServiceMeterValuePojo>>

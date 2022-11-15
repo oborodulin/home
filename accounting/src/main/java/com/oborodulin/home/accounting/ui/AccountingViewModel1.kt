@@ -4,8 +4,8 @@ import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.oborodulin.home.accounting.domain.model.Payer
-import com.oborodulin.home.accounting.domain.repositories.PayersRepository
+import com.oborodulin.home.domain.model.Payer
+import com.oborodulin.home.domain.repositories.PayersRepository
 import com.oborodulin.home.accounting.ui.payer.PayerViewState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.*

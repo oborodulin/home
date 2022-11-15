@@ -1,4 +1,4 @@
-package com.oborodulin.home.accounting.domain.model
+package com.oborodulin.home.domain.model
 
 import com.oborodulin.home.common.domain.model.ListItemModel
 import java.math.BigDecimal

@@ -1,14 +1,13 @@
-package com.oborodulin.home.accounting.domain.repositories
+package com.oborodulin.home.domain.repositories
 
-import com.oborodulin.home.accounting.domain.model.Payer
-import com.oborodulin.home.data.local.db.entities.PayerEntity
+import com.oborodulin.home.domain.model.Payer
 import kotlinx.coroutines.flow.Flow
 import java.util.*
 
 interface PayersRepository {
-    fun getAll(): Flow<List<PayerEntity>>
+    fun getAll(): Flow<List<Payer>>
 
-    fun get(id: UUID): Flow<PayerEntity>
+    fun get(id: UUID): Flow<Payer>
 
     fun add(payer: Payer): Flow<Payer>
 

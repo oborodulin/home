@@ -1,7 +1,7 @@
-package com.oborodulin.home.accounting.data.mappers
+package com.oborodulin.home.data.local.db.mappers
 
 import com.oborodulin.home.data.local.db.entities.PayerEntity
-import com.oborodulin.home.accounting.domain.model.Payer
+import com.oborodulin.home.domain.model.Payer
 
 class PayerEntityMapper {
     fun toPayer(payerEntity: PayerEntity): Payer {

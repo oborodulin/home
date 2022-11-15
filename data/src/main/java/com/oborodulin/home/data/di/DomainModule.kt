@@ -1,4 +1,4 @@
-package com.oborodulin.home.accounting.di
+package com.oborodulin.home.data.di
 
 import com.oborodulin.home.data.local.db.mappers.PayerEntityMapper
 import com.oborodulin.home.data.local.db.repositories.PayerDataSource
@@ -23,7 +23,7 @@ import javax.inject.Singleton
 
 @Module
 @InstallIn(SingletonComponent::class)
-object AccountingModule {
+object DomainModule {
 
     @Singleton
     @Provides

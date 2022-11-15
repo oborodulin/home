@@ -1,6 +1,6 @@
 package com.oborodulin.home.accounting.ui.payer.list
 
-import com.oborodulin.home.accounting.domain.model.Payer
+import com.oborodulin.home.domain.model.Payer
 
 data class PayersListUiState(
     val payers: List<Payer>,

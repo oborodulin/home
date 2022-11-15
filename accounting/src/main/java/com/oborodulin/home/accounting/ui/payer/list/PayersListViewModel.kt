@@ -1,15 +1,14 @@
 package com.oborodulin.home.accounting.ui.payer.list
 
-import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.viewModelScope
 import com.oborodulin.home.accounting.R
-import com.oborodulin.home.accounting.domain.converters.PayersListConverter
-import com.oborodulin.home.accounting.domain.model.Payer
-import com.oborodulin.home.accounting.domain.usecases.GetPayersUseCase
-import com.oborodulin.home.accounting.domain.usecases.PayerUseCases
+import com.oborodulin.home.accounting.ui.model.converters.PayersListConverter
+import com.oborodulin.home.domain.model.Payer
+import com.oborodulin.home.domain.usecase.GetPayersUseCase
+import com.oborodulin.home.domain.usecase.PayerUseCases
 import com.oborodulin.home.accounting.ui.AccountingViewModel
-import com.oborodulin.home.common.ui.navigation.InputModel
 import com.oborodulin.home.common.ui.navigation.NavRoutes
+import com.oborodulin.home.common.ui.navigation.PayerInput
 import com.oborodulin.home.common.ui.state.MviViewModel
 import com.oborodulin.home.common.ui.state.UiState
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -56,13 +55,12 @@ class PayersListViewModel @Inject constructor(
                             R.drawable.outline_person_black_24,
                             R.string.nav_item_payer_detail
                         ).routeForPayerDetail(
-                            InputModel(action.payerId)
+                            PayerInput(action.payerId)
                         )
                     )
                 )
             }
             is PayersListUiAction.DeletePayer -> {
-
             }
             /*is PostListUiAction.UserClick -> {
                 updateInteraction(action.interaction)
