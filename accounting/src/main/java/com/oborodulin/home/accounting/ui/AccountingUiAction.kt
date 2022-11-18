@@ -4,9 +4,6 @@ import com.oborodulin.home.common.ui.state.UiAction
 import java.util.*
 
 sealed class AccountingUiAction : UiAction {
-    object Load : AccountingUiAction()
-    object LoadPrevServiceMeterVals : AccountingUiAction()
-    data class PayerClick(val payerId: UUID) : AccountingUiAction()
-    data class EditPayer(val payerId: UUID) : AccountingUiAction()
+    data class Load(val payerId: UUID? = null) : AccountingUiAction()
 }
 

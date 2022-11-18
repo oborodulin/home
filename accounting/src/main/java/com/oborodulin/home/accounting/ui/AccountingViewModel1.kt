@@ -6,7 +6,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.oborodulin.home.domain.model.Payer
 import com.oborodulin.home.domain.repositories.PayersRepository
-import com.oborodulin.home.accounting.ui.payer.PayerViewState
+import com.oborodulin.home.accounting.ui.model.PayerModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.*
 import timber.log.Timber
@@ -31,14 +31,14 @@ class AccountingViewModel1 @Inject constructor(
     )
     val accountingUiState: State<AccountingScreenState>
         get() = _accountingUiState
-
+/*
     private val _payerUiState = mutableStateOf(
-        PayerViewState(
+        PayerModel(
             payer = Payer(),
             isLoading = true
         )
     )
-    val payerUiState: State<PayerViewState>
+    val payerUiState: State<PayerModel>
         get() = _payerUiState
 
     private val accountingErrorHandler = CoroutineExceptionHandler { _, exception ->
@@ -121,4 +121,6 @@ class AccountingViewModel1 @Inject constructor(
         )
  */
     }
+
+ */
 }

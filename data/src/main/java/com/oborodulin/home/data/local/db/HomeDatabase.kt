@@ -15,6 +15,8 @@ import com.oborodulin.home.data.local.db.dao.PayerDao
 import com.oborodulin.home.data.local.db.dao.RateDao
 import com.oborodulin.home.data.local.db.dao.ServiceDao
 import com.oborodulin.home.data.local.db.entities.*
+import com.oborodulin.home.data.local.db.views.MeterView
+import com.oborodulin.home.data.local.db.views.ServiceView
 import com.oborodulin.home.data.util.Constants
 import com.oborodulin.home.data.util.ServiceType
 import kotlinx.coroutines.CoroutineScope
@@ -62,6 +64,7 @@ private val MIGRATION_4_5 = object : Migration(4, 5) {
         RateEntity::class, RatePromotionEntity::class,
         MeterEntity::class, MeterTlEntity::class, MeterValueEntity::class, MeterVerificationEntity::class,
         ReceiptEntity::class],
+    views = [MeterView::class, ServiceView::class],
     version = 5
 )
 @TypeConverters(HomeTypeConverters::class)
@@ -232,7 +235,7 @@ class DatabaseCallback(
                 // electricity
                 val electricityMeterId = insertDefMeter(
                     db = db,
-                    payerServicesId = electricityServiceId.payerServiceId,
+                    payersServicesId = electricityServiceId.payerServiceId,
                     maxValue = BigDecimal.valueOf(9999),
                     measureUnitResId = com.oborodulin.home.common.R.string.kWh_unit
                 )
@@ -254,7 +257,7 @@ class DatabaseCallback(
                 // cold water
                 val coldWaterMeterId = insertDefMeter(
                     db = db,
-                    payerServicesId = coldWaterServiceId.payerServiceId,
+                    payersServicesId = coldWaterServiceId.payerServiceId,
                     maxValue = BigDecimal.valueOf(99999.999),
                     measureUnitResId = com.oborodulin.home.common.R.string.m3_unit
                 )
@@ -276,7 +279,7 @@ class DatabaseCallback(
                 // hot water
                 val hotWaterMeterId = insertDefMeter(
                     db = db,
-                    payerServicesId = hotWaterServiceId.payerServiceId,
+                    payersServicesId = hotWaterServiceId.payerServiceId,
                     maxValue = BigDecimal.valueOf(99999.999),
                     measureUnitResId = com.oborodulin.home.common.R.string.m3_unit
                 )
@@ -284,7 +287,7 @@ class DatabaseCallback(
                 // rent
                 insertDefRate(
                     db = db, servicesId = rentServiceId.serviceId,
-                    payerServicesId = rentServiceId.payerServiceId,
+                    payersServicesId = rentServiceId.payerServiceId,
                     rateValue = BigDecimal.valueOf(4.62)
                 )
                 // electricity
@@ -327,7 +330,7 @@ class DatabaseCallback(
                 // heating
                 insertDefRate(
                     db = db, servicesId = heatingServiceId.serviceId,
-                    payerServicesId = heatingServiceId.payerServiceId,
+                    payersServicesId = heatingServiceId.payerServiceId,
                     rateValue = BigDecimal.valueOf(14.76)
                 )
                 // hot water
@@ -338,13 +341,13 @@ class DatabaseCallback(
                 // garbage
                 insertDefRate(
                     db = db, servicesId = garbageServiceId.serviceId,
-                    payerServicesId = garbageServiceId.payerServiceId,
+                    payersServicesId = garbageServiceId.payerServiceId,
                     isPerPerson = true, rateValue = BigDecimal.valueOf(15.73)
                 )
                 // doorphone
                 val doorphoneRateId = insertDefRate(
                     db = db, servicesId = garbageServiceId.serviceId,
-                    payerServicesId = garbageServiceId.payerServiceId,
+                    payersServicesId = garbageServiceId.payerServiceId,
                     isPerPerson = true, rateValue = BigDecimal.valueOf(15.73)
                 )
                 // phone
@@ -387,10 +390,11 @@ class DatabaseCallback(
                 measureUnit = measureUnitResId?.let {
                     res.getString(it)
                 },
-                servicesId = service.id,
+                servicesId = service.serviceId,
                 localeCode = com.oborodulin.home.common.util.Constants.LANGUAGE_RU
             )
-        val payerService = PayerServiceCrossRefEntity(payersId = payer.id, servicesId = service.id)
+        val payerService =
+            PayerServiceCrossRefEntity(payersId = payer.payerId, servicesId = service.serviceId)
         db.insert(
             ServiceEntity.TABLE_NAME,
             SQLiteDatabase.CONFLICT_REPLACE,
@@ -412,20 +416,20 @@ class DatabaseCallback(
                         "\"tl\": {${jsonLogger.toJson(serviceTl)}}, " +
                         "\"payerService\": {${jsonLogger.toJson(payerService)}}}"
             )
-        return PayerServiceId(service.id, payerService.id)
+        return PayerServiceId(service.serviceId, payerService.payerServiceId)
     }
 
     private fun insertDefMeter(
-        db: SupportSQLiteDatabase, payerServicesId: UUID, maxValue: BigDecimal,
+        db: SupportSQLiteDatabase, payersServicesId: UUID, maxValue: BigDecimal,
         @StringRes measureUnitResId: Int? = null
     ): UUID {
         val meter = MeterEntity(
-            payerServicesId = payerServicesId,
+            payersServicesId = payersServicesId,
             num = res.getString(R.string.def_meter_num),
             maxValue = maxValue
         )
         val meterTl = MeterTlEntity(
-            metersId = meter.id,
+            metersId = meter.meterId,
             measureUnit = measureUnitResId?.let {
                 res.getString(it)
             },
@@ -445,7 +449,7 @@ class DatabaseCallback(
             "Default meter imported: {\"meter\": {${jsonLogger.toJson(meter)}}, " +
                     "\"tl\": {${jsonLogger.toJson(meterTl)}}}"
         )
-        return meter.id
+        return meter.meterId
     }
 
     private fun insertDefMeterValue(
@@ -465,7 +469,7 @@ class DatabaseCallback(
     }
 
     private fun insertDefRate(
-        db: SupportSQLiteDatabase, servicesId: UUID, payerServicesId: UUID? = null,
+        db: SupportSQLiteDatabase, servicesId: UUID, payersServicesId: UUID? = null,
         fromMeterValue: BigDecimal? = null, toMeterValue: BigDecimal? = null,
         rateValue: BigDecimal,
         isPerPerson: Boolean = false,
@@ -473,7 +477,7 @@ class DatabaseCallback(
     ): UUID {
         val rate = RateEntity(
             servicesId = servicesId,
-            payerServicesId = payerServicesId,
+            payersServicesId = payersServicesId,
             fromMeterValue = fromMeterValue,
             toMeterValue = toMeterValue,
             rateValue = rateValue,
@@ -486,6 +490,6 @@ class DatabaseCallback(
             Mapper.toContentValues(rate)
         )
         Timber.tag(TAG).i("Default rate imported: {${jsonLogger.toJson(rate)}}")
-        return rate.id
+        return rate.rateId
     }
 }

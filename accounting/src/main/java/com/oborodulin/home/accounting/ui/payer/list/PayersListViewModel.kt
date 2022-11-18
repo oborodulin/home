@@ -7,6 +7,7 @@ import com.oborodulin.home.domain.model.Payer
 import com.oborodulin.home.domain.usecase.GetPayersUseCase
 import com.oborodulin.home.domain.usecase.PayerUseCases
 import com.oborodulin.home.accounting.ui.AccountingViewModel
+import com.oborodulin.home.accounting.ui.model.PayerListItemModel
 import com.oborodulin.home.common.ui.navigation.NavRoutes
 import com.oborodulin.home.common.ui.navigation.PayerInput
 import com.oborodulin.home.common.ui.state.MviViewModel
@@ -22,10 +23,9 @@ private const val TAG = "Accounting.AccountingViewModel"
 
 @HiltViewModel
 class PayersListViewModel @Inject constructor(
-    private val accountingViewModel: AccountingViewModel,
     private val payerUseCases: PayerUseCases,
     private val converter: PayersListConverter
-) : MviViewModel<List<Payer>, UiState<List<Payer>>, PayersListUiAction, PayersListUiSingleEvent>() {
+) : MviViewModel<List<PayerListItemModel>, UiState<List<PayerListItemModel>>, PayersListUiAction, PayersListUiSingleEvent>() {
     /*
         private val _uiState = mutableStateOf(
              PayersListUiState(
@@ -41,7 +41,7 @@ class PayersListViewModel @Inject constructor(
         //_uiState.value = _uiState.value.copy(error = exception.message, isLoading = false)
     }
 
-    override fun initState(): UiState<List<Payer>> = UiState.Loading
+    override fun initState() = UiState.Loading
 
     override fun handleAction(action: PayersListUiAction) {
         when (action) {

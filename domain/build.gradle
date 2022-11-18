@@ -1,6 +1,7 @@
 plugins {
     id 'com.android.library'
     id 'org.jetbrains.kotlin.android'
+    id 'dagger.hilt.android.plugin'
     id 'org.jetbrains.kotlin.kapt'
 }
 android {
@@ -9,7 +10,11 @@ android {
     defaultConfig {
         minSdk cfg.sdk.minVersion
         targetSdk cfg.sdk.targetVersion
-
+        kapt {
+            //ERROR : error.NonExistentClass Kotlin In multi module Dagger project
+            //https://kotlinlang.org/docs/reference/kapt.html#non-existent-type-correction
+            correctErrorTypes = true
+        }
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         consumerProguardFiles "consumer-rules.pro"
     }
@@ -36,6 +41,10 @@ dependencies {
     // Logging
     implementation deps.logging.timber
     implementation deps.logging.logger
+    // Hilt
+    implementation deps.dagger.hilt
+    kapt deps.dagger.compiler
+    implementation deps.hilt.navigationCompose
 
     implementation deps.kotlinx.coroutinesCore
     implementation deps.jvm.inject

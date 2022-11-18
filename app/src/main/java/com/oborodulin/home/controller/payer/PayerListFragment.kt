@@ -1,25 +1,7 @@
 package com.oborodulin.home.controller.payer
 
-import android.content.Context
-import android.os.Bundle
-import android.view.*
-import android.widget.ImageView
-import android.widget.TextView
-import androidx.fragment.app.Fragment
-import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
-import com.google.android.material.floatingactionbutton.FloatingActionButton
-import com.oborodulin.home.R
-import com.oborodulin.home.domain.model.Payer
-import com.oborodulin.home.controller.ListFragment
-import com.oborodulin.home.data.local.db.entities.BaseEntity
-import com.oborodulin.home.data.local.db.entities.PayerEntity
-import com.oborodulin.home.model.RVSelHolder
-import com.oborodulin.home.model.RVSelListAdapter
-import java.util.*
-
 private const val TAG = "PayerListFragment"
-
+/*
 class PayerListFragment : Fragment(), ListFragment<PayerEntity> {
     /**
      * Интерфейс обратных вызовов
@@ -114,7 +96,7 @@ class PayerListFragment : Fragment(), ListFragment<PayerEntity> {
         })
          */
         rvPayer.layoutManager = LinearLayoutManager(context)
-        updateUI(emptyList())
+    //    updateUI(emptyList())
         return view
     }
 
@@ -151,7 +133,7 @@ class PayerListFragment : Fragment(), ListFragment<PayerEntity> {
             else -> return super.onOptionsItemSelected(item)
         }
     }
-
+/*
     private fun updateUI(payers: List<PayerEntity>) {
         adapter = RVSelListAdapter(
             this,
@@ -175,10 +157,13 @@ class PayerListFragment : Fragment(), ListFragment<PayerEntity> {
         }
          */
     }
+*/
 
+/ *
     private fun newPayer() {
         val payer = Payer()
         //lvmPayer.addPayer(payer)
         callbacks?.onPayerEditClick(payer.id)
     }
 }
+ */

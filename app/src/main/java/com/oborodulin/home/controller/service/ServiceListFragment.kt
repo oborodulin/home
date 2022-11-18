@@ -1,28 +1,7 @@
 package com.oborodulin.home.controller.service
 
-import android.content.Context
-import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
-import android.widget.ImageView
-import android.widget.TextView
-import androidx.fragment.app.Fragment
-import androidx.lifecycle.ViewModelProvider
-import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
-import com.google.android.material.floatingactionbutton.FloatingActionButton
-import com.oborodulin.home.R
-import com.oborodulin.home.controller.ListFragment
-import com.oborodulin.home.data.local.db.entities.BaseEntity
-import com.oborodulin.home.data.local.db.entities.ServiceEntity
-import com.oborodulin.home.model.RVSelHolder
-import com.oborodulin.home.model.RVSelListAdapter
-import com.oborodulin.home.model.service.ServiceListViewModel
-import java.util.*
-
 private const val TAG = "ServiceListFragment"
-
+/*
 class ServiceListFragment : Fragment(), ListFragment<ServiceEntity> {
     /**
      * Интерфейс обратных вызовов
@@ -152,5 +131,9 @@ class ServiceListFragment : Fragment(), ListFragment<ServiceEntity> {
              }
 
          */
+
+ /*
     }
 }
+
+ */

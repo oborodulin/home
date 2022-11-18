@@ -2,6 +2,7 @@ package com.oborodulin.home.data.local.db.dao
 
 import androidx.room.*
 import com.oborodulin.home.data.local.db.entities.PayerEntity
+import com.oborodulin.home.data.local.db.entities.PayerWithServices
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.distinctUntilChanged
@@ -9,32 +10,37 @@ import java.util.*
 
 @Dao
 interface PayerDao {
+    // READS:
     @Query("SELECT * FROM payers")
-    fun getAll(): Flow<List<PayerEntity>>
+    fun findAll(): Flow<List<PayerEntity>>
 
     @ExperimentalCoroutinesApi
-    fun getAllDistinctUntilChanged() = getAll().distinctUntilChanged()
+    fun findAllDistinctUntilChanged() = findAll().distinctUntilChanged()
 
-    @Query("SELECT * FROM payers WHERE id=:id")
-    fun get(id: UUID): Flow<PayerEntity>
+    @Query("SELECT * FROM payers WHERE payerId = :payerId")
+    fun findById(payerId: UUID): Flow<PayerEntity>
 
     @ExperimentalCoroutinesApi
-    fun getDistinctUntilChanged(id: UUID) = get(id).distinctUntilChanged()
+    fun findByIdDistinctUntilChanged(id: UUID) = findById(id).distinctUntilChanged()
 
+    @Transaction
+    @Query("SELECT * FROM payers")
+    fun findPayersWithServices(): List<PayerWithServices>
+
+    // INSERTS:
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun add(payer: PayerEntity)
+    suspend fun insert(vararg payer: PayerEntity)
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun addAll(payers: List<PayerEntity>)
 
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insert(payer: PayerEntity)
-
+    // UPDATES:
     @Update
-    suspend fun update(payer: PayerEntity)
+    suspend fun update(vararg payer: PayerEntity)
 
+    // DELETES:
     @Delete
-    suspend fun delete(payer: PayerEntity)
+    suspend fun delete(vararg payer: PayerEntity)
 
     @Delete
     suspend fun delete(payers: List<PayerEntity>)

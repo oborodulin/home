@@ -1,10 +1,12 @@
 package com.oborodulin.home.di
 
 import com.google.gson.Gson
+import com.oborodulin.home.common.domain.usecases.UseCase
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
+import kotlinx.coroutines.Dispatchers
 import javax.inject.Singleton
 
 @Module
@@ -16,4 +18,9 @@ object ApplicationModule {
     @Singleton
     @Provides
     fun provideJsonLogger(): Gson = Gson()
+
+    @Singleton
+    @Provides
+    fun provideUseCaseConfiguration(): UseCase.Configuration = UseCase.Configuration(Dispatchers.IO)
+
 }

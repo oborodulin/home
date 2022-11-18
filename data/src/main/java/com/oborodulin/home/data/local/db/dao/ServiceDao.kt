@@ -3,7 +3,7 @@ package com.oborodulin.home.data.local.db.dao
 import androidx.room.*
 import com.oborodulin.home.data.local.db.entities.ServiceEntity
 import com.oborodulin.home.data.local.db.entities.ServiceTlEntity
-import com.oborodulin.home.data.local.db.entities.pojo.ServicePojo
+import com.oborodulin.home.data.local.db.views.ServiceView
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.distinctUntilChanged
@@ -11,67 +11,41 @@ import java.util.*
 
 @Dao
 interface ServiceDao {
-    @Query("SELECT * FROM services ORDER BY pos")
-    fun getAll(): Flow<List<ServiceEntity>>
+    // READS:
+    @Query("SELECT * FROM services_view WHERE localeCode = :locale ORDER BY pos")
+    fun findAll(locale: String? = Locale.getDefault().language): Flow<List<ServiceView>>
 
     @ExperimentalCoroutinesApi
-    fun getAllDistinctUntilChanged() = getAll().distinctUntilChanged()
+    fun findAllDistinctUntilChanged() = findAll().distinctUntilChanged()
 
-    @Query("SELECT * FROM services WHERE id=:id")
-    fun get(id: UUID): Flow<ServiceEntity>
-
-    @ExperimentalCoroutinesApi
-    fun getDistinctUntilChanged(id: UUID) = get(id).distinctUntilChanged()
-
-    @Query(
-        "SELECT s.id, s.pos, s.type, stl.name, stl.measureUnit, stl.descr " +
-                "FROM services AS s JOIN services_tl AS stl ON stl.servicesId = s.id " +
-                "WHERE stl.localeCode = :locale ORDER BY s.pos"
-    )
-    fun getServices(locale: String? = Locale.getDefault().language): Flow<List<ServicePojo>>
+    @Query("SELECT * FROM services_view WHERE serviceId = :id AND localeCode = :locale")
+    fun findById(id: UUID, locale: String? = Locale.getDefault().language): Flow<ServiceView>
 
     @ExperimentalCoroutinesApi
-    fun getServicesDistinctUntilChanged() = getServices().distinctUntilChanged()
+    fun findByIdDistinctUntilChanged(id: UUID) = findById(id).distinctUntilChanged()
 
-    @Query(
-        "SELECT s.id, s.pos, s.type, stl.name, stl.measureUnit, stl.descr " +
-                "FROM services AS s JOIN services_tl AS stl ON stl.servicesId = s.id " +
-                "WHERE s.id = :id AND stl.localeCode = :locale ORDER BY s.pos"
-    )
-    fun getService(
-        id: UUID,
-        locale: String? = Locale.getDefault().language
-    ): Flow<ServicePojo>
-
-    @ExperimentalCoroutinesApi
-    fun getServiceDistinctUntilChanged(id: UUID) = getService(id).distinctUntilChanged()
+    // INSERTS:
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insert(vararg textContent: ServiceTlEntity)
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insert(textContent: ServiceTlEntity)
-
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insert(service: ServiceEntity)
+    suspend fun insert(vararg service: ServiceEntity)
 
     @Transaction
     suspend fun insert(service: ServiceEntity, textContent: ServiceTlEntity) {
         service.pos = service.pos ?: nextPos()
         updatePos(service.pos!!)
         insert(service)
-        textContent.servicesId = service.id
+        textContent.servicesId = service.serviceId
         insert(textContent)
     }
 
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun add(service: ServiceEntity)
-
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun addAll(services: List<ServiceEntity>)
+    // UPDATES:
+    @Update
+    suspend fun update(vararg textContent: ServiceTlEntity)
 
     @Update
-    suspend fun update(textContent: ServiceTlEntity)
-
-    @Update
-    suspend fun update(service: ServiceEntity)
+    suspend fun update(vararg service: ServiceEntity)
 
     @Transaction
     suspend fun update(service: ServiceEntity, textContent: ServiceTlEntity) {
@@ -81,12 +55,14 @@ interface ServiceDao {
         update(textContent)
     }
 
+    // DELETES:
     @Delete
-    suspend fun delete(service: ServiceEntity)
+    suspend fun delete(vararg service: ServiceEntity)
 
     @Query("DELETE FROM services")
     suspend fun deleteAll()
 
+    // API:
     @Query("SELECT IFNULL(MAX(pos), 0) FROM services")
     fun maxPos(): Int
 

@@ -2,12 +2,18 @@
   "formatVersion": 1,
   "database": {
     "version": 5,
-    "identityHash": "a0f2fdb0257f397ed1b3fe85d202bece",
+    "identityHash": "28a4ce3ca9fb61937f12390d34b8d696",
     "entities": [
       {
         "tableName": "payers",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`ercCode` TEXT NOT NULL, `fullName` TEXT NOT NULL, `address` TEXT NOT NULL, `totalArea` INTEGER, `livingSpace` INTEGER, `heatedVolume` INTEGER, `paymentDay` INTEGER, `personsNum` INTEGER, `isFavorite` INTEGER NOT NULL, `id` TEXT NOT NULL, PRIMARY KEY(`id`))",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`payerId` TEXT NOT NULL, `ercCode` TEXT NOT NULL, `fullName` TEXT NOT NULL, `address` TEXT NOT NULL, `totalArea` INTEGER, `livingSpace` INTEGER, `heatedVolume` INTEGER, `paymentDay` INTEGER, `personsNum` INTEGER, `isFavorite` INTEGER NOT NULL, PRIMARY KEY(`payerId`))",
         "fields": [
+          {
+            "fieldPath": "payerId",
+            "columnName": "payerId",
+            "affinity": "TEXT",
+            "notNull": true
+          },
           {
             "fieldPath": "ercCode",
             "columnName": "ercCode",
@@ -61,17 +67,11 @@
             "columnName": "isFavorite",
             "affinity": "INTEGER",
             "notNull": true
-          },
-          {
-            "fieldPath": "id",
-            "columnName": "id",
-            "affinity": "TEXT",
-            "notNull": true
           }
         ],
         "primaryKey": {
           "columnNames": [
-            "id"
+            "payerId"
           ],
           "autoGenerate": false
         },
@@ -80,8 +80,14 @@
       },
       {
         "tableName": "services",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`pos` INTEGER, `type` TEXT NOT NULL, `id` TEXT NOT NULL, PRIMARY KEY(`id`))",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`serviceId` TEXT NOT NULL, `pos` INTEGER, `type` TEXT NOT NULL, PRIMARY KEY(`serviceId`))",
         "fields": [
+          {
+            "fieldPath": "serviceId",
+            "columnName": "serviceId",
+            "affinity": "TEXT",
+            "notNull": true
+          },
           {
             "fieldPath": "pos",
             "columnName": "pos",
@@ -93,17 +99,11 @@
             "columnName": "type",
             "affinity": "TEXT",
             "notNull": true
-          },
-          {
-            "fieldPath": "id",
-            "columnName": "id",
-            "affinity": "TEXT",
-            "notNull": true
           }
         ],
         "primaryKey": {
           "columnNames": [
-            "id"
+            "serviceId"
           ],
           "autoGenerate": false
         },
@@ -112,8 +112,14 @@
       },
       {
         "tableName": "services_tl",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`localeCode` TEXT NOT NULL, `name` TEXT NOT NULL, `measureUnit` TEXT, `descr` TEXT, `servicesId` TEXT NOT NULL, `id` TEXT NOT NULL, PRIMARY KEY(`id`), FOREIGN KEY(`servicesId`) REFERENCES `services`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE )",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`serviceTlId` TEXT NOT NULL, `localeCode` TEXT NOT NULL, `name` TEXT NOT NULL, `measureUnit` TEXT, `descr` TEXT, `servicesId` TEXT NOT NULL, PRIMARY KEY(`serviceTlId`), FOREIGN KEY(`servicesId`) REFERENCES `services`(`serviceId`) ON UPDATE NO ACTION ON DELETE CASCADE )",
         "fields": [
+          {
+            "fieldPath": "serviceTlId",
+            "columnName": "serviceTlId",
+            "affinity": "TEXT",
+            "notNull": true
+          },
           {
             "fieldPath": "localeCode",
             "columnName": "localeCode",
@@ -143,17 +149,11 @@
             "columnName": "servicesId",
             "affinity": "TEXT",
             "notNull": true
-          },
-          {
-            "fieldPath": "id",
-            "columnName": "id",
-            "affinity": "TEXT",
-            "notNull": true
           }
         ],
         "primaryKey": {
           "columnNames": [
-            "id"
+            "serviceTlId"
           ],
           "autoGenerate": false
         },
@@ -187,15 +187,21 @@
               "servicesId"
             ],
             "referencedColumns": [
-              "id"
+              "serviceId"
             ]
           }
         ]
       },
       {
-        "tableName": "payer_services",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`payersId` TEXT NOT NULL, `servicesId` TEXT NOT NULL, `isAllocateRate` INTEGER NOT NULL, `id` TEXT NOT NULL, PRIMARY KEY(`id`), FOREIGN KEY(`payersId`) REFERENCES `payers`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE , FOREIGN KEY(`servicesId`) REFERENCES `services`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE )",
+        "tableName": "payers_services",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`payerServiceId` TEXT NOT NULL, `payersId` TEXT NOT NULL, `servicesId` TEXT NOT NULL, `isAllocateRate` INTEGER NOT NULL, PRIMARY KEY(`payerServiceId`), FOREIGN KEY(`payersId`) REFERENCES `payers`(`payerId`) ON UPDATE NO ACTION ON DELETE CASCADE , FOREIGN KEY(`servicesId`) REFERENCES `services`(`serviceId`) ON UPDATE NO ACTION ON DELETE CASCADE )",
         "fields": [
+          {
+            "fieldPath": "payerServiceId",
+            "columnName": "payerServiceId",
+            "affinity": "TEXT",
+            "notNull": true
+          },
           {
             "fieldPath": "payersId",
             "columnName": "payersId",
@@ -213,48 +219,42 @@
             "columnName": "isAllocateRate",
             "affinity": "INTEGER",
             "notNull": true
-          },
-          {
-            "fieldPath": "id",
-            "columnName": "id",
-            "affinity": "TEXT",
-            "notNull": true
           }
         ],
         "primaryKey": {
           "columnNames": [
-            "id"
+            "payerServiceId"
           ],
           "autoGenerate": false
         },
         "indices": [
           {
-            "name": "index_payer_services_payersId_servicesId",
+            "name": "index_payers_services_payersId_servicesId",
             "unique": true,
             "columnNames": [
               "payersId",
               "servicesId"
             ],
             "orders": [],
-            "createSql": "CREATE UNIQUE INDEX IF NOT EXISTS `index_payer_services_payersId_servicesId` ON `${TABLE_NAME}` (`payersId`, `servicesId`)"
+            "createSql": "CREATE UNIQUE INDEX IF NOT EXISTS `index_payers_services_payersId_servicesId` ON `${TABLE_NAME}` (`payersId`, `servicesId`)"
           },
           {
-            "name": "index_payer_services_payersId",
+            "name": "index_payers_services_payersId",
             "unique": false,
             "columnNames": [
               "payersId"
             ],
             "orders": [],
-            "createSql": "CREATE INDEX IF NOT EXISTS `index_payer_services_payersId` ON `${TABLE_NAME}` (`payersId`)"
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_payers_services_payersId` ON `${TABLE_NAME}` (`payersId`)"
           },
           {
-            "name": "index_payer_services_servicesId",
+            "name": "index_payers_services_servicesId",
             "unique": false,
             "columnNames": [
               "servicesId"
             ],
             "orders": [],
-            "createSql": "CREATE INDEX IF NOT EXISTS `index_payer_services_servicesId` ON `${TABLE_NAME}` (`servicesId`)"
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_payers_services_servicesId` ON `${TABLE_NAME}` (`servicesId`)"
           }
         ],
         "foreignKeys": [
@@ -266,7 +266,7 @@
               "payersId"
             ],
             "referencedColumns": [
-              "id"
+              "payerId"
             ]
           },
           {
@@ -277,15 +277,21 @@
               "servicesId"
             ],
             "referencedColumns": [
-              "id"
+              "serviceId"
             ]
           }
         ]
       },
       {
         "tableName": "rates",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`startDate` INTEGER NOT NULL, `fromMeterValue` INTEGER, `toMeterValue` INTEGER, `rateValue` INTEGER NOT NULL, `isPerPerson` INTEGER NOT NULL, `isPrivileges` INTEGER NOT NULL, `servicesId` TEXT NOT NULL, `payerServicesId` TEXT, `id` TEXT NOT NULL, PRIMARY KEY(`id`), FOREIGN KEY(`servicesId`) REFERENCES `services`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE , FOREIGN KEY(`payerServicesId`) REFERENCES `payer_services`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE )",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`rateId` TEXT NOT NULL, `startDate` INTEGER NOT NULL, `fromMeterValue` INTEGER, `toMeterValue` INTEGER, `rateValue` INTEGER NOT NULL, `isPerPerson` INTEGER NOT NULL, `isPrivileges` INTEGER NOT NULL, `servicesId` TEXT NOT NULL, `payersServicesId` TEXT, PRIMARY KEY(`rateId`), FOREIGN KEY(`servicesId`) REFERENCES `services`(`serviceId`) ON UPDATE NO ACTION ON DELETE CASCADE , FOREIGN KEY(`payersServicesId`) REFERENCES `payers_services`(`payerServiceId`) ON UPDATE NO ACTION ON DELETE CASCADE )",
         "fields": [
+          {
+            "fieldPath": "rateId",
+            "columnName": "rateId",
+            "affinity": "TEXT",
+            "notNull": true
+          },
           {
             "fieldPath": "startDate",
             "columnName": "startDate",
@@ -329,27 +335,21 @@
             "notNull": true
           },
           {
-            "fieldPath": "payerServicesId",
-            "columnName": "payerServicesId",
+            "fieldPath": "payersServicesId",
+            "columnName": "payersServicesId",
             "affinity": "TEXT",
             "notNull": false
-          },
-          {
-            "fieldPath": "id",
-            "columnName": "id",
-            "affinity": "TEXT",
-            "notNull": true
           }
         ],
         "primaryKey": {
           "columnNames": [
-            "id"
+            "rateId"
           ],
           "autoGenerate": false
         },
         "indices": [
           {
-            "name": "index_rates_startDate_fromMeterValue_isPerPerson_isPrivileges_servicesId_payerServicesId",
+            "name": "index_rates_startDate_fromMeterValue_isPerPerson_isPrivileges_servicesId_payersServicesId",
             "unique": true,
             "columnNames": [
               "startDate",
@@ -357,10 +357,10 @@
               "isPerPerson",
               "isPrivileges",
               "servicesId",
-              "payerServicesId"
+              "payersServicesId"
             ],
             "orders": [],
-            "createSql": "CREATE UNIQUE INDEX IF NOT EXISTS `index_rates_startDate_fromMeterValue_isPerPerson_isPrivileges_servicesId_payerServicesId` ON `${TABLE_NAME}` (`startDate`, `fromMeterValue`, `isPerPerson`, `isPrivileges`, `servicesId`, `payerServicesId`)"
+            "createSql": "CREATE UNIQUE INDEX IF NOT EXISTS `index_rates_startDate_fromMeterValue_isPerPerson_isPrivileges_servicesId_payersServicesId` ON `${TABLE_NAME}` (`startDate`, `fromMeterValue`, `isPerPerson`, `isPrivileges`, `servicesId`, `payersServicesId`)"
           },
           {
             "name": "index_rates_servicesId",
@@ -372,13 +372,13 @@
             "createSql": "CREATE INDEX IF NOT EXISTS `index_rates_servicesId` ON `${TABLE_NAME}` (`servicesId`)"
           },
           {
-            "name": "index_rates_payerServicesId",
+            "name": "index_rates_payersServicesId",
             "unique": false,
             "columnNames": [
-              "payerServicesId"
+              "payersServicesId"
             ],
             "orders": [],
-            "createSql": "CREATE INDEX IF NOT EXISTS `index_rates_payerServicesId` ON `${TABLE_NAME}` (`payerServicesId`)"
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_rates_payersServicesId` ON `${TABLE_NAME}` (`payersServicesId`)"
           }
         ],
         "foreignKeys": [
@@ -390,26 +390,32 @@
               "servicesId"
             ],
             "referencedColumns": [
-              "id"
+              "serviceId"
             ]
           },
           {
-            "table": "payer_services",
+            "table": "payers_services",
             "onDelete": "CASCADE",
             "onUpdate": "NO ACTION",
             "columns": [
-              "payerServicesId"
+              "payersServicesId"
             ],
             "referencedColumns": [
-              "id"
+              "payerServiceId"
             ]
           }
         ]
       },
       {
         "tableName": "rate_promotions",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`paymentMonths` INTEGER NOT NULL, `isPrevRate` INTEGER NOT NULL, `isActive` INTEGER NOT NULL, `ratesId` TEXT NOT NULL, `id` TEXT NOT NULL, PRIMARY KEY(`id`), FOREIGN KEY(`ratesId`) REFERENCES `rates`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE )",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`ratePromotionId` TEXT NOT NULL, `paymentMonths` INTEGER NOT NULL, `isPrevRate` INTEGER NOT NULL, `isActive` INTEGER NOT NULL, `ratesId` TEXT NOT NULL, PRIMARY KEY(`ratePromotionId`), FOREIGN KEY(`ratesId`) REFERENCES `rates`(`rateId`) ON UPDATE NO ACTION ON DELETE CASCADE )",
         "fields": [
+          {
+            "fieldPath": "ratePromotionId",
+            "columnName": "ratePromotionId",
+            "affinity": "TEXT",
+            "notNull": true
+          },
           {
             "fieldPath": "paymentMonths",
             "columnName": "paymentMonths",
@@ -433,17 +439,11 @@
             "columnName": "ratesId",
             "affinity": "TEXT",
             "notNull": true
-          },
-          {
-            "fieldPath": "id",
-            "columnName": "id",
-            "affinity": "TEXT",
-            "notNull": true
           }
         ],
         "primaryKey": {
           "columnNames": [
-            "id"
+            "ratePromotionId"
           ],
           "autoGenerate": false
         },
@@ -467,15 +467,21 @@
               "ratesId"
             ],
             "referencedColumns": [
-              "id"
+              "rateId"
             ]
           }
         ]
       },
       {
         "tableName": "meters",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`num` TEXT NOT NULL, `maxValue` INTEGER NOT NULL, `passportDate` INTEGER, `verificationPeriod` INTEGER, `payerServicesId` TEXT NOT NULL, `id` TEXT NOT NULL, PRIMARY KEY(`id`), FOREIGN KEY(`payerServicesId`) REFERENCES `payer_services`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE )",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`meterId` TEXT NOT NULL, `num` TEXT NOT NULL, `maxValue` INTEGER NOT NULL, `passportDate` INTEGER, `verificationPeriod` INTEGER, `payersServicesId` TEXT NOT NULL, PRIMARY KEY(`meterId`), FOREIGN KEY(`payersServicesId`) REFERENCES `payers_services`(`payerServiceId`) ON UPDATE NO ACTION ON DELETE CASCADE )",
         "fields": [
+          {
+            "fieldPath": "meterId",
+            "columnName": "meterId",
+            "affinity": "TEXT",
+            "notNull": true
+          },
           {
             "fieldPath": "num",
             "columnName": "num",
@@ -501,63 +507,63 @@
             "notNull": false
           },
           {
-            "fieldPath": "payerServicesId",
-            "columnName": "payerServicesId",
-            "affinity": "TEXT",
-            "notNull": true
-          },
-          {
-            "fieldPath": "id",
-            "columnName": "id",
+            "fieldPath": "payersServicesId",
+            "columnName": "payersServicesId",
             "affinity": "TEXT",
             "notNull": true
           }
         ],
         "primaryKey": {
           "columnNames": [
-            "id"
+            "meterId"
           ],
           "autoGenerate": false
         },
         "indices": [
           {
-            "name": "index_meters_num_payerServicesId",
+            "name": "index_meters_num_payersServicesId",
             "unique": true,
             "columnNames": [
               "num",
-              "payerServicesId"
+              "payersServicesId"
             ],
             "orders": [],
-            "createSql": "CREATE UNIQUE INDEX IF NOT EXISTS `index_meters_num_payerServicesId` ON `${TABLE_NAME}` (`num`, `payerServicesId`)"
+            "createSql": "CREATE UNIQUE INDEX IF NOT EXISTS `index_meters_num_payersServicesId` ON `${TABLE_NAME}` (`num`, `payersServicesId`)"
           },
           {
-            "name": "index_meters_payerServicesId",
+            "name": "index_meters_payersServicesId",
             "unique": false,
             "columnNames": [
-              "payerServicesId"
+              "payersServicesId"
             ],
             "orders": [],
-            "createSql": "CREATE INDEX IF NOT EXISTS `index_meters_payerServicesId` ON `${TABLE_NAME}` (`payerServicesId`)"
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_meters_payersServicesId` ON `${TABLE_NAME}` (`payersServicesId`)"
           }
         ],
         "foreignKeys": [
           {
-            "table": "payer_services",
+            "table": "payers_services",
             "onDelete": "CASCADE",
             "onUpdate": "NO ACTION",
             "columns": [
-              "payerServicesId"
+              "payersServicesId"
             ],
             "referencedColumns": [
-              "id"
+              "payerServiceId"
             ]
           }
         ]
       },
       {
         "tableName": "meters_tl",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`localeCode` TEXT NOT NULL, `measureUnit` TEXT, `descr` TEXT, `metersId` TEXT NOT NULL, `id` TEXT NOT NULL, PRIMARY KEY(`id`), FOREIGN KEY(`metersId`) REFERENCES `meters`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE )",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`meterTlId` TEXT NOT NULL, `localeCode` TEXT NOT NULL, `measureUnit` TEXT, `descr` TEXT, `metersId` TEXT NOT NULL, PRIMARY KEY(`meterTlId`), FOREIGN KEY(`metersId`) REFERENCES `meters`(`meterId`) ON UPDATE NO ACTION ON DELETE CASCADE )",
         "fields": [
+          {
+            "fieldPath": "meterTlId",
+            "columnName": "meterTlId",
+            "affinity": "TEXT",
+            "notNull": true
+          },
           {
             "fieldPath": "localeCode",
             "columnName": "localeCode",
@@ -581,17 +587,11 @@
             "columnName": "metersId",
             "affinity": "TEXT",
             "notNull": true
-          },
-          {
-            "fieldPath": "id",
-            "columnName": "id",
-            "affinity": "TEXT",
-            "notNull": true
           }
         ],
         "primaryKey": {
           "columnNames": [
-            "id"
+            "meterTlId"
           ],
           "autoGenerate": false
         },
@@ -625,15 +625,21 @@
               "metersId"
             ],
             "referencedColumns": [
-              "id"
+              "meterId"
             ]
           }
         ]
       },
       {
         "tableName": "meter_values",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`valueDate` INTEGER NOT NULL, `meterValue` INTEGER, `metersId` TEXT NOT NULL, `id` TEXT NOT NULL, PRIMARY KEY(`id`), FOREIGN KEY(`metersId`) REFERENCES `meters`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE )",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`meterValueId` TEXT NOT NULL, `valueDate` INTEGER NOT NULL, `meterValue` INTEGER, `metersId` TEXT NOT NULL, PRIMARY KEY(`meterValueId`), FOREIGN KEY(`metersId`) REFERENCES `meters`(`meterId`) ON UPDATE NO ACTION ON DELETE CASCADE )",
         "fields": [
+          {
+            "fieldPath": "meterValueId",
+            "columnName": "meterValueId",
+            "affinity": "TEXT",
+            "notNull": true
+          },
           {
             "fieldPath": "valueDate",
             "columnName": "valueDate",
@@ -651,17 +657,11 @@
             "columnName": "metersId",
             "affinity": "TEXT",
             "notNull": true
-          },
-          {
-            "fieldPath": "id",
-            "columnName": "id",
-            "affinity": "TEXT",
-            "notNull": true
           }
         ],
         "primaryKey": {
           "columnNames": [
-            "id"
+            "meterValueId"
           ],
           "autoGenerate": false
         },
@@ -685,15 +685,87 @@
               "metersId"
             ],
             "referencedColumns": [
-              "id"
+              "meterId"
+            ]
+          }
+        ]
+      },
+      {
+        "tableName": "meter_verifications",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`meterVerificationId` TEXT NOT NULL, `startDate` INTEGER NOT NULL, `endDate` INTEGER, `isOk` INTEGER NOT NULL, `metersId` TEXT NOT NULL, PRIMARY KEY(`meterVerificationId`), FOREIGN KEY(`metersId`) REFERENCES `meters`(`meterId`) ON UPDATE NO ACTION ON DELETE CASCADE )",
+        "fields": [
+          {
+            "fieldPath": "meterVerificationId",
+            "columnName": "meterVerificationId",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "startDate",
+            "columnName": "startDate",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "endDate",
+            "columnName": "endDate",
+            "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
+            "fieldPath": "isOk",
+            "columnName": "isOk",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "metersId",
+            "columnName": "metersId",
+            "affinity": "TEXT",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "columnNames": [
+            "meterVerificationId"
+          ],
+          "autoGenerate": false
+        },
+        "indices": [
+          {
+            "name": "index_meter_verifications_metersId",
+            "unique": false,
+            "columnNames": [
+              "metersId"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_meter_verifications_metersId` ON `${TABLE_NAME}` (`metersId`)"
+          }
+        ],
+        "foreignKeys": [
+          {
+            "table": "meters",
+            "onDelete": "CASCADE",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "metersId"
+            ],
+            "referencedColumns": [
+              "meterId"
             ]
           }
         ]
       },
       {
         "tableName": "receipts",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`receiptMonth` INTEGER NOT NULL, `receiptYear` INTEGER NOT NULL, `isPaid` INTEGER NOT NULL, `payersId` TEXT NOT NULL, `id` TEXT NOT NULL, PRIMARY KEY(`id`), FOREIGN KEY(`payersId`) REFERENCES `payers`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE )",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`receiptId` TEXT NOT NULL, `receiptMonth` INTEGER NOT NULL, `receiptYear` INTEGER NOT NULL, `isPaid` INTEGER NOT NULL, `payersId` TEXT NOT NULL, PRIMARY KEY(`receiptId`), FOREIGN KEY(`payersId`) REFERENCES `payers`(`payerId`) ON UPDATE NO ACTION ON DELETE CASCADE )",
         "fields": [
+          {
+            "fieldPath": "receiptId",
+            "columnName": "receiptId",
+            "affinity": "TEXT",
+            "notNull": true
+          },
           {
             "fieldPath": "receiptMonth",
             "columnName": "receiptMonth",
@@ -717,17 +789,11 @@
             "columnName": "payersId",
             "affinity": "TEXT",
             "notNull": true
-          },
-          {
-            "fieldPath": "id",
-            "columnName": "id",
-            "affinity": "TEXT",
-            "notNull": true
           }
         ],
         "primaryKey": {
           "columnNames": [
-            "id"
+            "receiptId"
           ],
           "autoGenerate": false
         },
@@ -762,16 +828,25 @@
               "payersId"
             ],
             "referencedColumns": [
-              "id"
+              "payerId"
             ]
           }
         ]
       }
     ],
-    "views": [],
+    "views": [
+      {
+        "viewName": "meters_view",
+        "createSql": "CREATE VIEW `${VIEW_NAME}` AS SELECT m.*, mtl.*, ps.* FROM meters AS m JOIN meters_tl AS mtl ON mtl.metersId = m.meterId JOIN payers_services AS ps ON ps.payerServiceId = m.payersServicesId JOIN services AS s ON s.serviceId = ps.servicesId ORDER BY ps.payersId, s.pos"
+      },
+      {
+        "viewName": "services_view",
+        "createSql": "CREATE VIEW `${VIEW_NAME}` AS SELECT s.*, stl.* FROM services AS s JOIN services_tl AS stl ON stl.servicesId = s.serviceId"
+      }
+    ],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'a0f2fdb0257f397ed1b3fe85d202bece')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '28a4ce3ca9fb61937f12390d34b8d696')"
     ]
   }
 }

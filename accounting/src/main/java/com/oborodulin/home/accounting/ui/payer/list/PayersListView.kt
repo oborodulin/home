@@ -19,12 +19,13 @@ import com.oborodulin.home.accounting.R
 import com.oborodulin.home.domain.model.Payer
 import com.oborodulin.home.accounting.ui.AccountingUiAction
 import com.oborodulin.home.accounting.ui.AccountingViewModel
+import com.oborodulin.home.accounting.ui.model.PayerListItemModel
 import com.oborodulin.home.common.ui.components.items.ListItemComponent
 import com.oborodulin.home.common.ui.state.CommonScreen
 import kotlinx.coroutines.flow.collectLatest
 import timber.log.Timber
 
-private const val TAG = "PayersListView"
+private const val TAG = "Accounting.PayersListView"
 
 @Composable
 fun PayersListView(
@@ -32,15 +33,15 @@ fun PayersListView(
     accountingViewModel: AccountingViewModel = hiltViewModel(),
     navController: NavController
 ) {
-    val context = LocalContext.current
     Timber.tag(TAG).d("PayersListView(...) called")
+    val context = LocalContext.current
     LaunchedEffect(Unit) {
         viewModel.submitAction(PayersListUiAction.Load)
     }
     viewModel.uiStateFlow.collectAsState().value.let { state ->
         CommonScreen(state = state) {
             PayersList(it) { payer ->
-                accountingViewModel.submitAction(AccountingUiAction.PayerClick(payer.id))
+                accountingViewModel.submitAction(AccountingUiAction.Load(payer.id))
             }
         }
     }
@@ -58,8 +59,8 @@ fun PayersListView(
 
 @Composable
 fun PayersList(
-    payers: List<Payer>,
-    onClick: (Payer) -> Unit
+    payers: List<PayerListItemModel>,
+    onClick: (PayerListItemModel) -> Unit
 ) {
     Timber.tag(TAG).d("PayersList(...) called")
     if (payers.isNotEmpty()) {

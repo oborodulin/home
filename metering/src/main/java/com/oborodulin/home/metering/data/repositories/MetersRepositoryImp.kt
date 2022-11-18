@@ -1,8 +1,5 @@
 package com.oborodulin.home.metering.data.repositories
 
-import com.oborodulin.home.data.local.db.entities.MeterEntity
-import com.oborodulin.home.data.local.db.entities.MeterValueEntity
-import com.oborodulin.home.data.local.db.entities.MeterVerificationEntity
 import com.oborodulin.home.data.local.db.entities.pojo.PrevServiceMeterValuePojo
 import com.oborodulin.home.metering.domain.model.Meter
 import com.oborodulin.home.metering.domain.repositories.MetersRepository
@@ -20,23 +17,13 @@ class MetersRepositoryImp @Inject constructor(
 
     override fun getMeters(payerId: UUID) = meteringDataSource.getMeters(payerId)
 
-    override fun getMeterAndValues(payerId: UUID) = meteringDataSource.getMeterAndValues(payerId)
+    override fun getMeterValues(meterId: UUID) = meteringDataSource.getMeterValues(meterId)
 
-    override fun getMeterAndVerifications(payerId: UUID) =
-        meteringDataSource.getMeterAndVerifications(payerId)
+    override fun getMeterVerifications(meterId: UUID) =
+        meteringDataSource.getMeterVerifications(meterId)
 
     override fun getPrevServiceMeterValues(payerId: UUID): Flow<List<PrevServiceMeterValuePojo>> =
         meteringDataSource.getPrevServiceMeterValues(payerId)
-
-    override fun add(meter: Meter): Flow<Meter> = flow {
-        meteringDataSource.addMeter(meter)
-        emit(meter)
-    }
-
-    override fun update(meter: Meter): Flow<Meter> = flow {
-        meteringDataSource.updateMeter(meter)
-        emit(meter)
-    }
 
     override fun save(meter: Meter): Flow<Meter> = flow {
         meteringDataSource.saveMeter(meter)

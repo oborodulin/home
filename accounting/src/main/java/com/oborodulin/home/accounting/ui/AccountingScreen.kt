@@ -37,7 +37,7 @@ fun AccountingScreen(
 ) { //setFabOnClick: (() -> Unit) -> Unit
     Timber.tag(TAG).d("AccountingScreen() called")
     LaunchedEffect(Unit) {
-        viewModel.submitAction(AccountingUiAction.Load)
+        viewModel.submitAction(AccountingUiAction.Load())
     }
     viewModel.uiStateFlow.collectAsState().value.let { state ->
         HomeComposableTheme(darkTheme = true) {

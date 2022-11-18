@@ -1,10 +1,10 @@
 package com.oborodulin.home.metering.domain.model
 
+import com.oborodulin.home.domain.model.DomainModel
+import java.math.BigDecimal
 import java.util.*
-import com.oborodulin.home.common.domain.model.DomainModel
 
 data class MeterValue(
-    val startDate: Date = Date(),
-    val endDate: Date?,
-    val isOk: Boolean = false,
+    val valueDate: Date = Date(),
+    val meterValue: BigDecimal? = null,
 ) : DomainModel()

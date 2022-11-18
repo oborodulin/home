@@ -7,5 +7,7 @@ sealed class PayersListUiAction : UiAction {
     object Load : PayersListUiAction()
     data class EditPayer(val payerId: UUID) : PayersListUiAction()
     data class DeletePayer(val payerId: UUID) : PayersListUiAction()
+//    data class ShowCompletedTasks(val show: Boolean) : PayersListEvent()
+//    data class ChangeSortByPriority(val enable: Boolean) : PayersListEvent()
+//    data class ChangeSortByDeadline(val enable: Boolean) : PayersListEvent()
 }
-

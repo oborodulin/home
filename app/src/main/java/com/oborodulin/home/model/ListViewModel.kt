@@ -6,7 +6,7 @@ import com.oborodulin.home.data.local.db.entities.BaseEntity
 
 private const val TAG = "ListViewModel"
 
-open class ListViewModel<T : BaseEntity> : ViewModel() {
+open class ListViewModel<T : Any> : ViewModel() {
     private val selItemsCntLiveData = MutableLiveData<Int?>()
 
     // create set text method

@@ -10,8 +10,8 @@ interface RateDao {
     @Query("SELECT * FROM rates")
     fun getAll(): Flow<List<RateEntity>>
 
-    @Query("SELECT * FROM rates WHERE id=:id")
-    fun get(id: UUID): RateEntity
+    @Query("SELECT * FROM rates WHERE rateId = :rateId")
+    fun get(rateId: UUID): RateEntity
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun add(rate: RateEntity)

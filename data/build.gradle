@@ -1,6 +1,7 @@
 plugins {
     id 'com.android.library'
     id 'org.jetbrains.kotlin.android'
+    id 'dagger.hilt.android.plugin'
     id 'org.jetbrains.kotlin.kapt'
 }
 android {
@@ -11,6 +12,9 @@ android {
         targetSdk cfg.sdk.targetVersion
 
         kapt {
+            //ERROR : error.NonExistentClass Kotlin In multi module Dagger project
+            //https://kotlinlang.org/docs/reference/kapt.html#non-existent-type-correction
+            correctErrorTypes = true
             arguments {
                 arg("room.schemaLocation", "$projectDir/schemas")
             }
@@ -46,11 +50,14 @@ dependencies {
     kapt deps.room.compiler
     implementation deps.room.runtime
     implementation deps.room.ktx
+    // Hilt
+    implementation deps.dagger.hilt
+    kapt deps.dagger.compiler
+    implementation deps.hilt.navigationCompose
 
+    implementation deps.jvm.inject
     implementation deps.kotlinx.coroutinesAndroid
     implementation deps.kotlinx.coroutinesCore
-    implementation deps.jvm.inject
-    implementation deps.logging.timber
 
     // Networking
     implementation deps.retrofit2.retrofit

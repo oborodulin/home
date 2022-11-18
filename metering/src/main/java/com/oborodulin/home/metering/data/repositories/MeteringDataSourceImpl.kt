@@ -2,15 +2,10 @@ package com.oborodulin.home.metering.data.repositories
 
 import com.oborodulin.home.common.di.IoDispatcher
 import com.oborodulin.home.data.local.db.dao.MeterDao
-import com.oborodulin.home.data.local.db.entities.MeterEntity
-import com.oborodulin.home.data.local.db.entities.MeterValueEntity
-import com.oborodulin.home.data.local.db.entities.MeterVerificationEntity
-import com.oborodulin.home.data.local.db.entities.pojo.MeterPojo
-import com.oborodulin.home.data.local.db.entities.pojo.PrevServiceMeterValuePojo
-import com.oborodulin.home.metering.data.mappers.MeterPojoMapper
+import com.oborodulin.home.metering.data.mappers.MeterMapper
 import com.oborodulin.home.metering.domain.model.Meter
 import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
 import java.util.*
 import javax.inject.Inject
@@ -21,47 +16,59 @@ import javax.inject.Inject
 class MeteringDataSourceImpl @Inject constructor(
     private val meterDao: MeterDao,
     @IoDispatcher private val dispatcher: CoroutineDispatcher,
-    private val meterPojoMapper: MeterPojoMapper
+    private val meterMapper: MeterMapper
 ) : MeteringDataSource {
-    override fun getMeters() = meterDao.getMetersDistinctUntilChanged()
+    override fun getMeters() = meterDao.findAllDistinctUntilChanged()
+        .map { list ->
+            list.map {
+                meterMapper.toMeter(it)
+            }
+        }
 
-    override fun getMeter(id: UUID) = meterDao.getMeterDistinctUntilChanged(id)
+    override fun getMeters(payerId: UUID) = meterDao.findByPayerId(payerId)
+        .map { list ->
+            list.map {
+                meterMapper.toMeter(it)
+            }
+        }
 
-    override fun getMeters(payerId: UUID) = meterDao.getMeters(payerId)
+    override fun getMeter(id: UUID) = meterDao.findByIdDistinctUntilChanged(id)
+        .map {
+            meterMapper.toMeter(it)
+        }
 
-    override fun getMeterAndValues(payerId: UUID) = meterDao.getMeterAndValues(payerId)
+    override fun getMeterValues(meterId: UUID) = meterDao.findValuesByMeterId(meterId)
+        .map { list ->
+            list.map {
+                meterMapper.toMeterValue(it)
+            }
+        }
 
-    override fun getMeterAndVerifications(payerId: UUID) =
-        meterDao.getMeterAndVerifications(payerId)
+    override fun getMeterVerifications(meterId: UUID) =
+        meterDao.findVerificationsByMeterId(meterId)
+            .map { list ->
+                list.map {
+                    meterMapper.toMeterVerification(it)
+                }
+            }
 
-    override fun getPrevServiceMeterValues(payerId: UUID): Flow<List<PrevServiceMeterValuePojo>> =
-        meterDao.getPrevMetersValuesByPayerDistinctUntilChanged(payerId)
-
-    override suspend fun addMeter(meter: Meter) = withContext(dispatcher) {
-        meterDao.add(meterPojoMapper.toMeterEntity(meter))
-    }
-
-    override suspend fun updateMeter(meter: Meter) = withContext(dispatcher) {
-        meterDao.update(
-            meterPojoMapper.toMeterEntity(meter),
-            meterPojoMapper.toMeterTlEntity(meter)
-        )
-    }
+    override fun getPrevServiceMeterValues(payerId: UUID) =
+        meterDao.findPrevMetersValuesByPayerIdDistinctUntilChanged(payerId)
 
     override suspend fun saveMeter(meter: Meter) = withContext(dispatcher) {
         meterDao.insert(
-            meterPojoMapper.toMeterEntity(meter),
-            meterPojoMapper.toMeterTlEntity(meter)
+            meterMapper.toMeterEntity(meter),
+            meterMapper.toMeterTlEntity(meter)
         )
     }
 
     override suspend fun deleteMeter(meter: Meter) = withContext(dispatcher) {
-        meterDao.delete(meterPojoMapper.toMeterEntity(meter))
+        meterDao.delete(meterMapper.toMeterEntity(meter))
     }
 
     override suspend fun deleteMeters(meters: List<Meter>) = withContext(dispatcher) {
         meterDao.delete(meters.map { meter ->
-            meterPojoMapper.toMeterEntity(meter)
+            meterMapper.toMeterEntity(meter)
         })
     }
 

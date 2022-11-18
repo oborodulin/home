@@ -16,7 +16,7 @@ class PayerEntityMapper {
             personsNum = payerEntity.personsNum,
             isFavorite = payerEntity.isFavorite,
         )
-        payer.id = payerEntity.id
+        payer.id = payerEntity.payerId
         return payer
     }
 
@@ -32,7 +32,7 @@ class PayerEntityMapper {
             personsNum = payer.personsNum,
             isFavorite = payer.isFavorite,
         )
-        payerEntity.id = payer.id
+        payerEntity.payerId = payer.id
         return payerEntity
     }
 }

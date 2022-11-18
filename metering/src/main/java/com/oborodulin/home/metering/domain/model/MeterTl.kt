@@ -1,6 +1,6 @@
 package com.oborodulin.home.metering.domain.model
 
-import com.oborodulin.home.common.domain.model.DomainModel
+import com.oborodulin.home.domain.model.DomainModel
 
 data class MeterTl(
     var measureUnit: String,

@@ -1,6 +1,5 @@
 package com.oborodulin.home.domain.model
 
-import com.oborodulin.home.common.domain.model.ListItemModel
 import java.math.BigDecimal
 
 data class Payer(
@@ -13,4 +12,4 @@ data class Payer(
     var paymentDay: Int? = null,
     var personsNum: Int? = null,
     var isFavorite: Boolean = false,
-) : ListItemModel(fullName, address)
+) : DomainModel()

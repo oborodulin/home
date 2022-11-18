@@ -1,7 +1,7 @@
-package com.oborodulin.home.common.domain.model;
+package com.oborodulin.home.domain.model;
 
 import java.io.Serializable
-import java.util.UUID
+import java.util.*
 
 open class DomainModel(
     var id: UUID = UUID.randomUUID(),

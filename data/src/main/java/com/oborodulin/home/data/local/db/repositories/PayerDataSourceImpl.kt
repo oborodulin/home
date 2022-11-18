@@ -1,10 +1,10 @@
 package com.oborodulin.home.data.local.db.repositories
 
 //import com.oborodulin.home.domain.model.NetworkMovie
-import com.oborodulin.home.data.local.db.mappers.PayerEntityMapper
-import com.oborodulin.home.domain.model.Payer
 import com.oborodulin.home.common.di.IoDispatcher
 import com.oborodulin.home.data.local.db.dao.PayerDao
+import com.oborodulin.home.data.local.db.mappers.PayerEntityMapper
+import com.oborodulin.home.domain.model.Payer
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
@@ -22,23 +22,15 @@ class PayerDataSourceImpl @Inject constructor(
 ) : PayerDataSource
 //    :    PagingSource<Int, NetworkMovie>()
 {
-    override fun getPayers() = payerDao.getAllDistinctUntilChanged()
+    override fun getPayers() = payerDao.findAllDistinctUntilChanged()
         .map { list ->
             list.map {
                 payerEntityMapper.toPayer(it)
             }
         }
 
-    override fun getPayer(id: UUID) =
-        payerDao.getDistinctUntilChanged(id).map { payerEntityMapper.toPayer(it) }
-
-    override suspend fun addPayer(payer: Payer) = withContext(dispatcher) {
-        payerDao.add(payerEntityMapper.toPayerEntity(payer))
-    }
-
-    override suspend fun updatePayer(payer: Payer) = withContext(dispatcher) {
-        payerDao.update(payerEntityMapper.toPayerEntity(payer))
-    }
+    override fun getPayer(payerId: UUID) =
+        payerDao.findByIdDistinctUntilChanged(payerId).map { payerEntityMapper.toPayer(it) }
 
     override suspend fun savePayer(payer: Payer) = withContext(dispatcher) {
         payerDao.insert(payerEntityMapper.toPayerEntity(payer))

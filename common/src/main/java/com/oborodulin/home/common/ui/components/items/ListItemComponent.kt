@@ -16,7 +16,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.oborodulin.home.common.domain.model.ListItemModel
+import com.oborodulin.home.common.ui.model.ListItemModel
 import com.oborodulin.home.common.ui.theme.Typography
 import timber.log.Timber
 
