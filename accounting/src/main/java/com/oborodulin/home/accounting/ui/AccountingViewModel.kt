@@ -15,7 +15,7 @@ import timber.log.Timber
 import java.util.*
 import javax.inject.Inject
 
-private const val TAG = "Accounting.AccountingViewModel"
+private const val TAG = "Accounting.ui.AccountingViewModel"
 
 @HiltViewModel
 class AccountingViewModel @Inject constructor(

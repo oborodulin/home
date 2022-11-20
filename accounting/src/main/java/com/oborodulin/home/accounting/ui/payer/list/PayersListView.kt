@@ -16,7 +16,6 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.oborodulin.home.accounting.R
-import com.oborodulin.home.domain.model.Payer
 import com.oborodulin.home.accounting.ui.AccountingUiAction
 import com.oborodulin.home.accounting.ui.AccountingViewModel
 import com.oborodulin.home.accounting.ui.model.PayerListItemModel
@@ -25,7 +24,7 @@ import com.oborodulin.home.common.ui.state.CommonScreen
 import kotlinx.coroutines.flow.collectLatest
 import timber.log.Timber
 
-private const val TAG = "Accounting.PayersListView"
+private const val TAG = "Accounting.ui.PayersListView"
 
 @Composable
 fun PayersListView(
@@ -49,8 +48,8 @@ fun PayersListView(
         viewModel.singleEventFlow.collectLatest {
             when (it) {
                 is PayersListUiSingleEvent.OpenPayerDetailScreen -> {
-                    Toast.makeText(context, "Open Payer Detail Screen", Toast.LENGTH_SHORT).show()
-                    //navController.navigate(it.navRoute)
+                    Toast.makeText(context, "Open Payer Screen", Toast.LENGTH_SHORT).show()
+                    navController.navigate(it.navRoute)
                 }
             }
         }

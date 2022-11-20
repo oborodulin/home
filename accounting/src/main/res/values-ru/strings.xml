@@ -9,9 +9,6 @@
     <!--СПИСОК: -->
     <!--плательщиков -->
     <string name="payer_list_empty_text">Плательщиков пока нет. Добавте, пожалуйста, хотя бы одного</string>
-    <!--НАВИГАЦИЯ: -->
-    <!--дополнительная -->
-    <string name="nav_item_payer_detail">Плательщик</string>
     <!--ФОРМА: -->
     <!--плательщика -->
     <string name="payer_subheader">Данные плательщика</string>

@@ -1,17 +1,14 @@
 package com.oborodulin.home.accounting.ui.payer.list
 
 import androidx.lifecycle.viewModelScope
-import com.oborodulin.home.accounting.R
-import com.oborodulin.home.accounting.ui.model.converters.PayersListConverter
-import com.oborodulin.home.domain.model.Payer
-import com.oborodulin.home.domain.usecase.GetPayersUseCase
-import com.oborodulin.home.domain.usecase.PayerUseCases
-import com.oborodulin.home.accounting.ui.AccountingViewModel
 import com.oborodulin.home.accounting.ui.model.PayerListItemModel
-import com.oborodulin.home.common.ui.navigation.NavRoutes
-import com.oborodulin.home.common.ui.navigation.PayerInput
+import com.oborodulin.home.accounting.ui.model.converters.PayersListConverter
 import com.oborodulin.home.common.ui.state.MviViewModel
 import com.oborodulin.home.common.ui.state.UiState
+import com.oborodulin.home.domain.usecase.GetPayersUseCase
+import com.oborodulin.home.domain.usecase.PayerUseCases
+import com.oborodulin.home.presentation.navigation.NavRoutes
+import com.oborodulin.home.presentation.navigation.PayerInput
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.flow.map
@@ -19,7 +16,7 @@ import kotlinx.coroutines.launch
 import timber.log.Timber
 import javax.inject.Inject
 
-private const val TAG = "Accounting.AccountingViewModel"
+private const val TAG = "Accounting.ui.AccountingViewModel"
 
 @HiltViewModel
 class PayersListViewModel @Inject constructor(
@@ -51,10 +48,7 @@ class PayersListViewModel @Inject constructor(
             is PayersListUiAction.EditPayer -> {
                 submitSingleEvent(
                     PayersListUiSingleEvent.OpenPayerDetailScreen(
-                        NavRoutes.NavPayerDetailScreen(
-                            R.drawable.outline_person_black_24,
-                            R.string.nav_item_payer_detail
-                        ).routeForPayerDetail(
+                        NavRoutes.PayerScreen.routeForPayer(
                             PayerInput(action.payerId)
                         )
                     )

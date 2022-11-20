@@ -13,4 +13,4 @@ data class PayerListItemModel(
     var paymentDay: Int? = null,
     var personsNum: Int? = null,
     var isFavorite: Boolean = false,
-) : ListItemModel(title = fullName, descr = address)
+) : ListItemModel(itemId = id, title = fullName, descr = address)

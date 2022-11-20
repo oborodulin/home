@@ -28,7 +28,7 @@ import timber.log.Timber
 /**
  * Created by tfakioglu on 12.December.2021
  */
-private const val TAG = "Accounting.AccountingScreen"
+private const val TAG = "Accounting.ui.AccountingScreen"
 
 @Composable
 fun AccountingScreen(

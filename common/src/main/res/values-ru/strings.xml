@@ -1,7 +1,10 @@
 <resources>
     <string name="app_name">Home-Common</string>
     <!--СООБЩЕНИЯ ОБ ОШИБКАХ -->
+    <string name="success">успешно</string>
     <string name="number_negative_error">Укажите, пожалуйста, положительное число!</string>
+    <string name="name_too_short_error">Наименование слишком короткое!</string>
+    <string name="card_number_too_short_error">Номер карты слишком короткий!</string>
 
     <!--ЕДИНИЦЫ ИЗМЕРЕНИЯ -->
     <string name="m2_unit">м2</string>
@@ -10,4 +13,8 @@
     <string name="Gcal_unit">Гкал</string>
     <string name="GJ_unit">ГДж</string>
     <string name="MWh_unit">МВт*ч</string>
+
+    <!--ЗАПОЛНИТЕЛИ (Compose Preview) -->
+    <string name="preview_blank_title">Заголовок</string>
+    <string name="preview_blank_descr">Описание</string>
 </resources>

@@ -1,6 +1,9 @@
 package com.oborodulin.home.common.ui.model
 
+import java.util.UUID
+
 open class ListItemModel(
-    var title: String,
-    var descr: String?
+    val itemId: UUID,
+    val title: String,
+    val descr: String?
 )

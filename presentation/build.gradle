@@ -1,0 +1,110 @@
+plugins {
+    id 'com.android.library'
+    id 'org.jetbrains.kotlin.android'
+    id 'dagger.hilt.android.plugin'
+    id 'org.jetbrains.kotlin.kapt'
+}
+
+android {
+    namespace 'com.oborodulin.home.presentation'
+    compileSdk cfg.sdk.compileVersion
+
+    defaultConfig {
+        minSdk cfg.sdk.minVersion
+        targetSdk cfg.sdk.targetVersion
+        kapt {
+            //ERROR : error.NonExistentClass Kotlin In multi module Dagger project
+            //https://kotlinlang.org/docs/reference/kapt.html#non-existent-type-correction
+            correctErrorTypes = true
+        }
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        consumerProguardFiles "consumer-rules.pro"
+    }
+    buildFeatures {
+        // Enables Jetpack Compose for this module
+        compose true
+    }
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+    }
+    compileOptions {
+        sourceCompatibility cfg.jvm.compatibility.source
+        targetCompatibility cfg.jvm.compatibility.target
+    }
+    kotlinOptions {
+        jvmTarget = cfg.jvm.target
+
+        // Enable Coroutines and Flow APIs
+        freeCompilerArgs += "-Xopt-in=kotlinx.coroutines.ExperimentalCoroutinesApi"
+        freeCompilerArgs += "-Xopt-in=kotlinx.coroutines.FlowPreview"
+    }
+    composeOptions {
+        kotlinCompilerExtensionVersion versions.composeKotlinExt
+    }
+}
+dependencies {
+    implementation project(":common")
+    implementation project(":data")
+    implementation project(":domain")
+
+    // Logging
+    implementation deps.logging.timber
+    implementation deps.logging.logger
+    // Room
+    implementation deps.room.runtime
+    kapt deps.room.compiler
+    implementation deps.room.ktx
+    // Compose
+    implementation deps.compose.ui
+    implementation deps.compose.material
+    implementation deps.compose.iconsCore
+    implementation deps.compose.iconsExtended
+    implementation deps.compose.uiTooling
+    implementation deps.compose.uiPreview
+    // Compose preview
+    debugImplementation deps.androidx.poolingcontainer
+    // Compose Constraint Layout
+    implementation deps.androidx.constraintlayoutCompose
+    // Hilt
+    implementation deps.dagger.hilt
+    kapt deps.dagger.compiler
+    implementation deps.hilt.navigationCompose
+    // Paging
+    implementation deps.paging.compose
+    // Sweet Toast
+    implementation deps.TalhaFaki.composableSweetToast
+    // Lottie
+    implementation deps.lottie.compose
+    // Network
+    implementation deps.retrofit2.retrofit
+    implementation deps.retrofit2.converterGson
+
+    implementation deps.androidx.coreKtx
+    implementation deps.androidx.appcompat
+    implementation deps.google.material
+    implementation deps.activity.compose
+    implementation deps.lifecycle.runtimeKtx
+    implementation deps.lifecycle.viewmodelCompose
+    implementation deps.google.gson
+    implementation deps.navigation.compose
+    //debugImplementation deps.compose.uiTooling
+
+    // Testing dependencies
+    testImplementation deps.test.junit
+    androidTestImplementation deps.test.junitExt
+    androidTestImplementation deps.test.espressoCore
+    androidTestImplementation deps.compose.uiTestJunit4
+}
+
+dependencies {
+
+    implementation 'androidx.core:core-ktx:1.7.0'
+    implementation 'androidx.appcompat:appcompat:1.5.1'
+    implementation 'com.google.android.material:material:1.7.0'
+    testImplementation 'junit:junit:4.13.2'
+    androidTestImplementation 'androidx.test.ext:junit:1.1.4'
+    androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.0'
+}

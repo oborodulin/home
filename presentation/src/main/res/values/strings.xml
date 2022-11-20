@@ -1,0 +1,10 @@
+<resources>
+    <!--НАВИГАЦИЯ: -->
+    <!--основная -->
+    <string name="nav_item_accounting">Учёт</string>
+    <string name="nav_item_billing">Тарифы</string>
+    <string name="nav_item_metering">Приборы</string>
+    <string name="nav_item_reporting">Квитанции</string>
+    <!--дополнительная -->
+    <string name="nav_item_payer_detail">Плательщик</string>
+</resources>
