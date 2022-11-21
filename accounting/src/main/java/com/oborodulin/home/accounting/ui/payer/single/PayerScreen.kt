@@ -25,9 +25,9 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.flowWithLifecycle
 import com.oborodulin.home.accounting.R
 import com.oborodulin.home.accounting.ui.model.PayerModel
-import com.oborodulin.home.common.ui.components.CustomTextField
-import com.oborodulin.home.common.ui.components.ScreenEvent
 import com.oborodulin.home.common.ui.components.creditCardFilter
+import com.oborodulin.home.common.ui.components.field.ScreenEvent
+import com.oborodulin.home.common.ui.components.field.TextFieldComponent
 import com.oborodulin.home.common.ui.state.CommonScreen
 import com.oborodulin.home.presentation.navigation.PayerInput
 import com.skyyo.userinputvalidation.toast
@@ -41,7 +41,9 @@ fun PayerScreen(
 ) {
     viewModel.uiStateFlow.collectAsState().value.let { result ->
         CommonScreen(result) { payerModel ->
-            Payer(viewModel, payerModel)
+            Payer(viewModel, payerModel){
+                viewModel.submitAction(PayerUiAction.Save(it))
+            }
         }
     }
     LaunchedEffect(payerInput.payerId) {
@@ -51,7 +53,7 @@ fun PayerScreen(
 
 @OptIn(ExperimentalComposeUiApi::class, ExperimentalLifecycleComposeApi::class)
 @Composable
-fun Payer(viewModel: PayerViewModel, payerModel: PayerModel) {
+fun Payer(viewModel: PayerViewModel, payerModel: PayerModel, onSubmit: (PayerModel) -> Unit) {
     val context = LocalContext.current
     val lifecycleOwner = LocalLifecycleOwner.current
     val focusManager = LocalFocusManager.current
@@ -81,8 +83,8 @@ fun Payer(viewModel: PayerViewModel, payerModel: PayerModel) {
                 is ScreenEvent.ClearFocus -> focusManager.clearFocus()
                 is ScreenEvent.RequestFocus -> {
                     when (event.textFieldKey) {
-                        PayerFocusedTextFieldKey.ERC_CODE -> ercCodeFocusRequester.requestFocus()
-                        PayerFocusedTextFieldKey.FULL_NAME -> fullNameFocusRequester.requestFocus()
+                        PayerFields.ERC_CODE -> ercCodeFocusRequester.requestFocus()
+                        PayerFields.FULL_NAME -> fullNameFocusRequester.requestFocus()
                         else -> {}
                     }
                 }
@@ -96,12 +98,12 @@ fun Payer(viewModel: PayerViewModel, payerModel: PayerModel) {
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        CustomTextField(
+        TextFieldComponent(
             modifier = Modifier
                 .focusRequester(ercCodeFocusRequester)
                 .onFocusChanged { focusState ->
                     viewModel.onTextFieldFocusChanged(
-                        key = PayerFocusedTextFieldKey.ERC_CODE,
+                        focusedField = PayerFields.ERC_CODE,
                         isFocused = focusState.isFocused
                     )
                 },
@@ -113,16 +115,16 @@ fun Payer(viewModel: PayerViewModel, payerModel: PayerModel) {
                 )
             },
             inputWrapper = ercCode,
-            onValueChange = viewModel::onNameEntered,
-            onImeKeyAction = viewModel::onNameImeActionClick
+            onValueChange = { viewModel.onTextFieldEntered(PayerInputEvent.ErcCode(it)) },
+            onImeKeyAction = viewModel::moveFocusImeAction
         )
         Spacer(Modifier.height(16.dp))
-        CustomTextField(
+        TextFieldComponent(
             modifier = Modifier
                 .focusRequester(fullNameFocusRequester)
                 .onFocusChanged { focusState ->
                     viewModel.onTextFieldFocusChanged(
-                        key = PayerFocusedTextFieldKey.FULL_NAME,
+                        focusedField = PayerFields.FULL_NAME,
                         isFocused = focusState.isFocused
                     )
                 },
@@ -133,13 +135,13 @@ fun Payer(viewModel: PayerViewModel, payerModel: PayerModel) {
                     imeAction = ImeAction.Done
                 )
             },
-            visualTransformation = ::creditCardFilter,
+          //  visualTransformation = ::creditCardFilter,
             inputWrapper = fullName,
-            onValueChange = viewModel::onCardNumberEntered,
-            onImeKeyAction = viewModel::onContinueClick
+            onValueChange = { viewModel.onTextFieldEntered(PayerInputEvent.FullName(it)) },
+            onImeKeyAction = viewModel::onContinueClick(onSubmit())
         )
         Spacer(Modifier.height(32.dp))
-        Button(onClick = viewModel::onContinueClick, enabled = areInputsValid) {
+        Button(onClick = viewModel::onContinueClick(onSubmit()), enabled = areInputsValid) {
             Text(text = "Continue")
         }
     }

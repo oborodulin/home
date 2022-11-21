@@ -17,4 +17,5 @@
     <!--ЗАПОЛНИТЕЛИ (Compose Preview) -->
     <string name="preview_blank_title">Заголовок</string>
     <string name="preview_blank_descr">Описание</string>
+    <string name="preview_blank_text_field">Текст</string>
 </resources>

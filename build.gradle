@@ -9,7 +9,7 @@ buildscript {
                 composeKotlinExt       : '1.3.1',
                 composeMaterial        : '1.2.1',
                 composeNavigation      : '2.5.2',
-                composeViewmodel       : '2.5.1',
+                viewmodelCompose       : '2.5.1',
                 composeIcons           : '1.2.1',
                 composeUi              : '1.2.1',
                 composeUiTest          : '1.2.1',
@@ -119,7 +119,7 @@ buildscript {
                                        viewmodelKtx    : "androidx.lifecycle:lifecycle-viewmodel-ktx:$versions.ktxLifecycle",
                                        runtimeCompose  : "androidx.lifecycle:lifecycle-runtime-compose:$versions.lifecycleCompose",
                                        // Integration with ViewModels
-                                       viewmodelCompose: "androidx.lifecycle:lifecycle-viewmodel-compose:$versions.composeViewmodel"],
+                                       viewmodelCompose: "androidx.lifecycle:lifecycle-viewmodel-compose:$versions.viewmodelCompose"],
                 logging             : [timber: "com.jakewharton.timber:timber:$versions.timber",
                                        logger: "com.orhanobut:logger:$versions.logger"],
                 // Lottie

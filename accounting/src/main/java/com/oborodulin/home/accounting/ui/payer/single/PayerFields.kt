@@ -1,8 +1,8 @@
 package com.oborodulin.home.accounting.ui.payer.single
 
-import com.oborodulin.home.common.ui.components.FocusableTextField
+import com.oborodulin.home.common.ui.components.field.Focusable
 
-enum class PayerFocusedTextFieldKey : FocusableTextField {
+enum class PayerFields : Focusable {
     ERC_CODE,
     FULL_NAME,
     ADDRESS,
@@ -11,6 +11,9 @@ enum class PayerFocusedTextFieldKey : FocusableTextField {
     HEATED_VOLUME,
     PAYMENT_DAY,
     PERSONS_NUM,
-    IS_FAVORITE,
-    NONE
+    IS_FAVORITE;
+
+    override fun key(): String {
+        return this.name
+    }
 }

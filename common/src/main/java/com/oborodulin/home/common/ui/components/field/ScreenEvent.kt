@@ -1,4 +1,4 @@
-package com.oborodulin.home.common.ui.components
+package com.oborodulin.home.common.ui.components.field
 
 import androidx.compose.ui.focus.FocusDirection
 
@@ -6,7 +6,7 @@ import androidx.compose.ui.focus.FocusDirection
 sealed class ScreenEvent {
     class ShowToast(val messageId: Int) : ScreenEvent()
     class UpdateKeyboard(val show: Boolean) : ScreenEvent()
-    class RequestFocus(val textFieldKey: FocusableTextField) : ScreenEvent()
+    class RequestFocus(val textFieldKey: Focusable) : ScreenEvent()
     object ClearFocus : ScreenEvent()
     class MoveFocus(val direction: FocusDirection = FocusDirection.Down) : ScreenEvent()
 }

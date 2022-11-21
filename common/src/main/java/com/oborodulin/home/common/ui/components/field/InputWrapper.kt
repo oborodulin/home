@@ -1,4 +1,4 @@
-package com.oborodulin.home.common.ui.components
+package com.oborodulin.home.common.ui.components.field
 
 import android.os.Parcelable
 import kotlinx.parcelize.Parcelize
