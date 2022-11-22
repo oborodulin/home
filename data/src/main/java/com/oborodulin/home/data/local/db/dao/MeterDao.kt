@@ -45,8 +45,8 @@ interface MeterDao {
         findByPayerId(serviceId).distinctUntilChanged()
 
     @Query(
-        "SELECT mv.payersId AS payerId, mv.servicesId AS serviceId, sv.type, sv.name, mv.meterId, " +
-                "IFNULL(mv.measureUnit, sv.measureUnit) AS measureUnit, " +
+        "SELECT mvl.meterValueId, mv.payersId AS payerId, mv.servicesId AS serviceId, sv.type, " +
+                "sv.name, mv.meterId, IFNULL(mv.measureUnit, sv.measureUnit) AS measureUnit, " +
                 "mvl.valueDate AS prevLastDate, mvl.meterValue AS prevValue " +
                 "FROM meters_view AS mv JOIN services_view AS sv ON sv.serviceId = mv.servicesId " +
                 "JOIN meter_values AS mvl ON mvl.metersId = mv.meterId " +

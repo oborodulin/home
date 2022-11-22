@@ -141,7 +141,6 @@ fun PreviewListItemComponent() {
     ListItemComponent(
         icon = R.drawable.outline_photo_24,
         item = ListItemModel(
-            itemId = UUID.randomUUID(),
             title = context.resources.getString(R.string.preview_blank_title),
             descr = context.resources.getString(R.string.preview_blank_descr),
         ),

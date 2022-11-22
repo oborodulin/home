@@ -20,4 +20,5 @@ class PayersListConverter :
                 isFavorite = it.isFavorite
             )
         }
+
 }

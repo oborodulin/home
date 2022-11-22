@@ -5,6 +5,7 @@ import java.math.BigDecimal
 import java.util.*
 
 data class ServiceMeterValueModel(
+    var id: UUID = UUID.randomUUID(),
     var type: ServiceType,
     val name: String,
     var meterId: UUID,

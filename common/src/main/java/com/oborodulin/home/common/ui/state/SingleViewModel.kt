@@ -20,8 +20,8 @@ abstract class SingleViewModel<T : Any, S : UiState<T>, A : UiAction, E : UiSing
     private val initFocusedTextField: Focusable,
 ) : MviViewModel<T, S, A, E>() {
     private var focusedTextField = FocusedTextField(
-        initFocusedTextField,
-        handle["focusedTextField"] ?: initFocusedTextField.key()
+        textField = initFocusedTextField,
+        key = handle["focusedTextField"] ?: initFocusedTextField.key()
     )
         set(value) {
             field = value
@@ -55,12 +55,13 @@ abstract class SingleViewModel<T : Any, S : UiState<T>, A : UiAction, E : UiSing
         _events.trySend(ScreenEvent.MoveFocus())
     }
 
-    fun onContinueClick(onSuccess: ) {
+    fun onContinueClick(onSuccess: () -> Unit) {
         viewModelScope.launch(Dispatchers.Default) {
             when (val inputErrors = getInputErrorsOrNull()) {
                 null -> {
                     clearFocusAndHideKeyboard()
-                    _events.send(ScreenEvent.ShowToast(com.oborodulin.home.common.R.string.success))
+                    onSuccess()
+                    //_events.send(ScreenEvent.ShowToast(com.oborodulin.home.common.R.string.success))
                 }
                 else -> displayInputErrors(inputErrors)
             }

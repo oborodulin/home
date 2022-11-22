@@ -4,7 +4,6 @@ import android.content.res.Configuration
 import androidx.annotation.StringRes
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
@@ -23,7 +22,6 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.oborodulin.home.common.R
-import com.oborodulin.home.common.ui.components.InputFieldComponent
 import com.oborodulin.home.common.ui.theme.HomeComposableTheme
 
 @Composable
@@ -77,8 +75,8 @@ fun PreviewTextFieldComponent() {
     HomeComposableTheme {
         Surface {
             TextFieldComponent(modifier = Modifier.fillMaxSize(),
-                inputWrapper = InputWrapper(value = "Text field"),
-                labelResId = R.string.preview_blank_text_field,
+                inputWrapper = InputWrapper(value = stringResource(R.string.preview_blank_text_field_val)),
+                labelResId = R.string.preview_blank_text_field_lbl,
                 onValueChange = {},
                 onImeKeyAction = {})
         }

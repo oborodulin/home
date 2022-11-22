@@ -39,8 +39,11 @@ fun PayersListView(
     }
     viewModel.uiStateFlow.collectAsState().value.let { state ->
         CommonScreen(state = state) {
-            PayersList(it) { payer ->
-                accountingViewModel.submitAction(AccountingUiAction.Load(payer.id))
+            PayersList(it,
+                onClick = { payer -> accountingViewModel.submitAction(AccountingUiAction.Load(payer.id)) },
+                onEdit = { payer -> viewModel.submitAction(PayersListUiAction.EditPayer(payer.id)) }
+            ) { payer ->
+                viewModel.submitAction(PayersListUiAction.DeletePayer(payer.id))
             }
         }
     }
@@ -59,7 +62,9 @@ fun PayersListView(
 @Composable
 fun PayersList(
     payers: List<PayerListItemModel>,
-    onClick: (PayerListItemModel) -> Unit
+    onClick: (PayerListItemModel) -> Unit,
+    onEdit: (PayerListItemModel) -> Unit,
+    onDelete: (PayerListItemModel) -> Unit
 ) {
     Timber.tag(TAG).d("PayersList(...) called")
     if (payers.isNotEmpty()) {
@@ -68,9 +73,11 @@ fun PayersList(
                 payers[index].let { payer ->
                     ListItemComponent(
                         icon = null,
-                        item = payer
+                        item = payer,
+                        onClick = { onClick(payer) },
+                        onEdit = { onEdit(payer) }
                     ) {
-                        onClick(payer)
+                        onDelete(payer)
                     }
                 }
             }

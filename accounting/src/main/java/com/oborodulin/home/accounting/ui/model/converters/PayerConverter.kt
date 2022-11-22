@@ -4,7 +4,6 @@ import com.oborodulin.home.accounting.ui.model.PayerModel
 import com.oborodulin.home.common.ui.state.CommonResultConverter
 import com.oborodulin.home.domain.model.Payer
 import com.oborodulin.home.domain.usecase.GetPayerUseCase
-import com.oborodulin.home.domain.usecase.SavePayerUseCase
 
 class PayerConverter :
     CommonResultConverter<GetPayerUseCase.Response, PayerModel>() {

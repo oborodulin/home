@@ -3,6 +3,7 @@ package com.oborodulin.home.accounting.ui.payer.single
 import com.oborodulin.home.common.ui.components.field.Focusable
 
 enum class PayerFields : Focusable {
+    PAYER_ID,
     ERC_CODE,
     FULL_NAME,
     ADDRESS,

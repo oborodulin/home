@@ -12,6 +12,7 @@ class PrevServiceMeterValuesConverter :
         return AccountingModel(
             serviceMeterVals = data.prevServiceMeterVals.map {
                 ServiceMeterValueModel(
+                    id = it.meterValueId,
                     type = it.type,
                     name = it.name,
                     meterId = it.meterId,

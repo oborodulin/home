@@ -41,8 +41,9 @@ fun PayerScreen(
 ) {
     viewModel.uiStateFlow.collectAsState().value.let { result ->
         CommonScreen(result) { payerModel ->
-            Payer(viewModel, payerModel){
-                viewModel.submitAction(PayerUiAction.Save(it))
+            viewModel.initFieldStatesByUiModel(payerModel)
+            Payer(viewModel) {
+                viewModel.submitAction(PayerUiAction.Save)
             }
         }
     }
@@ -53,7 +54,7 @@ fun PayerScreen(
 
 @OptIn(ExperimentalComposeUiApi::class, ExperimentalLifecycleComposeApi::class)
 @Composable
-fun Payer(viewModel: PayerViewModel, payerModel: PayerModel, onSubmit: (PayerModel) -> Unit) {
+fun Payer(viewModel: PayerViewModel, onSubmit: () -> Unit) {
     val context = LocalContext.current
     val lifecycleOwner = LocalLifecycleOwner.current
     val focusManager = LocalFocusManager.current
@@ -70,8 +71,8 @@ fun Payer(viewModel: PayerViewModel, payerModel: PayerModel, onSubmit: (PayerMod
     val fullName by viewModel.fullName.collectAsStateWithLifecycle()
     val areInputsValid by viewModel.areInputsValid.collectAsStateWithLifecycle()
 
-    val fullNameFocusRequester = remember { FocusRequester() }
     val ercCodeFocusRequester = remember { FocusRequester() }
+    val fullNameFocusRequester = remember { FocusRequester() }
 
     LaunchedEffect(Unit) {
         events.collect { event ->
@@ -110,7 +111,7 @@ fun Payer(viewModel: PayerViewModel, payerModel: PayerModel, onSubmit: (PayerMod
             labelResId = R.string.erc_code_hint,
             keyboardOptions = remember {
                 KeyboardOptions(
-                    keyboardType = KeyboardType.Text,
+                    keyboardType = KeyboardType.Number,
                     imeAction = ImeAction.Next
                 )
             },
@@ -131,17 +132,17 @@ fun Payer(viewModel: PayerViewModel, payerModel: PayerModel, onSubmit: (PayerMod
             labelResId = R.string.full_name_hint,
             keyboardOptions = remember {
                 KeyboardOptions(
-                    keyboardType = KeyboardType.Number,
+                    keyboardType = KeyboardType.Text,
                     imeAction = ImeAction.Done
                 )
             },
-          //  visualTransformation = ::creditCardFilter,
+            //  visualTransformation = ::creditCardFilter,
             inputWrapper = fullName,
             onValueChange = { viewModel.onTextFieldEntered(PayerInputEvent.FullName(it)) },
-            onImeKeyAction = viewModel::onContinueClick(onSubmit())
+            onImeKeyAction = { viewModel.onContinueClick { onSubmit() } }
         )
         Spacer(Modifier.height(32.dp))
-        Button(onClick = viewModel::onContinueClick(onSubmit()), enabled = areInputsValid) {
+        Button(onClick = { viewModel.onContinueClick { onSubmit() } }, enabled = areInputsValid) {
             Text(text = "Continue")
         }
     }

@@ -5,6 +5,7 @@ import java.math.BigDecimal
 import java.util.*
 
 class PrevServiceMeterValuePojo(
+    var meterValueId: UUID,
     var payerId: UUID,
     var serviceId: UUID,
     var type: ServiceType,

@@ -2,6 +2,7 @@ package com.oborodulin.home.accounting.ui.payer.single
 
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
+import androidx.room.util.UUIDUtil
 import com.oborodulin.home.accounting.ui.model.PayerModel
 import com.oborodulin.home.accounting.ui.model.converters.PayerConverter
 import com.oborodulin.home.common.ui.components.*
@@ -22,16 +23,6 @@ import javax.inject.Inject
 
 private const val TAG = "Accounting.ui.PayerViewModel"
 
-const val ERC_CODE = "ercCode"
-const val FULL_NAME = "fullName"
-const val ADDRESS = "address"
-const val TOTAL_AREA = "totalArea"
-const val LIVING_SPACE = "livingSpace"
-const val HEATED_VOLUME = "heatedVolume"
-const val PAYMENT_DAY = "paymentDay"
-const val PERSONS_NUM = "personsNum"
-const val IS_FAVORITE = "isFavorite"
-
 @OptIn(FlowPreview::class)
 @HiltViewModel
 class PayerViewModel @Inject constructor(
@@ -42,14 +33,64 @@ class PayerViewModel @Inject constructor(
     handle,
     PayerFields.ERC_CODE
 ) {
-    lateinit var payerModel: PayerModel
-
+    val payerId = handle.getStateFlow(PayerFields.PAYER_ID.name, InputWrapper())
     val ercCode = handle.getStateFlow(PayerFields.ERC_CODE.name, InputWrapper())
     val fullName = handle.getStateFlow(PayerFields.FULL_NAME.name, InputWrapper())
+
     val areInputsValid = combine(ercCode, fullName) { ercCode, fullName ->
-        ercCode.value.isNotEmpty() && ercCode.errorId == null &&
-                fullName.value.isNotEmpty() && fullName.errorId == null
+        ercCode.errorId == null && fullName.errorId == null
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), false)
+
+    override fun initState(): UiState<PayerModel> = UiState.Loading
+
+    override fun handleAction(action: PayerUiAction) {
+        when (action) {
+            is PayerUiAction.Create -> {
+                initFieldStatesByUiModel(PayerModel())
+            }
+            is PayerUiAction.Load -> {
+                loadPayer(action.payerId)
+            }
+            is PayerUiAction.Save -> {
+                savePayer()
+            }
+        }
+    }
+
+    private fun loadPayer(payerId: UUID) {
+        viewModelScope.launch {
+            payerUseCases.getPayerUseCase.execute(GetPayerUseCase.Request(payerId))
+                .map {
+                    converter.convert(it)
+                }
+                .collect {
+                    submitState(it)
+                }
+        }
+    }
+
+    private fun savePayer() {
+
+        viewModelScope.launch {
+            payerUseCases.savePayerUseCase.execute(
+                SavePayerUseCase.Request(
+                    converter.toPayer(
+                        PayerModel(
+                            id = UUID.fromString(payerId.value.value),
+                            ercCode = ercCode.value.value,
+                            fullName = fullName.value.value
+                        )
+                    )
+                )
+            ).collect {}
+        }
+    }
+
+    fun initFieldStatesByUiModel(payerModel: PayerModel) {
+        handle[PayerFields.PAYER_ID.name] = payerId.value.copy(value = payerModel.id.toString())
+        handle[PayerFields.ERC_CODE.name] = ercCode.value.copy(value = payerModel.ercCode)
+        handle[PayerFields.FULL_NAME.name] = fullName.value.copy(value = payerModel.fullName)
+    }
 
     override suspend fun observeInputEvents() {
         inputEvents.receiveAsFlow()
@@ -115,43 +156,7 @@ class PayerViewModel @Inject constructor(
             handle[error.fieldName] = ercCode.value.copy(errorId = error.errorId)
         }
     }
-
-    override fun initState(): UiState<PayerModel> = UiState.Loading
-
-    override fun handleAction(action: PayerUiAction) {
-        when (action) {
-            is PayerUiAction.Load -> {
-                loadPayer(action.payerId)
-            }
-            is PayerUiAction.Save -> {
-                savePayer(action.payerModel)
-            }
-        }
-    }
-
-    private fun loadPayer(payerId: UUID) {
-        viewModelScope.launch {
-            payerUseCases.getPayerUseCase.execute(GetPayerUseCase.Request(payerId))
-                .map {
-                    converter.convert(it)
-                }
-                .collect {
-                    submitState(it)
-                }
-        }
-    }
-
-    private fun savePayer(payerModel: PayerModel) {
-        viewModelScope.launch {
-            payerUseCases.savePayerUseCase.execute(
-                SavePayerUseCase.Request(
-                    converter.toPayer(payerModel)
-                )
-            ).collect {}
-        }
-    }
 }
-
 /*
         private val _payerState = mutableStateOf(Payer())
 
