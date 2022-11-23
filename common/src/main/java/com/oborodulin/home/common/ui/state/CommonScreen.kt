@@ -9,9 +9,13 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import timber.log.Timber
+
+private const val TAG = "Common.ui.CommonScreen"
 
 @Composable
 fun <T : Any> CommonScreen(state: UiState<T>, onSuccess: @Composable (T) -> Unit) {
+    Timber.tag(TAG).d("CommonScreen(...) called")
     when (state) {
         is UiState.Loading -> {
             Loading()
@@ -20,6 +24,7 @@ fun <T : Any> CommonScreen(state: UiState<T>, onSuccess: @Composable (T) -> Unit
             Error(state.errorMessage)
         }
         is UiState.Success -> {
+            Timber.tag(TAG).d("onSuccess(...) called: %s".format(state.data))
             onSuccess(state.data)
         }
     }
@@ -27,6 +32,7 @@ fun <T : Any> CommonScreen(state: UiState<T>, onSuccess: @Composable (T) -> Unit
 
 @Composable
 fun Error(errorMessage: String) {
+    Timber.tag(TAG).d("Error(...) called: %s".format(errorMessage))
     Column(
         modifier = Modifier.fillMaxSize(),
         verticalArrangement = Arrangement.Bottom
@@ -39,6 +45,7 @@ fun Error(errorMessage: String) {
 
 @Composable
 fun Loading() {
+    Timber.tag(TAG).d("Loading() called")
     Column(
         modifier = Modifier.fillMaxSize(),
         verticalArrangement = Arrangement.Center,

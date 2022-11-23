@@ -26,28 +26,28 @@ sealed class NavRoutes constructor(
     @StringRes open val titleResId: Int,
     val arguments: List<NamedNavArgument> = emptyList()
 ) {
-    object AccountingScreen : NavRoutes(
+    object Accounting : NavRoutes(
         ROUTE_ACCOUNTING,
         R.drawable.outline_account_balance_wallet_black_24,
         R.string.nav_item_accounting
     )
 
-    object BillingScreen : NavRoutes(
+    object Billing : NavRoutes(
         ROUTE_BILLING,
         R.drawable.outline_monetization_on_black_24,
         R.string.nav_item_billing
     )
 
-    object MeteringScreen : NavRoutes(
+    object Metering : NavRoutes(
         ROUTE_METERING,
         R.drawable.outline_electric_meter_black_24,
         R.string.nav_item_metering
     )
 
-    object ReportingScreen :
+    object Reporting :
         NavRoutes(ROUTE_REPORTING, R.drawable.outline_receipt_black_24, R.string.nav_item_reporting)
 
-    object PayerScreen : NavRoutes(
+    object Payer : NavRoutes(
         String.format(ROUTE_PAYER_DETAIL, "{$ARG_PAYER_ID}"),
         R.drawable.outline_person_black_24,
         R.string.nav_item_payer_detail,

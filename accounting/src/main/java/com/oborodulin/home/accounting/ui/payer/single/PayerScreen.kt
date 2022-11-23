@@ -24,13 +24,12 @@ import androidx.lifecycle.compose.ExperimentalLifecycleComposeApi
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.flowWithLifecycle
 import com.oborodulin.home.accounting.R
-import com.oborodulin.home.accounting.ui.model.PayerModel
-import com.oborodulin.home.common.ui.components.creditCardFilter
 import com.oborodulin.home.common.ui.components.field.ScreenEvent
 import com.oborodulin.home.common.ui.components.field.TextFieldComponent
 import com.oborodulin.home.common.ui.state.CommonScreen
+import com.oborodulin.home.common.util.toast
 import com.oborodulin.home.presentation.navigation.PayerInput
-import com.skyyo.userinputvalidation.toast
+import timber.log.Timber
 
 private const val TAG = "Accounting.ui.PayerScreen"
 
@@ -39,8 +38,10 @@ fun PayerScreen(
     viewModel: PayerViewModel = hiltViewModel(),
     payerInput: PayerInput
 ) {
-    viewModel.uiStateFlow.collectAsState().value.let { result ->
-        CommonScreen(result) { payerModel ->
+    Timber.tag(TAG).d("PayerScreen(...) called: payerInput = %s".format(payerInput))
+    viewModel.uiStateFlow.collectAsState().value.let { state ->
+        Timber.tag(TAG).d("Collect ui state flow: %s".format(state))
+        CommonScreen(state) { payerModel ->
             viewModel.initFieldStatesByUiModel(payerModel)
             Payer(viewModel) {
                 viewModel.submitAction(PayerUiAction.Save)
@@ -48,6 +49,7 @@ fun PayerScreen(
         }
     }
     LaunchedEffect(payerInput.payerId) {
+        Timber.tag(TAG).d("PayerScreen: LaunchedEffect() AFTER collect ui state flow")
         viewModel.submitAction(PayerUiAction.Load(payerInput.payerId))
     }
 }
@@ -55,6 +57,7 @@ fun PayerScreen(
 @OptIn(ExperimentalComposeUiApi::class, ExperimentalLifecycleComposeApi::class)
 @Composable
 fun Payer(viewModel: PayerViewModel, onSubmit: () -> Unit) {
+    Timber.tag(TAG).d("Payer(...) called")
     val context = LocalContext.current
     val lifecycleOwner = LocalLifecycleOwner.current
     val focusManager = LocalFocusManager.current
@@ -67,6 +70,7 @@ fun Payer(viewModel: PayerViewModel, onSubmit: () -> Unit) {
         )
     }
 
+    Timber.tag(TAG).d("CollectAsStateWithLifecycle for all payer fields")
     val ercCode by viewModel.ercCode.collectAsStateWithLifecycle()
     val fullName by viewModel.fullName.collectAsStateWithLifecycle()
     val areInputsValid by viewModel.areInputsValid.collectAsStateWithLifecycle()
@@ -75,7 +79,9 @@ fun Payer(viewModel: PayerViewModel, onSubmit: () -> Unit) {
     val fullNameFocusRequester = remember { FocusRequester() }
 
     LaunchedEffect(Unit) {
+        Timber.tag(TAG).d("Payer: LaunchedEffect()")
         events.collect { event ->
+            Timber.tag(TAG).d("Collect input events flow: %s".format(event.javaClass.name))
             when (event) {
                 is ScreenEvent.ShowToast -> context.toast(event.messageId)
                 is ScreenEvent.UpdateKeyboard -> {
@@ -146,6 +152,5 @@ fun Payer(viewModel: PayerViewModel, onSubmit: () -> Unit) {
             Text(text = "Continue")
         }
     }
-
 }
 

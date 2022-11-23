@@ -41,14 +41,15 @@ class PayersListViewModel @Inject constructor(
     override fun initState() = UiState.Loading
 
     override fun handleAction(action: PayersListUiAction) {
+        Timber.tag(TAG).d("handleAction(PayersListUiAction) called: %s".format(action.javaClass.name))
         when (action) {
             is PayersListUiAction.Load -> {
-                getPayers()
+                loadPayers()
             }
             is PayersListUiAction.EditPayer -> {
                 submitSingleEvent(
-                    PayersListUiSingleEvent.OpenPayerDetailScreen(
-                        NavRoutes.PayerScreen.routeForPayer(
+                    PayersListUiSingleEvent.OpenPayerScreen(
+                        NavRoutes.Payer.routeForPayer(
                             PayerInput(action.payerId)
                         )
                     )
@@ -69,7 +70,8 @@ class PayersListViewModel @Inject constructor(
         }
     }
 
-    private fun getPayers() {
+    private fun loadPayers() {
+        Timber.tag(TAG).d("loadPayers() called")
         viewModelScope.launch {
             payerUseCases.getPayersUseCase.execute(GetPayersUseCase.Request).map {
                 converter.convert(it)

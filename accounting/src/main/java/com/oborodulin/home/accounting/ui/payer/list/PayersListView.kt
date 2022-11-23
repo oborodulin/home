@@ -1,6 +1,5 @@
 package com.oborodulin.home.accounting.ui.payer.list
 
-import android.widget.Toast
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.MaterialTheme
@@ -35,9 +34,11 @@ fun PayersListView(
     Timber.tag(TAG).d("PayersListView(...) called")
     val context = LocalContext.current
     LaunchedEffect(Unit) {
+        Timber.tag(TAG).d("PayersListView: LaunchedEffect() BEFORE collect ui state flow")
         viewModel.submitAction(PayersListUiAction.Load)
     }
     viewModel.uiStateFlow.collectAsState().value.let { state ->
+        Timber.tag(TAG).d("Collect ui state flow: %s".format(state))
         CommonScreen(state = state) {
             PayersList(it,
                 onClick = { payer -> accountingViewModel.submitAction(AccountingUiAction.Load(payer.id)) },
@@ -48,10 +49,11 @@ fun PayersListView(
         }
     }
     LaunchedEffect(Unit) {
+        Timber.tag(TAG).d("PayersListView: LaunchedEffect() AFTER collect ui state flow")
         viewModel.singleEventFlow.collectLatest {
+            Timber.tag(TAG).d("Collect Latest UiSingleEvent: %s".format(it.javaClass.name))
             when (it) {
-                is PayersListUiSingleEvent.OpenPayerDetailScreen -> {
-                    Toast.makeText(context, "Open Payer Screen", Toast.LENGTH_SHORT).show()
+                is PayersListUiSingleEvent.OpenPayerScreen -> {
                     navController.navigate(it.navRoute)
                 }
             }

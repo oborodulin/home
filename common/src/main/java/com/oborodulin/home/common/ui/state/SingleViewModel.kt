@@ -10,9 +10,10 @@ import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
+import timber.log.Timber
 import java.util.*
 
-private const val TAG = "Accounting.ui.SingleViewModel"
+private const val TAG = "Common.SingleViewModel"
 
 @OptIn(FlowPreview::class)
 abstract class SingleViewModel<T : Any, S : UiState<T>, A : UiAction, E : UiSingleEvent>(
@@ -33,6 +34,7 @@ abstract class SingleViewModel<T : Any, S : UiState<T>, A : UiAction, E : UiSing
     val inputEvents = Channel<Inputable>(Channel.CONFLATED)
 
     init {
+        Timber.tag(TAG).d("init: Start observe input events")
         viewModelScope.launch(Dispatchers.Default) {
             observeInputEvents()
         }
@@ -44,18 +46,22 @@ abstract class SingleViewModel<T : Any, S : UiState<T>, A : UiAction, E : UiSing
     abstract suspend fun observeInputEvents()
 
     fun onTextFieldEntered(inputEvent: Inputable) {
+        Timber.tag(TAG).d("onTextFieldEntered: %s".format(inputEvent.javaClass.name))
         inputEvents.trySend(inputEvent)
     }
 
     fun onTextFieldFocusChanged(focusedField: Focusable, isFocused: Boolean) {
+        Timber.tag(TAG).d("onTextFieldFocusChanged: %s - %s".format(focusedField.javaClass.name, isFocused))
         focusedTextField.key = if (isFocused) focusedField.key() else null
     }
 
     fun moveFocusImeAction() {
+        Timber.tag(TAG).d("moveFocusImeAction() called")
         _events.trySend(ScreenEvent.MoveFocus())
     }
 
     fun onContinueClick(onSuccess: () -> Unit) {
+        Timber.tag(TAG).d("onContinueClick(onSuccess) called")
         viewModelScope.launch(Dispatchers.Default) {
             when (val inputErrors = getInputErrorsOrNull()) {
                 null -> {
@@ -73,6 +79,7 @@ abstract class SingleViewModel<T : Any, S : UiState<T>, A : UiAction, E : UiSing
     abstract fun displayInputErrors(inputErrors: List<InputError>)
 
     private suspend fun clearFocusAndHideKeyboard() {
+        Timber.tag(TAG).d("clearFocusAndHideKeyboard() called")
         _events.send(ScreenEvent.ClearFocus)
         _events.send(ScreenEvent.UpdateKeyboard(false))
         focusedTextField.textField = null
@@ -80,6 +87,7 @@ abstract class SingleViewModel<T : Any, S : UiState<T>, A : UiAction, E : UiSing
     }
 
     private fun focusOnLastSelectedTextField() {
+        Timber.tag(TAG).d("focusOnLastSelectedTextField() called")
         viewModelScope.launch(Dispatchers.Default) {
             focusedTextField.textField?.let {
                 _events.send(ScreenEvent.RequestFocus(focusedTextField.textField!!))

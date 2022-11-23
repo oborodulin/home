@@ -43,22 +43,21 @@ class AccountingViewModel @Inject constructor(
         when (action) {
             is AccountingUiAction.Load -> {
                 action.payerId?.let {
-                    getPrevServiceMeterVals(it)
+                    loadPrevServiceMeterVals(it)
                 }
             }
         }
     }
 
-    private fun getPrevServiceMeterVals(payerId: UUID) {
+    private fun loadPrevServiceMeterVals(payerId: UUID) {
         viewModelScope.launch {
             accountingUseCases.getPrevServiceMeterValuesUseCase.execute(
                 GetPrevServiceMeterValuesUseCase.Request(payerId)
             ).map {
                 converter.convert(it)
+            }.collect {
+                submitState(it)
             }
-                .collect {
-                    submitState(it)
-                }
         }
     }
 

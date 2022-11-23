@@ -37,6 +37,7 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.oborodulin.home.R
 import com.oborodulin.home.accounting.ui.AccountingScreen
+import com.oborodulin.home.accounting.ui.payer.single.PayerScreen
 import com.oborodulin.home.common.ui.components.FabComponent
 import com.oborodulin.home.common.ui.theme.SpeechRed
 import com.oborodulin.home.presentation.navigation.NavRoutes
@@ -46,7 +47,7 @@ import kotlin.math.roundToInt
 /**
  * Created by tfakioglu on 12.December.2021
  */
-private const val TAG = "MainScreen"
+private const val TAG = "App.ui.MainScreen"
 
 @Composable
 fun MainScreen() {
@@ -113,19 +114,19 @@ private fun MainScreenNavigationConfigurations(
 ) {
     Timber.tag(TAG).d("MainScreenNavigationConfigurations(...) called")
     NavHost(
-        navController, startDestination = NavRoutes.AccountingScreen.route,
+        navController, startDestination = NavRoutes.Accounting.route,
         modifier = Modifier.padding(paddingValues)
     ) {
-        composable(NavRoutes.AccountingScreen.route) {
+        composable(NavRoutes.Accounting.route) {
             AccountingScreen(navController) //setFabOnClick = setFabOnClick
         }
-        composable(route = NavRoutes.PayerScreen.route, arguments = NavRoutes.PayerScreen.arguments) {
+        composable(route = NavRoutes.Payer.route, arguments = NavRoutes.Payer.arguments) {
+            PayerScreen(payerInput = NavRoutes.Payer.fromEntry(it))
+        }
+        composable(NavRoutes.Billing.route) {
             //BillingScreen(navController)
         }
-        composable(NavRoutes.BillingScreen.route) {
-            //BillingScreen(navController)
-        }
-        composable(NavRoutes.MeteringScreen.route) {
+        composable(NavRoutes.Metering.route) {
             //MeteringScreen(navController)
         }
     }
@@ -138,10 +139,10 @@ fun BottomNavigationBar(
 ) {
     Timber.tag(TAG).d("BottomNavigationBar() called")
     val bottomNavRoutes = listOf(
-        NavRoutes.AccountingScreen,
-        NavRoutes.BillingScreen,
-        NavRoutes.MeteringScreen,
-        NavRoutes.ReportingScreen
+        NavRoutes.Accounting,
+        NavRoutes.Billing,
+        NavRoutes.Metering,
+        NavRoutes.Reporting
     )
     BottomNavigation(
         modifier

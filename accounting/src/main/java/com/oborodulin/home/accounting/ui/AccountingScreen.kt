@@ -16,9 +16,6 @@ import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import com.oborodulin.home.accounting.ui.model.AccountingModel
-import com.oborodulin.home.accounting.ui.payer.list.PayersList
-import com.oborodulin.home.accounting.ui.payer.list.PayersListUiAction
-import com.oborodulin.home.accounting.ui.payer.list.PayersListUiSingleEvent
 import com.oborodulin.home.accounting.ui.payer.list.PayersListView
 import com.oborodulin.home.common.ui.state.CommonScreen
 import com.oborodulin.home.common.ui.theme.HomeComposableTheme
@@ -35,11 +32,13 @@ fun AccountingScreen(
     navController: NavHostController,
     viewModel: AccountingViewModel = hiltViewModel()
 ) { //setFabOnClick: (() -> Unit) -> Unit
-    Timber.tag(TAG).d("AccountingScreen() called")
+    Timber.tag(TAG).d("AccountingScreen(...) called")
     LaunchedEffect(Unit) {
+        Timber.tag(TAG).d("AccountingScreen: LaunchedEffect() BEFORE collect ui state flow")
         viewModel.submitAction(AccountingUiAction.Load())
     }
     viewModel.uiStateFlow.collectAsState().value.let { state ->
+        Timber.tag(TAG).d("Collect ui state flow: %s".format(state))
         HomeComposableTheme(darkTheme = true) {
             CommonScreen(state = state) {
                 Column(
@@ -68,9 +67,11 @@ fun AccountingScreen(
         }
     }
     LaunchedEffect(Unit) {
+        Timber.tag(TAG).d("AccountingScreen: LaunchedEffect() AFTER collect ui state flow")
         viewModel.singleEventFlow.collectLatest {
+            Timber.tag(TAG).d("Collect Latest UiSingleEvent: %s".format(it.javaClass.name))
             when (it) {
-                is AccountingUiSingleEvent.OpenPayerDetailScreen -> {
+                is AccountingUiSingleEvent.OpenPayerScreen -> {
                     navController.navigate(it.navRoute)
                 }
             }

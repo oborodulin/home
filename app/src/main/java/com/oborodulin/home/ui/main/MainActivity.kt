@@ -17,7 +17,7 @@ import dagger.hilt.android.AndroidEntryPoint
 import timber.log.Timber
 import java.util.*
 
-private const val TAG = "MainActivity"
+private const val TAG = "App.MainActivity"
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() { //, PayerListFragment.Callbacks {

@@ -2,15 +2,19 @@ package com.oborodulin.home.accounting.ui.payer.single
 
 import com.oborodulin.home.common.R
 import com.oborodulin.home.common.ui.components.field.Validatable
+import timber.log.Timber
+
+private const val TAG = "Accounting.ui.PayerInputValidator"
 
 sealed class PayerInputValidator : Validatable {
     object ErcCode : PayerInputValidator() {
         override fun errorIdOrNull(input: String): Int? =
-            when {
-                input.length < 2 -> R.string.name_too_short_error
-                //etc..
-                else -> null
-            }
+        when
+        {
+            input.length < 2 -> R.string.name_too_short_error
+            //etc..
+            else -> null
+        }
     }
 
     object FullName : PayerInputValidator() {
