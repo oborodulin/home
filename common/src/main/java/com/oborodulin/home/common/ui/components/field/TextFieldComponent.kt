@@ -28,7 +28,7 @@ import com.oborodulin.home.common.ui.theme.HomeComposableTheme
 fun TextFieldComponent(
     modifier: Modifier,
     inputWrapper: InputWrapper,
-    @StringRes labelResId: Int,
+    @StringRes labelResId: Int? = null,
     keyboardOptions: KeyboardOptions = remember {
         KeyboardOptions.Default
     },
@@ -49,7 +49,7 @@ fun TextFieldComponent(
                 fieldValue.value = it
                 onValueChange(it.text)
             },
-            label = { Text(stringResource(labelResId)) },
+            label = { labelResId?.let{Text(stringResource(it))} },
             isError = inputWrapper.errorId != null,
             visualTransformation = visualTransformation,
             keyboardOptions = keyboardOptions,

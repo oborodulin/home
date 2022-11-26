@@ -31,6 +31,7 @@ class MeterMapper {
         val meterValue = MeterValue(
             valueDate = meterValueEntity.valueDate,
             meterValue = meterValueEntity.meterValue,
+            metersId = meterValueEntity.metersId
         )
         meterValue.id = meterValueEntity.meterValueId
         return meterValue
@@ -63,6 +64,14 @@ class MeterMapper {
             localeCode = Locale.getDefault().language,
             measureUnit = meter.tl.measureUnit,
             descr = meter.tl.descr,
+        )
+
+    fun toMeterValueEntity(meterValue: MeterValue) =
+        MeterValueEntity(
+            meterValueId = meterValue.id,
+            valueDate = meterValue.valueDate,
+            meterValue = meterValue.meterValue,
+            metersId = meterValue.metersId
         )
 
     fun toMeterValueEntityList(meter: Meter) =

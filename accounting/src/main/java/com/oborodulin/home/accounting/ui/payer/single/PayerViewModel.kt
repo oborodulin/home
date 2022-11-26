@@ -2,7 +2,6 @@ package com.oborodulin.home.accounting.ui.payer.single
 
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
-import androidx.room.util.UUIDUtil
 import com.oborodulin.home.accounting.ui.model.PayerModel
 import com.oborodulin.home.accounting.ui.model.converters.PayerConverter
 import com.oborodulin.home.common.ui.components.*
@@ -15,6 +14,7 @@ import com.oborodulin.home.domain.usecase.GetPayerUseCase
 import com.oborodulin.home.domain.usecase.PayerUseCases
 import com.oborodulin.home.domain.usecase.SavePayerUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
@@ -27,20 +27,40 @@ private const val TAG = "Accounting.ui.PayerViewModel"
 @OptIn(FlowPreview::class)
 @HiltViewModel
 class PayerViewModel @Inject constructor(
-    private val handle: SavedStateHandle,
+    private val state: SavedStateHandle,
     private val payerUseCases: PayerUseCases,
-    private val converter: PayerConverter
+    private val converter: PayerConverter,
 ) : SingleViewModel<PayerModel, UiState<PayerModel>, PayerUiAction, UiSingleEvent>(
-    handle,
+    state,
     PayerFields.ERC_CODE
 ) {
-    val payerId = handle.getStateFlow(PayerFields.PAYER_ID.name, InputWrapper())
-    val ercCode = handle.getStateFlow(PayerFields.ERC_CODE.name, InputWrapper())
-    val fullName = handle.getStateFlow(PayerFields.FULL_NAME.name, InputWrapper())
+    private val payerId: StateFlow<InputWrapper> by lazy {
+        state.getStateFlow(
+            PayerFields.PAYER_ID.name,
+            InputWrapper()
+        )
+    }
+    val ercCode: StateFlow<InputWrapper> by lazy {
+        state.getStateFlow(
+            PayerFields.ERC_CODE.name,
+            InputWrapper()
+        )
+    }
+    val fullName: StateFlow<InputWrapper> by lazy {
+        state.getStateFlow(
+            PayerFields.FULL_NAME.name,
+            InputWrapper()
+        )
+    }
 
     val areInputsValid = combine(ercCode, fullName) { ercCode, fullName ->
         ercCode.errorId == null && fullName.errorId == null
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), false)
+
+    private val errorHandler = CoroutineExceptionHandler { _, exception ->
+        Timber.tag(TAG).e(exception, exception.message)
+        //_uiState.value = _uiState.value.copy(error = exception.message, isLoading = false)
+    }
 
     override fun initState(): UiState<PayerModel> = UiState.Loading
 
@@ -61,7 +81,7 @@ class PayerViewModel @Inject constructor(
 
     private fun loadPayer(payerId: UUID) {
         Timber.tag(TAG).d("loadPayer(UUID) called: %s".format(payerId.toString()))
-        viewModelScope.launch {
+        viewModelScope.launch(errorHandler) {
             payerUseCases.getPayerUseCase.execute(GetPayerUseCase.Request(payerId))
                 .map {
                     converter.convert(it)
@@ -74,7 +94,7 @@ class PayerViewModel @Inject constructor(
 
     private fun savePayer() {
         Timber.tag(TAG).d("savePayer() called")
-        viewModelScope.launch {
+        viewModelScope.launch(errorHandler) {
             payerUseCases.savePayerUseCase.execute(
                 SavePayerUseCase.Request(
                     converter.toPayer(
@@ -89,11 +109,13 @@ class PayerViewModel @Inject constructor(
         }
     }
 
-    fun initFieldStatesByUiModel(payerModel: PayerModel) {
-        Timber.tag(TAG).d("initFieldStatesByUiModel(PayerModel) called: payerModel = %s".format(payerModel))
-        handle[PayerFields.PAYER_ID.name] = payerId.value.copy(value = payerModel.id.toString())
-        handle[PayerFields.ERC_CODE.name] = ercCode.value.copy(value = payerModel.ercCode)
-        handle[PayerFields.FULL_NAME.name] = fullName.value.copy(value = payerModel.fullName)
+    private fun initFieldStatesByUiModel(payerModel: PayerModel) {
+        super.initFieldStatesByUiModel(payerModel)
+        Timber.tag(TAG)
+            .d("initFieldStatesByUiModel(PayerModel) called: payerModel = %s".format(payerModel))
+        state[PayerFields.PAYER_ID.name] = InputWrapper(payerModel.id.toString())
+        state[PayerFields.ERC_CODE.name] = InputWrapper(payerModel.ercCode)
+        state[PayerFields.FULL_NAME.name] = InputWrapper(payerModel.fullName)
     }
 
     override suspend fun observeInputEvents() {
@@ -104,30 +126,30 @@ class PayerViewModel @Inject constructor(
                     is PayerInputEvent.ErcCode -> {
                         when (PayerInputValidator.ErcCode.errorIdOrNull(event.input)) {
                             null -> {
-                                handle[PayerFields.ERC_CODE.name] =
+                                state[PayerFields.ERC_CODE.name] =
                                     ercCode.value.copy(value = event.input, errorId = null)
                             }
                             else -> {
-                                handle[PayerFields.ERC_CODE.name] =
+                                state[PayerFields.ERC_CODE.name] =
                                     ercCode.value.copy(value = event.input)
                             }
                         }
-                        Timber.tag(TAG).d("Validate: %s".format(handle[PayerFields.ERC_CODE.name]))
+                        Timber.tag(TAG).d("Validate: %s".format(state[PayerFields.ERC_CODE.name]))
                     }
                     is PayerInputEvent.FullName -> {
                         when (PayerInputValidator.FullName.errorIdOrNull(event.input)) {
                             null -> {
-                                handle[PayerFields.FULL_NAME.name] = fullName.value.copy(
+                                state[PayerFields.FULL_NAME.name] = fullName.value.copy(
                                     value = event.input,
                                     errorId = null
                                 )
                             }
                             else -> {
-                                handle[PayerFields.FULL_NAME.name] =
+                                state[PayerFields.FULL_NAME.name] =
                                     fullName.value.copy(value = event.input)
                             }
                         }
-                        Timber.tag(TAG).d("Validate: %s".format(handle[PayerFields.FULL_NAME.name]))
+                        Timber.tag(TAG).d("Validate: %s".format(state[PayerFields.FULL_NAME.name]))
                     }
                 }
             }
@@ -136,14 +158,24 @@ class PayerViewModel @Inject constructor(
                 when (event) {
                     is PayerInputEvent.ErcCode -> {
                         val errorId = PayerInputValidator.ErcCode.errorIdOrNull(event.input)
-                        handle[PayerFields.ERC_CODE.name] = ercCode.value.copy(errorId = errorId)
-                        Timber.tag(TAG).d("Validate (debounce): %s - %s".format(PayerFields.ERC_CODE.name, errorId))
+                        state[PayerFields.ERC_CODE.name] = ercCode.value.copy(errorId = errorId)
+                        Timber.tag(TAG).d(
+                            "Validate (debounce): %s - %s".format(
+                                PayerFields.ERC_CODE.name,
+                                errorId
+                            )
+                        )
                     }
                     is PayerInputEvent.FullName -> {
                         val errorId = PayerInputValidator.FullName.errorIdOrNull(event.input)
-                        handle[PayerFields.FULL_NAME.name] =
+                        state[PayerFields.FULL_NAME.name] =
                             fullName.value.copy(errorId = errorId)
-                        Timber.tag(TAG).d("Validate (debounce): %s - %s".format(PayerFields.FULL_NAME.name, errorId))
+                        Timber.tag(TAG).d(
+                            "Validate (debounce): %s - %s".format(
+                                PayerFields.FULL_NAME.name,
+                                errorId
+                            )
+                        )
                     }
                 }
             }
@@ -162,9 +194,14 @@ class PayerViewModel @Inject constructor(
     }
 
     override fun displayInputErrors(inputErrors: List<InputError>) {
-        Timber.tag(TAG).d("displayInputErrors() called: inputErrors.count = %d".format(inputErrors?.size))
+        Timber.tag(TAG)
+            .d("displayInputErrors() called: inputErrors.count = %d".format(inputErrors?.size))
         for (error in inputErrors) {
-            handle[error.fieldName] = ercCode.value.copy(errorId = error.errorId)
+            state[error.fieldName] = when (error.fieldName) {
+                PayerFields.ERC_CODE.name -> ercCode.value.copy(errorId = error.errorId)
+                PayerFields.FULL_NAME.name -> fullName.value.copy(errorId = error.errorId)
+                else -> null
+            }
         }
     }
 }

@@ -15,6 +15,7 @@ interface MeteringDataSource {
     fun getMeterValues(meterId: UUID): Flow<List<MeterValue>>
     fun getMeterVerifications(meterId: UUID): Flow<List<MeterVerification>>
     suspend fun saveMeter(meter: Meter)
+    suspend fun saveMeterValue(meterValue: MeterValue)
     suspend fun deleteMeter(meter: Meter)
     suspend fun deleteMeters(meters: List<Meter>)
     suspend fun deleteMeters()

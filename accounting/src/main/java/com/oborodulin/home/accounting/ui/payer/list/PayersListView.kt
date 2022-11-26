@@ -2,11 +2,10 @@ package com.oborodulin.home.accounting.ui.payer.list
 
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.selection.selectableGroup
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
@@ -69,14 +68,22 @@ fun PayersList(
     onDelete: (PayerListItemModel) -> Unit
 ) {
     Timber.tag(TAG).d("PayersList(...) called")
+    var selectedIndex by remember {
+        mutableStateOf(-1)
+    }
     if (payers.isNotEmpty()) {
-        LazyColumn(modifier = Modifier.padding(16.dp)) {
+        LazyColumn(
+            modifier = Modifier
+                .padding(16.dp)
+                .selectableGroup() // Optional, for accessibility purpose
+        ) {
             items(payers.size) { index ->
                 payers[index].let { payer ->
                     ListItemComponent(
                         icon = null,
                         item = payer,
-                        onClick = { onClick(payer) },
+                        selected = (payer.isFavorite and (selectedIndex == -1)) or (selectedIndex == index),
+                        onClick = { selectedIndex = index; onClick(payer) },
                         onEdit = { onEdit(payer) }
                     ) {
                         onDelete(payer)

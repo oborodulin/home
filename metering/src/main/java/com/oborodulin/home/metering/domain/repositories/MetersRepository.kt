@@ -15,6 +15,7 @@ interface MetersRepository {
     fun getMeterVerifications(meterId: UUID): Flow<List<MeterVerification>>
     fun getPrevServiceMeterValues(payerId: UUID): Flow<List<PrevServiceMeterValuePojo>>
     fun save(meter: Meter): Flow<Meter>
+    fun save(meterValue: MeterValue): Flow<MeterValue>
     fun delete(meter: Meter): Flow<Meter>
     suspend fun deleteAll()
 }

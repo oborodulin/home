@@ -23,20 +23,6 @@ class PayersListViewModel @Inject constructor(
     private val payerUseCases: PayerUseCases,
     private val converter: PayersListConverter
 ) : MviViewModel<List<PayerListItemModel>, UiState<List<PayerListItemModel>>, PayersListUiAction, PayersListUiSingleEvent>() {
-    /*
-        private val _uiState = mutableStateOf(
-             PayersListUiState(
-                payers = listOf(),
-                isLoading = true
-            )
-        )
-        val uiState: State<PayersListUiState>
-            get() = _uiState
-    */
-    private val errorHandler = CoroutineExceptionHandler { _, exception ->
-        Timber.tag(TAG).e(exception, exception.message)
-        //_uiState.value = _uiState.value.copy(error = exception.message, isLoading = false)
-    }
 
     override fun initState() = UiState.Loading
 
@@ -81,6 +67,8 @@ class PayersListViewModel @Inject constructor(
                 }
         }
     }
+
+    override fun initFieldStatesByUiModel(uiModel: Any) {}
 
     /*    private fun getPayers() {
             viewModelScope.launch(errorHandler) {

@@ -176,6 +176,7 @@ class DatabaseCallback(
                     fullName = res.getString(R.string.def_payer2_full_name),
                     address = res.getString(R.string.def_payer2_address),
                     paymentDay = 20,
+                    isFavorite = true,
                 )
                 db.insert(
                     PayerEntity.TABLE_NAME,

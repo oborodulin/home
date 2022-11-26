@@ -11,12 +11,13 @@ import com.oborodulin.home.metering.domain.repositories.MetersRepository
 import com.oborodulin.home.metering.domain.usecases.GetMetersUseCase
 import com.oborodulin.home.metering.domain.usecases.GetPrevServiceMeterValuesUseCase
 import com.oborodulin.home.metering.domain.usecases.MeterUseCases
+import com.oborodulin.home.metering.domain.usecases.SaveMeterValueUseCase
+import com.oborodulin.home.metering.ui.model.converters.MeterValueConverter
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.Dispatchers
 import javax.inject.Singleton
 
 @Module
@@ -26,6 +27,10 @@ object MeteringModule {
     @Singleton
     @Provides
     fun provideMeterMapper(): MeterMapper = MeterMapper()
+
+    @Singleton
+    @Provides
+    fun provideMeterValueConverter(): MeterValueConverter = MeterValueConverter()
 
     @Singleton
     @Provides
@@ -51,5 +56,6 @@ object MeteringModule {
                 configuration,
                 repository
             ),
+            saveMeterValueUseCase = SaveMeterValueUseCase(configuration, repository)
         )
 }

@@ -6,6 +6,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.layout.Arrangement.Top
+import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
@@ -34,8 +35,12 @@ private val EMPTY: (ListItemModel) -> Unit = {}
 
 @Composable
 fun ListItemComponent(
-    icon: Int?, item: ListItemModel, onClick: (ListItemModel) -> Unit = EMPTY,
-    onEdit: (ListItemModel) -> Unit = EMPTY, onDelete: (ListItemModel) -> Unit = EMPTY
+    icon: Int?,
+    item: ListItemModel,
+    selected: Boolean = false,
+    onClick: (ListItemModel) -> Unit = EMPTY,
+    onEdit: (ListItemModel) -> Unit = EMPTY,
+    onDelete: (ListItemModel) -> Unit = EMPTY
 ) {
     Timber.tag(TAG)
         .d("ListItemComponent(...) called: {\"listItem\": {\"icon\": $icon, \"title\": \"${item.title}\", \"desc\": \"${item.descr}\"}}")
@@ -45,15 +50,14 @@ fun ListItemComponent(
             .fillMaxWidth()
             .height(110.dp)
             .clip(RoundedCornerShape(8.dp))
+            .selectable(selected = selected, onClick = { if (onClick !== EMPTY) onClick(item) })
             .background(color = MaterialTheme.colors.background)
+        //.clickable {}
     ) {
         Row(
             Modifier
                 .padding(all = 4.dp)
                 .fillMaxSize()
-                .clickable {
-                    if (onClick !== EMPTY) onClick(item)
-                }
         ) {
             icon?.let {
                 Image(

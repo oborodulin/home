@@ -61,6 +61,8 @@ class AccountingViewModel @Inject constructor(
         }
     }
 
+    override fun initFieldStatesByUiModel(uiModel: Any) {}
+
 
     /*    private fun getPayers() {
             viewModelScope.launch(errorHandler) {

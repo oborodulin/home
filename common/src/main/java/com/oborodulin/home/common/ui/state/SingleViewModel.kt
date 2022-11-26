@@ -4,34 +4,37 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
 import com.oborodulin.home.common.ui.components.*
 import com.oborodulin.home.common.ui.components.field.*
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.FlowPreview
+import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.Channel
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.*
-import kotlinx.coroutines.launch
 import timber.log.Timber
 import java.util.*
 
 private const val TAG = "Common.SingleViewModel"
+private const val FOCUSED_FIELD_KEY = "focusedTextField"
 
 @OptIn(FlowPreview::class)
 abstract class SingleViewModel<T : Any, S : UiState<T>, A : UiAction, E : UiSingleEvent>(
-    private val handle: SavedStateHandle,
+    private val state: SavedStateHandle,
     private val initFocusedTextField: Focusable,
 ) : MviViewModel<T, S, A, E>() {
     private var focusedTextField = FocusedTextField(
         textField = initFocusedTextField,
-        key = handle["focusedTextField"] ?: initFocusedTextField.key()
+        key = state[FOCUSED_FIELD_KEY] ?: initFocusedTextField.key()
     )
         set(value) {
             field = value
-            handle["focusedTextField"] = value.key
+            state[FOCUSED_FIELD_KEY] = value.key
         }
 
     private val _events = Channel<ScreenEvent>()
     val events = _events.receiveAsFlow()
     val inputEvents = Channel<Inputable>(Channel.CONFLATED)
+
+    private val errorHandler = CoroutineExceptionHandler { _, exception ->
+        Timber.tag(TAG).e(exception, exception.message)
+        //_uiState.value = _uiState.value.copy(error = exception.message, isLoading = false)
+    }
 
     init {
         Timber.tag(TAG).d("init: Start observe input events")
@@ -43,6 +46,8 @@ abstract class SingleViewModel<T : Any, S : UiState<T>, A : UiAction, E : UiSing
         }
     }
 
+    override fun initFieldStatesByUiModel(uiModel: Any) {}
+
     abstract suspend fun observeInputEvents()
 
     fun onTextFieldEntered(inputEvent: Inputable) {
@@ -51,7 +56,8 @@ abstract class SingleViewModel<T : Any, S : UiState<T>, A : UiAction, E : UiSing
     }
 
     fun onTextFieldFocusChanged(focusedField: Focusable, isFocused: Boolean) {
-        Timber.tag(TAG).d("onTextFieldFocusChanged: %s - %s".format(focusedField.javaClass.name, isFocused))
+        Timber.tag(TAG)
+            .d("onTextFieldFocusChanged: %s - %s".format(focusedField.javaClass.name, isFocused))
         focusedTextField.key = if (isFocused) focusedField.key() else null
     }
 

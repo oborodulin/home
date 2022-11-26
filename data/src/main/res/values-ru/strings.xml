@@ -16,11 +16,11 @@
     <!--Плательщик 1-->
     <string name="def_payer1_erc_code">000000000000000</string>
     <string name="def_payer1_full_name">Собственник жилья 1</string>
-    <string name="def_payer1_address">Адрес не указан</string>
+    <string name="def_payer1_address">Адрес 1 не указан</string>
     <!--Плательщик 2-->
     <string name="def_payer2_erc_code">999999999999999</string>
     <string name="def_payer2_full_name">Собственник жилья 2</string>
-    <string name="def_payer2_address">Адрес не указан</string>
+    <string name="def_payer2_address">Адрес 2 не указан</string>
     <!--Приборы -->
     <string name="def_meter_num">б/н</string>
 

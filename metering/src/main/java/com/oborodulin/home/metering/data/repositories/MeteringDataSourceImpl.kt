@@ -4,6 +4,7 @@ import com.oborodulin.home.common.di.IoDispatcher
 import com.oborodulin.home.data.local.db.dao.MeterDao
 import com.oborodulin.home.metering.data.mappers.MeterMapper
 import com.oborodulin.home.metering.domain.model.Meter
+import com.oborodulin.home.metering.domain.model.MeterValue
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
@@ -60,6 +61,10 @@ class MeteringDataSourceImpl @Inject constructor(
             meterMapper.toMeterEntity(meter),
             meterMapper.toMeterTlEntity(meter)
         )
+    }
+
+    override suspend fun saveMeterValue(meterValue: MeterValue) = withContext(dispatcher) {
+        meterDao.insert(meterMapper.toMeterValueEntity(meterValue))
     }
 
     override suspend fun deleteMeter(meter: Meter) = withContext(dispatcher) {

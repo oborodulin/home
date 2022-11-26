@@ -2,6 +2,7 @@ package com.oborodulin.home.metering.data.repositories
 
 import com.oborodulin.home.data.local.db.entities.pojo.PrevServiceMeterValuePojo
 import com.oborodulin.home.metering.domain.model.Meter
+import com.oborodulin.home.metering.domain.model.MeterValue
 import com.oborodulin.home.metering.domain.repositories.MetersRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
@@ -28,6 +29,11 @@ class MetersRepositoryImp @Inject constructor(
     override fun save(meter: Meter): Flow<Meter> = flow {
         meteringDataSource.saveMeter(meter)
         emit(meter)
+    }
+
+    override fun save(meterValue: MeterValue): Flow<MeterValue> = flow {
+        meteringDataSource.saveMeterValue(meterValue)
+        emit(meterValue)
     }
 
     override fun delete(meter: Meter): Flow<Meter> = flow {
