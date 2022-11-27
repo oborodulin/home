@@ -10,7 +10,7 @@ class PrevServiceMeterValuesConverter :
 
     override fun convertSuccess(data: GetPrevServiceMeterValuesUseCase.Response): AccountingModel {
         return AccountingModel(
-            serviceMeterVals = data.prevServiceMeterVals.map {
+            serviceMeterVals = data.prevServiceMeterValues.map {
                 MeterValueModel(
                     id = it.meterValueId,
                     type = it.type,

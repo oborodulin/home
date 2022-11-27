@@ -16,6 +16,7 @@ import com.oborodulin.home.data.local.db.dao.RateDao
 import com.oborodulin.home.data.local.db.dao.ServiceDao
 import com.oborodulin.home.data.local.db.entities.*
 import com.oborodulin.home.data.local.db.views.MeterView
+import com.oborodulin.home.data.local.db.views.PrevMetersValuesView
 import com.oborodulin.home.data.local.db.views.ServiceView
 import com.oborodulin.home.data.util.Constants
 import com.oborodulin.home.data.util.ServiceType
@@ -64,7 +65,7 @@ private val MIGRATION_4_5 = object : Migration(4, 5) {
         RateEntity::class, RatePromotionEntity::class,
         MeterEntity::class, MeterTlEntity::class, MeterValueEntity::class, MeterVerificationEntity::class,
         ReceiptEntity::class],
-    views = [MeterView::class, ServiceView::class],
+    views = [MeterView::class, ServiceView::class, PrevMetersValuesView::class],
     version = 5
 )
 @TypeConverters(HomeTypeConverters::class)

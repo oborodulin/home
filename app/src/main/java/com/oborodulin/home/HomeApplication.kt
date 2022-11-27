@@ -37,15 +37,16 @@ class HomeApplication : Application(), Configuration.Provider {
             PrettyFormatStrategy.newBuilder().showThreadInfo(true).methodCount(1).methodOffset(5)
                 .tag(TAG)
                 .build()
-        Logger.addLogAdapter(AndroidLogAdapter(logFormatStrategy))
+        //Logger.addLogAdapter(AndroidLogAdapter(logFormatStrategy))
 
         if (BuildConfig.DEBUG) {
             Timber.plant(object : Timber.DebugTree() {
+             /*
                 @Override
                 override fun log(priority: Int, tag: String?, message: String, t: Throwable?) {
                     Logger.log(priority, tag, message, t)
                 }
-
+*/
                 @Override
                 override fun createStackElementTag(element: StackTraceElement): String? {
                     return String.format(

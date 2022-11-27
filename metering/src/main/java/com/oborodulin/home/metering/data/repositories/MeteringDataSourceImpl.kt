@@ -53,8 +53,11 @@ class MeteringDataSourceImpl @Inject constructor(
                 }
             }
 
-    override fun getPrevServiceMeterValues(payerId: UUID) =
-        meterDao.findPrevMetersValuesByPayerIdDistinctUntilChanged(payerId)
+    override fun getPrevServiceMeterValues(payerId: UUID?) =
+        when (payerId) {
+            null -> meterDao.findPrevMetersValuesByPayerIsFavorite()
+            else -> meterDao.findPrevMetersValuesByPayerIdDistinctUntilChanged(payerId)
+        }
 
     override suspend fun saveMeter(meter: Meter) = withContext(dispatcher) {
         meterDao.insert(

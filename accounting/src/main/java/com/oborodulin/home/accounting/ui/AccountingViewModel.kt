@@ -40,16 +40,15 @@ class AccountingViewModel @Inject constructor(
     override fun initState(): UiState<AccountingModel> = UiState.Loading
 
     override fun handleAction(action: AccountingUiAction) {
+        Timber.tag(TAG).d("handleAction(AccountingUiAction) called: %s".format(action.javaClass.name))
         when (action) {
-            is AccountingUiAction.Load -> {
-                action.payerId?.let {
-                    loadPrevServiceMeterVals(it)
-                }
-            }
+            is AccountingUiAction.Init -> loadPrevServiceMeterValues()
+            is AccountingUiAction.Load -> loadPrevServiceMeterValues(action.payerId)
         }
     }
 
-    private fun loadPrevServiceMeterVals(payerId: UUID) {
+    private fun loadPrevServiceMeterValues(payerId: UUID? = null) {
+        Timber.tag(TAG).d("loadPrevServiceMeterValues(UUID?) called: %s".format(payerId.toString()))
         viewModelScope.launch {
             accountingUseCases.getPrevServiceMeterValuesUseCase.execute(
                 GetPrevServiceMeterValuesUseCase.Request(payerId)

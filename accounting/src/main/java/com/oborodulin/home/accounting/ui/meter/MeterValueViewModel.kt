@@ -30,8 +30,7 @@ class MeterValueViewModel @Inject constructor(
     private val meterUseCases: MeterUseCases,
     private val converter: MeterValueConverter,
 ) : SingleViewModel<MeterValueModel, UiState<MeterValueModel>, MeterValueUiAction, UiSingleEvent>(
-    state,
-    MeterValueFields.METER_CURR_VALUE
+    state
 ) {
     private val meterValueId: StateFlow<InputWrapper> by lazy {
         state.getStateFlow(
@@ -100,9 +99,10 @@ class MeterValueViewModel @Inject constructor(
             )
         state[MeterValueFields.METER_VALUE_ID.name] = InputWrapper(meterValueModel.id.toString())
         state[MeterValueFields.METERS_ID.name] = InputWrapper(meterValueModel.metersId.toString())
-        state[MeterValueFields.METER_CURR_VALUE.name] =
-            meterValueModel.currentValue?.let { InputWrapper(it.toString()) }
-
+        meterValueModel.currentValue?.let {
+            state[MeterValueFields.METER_CURR_VALUE.name] =
+                InputWrapper(it.toString())
+        }
     }
 
     override suspend fun observeInputEvents() {
@@ -121,8 +121,8 @@ class MeterValueViewModel @Inject constructor(
                                     currentValue.value.copy(value = event.input)
                             }
                         }
-                        Timber.tag(TAG)
-                            .d("Validate: %s".format(state[MeterValueFields.METER_CURR_VALUE.name]))
+                        //Timber.tag(TAG)
+                        //    .d("Validate: %s".format(state[MeterValueFields.METER_CURR_VALUE.name]))
                     }
                 }
             }

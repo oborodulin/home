@@ -2,18 +2,16 @@ package com.oborodulin.home.common.ui.components.items
 
 import android.content.res.Configuration
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.layout.Arrangement.Top
 import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.MaterialTheme
+import androidx.compose.material.Card
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
@@ -25,7 +23,6 @@ import com.oborodulin.home.common.R
 import com.oborodulin.home.common.ui.model.ListItemModel
 import com.oborodulin.home.common.ui.theme.Typography
 import timber.log.Timber
-import java.util.UUID
 
 /**
  * Created by tfakioglu on 12.December.2021
@@ -44,14 +41,14 @@ fun ListItemComponent(
 ) {
     Timber.tag(TAG)
         .d("ListItemComponent(...) called: {\"listItem\": {\"icon\": $icon, \"title\": \"${item.title}\", \"desc\": \"${item.descr}\"}}")
-    Box(
+    Card(
         modifier = Modifier
             .padding(horizontal = 8.dp, vertical = 4.dp)
             .fillMaxWidth()
-            .height(110.dp)
+            //.height(110.dp)
             .clip(RoundedCornerShape(8.dp))
             .selectable(selected = selected, onClick = { if (onClick !== EMPTY) onClick(item) })
-            .background(color = MaterialTheme.colors.background)
+        //.background(color = MaterialTheme.colors.background)
         //.clickable {}
     ) {
         Row(
@@ -79,7 +76,7 @@ fun ListItemComponent(
                 Text(
                     text = item.title,
                     style = Typography.body1.copy(
-                        color = Color.White,
+                        //color = Color.White,
                         fontWeight = FontWeight.Bold
                     )
                 )
@@ -91,7 +88,7 @@ fun ListItemComponent(
                         maxLines = 2,
                         overflow = TextOverflow.Ellipsis,
                         style = Typography.body2.copy(
-                            color = Color.White
+                            //color = Color.White
                         )
                     )
                 }
@@ -111,11 +108,11 @@ fun ListItemComponent(
                         Image(
                             modifier = Modifier
                                 .padding(4.dp)
-                                .size(100.dp)
+                                //.size(100.dp)
                                 .clip(RoundedCornerShape(8.dp))
                                 .clickable { onEdit(item) },
                             painter = painterResource(R.drawable.outline_mode_edit_black_24),
-                            contentScale = ContentScale.Crop,
+                            //contentScale = ContentScale.Crop,
                             contentDescription = ""
                         )
                     }
@@ -123,11 +120,11 @@ fun ListItemComponent(
                         Image(
                             modifier = Modifier
                                 .padding(4.dp)
-                                .size(100.dp)
+                                //.size(100.dp)
                                 .clip(RoundedCornerShape(8.dp))
                                 .clickable { onDelete(item) },
                             painter = painterResource(R.drawable.outline_delete_black_24),
-                            contentScale = ContentScale.Crop,
+                            //contentScale = ContentScale.Crop,
                             contentDescription = ""
                         )
                     }

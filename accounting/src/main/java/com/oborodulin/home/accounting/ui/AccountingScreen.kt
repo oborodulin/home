@@ -4,7 +4,6 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -12,8 +11,9 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.constraintlayout.compose.ConstraintLayout
+import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import com.oborodulin.home.accounting.ui.meter.MeterValueView
@@ -21,6 +21,8 @@ import com.oborodulin.home.accounting.ui.model.AccountingModel
 import com.oborodulin.home.accounting.ui.payer.list.PayersListView
 import com.oborodulin.home.common.ui.state.CommonScreen
 import com.oborodulin.home.common.ui.theme.HomeComposableTheme
+import com.oborodulin.home.common.ui.theme.Typography
+import com.oborodulin.home.common.util.dateToString
 import kotlinx.coroutines.flow.collectLatest
 import timber.log.Timber
 
@@ -37,12 +39,12 @@ fun AccountingScreen(
     Timber.tag(TAG).d("AccountingScreen(...) called")
     LaunchedEffect(Unit) {
         Timber.tag(TAG).d("AccountingScreen: LaunchedEffect() BEFORE collect ui state flow")
-        viewModel.submitAction(AccountingUiAction.Load())
+        viewModel.submitAction(AccountingUiAction.Init)
     }
     viewModel.uiStateFlow.collectAsState().value.let { state ->
         Timber.tag(TAG).d("Collect ui state flow: %s".format(state))
 
-        HomeComposableTheme(darkTheme = true) {
+        HomeComposableTheme() { //darkTheme = true
             CommonScreen(state = state) {
                 Column(
                     modifier = Modifier
@@ -51,23 +53,21 @@ fun AccountingScreen(
                     horizontalAlignment = Alignment.CenterHorizontally
                 )
                 {
-                    Surface(
+                    Box(
                         modifier = Modifier
                             .clip(RoundedCornerShape(30.dp))
+                            .weight(3f)
                     ) {
-                        Box(
-                            modifier = Modifier.weight(2f)
-                        ) {
-                            PayersListView(navController = navController)
-                        }
-                        Box(
-                            modifier = Modifier.weight(1f)
-                        ) {
-                            PrevServiceMeterVals(it)
-                        }
+                        PayersListView(navController = navController)
+                    }
+                    Box(
+                        modifier = Modifier
+                            .clip(RoundedCornerShape(30.dp))
+                            .weight(1f)
+                    ) {
+                        PrevServiceMeterVals(it)
                     }
                 }
-                //}
             }
         }
         LaunchedEffect(Unit) {
@@ -88,25 +88,34 @@ fun AccountingScreen(
 
 @Composable
 fun PrevServiceMeterVals(accountingModel: AccountingModel) {
-    for (meterValue in accountingModel.serviceMeterVals) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .fillMaxHeight()
-        ) {
-            Column {
-                Text(text = meterValue.name)
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .fillMaxHeight()
+            .padding(vertical = 8.dp)
+    ) {
+        for (meterValue in accountingModel.serviceMeterVals) {
+            Row(
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Column(modifier = Modifier.width(90.dp)) {
+                    Text(
+                        text = meterValue.name,
+                        style = Typography.body1.copy(fontWeight = FontWeight.Bold)
+                    )
+                }
+                Column(modifier = Modifier.width(70.dp)) {
+                    meterValue.prevLastDate?.let { Text(text = it.dateToString("dd-MM-yy")) }
+                }
+                Column(modifier = Modifier.width(70.dp)) {
+                    meterValue.prevValue?.let { Text(text = it.toString()) }
+                }
+                Column(modifier = Modifier.width(50.dp)) {
+                    meterValue.measureUnit?.let { Text(text = it) }
+                }
+                MeterValueView(meterValueModel = meterValue)
             }
-            Column {
-                Text(text = meterValue.prevValue.toString())
-            }
-            Column {
-                meterValue.measureUnit?.let { Text(text = it) }
-            }
-            Column {
-                Text(text = meterValue.prevLastDate.toString())
-            }
-            MeterValueView(meterValueModel = meterValue)
+            Spacer(modifier = Modifier.size(20.dp))
         }
     }
 }

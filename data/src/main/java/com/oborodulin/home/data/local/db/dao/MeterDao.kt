@@ -2,7 +2,7 @@ package com.oborodulin.home.data.local.db.dao
 
 import androidx.room.*
 import com.oborodulin.home.data.local.db.entities.*
-import com.oborodulin.home.data.local.db.entities.pojo.PrevServiceMeterValuePojo
+import com.oborodulin.home.data.local.db.views.PrevMetersValuesView
 import com.oborodulin.home.data.local.db.views.MeterView
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
@@ -45,25 +45,22 @@ interface MeterDao {
         findByPayerId(serviceId).distinctUntilChanged()
 
     @Query(
-        "SELECT mvl.meterValueId, mv.payersId AS payerId, mv.servicesId AS serviceId, sv.type, " +
-                "sv.name, mv.meterId, IFNULL(mv.measureUnit, sv.measureUnit) AS measureUnit, " +
-                "mvl.valueDate AS prevLastDate, mvl.meterValue AS prevValue " +
-                "FROM meters_view AS mv JOIN services_view AS sv ON sv.serviceId = mv.servicesId " +
-                "JOIN meter_values AS mvl ON mvl.metersId = mv.meterId " +
-                "JOIN (SELECT v.metersId, MAX(v.valueDate) maxValueDate " +
-                "FROM meter_values v JOIN meters m ON m.meterId = v.metersId " +
-                "JOIN payers_services AS ps ON ps.payerServiceId = m.payersServicesId " +
-                "JOIN payers AS p ON p.payerId = ps.payersId " +
-                "WHERE v.valueDate <= IIF(strftime('%s', 'now') > strftime('%s', 'now', 'start of month', 'start of month', '+' || IFNULL(p.paymentDay, 20) || ' days')," +
-                "strftime('%s', 'now', 'start of month', '+' || IFNULL(p.paymentDay, 20) || ' days')," +
-                "strftime('%s', 'now', '-1 months', 'start of month', '+' || IFNULL(p.paymentDay, 20) || ' days')) * 1000 " +
-                "GROUP BY v.metersId) mp ON mp.metersId = mvl.metersId AND mp.maxValueDate = mvl.valueDate " +
-                "WHERE mv.payersId = :payerId AND mv.localeCode = :locale AND sv.localeCode = :locale " +
-                "ORDER BY sv.pos"
+        "SELECT pmv.* FROM prev_meters_values_view pmv " +
+                "WHERE pmv.payerId = :payerId AND pmv.meterLocaleCode = :locale AND pmv.serviceLocaleCode = :locale " +
+                "ORDER BY pmv.pos"
     )
     fun findPrevMetersValuesByPayerId(
         payerId: UUID, locale: String? = Locale.getDefault().language
-    ): Flow<List<PrevServiceMeterValuePojo>>
+    ): Flow<List<PrevMetersValuesView>>
+
+    @Query(
+        "SELECT pmv.* FROM prev_meters_values_view pmv " +
+                "WHERE pmv.isFavorite = 'true' AND pmv.meterLocaleCode = :locale AND pmv.serviceLocaleCode = :locale " +
+                "ORDER BY pmv.pos"
+    )
+    fun findPrevMetersValuesByPayerIsFavorite(
+        locale: String? = Locale.getDefault().language
+    ): Flow<List<PrevMetersValuesView>>
 
     @ExperimentalCoroutinesApi
     fun findPrevMetersValuesByPayerIdDistinctUntilChanged(payerId: UUID) =

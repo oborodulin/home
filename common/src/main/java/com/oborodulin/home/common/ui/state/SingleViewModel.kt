@@ -16,11 +16,11 @@ private const val FOCUSED_FIELD_KEY = "focusedTextField"
 @OptIn(FlowPreview::class)
 abstract class SingleViewModel<T : Any, S : UiState<T>, A : UiAction, E : UiSingleEvent>(
     private val state: SavedStateHandle,
-    private val initFocusedTextField: Focusable,
+    private val initFocusedTextField: Focusable? = null,
 ) : MviViewModel<T, S, A, E>() {
     private var focusedTextField = FocusedTextField(
         textField = initFocusedTextField,
-        key = state[FOCUSED_FIELD_KEY] ?: initFocusedTextField.key()
+        key = state[FOCUSED_FIELD_KEY] ?: initFocusedTextField?.key()
     )
         set(value) {
             field = value
@@ -38,7 +38,8 @@ abstract class SingleViewModel<T : Any, S : UiState<T>, A : UiAction, E : UiSing
 
     init {
         Timber.tag(TAG).d("init: Start observe input events")
-        viewModelScope.launch(Dispatchers.Default) {
+        //Dispatchers.Default
+        viewModelScope.launch(errorHandler) {
             observeInputEvents()
         }
         focusedTextField.key?.let {
