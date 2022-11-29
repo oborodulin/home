@@ -1,5 +1,6 @@
 package com.oborodulin.home.accounting.ui.payer.single
 
+import android.content.res.Configuration
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.Button
@@ -17,14 +18,15 @@ import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.compose.ExperimentalLifecycleComposeApi
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.flowWithLifecycle
 import com.oborodulin.home.accounting.R
+import com.oborodulin.home.accounting.ui.meter.MeterValueViewModelImp
 import com.oborodulin.home.common.ui.components.field.ScreenEvent
 import com.oborodulin.home.common.ui.components.field.TextFieldComponent
 import com.oborodulin.home.common.ui.state.CommonScreen
@@ -36,7 +38,7 @@ private const val TAG = "Accounting.ui.PayerScreen"
 
 @Composable
 fun PayerScreen(
-    viewModel: PayerViewModel = hiltViewModel(),
+    viewModel: PayerViewModelImp = hiltViewModel(),
     payerInput: PayerInput
 ) {
     Timber.tag(TAG).d("PayerScreen(...) called: payerInput = %s".format(payerInput))
@@ -102,7 +104,7 @@ fun Payer(viewModel: PayerViewModel, onSubmit: () -> Unit) {
 
     Column(
         modifier = Modifier.fillMaxSize(),
-        verticalArrangement = Arrangement.Center,
+        verticalArrangement = Arrangement.Top,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         TextFieldComponent(
@@ -154,3 +156,9 @@ fun Payer(viewModel: PayerViewModel, onSubmit: () -> Unit) {
     }
 }
 
+@Preview(name = "Night Mode", showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
+@Preview(name = "Day Mode", showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_NO)
+@Composable
+fun PreviewPayer() {
+    Payer(viewModel = PayerViewModelImp.previewModel, onSubmit = {})
+}

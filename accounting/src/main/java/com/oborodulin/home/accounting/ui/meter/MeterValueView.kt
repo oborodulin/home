@@ -1,8 +1,7 @@
 package com.oborodulin.home.accounting.ui.meter
 
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxSize
+import android.content.res.Configuration
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -20,6 +19,8 @@ import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.ExperimentalLifecycleComposeApi
@@ -35,10 +36,10 @@ private const val TAG = "Accounting.ui.MeterValueView"
 
 @Composable
 fun MeterValueView(
-    viewModel: MeterValueViewModel = hiltViewModel(),
+    viewModel: MeterValueViewModel,
     meterValueModel: MeterValueModel
 ) {
-    Timber.tag(TAG).d("MeterValueView(...) called: meterValueInput = %s".format(meterValueModel))
+    Timber.tag(TAG).d("MeterValueView(...) called: meterValueInput = %s", meterValueModel)
     viewModel.initFieldStatesByUiModel(meterValueModel)
     MeterValue(viewModel) {
         viewModel.submitAction(MeterValueUiAction.Save)
@@ -79,7 +80,9 @@ fun MeterValue(viewModel: MeterValueViewModel, onSubmit: () -> Unit) {
     }
 
     Column(
-        modifier = Modifier.fillMaxSize(),
+        modifier = Modifier
+            .fillMaxHeight()
+            .width(120.dp),
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
@@ -104,4 +107,11 @@ fun MeterValue(viewModel: MeterValueViewModel, onSubmit: () -> Unit) {
             onImeKeyAction = { if (areInputsValid) viewModel.onContinueClick { onSubmit() } }
         )
     }
+}
+
+@Preview(name = "Night Mode", showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
+@Preview(name = "Day Mode", showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_NO)
+@Composable
+fun PreviewMeterValue() {
+    MeterValue(viewModel = MeterValueViewModelImp.previewModel, onSubmit = {})
 }

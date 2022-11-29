@@ -24,7 +24,7 @@ fun <T : Any> CommonScreen(state: UiState<T>, onSuccess: @Composable (T) -> Unit
             Error(state.errorMessage)
         }
         is UiState.Success -> {
-            Timber.tag(TAG).d("onSuccess(...) called: %s".format(state.data))
+            Timber.tag(TAG).d("onSuccess(...) called: %s", state.data)
             onSuccess(state.data)
         }
     }
@@ -32,7 +32,7 @@ fun <T : Any> CommonScreen(state: UiState<T>, onSuccess: @Composable (T) -> Unit
 
 @Composable
 fun Error(errorMessage: String) {
-    Timber.tag(TAG).d("Error(...) called: %s".format(errorMessage))
+    Timber.tag(TAG).d("Error(...) called: %s", errorMessage)
     Column(
         modifier = Modifier.fillMaxSize(),
         verticalArrangement = Arrangement.Bottom

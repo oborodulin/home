@@ -2,6 +2,7 @@ package com.oborodulin.home.common.ui.components.items
 
 import android.content.res.Configuration
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.layout.Arrangement.Top
@@ -10,8 +11,10 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Card
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
@@ -35,6 +38,7 @@ fun ListItemComponent(
     icon: Int?,
     item: ListItemModel,
     selected: Boolean = false,
+    background: Color = Color.Transparent,
     onClick: (ListItemModel) -> Unit = EMPTY,
     onEdit: (ListItemModel) -> Unit = EMPTY,
     onDelete: (ListItemModel) -> Unit = EMPTY
@@ -45,11 +49,13 @@ fun ListItemComponent(
         modifier = Modifier
             .padding(horizontal = 8.dp, vertical = 4.dp)
             .fillMaxWidth()
-            //.height(110.dp)
+            .height(88.dp)
             .clip(RoundedCornerShape(8.dp))
-            .selectable(selected = selected, onClick = { if (onClick !== EMPTY) onClick(item) })
+            .background(background)
+            .selectable(selected = selected, onClick = { if (onClick !== EMPTY) onClick(item) }),
         //.background(color = MaterialTheme.colors.background)
         //.clickable {}
+        elevation = 10.dp
     ) {
         Row(
             Modifier
@@ -60,9 +66,9 @@ fun ListItemComponent(
                 Image(
                     modifier = Modifier
                         .padding(4.dp)
-                        .size(100.dp)
+                        .size(80.dp)
                         .clip(RoundedCornerShape(8.dp)),
-                    painter = painterResource(id = icon),
+                    painter = painterResource(icon),
                     contentScale = ContentScale.Crop,
                     contentDescription = ""
                 )
@@ -70,49 +76,42 @@ fun ListItemComponent(
             Column(
                 verticalArrangement = Top,
                 modifier = Modifier
-                    .padding(vertical = 4.dp, horizontal = 12.dp)
+                    .padding(vertical = 4.dp, horizontal = 8.dp)
                     .fillMaxHeight()
             ) {
                 Text(
                     text = item.title,
-                    style = Typography.body1.copy(
-                        //color = Color.White,
-                        fontWeight = FontWeight.Bold
-                    )
+                    style = Typography.body1.copy(fontWeight = FontWeight.Bold)
                 )
                 item.descr?.let {
                     Text(
                         text = item.descr,
-                        modifier = Modifier
-                            .padding(vertical = 8.dp),
+                        modifier = Modifier.padding(vertical = 8.dp),
                         maxLines = 2,
-                        overflow = TextOverflow.Ellipsis,
-                        style = Typography.body2.copy(
-                            //color = Color.White
-                        )
+                        overflow = TextOverflow.Ellipsis
                     )
                 }
             }
             Column(
                 verticalArrangement = Top,
                 modifier = Modifier
-                    .padding(vertical = 4.dp, horizontal = 12.dp)
+                    .padding(all = 4.dp)
                     .fillMaxHeight()
             ) {
                 Row(
-                    Modifier
+                    modifier = Modifier
                         .padding(all = 4.dp)
-                        .fillMaxSize()
+                        .fillMaxSize(),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.End
                 ) {
                     if (onEdit !== EMPTY) {
                         Image(
                             modifier = Modifier
                                 .padding(4.dp)
-                                //.size(100.dp)
                                 .clip(RoundedCornerShape(8.dp))
                                 .clickable { onEdit(item) },
                             painter = painterResource(R.drawable.outline_mode_edit_black_24),
-                            //contentScale = ContentScale.Crop,
                             contentDescription = ""
                         )
                     }
@@ -120,11 +119,9 @@ fun ListItemComponent(
                         Image(
                             modifier = Modifier
                                 .padding(4.dp)
-                                //.size(100.dp)
                                 .clip(RoundedCornerShape(8.dp))
                                 .clickable { onDelete(item) },
                             painter = painterResource(R.drawable.outline_delete_black_24),
-                            //contentScale = ContentScale.Crop,
                             contentDescription = ""
                         )
                     }

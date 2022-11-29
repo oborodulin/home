@@ -17,6 +17,8 @@ android {
             //https://kotlinlang.org/docs/reference/kapt.html#non-existent-type-correction
             correctErrorTypes = true
         }
+        // Desugaring: Required when setting minSdkVersion to 20 or lower
+        // multiDexEnabled true
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         consumerProguardFiles "consumer-rules.pro"
     }
@@ -43,6 +45,13 @@ android {
     }
     composeOptions {
         kotlinCompilerExtensionVersion versions.composeKotlinExt
+    }
+    // Desugaring: Newer versions of the Android Gradle plugin (starting with 4.0) are able to use desugaring to
+    // backport new APIs to older versions of Android.
+    // You can read more about it here: https://jakewharton.com/d8-library-desugaring/
+    // https://www.rockandnull.com/java-time-android/
+    compileOptions {
+        coreLibraryDesugaringEnabled true
     }
     namespace 'com.oborodulin.home.accounting'
 }
@@ -86,6 +95,8 @@ dependencies {
     // Network
     implementation deps.retrofit2.retrofit
     implementation deps.retrofit2.converterGson
+    // Desugaring
+    coreLibraryDesugaring deps.tools.desugar
 
     implementation deps.androidx.coreKtx
     implementation deps.androidx.appcompat

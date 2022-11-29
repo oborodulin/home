@@ -1,21 +1,26 @@
 package com.oborodulin.home.accounting.ui.payer.list
 
+import android.content.res.Configuration
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.selection.selectableGroup
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.oborodulin.home.accounting.R
 import com.oborodulin.home.accounting.ui.AccountingUiAction
 import com.oborodulin.home.accounting.ui.AccountingViewModel
+import com.oborodulin.home.accounting.ui.AccountingViewModelImp
 import com.oborodulin.home.accounting.ui.model.PayerListItemModel
 import com.oborodulin.home.common.ui.components.items.ListItemComponent
 import com.oborodulin.home.common.ui.state.CommonScreen
@@ -26,18 +31,17 @@ private const val TAG = "Accounting.ui.PayersListView"
 
 @Composable
 fun PayersListView(
-    viewModel: PayersListViewModel = hiltViewModel(),
-    accountingViewModel: AccountingViewModel = hiltViewModel(),
+    viewModel: PayersListViewModel,
+    accountingViewModel: AccountingViewModel,
     navController: NavController
 ) {
     Timber.tag(TAG).d("PayersListView(...) called")
-    val context = LocalContext.current
     LaunchedEffect(Unit) {
         Timber.tag(TAG).d("PayersListView: LaunchedEffect() BEFORE collect ui state flow")
         viewModel.submitAction(PayersListUiAction.Load)
     }
     viewModel.uiStateFlow.collectAsState().value.let { state ->
-        Timber.tag(TAG).d("Collect ui state flow: %s".format(state))
+        Timber.tag(TAG).d("Collect ui state flow: %s", state)
         CommonScreen(state = state) {
             PayersList(it,
                 onClick = { payer -> accountingViewModel.submitAction(AccountingUiAction.Load(payer.id)) },
@@ -72,9 +76,11 @@ fun PayersList(
         mutableStateOf(-1)
     }
     if (payers.isNotEmpty()) {
+        val listState = rememberLazyListState()
         LazyColumn(
+            state = listState,
             modifier = Modifier
-                .padding(16.dp)
+                .padding(8.dp)
                 .selectableGroup() // Optional, for accessibility purpose
         ) {
             items(payers.size) { index ->
@@ -83,7 +89,11 @@ fun PayersList(
                         icon = null,
                         item = payer,
                         selected = (payer.isFavorite and (selectedIndex == -1)) or (selectedIndex == index),
-                        onClick = { selectedIndex = index; onClick(payer) },
+                        background = (if (selectedIndex == index) Color.LightGray else Color.Transparent),
+                        onClick = {
+                            selectedIndex = if (selectedIndex != index) index else -1
+                            onClick(payer)
+                        },
                         onEdit = { onEdit(payer) }
                     ) {
                         onDelete(payer)
@@ -92,6 +102,7 @@ fun PayersList(
             }
         }
     }
+
 /*
         list.apply {
             val error = when {
@@ -135,3 +146,13 @@ fun PayersList(
     }
 }
 
+@Preview(name = "Night Mode", showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
+@Preview(name = "Day Mode", showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_NO)
+@Composable
+fun PreviewPayersList() {
+    PayersList(
+        payers = PayersListViewModelImp.previewList(LocalContext.current),
+        onClick = {},
+        onEdit = {},
+        onDelete = {})
+}

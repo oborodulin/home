@@ -43,14 +43,14 @@ abstract class MviViewModel<T : Any, S : UiState<T>, A : UiAction, E : UiSingleE
     abstract fun initFieldStatesByUiModel(uiModel: Any)
 
     fun submitAction(action: A) {
-        Timber.tag(TAG).d("submitAction: emit action = %s".format(action.javaClass.name))
+        Timber.tag(TAG).d("submitAction: emit action = %s", action.javaClass.name)
         viewModelScope.launch(errorHandler) {
             actionFlow.emit(action)
         }
     }
 
     fun submitState(state: S) {
-        Timber.tag(TAG).d("submitState: change ui state = %s".format(state.javaClass.name))
+        Timber.tag(TAG).d("submitState: change ui state = %s", state.javaClass.name)
         viewModelScope.launch() {
             _uiStateFlow.value = state
             if (state is UiState.Success<*>) initFieldStatesByUiModel((state as UiState.Success<T>).data)
@@ -58,7 +58,7 @@ abstract class MviViewModel<T : Any, S : UiState<T>, A : UiAction, E : UiSingleE
     }
 
     fun submitSingleEvent(event: E) {
-        Timber.tag(TAG).d("submitSingleEvent: send single event = %s".format(event.javaClass.name))
+        Timber.tag(TAG).d("submitSingleEvent: send single event = %s", event.javaClass.name)
         viewModelScope.launch(errorHandler) {
             _singleEventFlow.send(event)
         }

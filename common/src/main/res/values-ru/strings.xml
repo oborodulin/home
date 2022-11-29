@@ -17,6 +17,7 @@
     <!--ЗАПОЛНИТЕЛИ (Compose Preview) -->
     <string name="preview_blank_title">Заголовок</string>
     <string name="preview_blank_descr">Описание</string>
-    <string name="preview_blank_text_field_lbl">Поле</string>
-    <string name="preview_blank_text_field_val">Текст</string>
+    <string name="preview_blank_text_field_lbl">Метка поля</string>
+    <string name="preview_blank_text_field_val">Содержимое</string>
+    <string name="preview_blank_text_field_err">текст ошибки</string>
 </resources>
