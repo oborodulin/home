@@ -41,6 +41,6 @@ dependencies {
     implementation deps.androidx.appcompat
     implementation deps.google.material
     testImplementation deps.test.junit
-    androidTestImplementation deps.test.junitExt
+    androidTestImplementation deps.test.extJunit
     androidTestImplementation deps.test.espressoCore
 }

@@ -19,6 +19,7 @@ class PrevServiceMeterValuesConverter :
                     measureUnit = it.measureUnit,
                     prevLastDate = it.prevLastDate,
                     prevValue = it.prevValue,
+                    valueFormat =  it.valueFormat
                 )
             }
         )

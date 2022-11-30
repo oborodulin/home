@@ -4,7 +4,7 @@ import com.oborodulin.home.data.local.db.entities.MeterEntity
 import com.oborodulin.home.data.local.db.entities.MeterTlEntity
 import com.oborodulin.home.data.local.db.entities.MeterValueEntity
 import com.oborodulin.home.data.local.db.entities.MeterVerificationEntity
-import com.oborodulin.home.data.local.db.views.MeterView
+import com.oborodulin.home.data.local.db.views.MetersView
 import com.oborodulin.home.metering.domain.model.Meter
 import com.oborodulin.home.metering.domain.model.MeterTl
 import com.oborodulin.home.metering.domain.model.MeterValue
@@ -12,18 +12,18 @@ import com.oborodulin.home.metering.domain.model.MeterVerification
 import java.util.*
 
 class MeterMapper {
-    fun toMeter(meterView: MeterView): Meter {
-        val tl = MeterTl(measureUnit = meterView.tl.measureUnit ?: "", descr = meterView.tl.descr)
-        tl.id = meterView.tl.meterTlId
+    fun toMeter(metersView: MetersView): Meter {
+        val tl = MeterTl(measureUnit = metersView.tl.measureUnit ?: "", descr = metersView.tl.descr)
+        tl.id = metersView.tl.meterTlId
         val meter = Meter(
-            payersServicesId = meterView.ps.payerServiceId,
-            num = meterView.data.num,
-            maxValue = meterView.data.maxValue,
-            passportDate = meterView.data.passportDate,
-            verificationPeriod = meterView.data.verificationPeriod,
+            payersServicesId = metersView.ps.payerServiceId,
+            num = metersView.data.num,
+            maxValue = metersView.data.maxValue,
+            passportDate = metersView.data.passportDate,
+            verificationPeriod = metersView.data.verificationPeriod,
             tl = tl
         )
-        meter.id = meterView.data.meterId
+        meter.id = metersView.data.meterId
         return meter
     }
 

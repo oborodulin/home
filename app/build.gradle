@@ -117,7 +117,7 @@ dependencies {
     androidTestImplementation deps.test.espressoContrib
     androidTestImplementation deps.test.espressoCore
     androidTestImplementation deps.test.espressoIntents
-    androidTestImplementation deps.test.junitExt
+    androidTestImplementation deps.test.extJunit
     androidTestImplementation deps.test.uiautomator
     androidTestImplementation deps.work.testing
     androidTestImplementation deps.truth

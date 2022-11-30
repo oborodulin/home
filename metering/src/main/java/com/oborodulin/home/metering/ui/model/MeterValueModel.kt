@@ -12,6 +12,7 @@ data class MeterValueModel(
     var measureUnit: String? = null,
     val prevLastDate: Date? = null,
     val prevValue: BigDecimal? = null,
+    val valueFormat: String,
     val valueDate: Date = Date(),
     val currentValue: BigDecimal? = null,
 )

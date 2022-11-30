@@ -69,7 +69,7 @@ dependencies {
     testImplementation deps.test.junit
     testImplementation deps.kotlinx.coroutinesTest
     testImplementation deps.kotlinx.coroutinesAndroid
-    testImplementation deps.test.junitExt
+    testImplementation deps.test.extJunit
     testImplementation deps.dagger.testing
     kaptTest deps.dagger.hiltCompiler
 

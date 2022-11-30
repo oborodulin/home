@@ -118,16 +118,23 @@ private fun MainScreenNavigationConfigurations(
         modifier = Modifier.padding(paddingValues)
     ) {
         composable(NavRoutes.Accounting.route) {
+            // Payers; Meters values; Payments
             AccountingScreen(navController) //setFabOnClick = setFabOnClick
         }
         composable(route = NavRoutes.Payer.route, arguments = NavRoutes.Payer.arguments) {
             PayerScreen(payerInput = NavRoutes.Payer.fromEntry(it))
         }
-        composable(NavRoutes.Billing.route) {
+        composable(route = NavRoutes.Billing.route, arguments = NavRoutes.Billing.arguments) {
+            // Services; Payer services; Rates; Rate promotions
             //BillingScreen(navController)
         }
-        composable(NavRoutes.Metering.route) {
+        composable(route = NavRoutes.Metering.route, arguments = NavRoutes.Metering.arguments) {
+            // Meters; Meter verifications
             //MeteringScreen(navController)
+        }
+        composable(route = NavRoutes.Reporting.route, arguments = NavRoutes.Reporting.arguments) {
+            // Receipts
+            //ReportingScreen(navController)
         }
     }
 }

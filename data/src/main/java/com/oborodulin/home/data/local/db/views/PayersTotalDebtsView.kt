@@ -6,13 +6,11 @@ import java.math.BigDecimal
 import java.util.*
 
 @DatabaseView(
-    viewName = PrevMetersValuesView.VIEW_NAME,
+    viewName = PayersTotalDebtsView.VIEW_NAME,
     value = "SELECT mvl.meterValueId, mv.payersId AS payerId, mv.servicesId AS serviceId, " +
             "sv.type, sv.name, sv.pos, mv.meterId, IFNULL(mv.measureUnit, sv.measureUnit) AS measureUnit, " +
             "mvl.valueDate AS prevLastDate, mvl.meterValue AS prevValue, p.isFavorite, " +
-            "mv.localeCode AS meterlocaleCode, sv.localeCode AS servicelocaleCode, " +
-            "substr('#0.' || '0000000000', 1, 3+(length(cast(mv.maxValue as text)) - " +
-            "CASE WHEN instr(cast(mv.maxValue as text), '.') = 0 THEN length(cast(mv.maxValue as text)) + 1 ELSE instr(cast(mv.maxValue as text), '.') END)) AS valueFormat " +
+            "mv.localeCode AS meterlocaleCode, sv.localeCode AS servicelocaleCode " +
             "FROM meters_view AS mv JOIN services_view AS sv ON sv.serviceId = mv.servicesId " +
             "JOIN meter_values AS mvl ON mvl.metersId = mv.meterId " +
             "JOIN payers AS p ON p.payerId = mv.payersId " +
@@ -23,9 +21,9 @@ import java.util.*
             "WHERE v.valueDate <= CASE WHEN strftime('%s', 'now') > strftime('%s', 'now', 'start of month', 'start of month', '+' || IFNULL(p.paymentDay, 20) || ' days') " +
             "THEN strftime('%s', 'now', 'start of month', '+' || IFNULL(p.paymentDay, 20) || ' days') " +
             "ELSE strftime('%s', 'now', '-1 months', 'start of month', '+' || IFNULL(p.paymentDay, 20) || ' days') END * 1000 " +
-            "GROUP BY v.metersId) mp ON mp.metersId = mvl.metersId AND mp.maxValueDate = mvl.valueDate"
+            "GROUP BY v.metersId) mp ON mp.metersId = mvl.metersId AND mp.maxValueDate = mvl.valueDate "
 )
-class PrevMetersValuesView(
+class PayersTotalDebtsView(
     var meterValueId: UUID,
     var payerId: UUID,
     var serviceId: UUID,
@@ -39,9 +37,8 @@ class PrevMetersValuesView(
     var isFavorite: Boolean,
     val meterlocaleCode: String,
     val servicelocaleCode: String,
-    val valueFormat: String,
 ) {
     companion object {
-        const val VIEW_NAME = "prev_meters_values_view"
+        const val VIEW_NAME = "payers_total_debts_view"
     }
 }

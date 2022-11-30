@@ -43,6 +43,6 @@ dependencies {
     kaptAndroidTest deps.dagger.compiler
     testImplementation deps.test.junit
     androidTestImplementation deps.dagger.testing
-    androidTestImplementation deps.test.junitExt
+    androidTestImplementation deps.test.extJunit
     androidTestImplementation deps.test.espressoCore
 }

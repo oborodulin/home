@@ -175,7 +175,7 @@ fun PrevServiceMeterValues(
                     Spacer(modifier = Modifier.height(10.dp))
                     meterValue.prevValue?.let {
                         Text(
-                            text = DecimalFormat("#0.000").format(it),
+                            text = DecimalFormat(meterValue.valueFormat).format(it),
                             style = Typography.body1.copy(fontWeight = FontWeight.Bold)
                         )
                     }

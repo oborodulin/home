@@ -29,7 +29,7 @@ buildscript {
                 hiltNavCompose         : '1.0.0',
                 inject                 : '1',
                 junit                  : '4.13.2',
-                junitExt               : '1.1.4',
+                extJunit               : '1.1.4',
                 kotlin                 : '1.7.0',
                 kotlinReflect          : '1.7.20',
                 ktlint                 : '0.45.2',
@@ -142,7 +142,7 @@ buildscript {
                 // Sweet Toast
                 TalhaFaki           : [composableSweetToast: "com.github.tfaki:ComposableSweetToast:$versions.composableSweetToast"],
                 test                : [junit          : "junit:junit:$versions.junit",
-                                       junitExt       : "androidx.test.ext:junit:$versions.junitExt",
+                                       extJunit       : "androidx.test.ext:junit:$versions.extJunit",
                                        espressoContrib: "androidx.test.espresso:espresso-contrib:$versions.espresso",
                                        espressoCore   : "androidx.test.espresso:espresso-core:$versions.espresso",
                                        espressoIntents: "androidx.test.espresso:espresso-intents:$versions.espresso",

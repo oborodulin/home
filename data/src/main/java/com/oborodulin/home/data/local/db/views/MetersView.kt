@@ -7,13 +7,13 @@ import com.oborodulin.home.data.local.db.entities.MeterTlEntity
 import com.oborodulin.home.data.local.db.entities.PayerServiceCrossRefEntity
 
 @DatabaseView(
-    viewName = MeterView.VIEW_NAME,
+    viewName = MetersView.VIEW_NAME,
     value = "SELECT m.*, mtl.*, ps.* FROM meters AS m JOIN meters_tl AS mtl ON mtl.metersId = m.meterId " +
             "JOIN payers_services AS ps ON ps.payerServiceId = m.payersServicesId " +
             "JOIN services AS s ON s.serviceId = ps.servicesId " +
             "ORDER BY ps.payersId, s.pos"
 )
-class MeterView(
+class MetersView(
     @Embedded
     var data: MeterEntity,
     @Embedded

@@ -3,7 +3,7 @@ package com.oborodulin.home.data.local.db.dao
 import androidx.room.*
 import com.oborodulin.home.data.local.db.entities.ServiceEntity
 import com.oborodulin.home.data.local.db.entities.ServiceTlEntity
-import com.oborodulin.home.data.local.db.views.ServiceView
+import com.oborodulin.home.data.local.db.views.ServicesView
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.distinctUntilChanged
@@ -13,13 +13,13 @@ import java.util.*
 interface ServiceDao {
     // READS:
     @Query("SELECT * FROM services_view WHERE localeCode = :locale ORDER BY pos")
-    fun findAll(locale: String? = Locale.getDefault().language): Flow<List<ServiceView>>
+    fun findAll(locale: String? = Locale.getDefault().language): Flow<List<ServicesView>>
 
     @ExperimentalCoroutinesApi
     fun findAllDistinctUntilChanged() = findAll().distinctUntilChanged()
 
     @Query("SELECT * FROM services_view WHERE serviceId = :id AND localeCode = :locale")
-    fun findById(id: UUID, locale: String? = Locale.getDefault().language): Flow<ServiceView>
+    fun findById(id: UUID, locale: String? = Locale.getDefault().language): Flow<ServicesView>
 
     @ExperimentalCoroutinesApi
     fun findByIdDistinctUntilChanged(id: UUID) = findById(id).distinctUntilChanged()

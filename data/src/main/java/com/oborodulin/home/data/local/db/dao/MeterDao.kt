@@ -3,7 +3,7 @@ package com.oborodulin.home.data.local.db.dao
 import androidx.room.*
 import com.oborodulin.home.data.local.db.entities.*
 import com.oborodulin.home.data.local.db.views.PrevMetersValuesView
-import com.oborodulin.home.data.local.db.views.MeterView
+import com.oborodulin.home.data.local.db.views.MetersView
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.distinctUntilChanged
@@ -13,13 +13,13 @@ import java.util.*
 interface MeterDao {
     // READS:
     @Query("SELECT * FROM meters_view WHERE meters_view.localeCode = :locale")
-    fun findAll(locale: String? = Locale.getDefault().language): Flow<List<MeterView>>
+    fun findAll(locale: String? = Locale.getDefault().language): Flow<List<MetersView>>
 
     @ExperimentalCoroutinesApi
     fun findAllDistinctUntilChanged() = findAll().distinctUntilChanged()
 
     @Query("SELECT mv.* FROM meters_view AS mv WHERE mv.meterId = :meterId AND mv.localeCode = :locale")
-    fun findById(meterId: UUID, locale: String? = Locale.getDefault().language): Flow<MeterView>
+    fun findById(meterId: UUID, locale: String? = Locale.getDefault().language): Flow<MetersView>
 
     @ExperimentalCoroutinesApi
     fun findByIdDistinctUntilChanged(id: UUID) = findById(id).distinctUntilChanged()
@@ -28,7 +28,7 @@ interface MeterDao {
         "SELECT mv.* FROM meters_view AS mv WHERE mv.payersId = :payerId AND mv.localeCode = :locale"
     )
     fun findByPayerId(payerId: UUID, locale: String? = Locale.getDefault().language):
-            Flow<List<MeterView>>
+            Flow<List<MetersView>>
 
     @ExperimentalCoroutinesApi
     fun findByPayerIdDistinctUntilChanged(payerId: UUID) =
@@ -38,7 +38,7 @@ interface MeterDao {
         "SELECT mv.* FROM meters_view AS mv WHERE mv.servicesId = :serviceId AND mv.localeCode = :locale"
     )
     fun findByServiceId(serviceId: UUID, locale: String? = Locale.getDefault().language):
-            Flow<List<MeterView>>
+            Flow<List<MetersView>>
 
     @ExperimentalCoroutinesApi
     fun findByServiceIdDistinctUntilChanged(serviceId: UUID) =

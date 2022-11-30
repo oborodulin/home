@@ -124,6 +124,7 @@ class AccountingViewModelImp @Inject constructor(
                         measureUnit = ctx.resources.getString(com.oborodulin.home.common.R.string.kWh_unit),
                         prevLastDate = SimpleDateFormat("yyyy-MM-dd").parse("2022-08-01"),
                         prevValue = BigDecimal.valueOf(9628),
+                        valueFormat = "#0",
                         valueDate = Date()
                     ),
                     MeterValueModel(
@@ -134,6 +135,7 @@ class AccountingViewModelImp @Inject constructor(
                         measureUnit = ctx.resources.getString(com.oborodulin.home.common.R.string.m3_unit),
                         prevLastDate = SimpleDateFormat("yyyy-MM-dd").parse("2022-08-01"),
                         prevValue = BigDecimal.valueOf(1553),
+                        valueFormat = "#0.000",
                         valueDate = Date()
                     )
                 )

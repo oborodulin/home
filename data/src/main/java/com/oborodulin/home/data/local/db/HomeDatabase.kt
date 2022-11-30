@@ -15,9 +15,9 @@ import com.oborodulin.home.data.local.db.dao.PayerDao
 import com.oborodulin.home.data.local.db.dao.RateDao
 import com.oborodulin.home.data.local.db.dao.ServiceDao
 import com.oborodulin.home.data.local.db.entities.*
-import com.oborodulin.home.data.local.db.views.MeterView
+import com.oborodulin.home.data.local.db.views.MetersView
 import com.oborodulin.home.data.local.db.views.PrevMetersValuesView
-import com.oborodulin.home.data.local.db.views.ServiceView
+import com.oborodulin.home.data.local.db.views.ServicesView
 import com.oborodulin.home.data.util.Constants
 import com.oborodulin.home.data.util.ServiceType
 import kotlinx.coroutines.CoroutineScope
@@ -65,7 +65,7 @@ private val MIGRATION_4_5 = object : Migration(4, 5) {
         RateEntity::class, RatePromotionEntity::class,
         MeterEntity::class, MeterTlEntity::class, MeterValueEntity::class, MeterVerificationEntity::class,
         ReceiptEntity::class],
-    views = [MeterView::class, ServiceView::class, PrevMetersValuesView::class],
+    views = [MetersView::class, ServicesView::class, PrevMetersValuesView::class],
     version = 5
 )
 @TypeConverters(HomeTypeConverters::class)
