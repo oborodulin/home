@@ -6,9 +6,12 @@ import androidx.room.TypeConverter
 import com.oborodulin.home.data.util.ServiceType
 import java.math.BigDecimal
 import java.time.*
+import java.time.format.DateTimeFormatter
 import java.util.*
 
-class HomeTypeConverters {
+object HomeTypeConverters {
+    private val formatter = DateTimeFormatter.ISO_OFFSET_DATE_TIME
+
     @TypeConverter
     fun toUUID(uuid: String?): UUID? = UUID.fromString(uuid)
 
@@ -20,6 +23,16 @@ class HomeTypeConverters {
 
     @TypeConverter
     fun toDate(millisSinceEpoch: Long?): Date? = millisSinceEpoch?.let { Date(it) }
+
+    @TypeConverter
+    @JvmStatic
+    fun toOffsetDateTime(value: String?): OffsetDateTime? = value?.let {
+        formatter.parse(value, OffsetDateTime::from)
+    }
+
+    @TypeConverter
+    @JvmStatic
+    fun fromOffsetDateTime(date: OffsetDateTime?): String? = date?.format(formatter)
 
     @RequiresApi(Build.VERSION_CODES.O)
     @TypeConverter

@@ -35,6 +35,12 @@ android {
     compileOptions {
         sourceCompatibility cfg.jvm.compatibility.source
         targetCompatibility cfg.jvm.compatibility.target
+
+        // Desugaring: Newer versions of the Android Gradle plugin (starting with 4.0) are able to use desugaring to
+        // backport new APIs to older versions of Android.
+        // You can read more about it here: https://jakewharton.com/d8-library-desugaring/
+        // https://www.rockandnull.com/java-time-android/
+        //coreLibraryDesugaringEnabled true
     }
     kotlinOptions {
         jvmTarget = cfg.jvm.target
@@ -45,13 +51,6 @@ android {
     }
     composeOptions {
         kotlinCompilerExtensionVersion versions.composeKotlinExt
-    }
-    // Desugaring: Newer versions of the Android Gradle plugin (starting with 4.0) are able to use desugaring to
-    // backport new APIs to older versions of Android.
-    // You can read more about it here: https://jakewharton.com/d8-library-desugaring/
-    // https://www.rockandnull.com/java-time-android/
-    compileOptions {
-        coreLibraryDesugaringEnabled true
     }
     namespace 'com.oborodulin.home.accounting'
 }
@@ -96,7 +95,7 @@ dependencies {
     implementation deps.retrofit2.retrofit
     implementation deps.retrofit2.converterGson
     // Desugaring
-    coreLibraryDesugaring deps.tools.desugar
+    //coreLibraryDesugaring deps.tools.desugar
 
     implementation deps.androidx.coreKtx
     implementation deps.androidx.appcompat

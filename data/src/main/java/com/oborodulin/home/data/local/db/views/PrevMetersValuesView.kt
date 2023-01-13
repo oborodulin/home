@@ -3,6 +3,7 @@ package com.oborodulin.home.data.local.db.views
 import androidx.room.DatabaseView
 import com.oborodulin.home.data.util.ServiceType
 import java.math.BigDecimal
+import java.time.OffsetDateTime
 import java.util.*
 
 @DatabaseView(
@@ -20,9 +21,9 @@ import java.util.*
             "FROM meter_values v JOIN meters m ON m.meterId = v.metersId " +
             "JOIN payers_services AS ps ON ps.payerServiceId = m.payersServicesId " +
             "JOIN payers AS p ON p.payerId = ps.payersId " +
-            "WHERE v.valueDate <= CASE WHEN strftime('%s', 'now') > strftime('%s', 'now', 'start of month', 'start of month', '+' || IFNULL(p.paymentDay, 20) || ' days') " +
-            "THEN strftime('%s', 'now', 'start of month', '+' || IFNULL(p.paymentDay, 20) || ' days') " +
-            "ELSE strftime('%s', 'now', '-1 months', 'start of month', '+' || IFNULL(p.paymentDay, 20) || ' days') END * 1000 " +
+            "WHERE v.valueDate <= CASE WHEN strftime('%s', 'now') > strftime('%s', 'now', 'start of month', '+' || (IFNULL(p.paymentDay, 20) - 1) || ' days') " +
+            "THEN strftime('%s', 'now', 'start of month', '+' || (IFNULL(p.paymentDay, 20) - 1) || ' days') " +
+            "ELSE strftime('%s', 'now', '-1 months', 'start of month', '+' || (IFNULL(p.paymentDay, 20) - 1) || ' days') END * 1000 " +
             "GROUP BY v.metersId) mp ON mp.metersId = mvl.metersId AND mp.maxValueDate = mvl.valueDate"
 )
 class PrevMetersValuesView(
@@ -34,7 +35,7 @@ class PrevMetersValuesView(
     var pos: Int,
     var meterId: UUID,
     var measureUnit: String?,
-    val prevLastDate: Date,
+    val prevLastDate: OffsetDateTime,
     val prevValue: BigDecimal,
     var isFavorite: Boolean,
     val meterlocaleCode: String,

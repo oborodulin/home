@@ -14,6 +14,7 @@ import javax.inject.Inject
 /**
  * Created by tfakioglu on 12.December.2021
  */
+@OptIn(kotlinx.coroutines.ExperimentalCoroutinesApi::class)
 class PayerDataSourceImpl @Inject constructor(
     private val payerDao: PayerDao,
     @IoDispatcher private val dispatcher: CoroutineDispatcher,

@@ -24,5 +24,11 @@ class RatePromotionEntity(
 ) {
     companion object {
         const val TABLE_NAME = "rate_promotions"
+
+        fun populatePrevRatePromotion(rateId: UUID) = RatePromotionEntity(
+            ratesId = rateId,
+            paymentMonths = 10,
+            isPrevRate = true
+        )
     }
 }

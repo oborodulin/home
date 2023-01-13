@@ -13,6 +13,8 @@ android {
         minSdk cfg.sdk.minVersion
         targetSdk cfg.sdk.targetVersion
 
+        // Desugaring: Required when setting minSdkVersion to 20 or lower
+        // multiDexEnabled true
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
 
@@ -25,6 +27,12 @@ android {
     compileOptions {
         sourceCompatibility cfg.jvm.compatibility.source
         targetCompatibility cfg.jvm.compatibility.target
+
+        // Desugaring: Newer versions of the Android Gradle plugin (starting with 4.0) are able to use desugaring to
+        // backport new APIs to older versions of Android.
+        // You can read more about it here: https://jakewharton.com/d8-library-desugaring/
+        // https://www.rockandnull.com/java-time-android/
+        //coreLibraryDesugaringEnabled true
     }
     kotlinOptions {
         jvmTarget = cfg.jvm.target
@@ -42,7 +50,6 @@ dependencies {
     // Logging
     implementation deps.logging.timber
     implementation deps.logging.logger
-
     // Hilt
     implementation deps.dagger.hilt
     kapt deps.dagger.compiler
@@ -53,17 +60,19 @@ dependencies {
     implementation deps.kotlin.reflect
     // XML-parser
     implementation deps.xml.xmlpull
-
     // Compose
     implementation deps.compose.ui
     implementation deps.compose.material
     implementation deps.compose.uiTooling
     implementation deps.compose.uiPreview
-
     // Coil
     implementation deps.coil.compose
     // Lottie
     implementation deps.lottie.compose
+    // Desugaring
+    //coreLibraryDesugaring deps.tools.desugar
+
+    implementation deps.lifecycle.viewmodel
 
     implementation deps.androidx.coreKtx
     implementation deps.androidx.appcompat

@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 5,
-    "identityHash": "28a4ce3ca9fb61937f12390d34b8d696",
+    "identityHash": "6dcb28ad548e0b7b3d8e30b259259481",
     "entities": [
       {
         "tableName": "payers",
@@ -112,7 +112,7 @@
       },
       {
         "tableName": "services_tl",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`serviceTlId` TEXT NOT NULL, `localeCode` TEXT NOT NULL, `name` TEXT NOT NULL, `measureUnit` TEXT, `descr` TEXT, `servicesId` TEXT NOT NULL, PRIMARY KEY(`serviceTlId`), FOREIGN KEY(`servicesId`) REFERENCES `services`(`serviceId`) ON UPDATE NO ACTION ON DELETE CASCADE )",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`serviceTlId` TEXT NOT NULL, `localeCode` TEXT NOT NULL, `name` TEXT NOT NULL, `measureUnit` TEXT, `descr` TEXT, `servicesId` TEXT, PRIMARY KEY(`serviceTlId`), FOREIGN KEY(`servicesId`) REFERENCES `services`(`serviceId`) ON UPDATE NO ACTION ON DELETE CASCADE )",
         "fields": [
           {
             "fieldPath": "serviceTlId",
@@ -148,7 +148,7 @@
             "fieldPath": "servicesId",
             "columnName": "servicesId",
             "affinity": "TEXT",
-            "notNull": true
+            "notNull": false
           }
         ],
         "primaryKey": {
@@ -284,7 +284,7 @@
       },
       {
         "tableName": "rates",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`rateId` TEXT NOT NULL, `startDate` INTEGER NOT NULL, `fromMeterValue` INTEGER, `toMeterValue` INTEGER, `rateValue` INTEGER NOT NULL, `isPerPerson` INTEGER NOT NULL, `isPrivileges` INTEGER NOT NULL, `servicesId` TEXT NOT NULL, `payersServicesId` TEXT, PRIMARY KEY(`rateId`), FOREIGN KEY(`servicesId`) REFERENCES `services`(`serviceId`) ON UPDATE NO ACTION ON DELETE CASCADE , FOREIGN KEY(`payersServicesId`) REFERENCES `payers_services`(`payerServiceId`) ON UPDATE NO ACTION ON DELETE CASCADE )",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`rateId` TEXT NOT NULL, `startDate` TEXT NOT NULL, `fromMeterValue` INTEGER, `toMeterValue` INTEGER, `rateValue` INTEGER NOT NULL, `isPerPerson` INTEGER NOT NULL, `isPrivileges` INTEGER NOT NULL, `servicesId` TEXT NOT NULL, `payersServicesId` TEXT, PRIMARY KEY(`rateId`), FOREIGN KEY(`servicesId`) REFERENCES `services`(`serviceId`) ON UPDATE NO ACTION ON DELETE CASCADE , FOREIGN KEY(`payersServicesId`) REFERENCES `payers_services`(`payerServiceId`) ON UPDATE NO ACTION ON DELETE CASCADE )",
         "fields": [
           {
             "fieldPath": "rateId",
@@ -295,7 +295,7 @@
           {
             "fieldPath": "startDate",
             "columnName": "startDate",
-            "affinity": "INTEGER",
+            "affinity": "TEXT",
             "notNull": true
           },
           {
@@ -474,7 +474,7 @@
       },
       {
         "tableName": "meters",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`meterId` TEXT NOT NULL, `num` TEXT NOT NULL, `maxValue` INTEGER NOT NULL, `passportDate` INTEGER, `verificationPeriod` INTEGER, `payersServicesId` TEXT NOT NULL, PRIMARY KEY(`meterId`), FOREIGN KEY(`payersServicesId`) REFERENCES `payers_services`(`payerServiceId`) ON UPDATE NO ACTION ON DELETE CASCADE )",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`meterId` TEXT NOT NULL, `num` TEXT NOT NULL, `maxValue` INTEGER NOT NULL, `passportDate` TEXT, `verificationPeriod` INTEGER, `payersServicesId` TEXT NOT NULL, PRIMARY KEY(`meterId`), FOREIGN KEY(`payersServicesId`) REFERENCES `payers_services`(`payerServiceId`) ON UPDATE NO ACTION ON DELETE CASCADE )",
         "fields": [
           {
             "fieldPath": "meterId",
@@ -497,7 +497,7 @@
           {
             "fieldPath": "passportDate",
             "columnName": "passportDate",
-            "affinity": "INTEGER",
+            "affinity": "TEXT",
             "notNull": false
           },
           {
@@ -556,7 +556,7 @@
       },
       {
         "tableName": "meters_tl",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`meterTlId` TEXT NOT NULL, `localeCode` TEXT NOT NULL, `measureUnit` TEXT, `descr` TEXT, `metersId` TEXT NOT NULL, PRIMARY KEY(`meterTlId`), FOREIGN KEY(`metersId`) REFERENCES `meters`(`meterId`) ON UPDATE NO ACTION ON DELETE CASCADE )",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`meterTlId` TEXT NOT NULL, `localeCode` TEXT NOT NULL, `measureUnit` TEXT, `descr` TEXT, `metersId` TEXT, PRIMARY KEY(`meterTlId`), FOREIGN KEY(`metersId`) REFERENCES `meters`(`meterId`) ON UPDATE NO ACTION ON DELETE CASCADE )",
         "fields": [
           {
             "fieldPath": "meterTlId",
@@ -586,7 +586,7 @@
             "fieldPath": "metersId",
             "columnName": "metersId",
             "affinity": "TEXT",
-            "notNull": true
+            "notNull": false
           }
         ],
         "primaryKey": {
@@ -632,7 +632,7 @@
       },
       {
         "tableName": "meter_values",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`meterValueId` TEXT NOT NULL, `valueDate` INTEGER NOT NULL, `meterValue` INTEGER, `metersId` TEXT NOT NULL, PRIMARY KEY(`meterValueId`), FOREIGN KEY(`metersId`) REFERENCES `meters`(`meterId`) ON UPDATE NO ACTION ON DELETE CASCADE )",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`meterValueId` TEXT NOT NULL, `valueDate` TEXT NOT NULL, `meterValue` INTEGER, `metersId` TEXT NOT NULL, PRIMARY KEY(`meterValueId`), FOREIGN KEY(`metersId`) REFERENCES `meters`(`meterId`) ON UPDATE NO ACTION ON DELETE CASCADE )",
         "fields": [
           {
             "fieldPath": "meterValueId",
@@ -643,7 +643,7 @@
           {
             "fieldPath": "valueDate",
             "columnName": "valueDate",
-            "affinity": "INTEGER",
+            "affinity": "TEXT",
             "notNull": true
           },
           {
@@ -692,7 +692,7 @@
       },
       {
         "tableName": "meter_verifications",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`meterVerificationId` TEXT NOT NULL, `startDate` INTEGER NOT NULL, `endDate` INTEGER, `isOk` INTEGER NOT NULL, `metersId` TEXT NOT NULL, PRIMARY KEY(`meterVerificationId`), FOREIGN KEY(`metersId`) REFERENCES `meters`(`meterId`) ON UPDATE NO ACTION ON DELETE CASCADE )",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`meterVerificationId` TEXT NOT NULL, `startDate` TEXT NOT NULL, `endDate` TEXT, `isOk` INTEGER NOT NULL, `metersId` TEXT NOT NULL, PRIMARY KEY(`meterVerificationId`), FOREIGN KEY(`metersId`) REFERENCES `meters`(`meterId`) ON UPDATE NO ACTION ON DELETE CASCADE )",
         "fields": [
           {
             "fieldPath": "meterVerificationId",
@@ -703,13 +703,13 @@
           {
             "fieldPath": "startDate",
             "columnName": "startDate",
-            "affinity": "INTEGER",
+            "affinity": "TEXT",
             "notNull": true
           },
           {
             "fieldPath": "endDate",
             "columnName": "endDate",
-            "affinity": "INTEGER",
+            "affinity": "TEXT",
             "notNull": false
           },
           {
@@ -842,11 +842,19 @@
       {
         "viewName": "services_view",
         "createSql": "CREATE VIEW `${VIEW_NAME}` AS SELECT s.*, stl.* FROM services AS s JOIN services_tl AS stl ON stl.servicesId = s.serviceId"
+      },
+      {
+        "viewName": "prev_meters_values_view",
+        "createSql": "CREATE VIEW `${VIEW_NAME}` AS SELECT mvl.meterValueId, mv.payersId AS payerId, mv.servicesId AS serviceId, sv.type, sv.name, sv.pos, mv.meterId, IFNULL(mv.measureUnit, sv.measureUnit) AS measureUnit, mvl.valueDate AS prevLastDate, mvl.meterValue AS prevValue, p.isFavorite, mv.localeCode AS meterlocaleCode, sv.localeCode AS servicelocaleCode, substr('#0.' || '0000000000', 1, 3+(length(cast(mv.maxValue as text)) - CASE WHEN instr(cast(mv.maxValue as text), '.') = 0 THEN length(cast(mv.maxValue as text)) + 1 ELSE instr(cast(mv.maxValue as text), '.') END)) AS valueFormat FROM meters_view AS mv JOIN services_view AS sv ON sv.serviceId = mv.servicesId JOIN meter_values AS mvl ON mvl.metersId = mv.meterId JOIN payers AS p ON p.payerId = mv.payersId JOIN (SELECT v.metersId, MAX(v.valueDate) maxValueDate FROM meter_values v JOIN meters m ON m.meterId = v.metersId JOIN payers_services AS ps ON ps.payerServiceId = m.payersServicesId JOIN payers AS p ON p.payerId = ps.payersId WHERE v.valueDate <= CASE WHEN strftime('%s', 'now') > strftime('%s', 'now', 'start of month', '+' || (IFNULL(p.paymentDay, 20) - 1) || ' days') THEN strftime('%s', 'now', 'start of month', '+' || (IFNULL(p.paymentDay, 20) - 1) || ' days') ELSE strftime('%s', 'now', '-1 months', 'start of month', '+' || (IFNULL(p.paymentDay, 20) - 1) || ' days') END * 1000 GROUP BY v.metersId) mp ON mp.metersId = mvl.metersId AND mp.maxValueDate = mvl.valueDate"
+      },
+      {
+        "viewName": "payers_total_debts_view",
+        "createSql": "CREATE VIEW `${VIEW_NAME}` AS SELECT mvl.meterValueId, mv.payersId AS payerId, mv.servicesId AS serviceId, sv.type, sv.name, sv.pos, mv.meterId, IFNULL(mv.measureUnit, sv.measureUnit) AS measureUnit, mvl.valueDate AS prevLastDate, mvl.meterValue AS prevValue, p.isFavorite, mv.localeCode AS meterlocaleCode, sv.localeCode AS servicelocaleCode FROM meters_view AS mv JOIN services_view AS sv ON sv.serviceId = mv.servicesId JOIN meter_values AS mvl ON mvl.metersId = mv.meterId JOIN payers AS p ON p.payerId = mv.payersId JOIN (SELECT v.metersId, MAX(v.valueDate) maxValueDate FROM meter_values v JOIN meters m ON m.meterId = v.metersId JOIN payers_services AS ps ON ps.payerServiceId = m.payersServicesId JOIN payers AS p ON p.payerId = ps.payersId WHERE v.valueDate <= CASE WHEN strftime('%s', 'now') > strftime('%s', 'now', 'start of month', 'start of month', '+' || IFNULL(p.paymentDay, 20) || ' days') THEN strftime('%s', 'now', 'start of month', '+' || IFNULL(p.paymentDay, 20) || ' days') ELSE strftime('%s', 'now', '-1 months', 'start of month', '+' || IFNULL(p.paymentDay, 20) || ' days') END * 1000 GROUP BY v.metersId) mp ON mp.metersId = mvl.metersId AND mp.maxValueDate = mvl.valueDate"
       }
     ],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '28a4ce3ca9fb61937f12390d34b8d696')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '6dcb28ad548e0b7b3d8e30b259259481')"
     ]
   }
 }

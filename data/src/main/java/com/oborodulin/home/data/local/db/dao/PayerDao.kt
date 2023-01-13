@@ -2,7 +2,9 @@ package com.oborodulin.home.data.local.db.dao
 
 import androidx.room.*
 import com.oborodulin.home.data.local.db.entities.PayerEntity
+import com.oborodulin.home.data.local.db.entities.PayerServiceCrossRefEntity
 import com.oborodulin.home.data.local.db.entities.PayerWithServices
+import com.oborodulin.home.data.local.db.entities.ServiceEntity
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.distinctUntilChanged
@@ -33,6 +35,17 @@ interface PayerDao {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun addAll(payers: List<PayerEntity>)
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insert(vararg payerService: PayerServiceCrossRefEntity)
+
+    suspend fun insert(payer: PayerEntity, service: ServiceEntity) =
+        insert(
+            PayerServiceCrossRefEntity(
+                payersId = payer.payerId,
+                servicesId = service.serviceId
+            )
+        )
 
     // UPDATES:
     @Update

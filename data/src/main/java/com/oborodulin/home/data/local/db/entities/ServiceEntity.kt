@@ -13,5 +13,17 @@ data class ServiceEntity(
 ) {
     companion object {
         const val TABLE_NAME = "services"
+
+        fun populateRentService() = ServiceEntity(pos = 1, type = ServiceType.RENT)
+        fun populateElectricityService() = ServiceEntity(pos = 2, type = ServiceType.ELECRICITY)
+        fun populateGasService() = ServiceEntity(pos = 3, type = ServiceType.GAS)
+        fun populateColdWaterService() = ServiceEntity(pos = 4, type = ServiceType.COLD_WATER)
+        fun populateWasteService() = ServiceEntity(pos = 5, type = ServiceType.WASTE,)
+        fun populateHeatingService() = ServiceEntity(pos = 6, type = ServiceType.HEATING)
+        fun populateHotWaterService() = ServiceEntity(pos = 7, type = ServiceType.HOT_WATER)
+        fun populateGarbageService() = ServiceEntity(pos = 8, type = ServiceType.GARBAGE)
+        fun populateDoorphoneService() = ServiceEntity(pos = 9, type = ServiceType.DOORPHONE)
+        fun populatePhoneService() = ServiceEntity(pos = 10, type = ServiceType.PHONE)
+        fun populateUgsoService() = ServiceEntity(pos = 11, type = ServiceType.USGO)
     }
 }

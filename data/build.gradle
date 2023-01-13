@@ -32,6 +32,12 @@ android {
     compileOptions {
         sourceCompatibility cfg.jvm.compatibility.source
         targetCompatibility cfg.jvm.compatibility.target
+
+        // Desugaring: Newer versions of the Android Gradle plugin (starting with 4.0) are able to use desugaring to
+        // backport new APIs to older versions of Android.
+        // You can read more about it here: https://jakewharton.com/d8-library-desugaring/
+        // https://www.rockandnull.com/java-time-android/
+        //coreLibraryDesugaringEnabled true
     }
     kotlinOptions {
         jvmTarget = cfg.jvm.target
@@ -58,7 +64,8 @@ dependencies {
     implementation deps.jvm.inject
     implementation deps.kotlinx.coroutinesAndroid
     implementation deps.kotlinx.coroutinesCore
-
+    // Desugaring
+    //coreLibraryDesugaring deps.tools.desugar
     // Networking
     implementation deps.retrofit2.retrofit
     implementation deps.retrofit2.converterGson
@@ -70,6 +77,8 @@ dependencies {
     testImplementation deps.kotlinx.coroutinesTest
     testImplementation deps.kotlinx.coroutinesAndroid
     testImplementation deps.test.extJunit
+    implementation deps.test.extJunitKtx
+    testImplementation deps.test.hamcrest
     testImplementation deps.dagger.testing
     kaptTest deps.dagger.hiltCompiler
 

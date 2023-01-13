@@ -7,6 +7,7 @@ import com.oborodulin.home.accounting.ui.model.AccountingModel
 import com.oborodulin.home.accounting.ui.model.converters.PrevServiceMeterValuesConverter
 import com.oborodulin.home.common.ui.state.MviViewModel
 import com.oborodulin.home.common.ui.state.UiState
+import com.oborodulin.home.common.util.Utils
 import com.oborodulin.home.data.R
 import com.oborodulin.home.data.util.ServiceType
 import com.oborodulin.home.metering.domain.usecases.GetPrevServiceMeterValuesUseCase
@@ -21,6 +22,7 @@ import kotlinx.coroutines.launch
 import timber.log.Timber
 import java.math.BigDecimal
 import java.text.SimpleDateFormat
+import java.time.OffsetDateTime
 import java.util.*
 import javax.inject.Inject
 
@@ -122,10 +124,10 @@ class AccountingViewModelImp @Inject constructor(
                         type = ServiceType.ELECRICITY,
                         name = ctx.resources.getString(R.string.service_electricity),
                         measureUnit = ctx.resources.getString(com.oborodulin.home.common.R.string.kWh_unit),
-                        prevLastDate = SimpleDateFormat("yyyy-MM-dd").parse("2022-08-01"),
+                        prevLastDate = Utils.toOffsetDateTime("2022-08-01T14:29:10.212"),
                         prevValue = BigDecimal.valueOf(9628),
                         valueFormat = "#0",
-                        valueDate = Date()
+                        valueDate = OffsetDateTime.now()
                     ),
                     MeterValueModel(
                         id = UUID.randomUUID(),
@@ -133,10 +135,10 @@ class AccountingViewModelImp @Inject constructor(
                         type = ServiceType.COLD_WATER,
                         name = ctx.resources.getString(R.string.service_cold_water),
                         measureUnit = ctx.resources.getString(com.oborodulin.home.common.R.string.m3_unit),
-                        prevLastDate = SimpleDateFormat("yyyy-MM-dd").parse("2022-08-01"),
+                        prevLastDate = Utils.toOffsetDateTime("2022-08-01T14:29:10.212"),
                         prevValue = BigDecimal.valueOf(1553),
                         valueFormat = "#0.000",
-                        valueDate = Date()
+                        valueDate = OffsetDateTime.now()
                     )
                 )
             )

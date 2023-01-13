@@ -2,8 +2,8 @@ package com.oborodulin.home.data.local.db.entities
 
 import androidx.room.*
 import androidx.room.ForeignKey.CASCADE
-import com.oborodulin.home.data.local.db.converters.DateTypeConverter
 import java.math.BigDecimal
+import java.time.OffsetDateTime
 import java.util.*
 
 @Entity(
@@ -26,7 +26,8 @@ import java.util.*
 )
 class RateEntity(
     @PrimaryKey var rateId: UUID = UUID.randomUUID(),
-    @TypeConverters(DateTypeConverter::class) val startDate: Date = Date(),
+    //@TypeConverters(DateTypeConverter::class)
+    val startDate: OffsetDateTime = OffsetDateTime.now(),
     val fromMeterValue: BigDecimal? = null,
     val toMeterValue: BigDecimal? = null,
     val rateValue: BigDecimal,
@@ -37,5 +38,65 @@ class RateEntity(
 ) {
     companion object {
         const val TABLE_NAME = "rates"
+
+        fun populateElectricityRate1(serviceId: UUID) = RateEntity(
+            servicesId = serviceId,
+            fromMeterValue = BigDecimal.ZERO, toMeterValue = BigDecimal.valueOf(150),
+            rateValue = BigDecimal.valueOf(1.56)
+        )
+
+        fun populateElectricityRate2(serviceId: UUID) = RateEntity(
+            servicesId = serviceId, fromMeterValue = BigDecimal.valueOf(150),
+            toMeterValue = BigDecimal.valueOf(800),
+            rateValue = BigDecimal.valueOf(2.12)
+        )
+
+        fun populateElectricityRate3(serviceId: UUID) = RateEntity(
+            servicesId = serviceId, fromMeterValue = BigDecimal.valueOf(800),
+            rateValue = BigDecimal.valueOf(3.21)
+        )
+
+        fun populateElectricityPrivilegesRate(serviceId: UUID) = RateEntity(
+            servicesId = serviceId, isPrivileges = true, rateValue = BigDecimal.valueOf(0.92)
+        )
+
+        fun populateGasRate(serviceId: UUID) = RateEntity(
+            servicesId = serviceId, isPerPerson = true, rateValue = BigDecimal.valueOf(18.05)
+        )
+
+        fun populateColdWaterRate(serviceId: UUID) = RateEntity(
+            servicesId = serviceId, rateValue = BigDecimal.valueOf(25.02)
+        )
+
+        fun populateWasteRate(serviceId: UUID) = RateEntity(
+            servicesId = serviceId, rateValue = BigDecimal.valueOf(11.61)
+        )
+
+        fun populateHotWaterRate(serviceId: UUID) = RateEntity(
+            servicesId = serviceId, rateValue = BigDecimal.valueOf(77.67)
+        )
+
+        fun populateRentRateForPayer(serviceId: UUID, payersServiceId: UUID? = null) = RateEntity(
+            servicesId = serviceId, payersServicesId = payersServiceId,
+            rateValue = BigDecimal.valueOf(4.62)
+        )
+
+        fun populateHeatingRateForPayer(serviceId: UUID, payersServiceId: UUID? = null) =
+            RateEntity(
+                servicesId = serviceId, payersServicesId = payersServiceId,
+                rateValue = BigDecimal.valueOf(14.76)
+            )
+
+        fun populateGarbageRateForPayer(serviceId: UUID, payersServiceId: UUID? = null) =
+            RateEntity(
+                servicesId = serviceId, payersServicesId = payersServiceId,
+                isPerPerson = true, rateValue = BigDecimal.valueOf(15.73)
+            )
+
+        fun populateDoorphoneRateForPayer(serviceId: UUID, payersServiceId: UUID? = null) =
+            RateEntity(
+                servicesId = serviceId, payersServicesId = payersServiceId,
+                isPerPerson = true, rateValue = BigDecimal.valueOf(15.73)
+            )
     }
 }
