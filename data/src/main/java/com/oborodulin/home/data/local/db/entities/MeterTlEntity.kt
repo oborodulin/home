@@ -17,23 +17,26 @@ import java.util.*
 data class MeterTlEntity(
     @PrimaryKey var meterTlId: UUID = UUID.randomUUID(),
     val localeCode: String = Locale.getDefault().language,
-    var measureUnit: String? = null,
+    var measureUnit: String,
     val descr: String? = null,
-    @ColumnInfo(index = true) var metersId: UUID? = null,
+    @ColumnInfo(index = true) var metersId: UUID,
 ) {
     companion object {
         const val TABLE_NAME = "meters_tl"
 
-        fun populateElectricityMeterTl(ctx: Context) = MeterTlEntity(
-            measureUnit = ctx.resources.getString(com.oborodulin.home.common.R.string.kWh_unit)
+        fun populateElectricityMeterTl(ctx: Context, meterId: UUID) = MeterTlEntity(
+            measureUnit = ctx.resources.getString(com.oborodulin.home.common.R.string.kWh_unit),
+            metersId = meterId
         )
 
-        fun populateColdWaterMeterTl(ctx: Context) = MeterTlEntity(
-            measureUnit = ctx.resources.getString(com.oborodulin.home.common.R.string.m3_unit)
+        fun populateColdWaterMeterTl(ctx: Context, meterId: UUID) = MeterTlEntity(
+            measureUnit = ctx.resources.getString(com.oborodulin.home.common.R.string.m3_unit),
+            metersId = meterId
         )
 
-        fun populateHotWaterMeterTl(ctx: Context) = MeterTlEntity(
-            measureUnit = ctx.resources.getString(com.oborodulin.home.common.R.string.m3_unit)
+        fun populateHotWaterMeterTl(ctx: Context, meterId: UUID) = MeterTlEntity(
+            measureUnit = ctx.resources.getString(com.oborodulin.home.common.R.string.m3_unit),
+            metersId = meterId
         )
     }
 }

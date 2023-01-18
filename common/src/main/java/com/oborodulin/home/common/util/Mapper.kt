@@ -25,7 +25,7 @@ class Mapper {
                     "java.util.Date" -> contentValues.put(it.name, (it.getter.call(instance) as Date).time)
                     "java.util.Date?" -> contentValues.put(it.name, (it.getter.call(instance) as? Date)?.time)
                     "java.time.OffsetDateTime" -> contentValues.put(it.name, (it.getter.call(instance) as OffsetDateTime).format(formatter))
-                    "java.time.OffsetDateTime?" -> contentValues.put(it.name, (it.getter.call(instance) as OffsetDateTime)?.format(formatter))
+                    "java.time.OffsetDateTime?" -> contentValues.put(it.name, (it.getter.call(instance) as? OffsetDateTime)?.format(formatter))
                     else -> contentValues.put(it.name, it.getter.call(instance)?.toString())
                 }
             }

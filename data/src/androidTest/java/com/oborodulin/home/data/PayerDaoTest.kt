@@ -32,7 +32,7 @@ class PayerDaoTest {
 
     @Before
     fun setupDatabase() {
-        database = HomeDatabase.getTestInstance(appContext, null)
+        database = HomeDatabase.getTestInstance(appContext)
         payerDao = database.payerDao()
     }
 

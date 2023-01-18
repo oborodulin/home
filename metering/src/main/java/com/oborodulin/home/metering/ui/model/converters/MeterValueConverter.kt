@@ -22,7 +22,7 @@ class MeterValueConverter :
             valueDate = meterValueModel.valueDate,
             meterValue = meterValueModel.currentValue,
         )
-        meterValue.id = meterValueModel.id
+        meterValueModel.id?.let { meterValue.id = it }
         return meterValue
     }
 }

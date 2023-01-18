@@ -9,6 +9,7 @@ import com.oborodulin.home.common.ui.state.MviViewModel
 import com.oborodulin.home.common.ui.state.UiState
 import com.oborodulin.home.common.util.Utils
 import com.oborodulin.home.data.R
+import com.oborodulin.home.data.local.db.HomeDatabase
 import com.oborodulin.home.data.util.ServiceType
 import com.oborodulin.home.metering.domain.usecases.GetPrevServiceMeterValuesUseCase
 import com.oborodulin.home.metering.ui.model.MeterValueModel
@@ -51,9 +52,20 @@ class AccountingViewModelImp @Inject constructor(
 
     override fun initState(): UiState<AccountingModel> = UiState.Loading
 
-    override fun handleAction(action: AccountingUiAction) {
+    override suspend fun handleAction(action: AccountingUiAction) {
         Timber.tag(TAG)
-            .d("handleAction(AccountingUiAction) called: %s", action.javaClass.name)
+            .d(
+                "handleAction(AccountingUiAction) called: %s [HomeDatabase.isImportExecute = %s]",
+                action.javaClass.name,
+                HomeDatabase.isImportExecute
+            )
+        if (HomeDatabase.isImportExecute) HomeDatabase.isImportDone?.await()
+        Timber.tag(TAG)
+            .d(
+                "await(): HomeDatabase.isImportExecute = %s; HomeDatabase.isImportDone = %s",
+                HomeDatabase.isImportExecute,
+                HomeDatabase.isImportDone
+            )
         when (action) {
             is AccountingUiAction.Init -> loadPrevServiceMeterValues()
             is AccountingUiAction.Load -> loadPrevServiceMeterValues(action.payerId)

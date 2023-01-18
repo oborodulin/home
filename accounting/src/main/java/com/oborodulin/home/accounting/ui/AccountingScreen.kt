@@ -114,7 +114,7 @@ private fun AccountingView(
                         .clip(RoundedCornerShape(30.dp))
                         .weight(4f)
                 ) {
-                    PrevServiceMeterValues(accountingModel = it, viewModel = meterValueViewModel)
+                    //PrevServiceMeterValues(accountingModel = it, viewModel = meterValueViewModel)
                 }
                 Box(
                     modifier = Modifier

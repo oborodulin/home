@@ -33,7 +33,7 @@ class PayersListViewModelImp @Inject constructor(
 
     override fun initState() = UiState.Loading
 
-    override fun handleAction(action: PayersListUiAction) {
+    override suspend fun handleAction(action: PayersListUiAction) {
         Timber.tag(TAG)
             .d("handleAction(PayersListUiAction) called: %s", action.javaClass.name)
         when (action) {

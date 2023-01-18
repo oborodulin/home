@@ -64,7 +64,7 @@ class MeterValueViewModelImp @Inject constructor(
 
     override fun initState() = UiState.Loading
 
-    override fun handleAction(action: MeterValueUiAction) {
+    override suspend fun handleAction(action: MeterValueUiAction) {
         Timber.tag(TAG)
             .d("handleAction(MeterValueUiAction) called: %s".format(action.javaClass.name))
         when (action) {

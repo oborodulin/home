@@ -21,68 +21,81 @@ class ServiceTlEntity(
     val name: String = "",
     var measureUnit: String? = null,
     val descr: String? = null,
-    @ColumnInfo(index = true) var servicesId: UUID? = null,
+    @ColumnInfo(index = true) var servicesId: UUID,
 ) {
     companion object {
         const val TABLE_NAME = "services_tl"
 
-        fun populateRentServiceTl(ctx: Context) =
-            ServiceTlEntity(name = ctx.resources.getString(R.string.service_rent))
+        fun populateRentServiceTl(ctx: Context, serviceId: UUID) =
+            ServiceTlEntity(
+                name = ctx.resources.getString(R.string.service_rent),
+                servicesId = serviceId
+            )
 
-        fun populateElectricityServiceTl(ctx: Context) =
+        fun populateElectricityServiceTl(ctx: Context, serviceId: UUID) =
             ServiceTlEntity(
                 name = ctx.resources.getString(R.string.service_electricity),
-                measureUnit = ctx.resources.getString(com.oborodulin.home.common.R.string.kWh_unit)
+                measureUnit = ctx.resources.getString(com.oborodulin.home.common.R.string.kWh_unit),
+                servicesId = serviceId
             )
 
-        fun populateGasServiceTl(ctx: Context) =
+        fun populateGasServiceTl(ctx: Context, serviceId: UUID) =
             ServiceTlEntity(
                 name = ctx.resources.getString(R.string.service_gas),
-                measureUnit = ctx.resources.getString(com.oborodulin.home.common.R.string.m3_unit)
+                measureUnit = ctx.resources.getString(com.oborodulin.home.common.R.string.m3_unit),
+                servicesId = serviceId
             )
 
-        fun populateColdWaterServiceTl(ctx: Context) =
+        fun populateColdWaterServiceTl(ctx: Context, serviceId: UUID) =
             ServiceTlEntity(
                 name = ctx.resources.getString(R.string.service_cold_water),
-                measureUnit = ctx.resources.getString(com.oborodulin.home.common.R.string.m3_unit)
+                measureUnit = ctx.resources.getString(com.oborodulin.home.common.R.string.m3_unit),
+                servicesId = serviceId
             )
 
-        fun populateWasteServiceTl(ctx: Context) =
+        fun populateWasteServiceTl(ctx: Context, serviceId: UUID) =
             ServiceTlEntity(
                 name = ctx.resources.getString(R.string.service_waste),
-                measureUnit = ctx.resources.getString(com.oborodulin.home.common.R.string.m3_unit)
+                measureUnit = ctx.resources.getString(com.oborodulin.home.common.R.string.m3_unit),
+                servicesId = serviceId
             )
 
-        fun populateHeatingServiceTl(ctx: Context) =
+        fun populateHeatingServiceTl(ctx: Context, serviceId: UUID) =
             ServiceTlEntity(
                 name = ctx.resources.getString(R.string.service_heating),
-                measureUnit = ctx.resources.getString(com.oborodulin.home.common.R.string.Gcal_unit)
+                measureUnit = ctx.resources.getString(com.oborodulin.home.common.R.string.Gcal_unit),
+                servicesId = serviceId
             )
 
-        fun populateHotWaterServiceTl(ctx: Context) =
+        fun populateHotWaterServiceTl(ctx: Context, serviceId: UUID) =
             ServiceTlEntity(
                 name = ctx.resources.getString(R.string.service_hot_water),
-                measureUnit = ctx.resources.getString(com.oborodulin.home.common.R.string.m3_unit)
+                measureUnit = ctx.resources.getString(com.oborodulin.home.common.R.string.m3_unit),
+                servicesId = serviceId
             )
 
-        fun populateGarbageServiceTl(ctx: Context) =
+        fun populateGarbageServiceTl(ctx: Context, serviceId: UUID) =
             ServiceTlEntity(
-                name = ctx.resources.getString(R.string.service_garbage)
+                name = ctx.resources.getString(R.string.service_garbage),
+                servicesId = serviceId
             )
 
-        fun populateDoorphoneServiceTl(ctx: Context) =
+        fun populateDoorphoneServiceTl(ctx: Context, serviceId: UUID) =
             ServiceTlEntity(
-                name = ctx.resources.getString(R.string.service_doorphone)
+                name = ctx.resources.getString(R.string.service_doorphone),
+                servicesId = serviceId
             )
 
-        fun populatePhoneServiceTl(ctx: Context) =
+        fun populatePhoneServiceTl(ctx: Context, serviceId: UUID) =
             ServiceTlEntity(
-                name = ctx.resources.getString(R.string.service_phone)
+                name = ctx.resources.getString(R.string.service_phone),
+                servicesId = serviceId
             )
 
-        fun populateUgsoServiceTl(ctx: Context) =
+        fun populateUgsoServiceTl(ctx: Context, serviceId: UUID) =
             ServiceTlEntity(
-                name = ctx.resources.getString(R.string.service_ugso)
+                name = ctx.resources.getString(R.string.service_ugso),
+                servicesId = serviceId
             )
     }
 }

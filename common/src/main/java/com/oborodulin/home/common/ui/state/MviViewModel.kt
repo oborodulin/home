@@ -37,7 +37,7 @@ abstract class MviViewModel<T : Any, S : UiState<T>, A : UiAction, E : UiSingleE
 
     abstract fun initState(): S
 
-    abstract fun handleAction(action: A)
+    abstract suspend fun handleAction(action: A)
 
     abstract fun initFieldStatesByUiModel(uiModel: Any)
 

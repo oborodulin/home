@@ -64,7 +64,7 @@ class PayerViewModelImp @Inject constructor(
 
     override fun initState(): UiState<PayerModel> = UiState.Loading
 
-    override fun handleAction(action: PayerUiAction) {
+    override suspend fun handleAction(action: PayerUiAction) {
         Timber.tag(TAG).d("handleAction(PayerUiAction) called: %s", action.javaClass.name)
         when (action) {
             is PayerUiAction.Create -> {
