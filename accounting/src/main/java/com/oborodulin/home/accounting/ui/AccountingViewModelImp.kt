@@ -73,7 +73,7 @@ class AccountingViewModelImp @Inject constructor(
     }
 
     private fun loadPrevServiceMeterValues(payerId: UUID? = null) {
-        Timber.tag(TAG).d("loadPrevServiceMeterValues(UUID?) called: %s", payerId.toString())
+        Timber.tag(TAG).d("loadPrevServiceMeterValues(UUID?) called: payerId = %s", payerId.toString())
         viewModelScope.launch {
             accountingUseCases.getPrevServiceMeterValuesUseCase.execute(
                 GetPrevServiceMeterValuesUseCase.Request(payerId)

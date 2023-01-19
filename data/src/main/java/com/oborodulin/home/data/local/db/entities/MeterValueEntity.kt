@@ -27,40 +27,78 @@ data class MeterValueEntity(
     companion object {
         const val TABLE_NAME = "meter_values"
 
-        fun populateElectricityMeterValue1(meterId: UUID) = MeterValueEntity(
+        fun populateElectricityMeterValue1(
+            meterId: UUID,
+            valueDate: OffsetDateTime,
+            meterValue: BigDecimal? = null
+        ) = MeterValueEntity(
             metersId = meterId,
-            valueDate = Utils.toOffsetDateTime("2022-06-19T14:29:10.212"),
-            meterValue = BigDecimal.valueOf(9532)
+            valueDate = valueDate,//Utils.toOffsetDateTime("2022-06-19T14:29:10.212"),
+            meterValue = meterValue ?: BigDecimal.valueOf(9532)
         )
 
-        fun populateElectricityMeterValue2(meterId: UUID) = MeterValueEntity(
+        fun populateElectricityMeterValue2(
+            meterId: UUID,
+            valueDate: OffsetDateTime,
+            meterValue: BigDecimal? = null
+        ) = MeterValueEntity(
             metersId = meterId,
-            valueDate = Utils.toOffsetDateTime("2022-07-01T14:29:10.212"),
-            meterValue = BigDecimal.valueOf(9558)
+            valueDate = valueDate,
+            meterValue = meterValue ?: BigDecimal.valueOf(9558)
         )
 
-        fun populateElectricityMeterValue3(meterId: UUID) = MeterValueEntity(
+        fun populateElectricityMeterValue3(
+            meterId: UUID,
+            valueDate: OffsetDateTime,
+            meterValue: BigDecimal? = null
+        ) = MeterValueEntity(
             metersId = meterId,
-            valueDate = Utils.toOffsetDateTime("2022-08-01T14:29:10.212"),
-            meterValue = BigDecimal.valueOf(9628)
+            valueDate = valueDate,
+            meterValue = meterValue ?: BigDecimal.valueOf(9628)
         )
 
-        fun populateColdWaterMeterValue1(meterId: UUID) = MeterValueEntity(
+        fun populateColdWaterMeterValue1(
+            meterId: UUID,
+            valueDate: OffsetDateTime,
+            meterValue: BigDecimal? = null
+        ) = MeterValueEntity(
             metersId = meterId,
-            valueDate = Utils.toOffsetDateTime("2022-06-19T14:29:10.212"),
-            meterValue = BigDecimal.valueOf(1538)
+            valueDate = valueDate,
+            meterValue = meterValue ?: BigDecimal.valueOf(1538)
         )
 
-        fun populateColdWaterMeterValue2(meterId: UUID) = MeterValueEntity(
+        fun populateColdWaterMeterValue2(
+            meterId: UUID,
+            valueDate: OffsetDateTime,
+            meterValue: BigDecimal? = null
+        ) = MeterValueEntity(
             metersId = meterId,
-            valueDate = Utils.toOffsetDateTime("2022-07-01T14:29:10.212"),
-            meterValue = BigDecimal.valueOf(1542)
+            valueDate = valueDate,
+            meterValue = meterValue ?: BigDecimal.valueOf(1542)
         )
 
-        fun populateColdWaterMeterValue3(meterId: UUID) = MeterValueEntity(
+        fun populateColdWaterMeterValue3(
+            meterId: UUID,
+            valueDate: OffsetDateTime,
+            meterValue: BigDecimal? = null
+        ) = MeterValueEntity(
             metersId = meterId,
-            valueDate = Utils.toOffsetDateTime("2022-08-01T14:29:10.212"),
-            meterValue = BigDecimal.valueOf(1553)
+            valueDate = valueDate,
+            meterValue = meterValue ?: BigDecimal.valueOf(1553)
         )
+    }
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (javaClass != other?.javaClass) return false
+
+        other as MeterValueEntity
+        if (meterValueId != other.meterValueId) return false
+
+        return true
+    }
+
+    override fun hashCode(): Int {
+        return meterValueId.hashCode()
     }
 }

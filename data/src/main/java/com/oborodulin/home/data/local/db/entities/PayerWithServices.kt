@@ -17,4 +17,18 @@ data class PayerWithServices(
         )
     )
     val services: List<ServiceEntity>
-)
+) {
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (javaClass != other?.javaClass) return false
+
+        other as PayerWithServices
+        if (payer.payerId != other.payer.payerId) return false
+
+        return true
+    }
+
+    override fun hashCode(): Int {
+        return payer.payerId.hashCode()
+    }
+}

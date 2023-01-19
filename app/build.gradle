@@ -119,8 +119,8 @@ dependencies {
     androidTestImplementation deps.test.espressoIntents
     androidTestImplementation deps.test.extJunit
     androidTestImplementation deps.test.uiautomator
+    androidTestImplementation deps.test.truth
     androidTestImplementation deps.work.testing
-    androidTestImplementation deps.truth
     androidTestImplementation deps.dagger.testing
     androidTestImplementation deps.kotlinx.coroutinesTest
     testImplementation deps.test.junit

@@ -26,4 +26,18 @@ data class MeterVerificationEntity(
     companion object {
         const val TABLE_NAME = "meter_verifications"
     }
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (javaClass != other?.javaClass) return false
+
+        other as MeterVerificationEntity
+        if (meterVerificationId != other.meterVerificationId) return false
+
+        return true
+    }
+
+    override fun hashCode(): Int {
+        return meterVerificationId.hashCode()
+    }
 }

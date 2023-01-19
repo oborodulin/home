@@ -2,6 +2,7 @@ package com.oborodulin.home.data.local.db
 
 import android.content.Context
 import android.database.sqlite.SQLiteDatabase
+import android.database.sqlite.SQLiteException
 import androidx.room.*
 import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
@@ -19,6 +20,7 @@ import com.oborodulin.home.data.local.db.views.ServicesView
 import com.oborodulin.home.data.util.Constants
 import kotlinx.coroutines.*
 import timber.log.Timber
+import java.time.OffsetDateTime
 import java.util.*
 
 private const val TAG = "HomeDatabase"
@@ -78,7 +80,7 @@ abstract class HomeDatabase : RoomDatabase() {
         private var INSTANCE: HomeDatabase? = null
 
         @Synchronized
-        fun getInstance(context: Context, jsonLogger: Gson): HomeDatabase {
+        fun getInstance(context: Context, jsonLogger: Gson? = null): HomeDatabase {
             // Multiple threads can ask for the database at the same time, ensure we only initialize
             // it once by using synchronized. Only one thread may enter a synchronized block at a
             // time.
@@ -132,6 +134,11 @@ abstract class HomeDatabase : RoomDatabase() {
             }
             return instance
         }
+
+        // https://stackoverflow.com/questions/2421189/version-of-sqlite-used-in-android
+        fun sqliteVersion() = SQLiteDatabase.create(null).use {
+            android.database.DatabaseUtils.stringForQuery(it, "SELECT sqlite_version()", null)
+        }
     }
 
     /**
@@ -142,6 +149,8 @@ abstract class HomeDatabase : RoomDatabase() {
         private val jsonLogger: Gson? = null
     ) :
         Callback() {
+        private val currentDateTime: OffsetDateTime = OffsetDateTime.now()
+
         override fun onCreate(db: SupportSQLiteDatabase) {
             super.onCreate(db)
             isImportExecute = true
@@ -334,17 +343,20 @@ abstract class HomeDatabase : RoomDatabase() {
                 // meter values:
                 insertDefMeterValue(
                     db, MeterValueEntity.populateElectricityMeterValue1(
-                        electricityPayer1Meter.meterId
+                        electricityPayer1Meter.meterId,
+                        currentDateTime.minusMonths(2).withDayOfMonth(1)
                     )
                 )
                 insertDefMeterValue(
                     db, MeterValueEntity.populateElectricityMeterValue2(
-                        electricityPayer1Meter.meterId
+                        electricityPayer1Meter.meterId,
+                        currentDateTime.minusMonths(1).withDayOfMonth(1)
                     )
                 )
                 insertDefMeterValue(
                     db, MeterValueEntity.populateElectricityMeterValue3(
-                        electricityPayer1Meter.meterId
+                        electricityPayer1Meter.meterId,
+                        currentDateTime.withDayOfMonth(1)
                     )
                 )
                 // cold water
@@ -357,17 +369,20 @@ abstract class HomeDatabase : RoomDatabase() {
                 // meter values:
                 insertDefMeterValue(
                     db, MeterValueEntity.populateColdWaterMeterValue1(
-                        coldWaterPayer1Meter.meterId
+                        coldWaterPayer1Meter.meterId,
+                        currentDateTime.minusMonths(2).withDayOfMonth(1)
                     )
                 )
                 insertDefMeterValue(
                     db, MeterValueEntity.populateColdWaterMeterValue2(
-                        coldWaterPayer1Meter.meterId
+                        coldWaterPayer1Meter.meterId,
+                        currentDateTime.minusMonths(1).withDayOfMonth(1)
                     )
                 )
                 insertDefMeterValue(
                     db, MeterValueEntity.populateColdWaterMeterValue3(
-                        coldWaterPayer1Meter.meterId
+                        coldWaterPayer1Meter.meterId,
+                        currentDateTime.withDayOfMonth(1)
                     )
                 )
                 // hot water
@@ -487,17 +502,20 @@ abstract class HomeDatabase : RoomDatabase() {
                 // meter values:
                 insertDefMeterValue(
                     db, MeterValueEntity.populateElectricityMeterValue2(
-                        electricityPayer2Meter.meterId
+                        electricityPayer2Meter.meterId,
+                        currentDateTime.minusMonths(2).withDayOfMonth(1)
                     )
                 )
                 insertDefMeterValue(
                     db, MeterValueEntity.populateElectricityMeterValue2(
-                        electricityPayer2Meter.meterId
+                        electricityPayer2Meter.meterId,
+                        currentDateTime.minusMonths(1).withDayOfMonth(1)
                     )
                 )
                 insertDefMeterValue(
                     db, MeterValueEntity.populateElectricityMeterValue3(
-                        electricityPayer2Meter.meterId
+                        electricityPayer2Meter.meterId,
+                        currentDateTime.withDayOfMonth(1)
                     )
                 )
                 // cold water
@@ -510,17 +528,20 @@ abstract class HomeDatabase : RoomDatabase() {
                 // meter values:
                 insertDefMeterValue(
                     db, MeterValueEntity.populateColdWaterMeterValue2(
-                        coldWaterPayer2Meter.meterId
+                        coldWaterPayer2Meter.meterId,
+                        currentDateTime.minusMonths(2).withDayOfMonth(1)
                     )
                 )
                 insertDefMeterValue(
                     db, MeterValueEntity.populateColdWaterMeterValue2(
-                        coldWaterPayer2Meter.meterId
+                        coldWaterPayer2Meter.meterId,
+                        currentDateTime.minusMonths(1).withDayOfMonth(1)
                     )
                 )
                 insertDefMeterValue(
                     db, MeterValueEntity.populateColdWaterMeterValue3(
-                        coldWaterPayer2Meter.meterId
+                        coldWaterPayer2Meter.meterId,
+                        currentDateTime.withDayOfMonth(1)
                     )
                 )
                 // hot water
@@ -571,7 +592,7 @@ abstract class HomeDatabase : RoomDatabase() {
                             }
 
                  */
-            } catch (e: Exception) {
+            } catch (e: SQLiteException) {
                 Timber.tag(TAG).e(e)
             } finally {
                 db.endTransaction()
@@ -579,7 +600,7 @@ abstract class HomeDatabase : RoomDatabase() {
             }
         }
 
-        private suspend fun insertDefService(
+        private fun insertDefService(
             db: SupportSQLiteDatabase,
             service: ServiceEntity,
             textContent: ServiceTlEntity
@@ -601,7 +622,7 @@ abstract class HomeDatabase : RoomDatabase() {
                 )
         }
 
-        private suspend fun insertPayerService(
+        private fun insertPayerService(
             db: SupportSQLiteDatabase,
             payer: PayerEntity,
             serviceId: UUID
@@ -620,7 +641,7 @@ abstract class HomeDatabase : RoomDatabase() {
             return payerService.payerServiceId
         }
 
-        private suspend fun insertDefMeter(
+        private fun insertDefMeter(
             db: SupportSQLiteDatabase,
             meter: MeterEntity, textContent: MeterTlEntity
         ) {
@@ -640,7 +661,7 @@ abstract class HomeDatabase : RoomDatabase() {
             )
         }
 
-        private suspend fun insertDefMeterValue(
+        private fun insertDefMeterValue(
             db: SupportSQLiteDatabase,
             meterValue: MeterValueEntity
         ) {
@@ -652,7 +673,7 @@ abstract class HomeDatabase : RoomDatabase() {
             Timber.tag(TAG).i("Default meter value imported: {${jsonLogger?.toJson(meterValue)}}")
         }
 
-        private suspend fun insertDefRate(db: SupportSQLiteDatabase, rate: RateEntity): UUID {
+        private fun insertDefRate(db: SupportSQLiteDatabase, rate: RateEntity): UUID {
             db.insert(
                 RateEntity.TABLE_NAME,
                 SQLiteDatabase.CONFLICT_REPLACE,

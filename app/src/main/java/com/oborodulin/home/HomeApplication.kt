@@ -1,20 +1,20 @@
 package com.oborodulin.home
 
+//import com.oborodulin.home.domain.rate.RateRepository
+//import com.oborodulin.home.domain.service.ServiceRepository
 import android.app.Application
 import android.content.Context
 import androidx.work.Configuration
 import com.oborodulin.home.common.util.Constants
-import com.oborodulin.home.di.ApplicationInjector
 import com.oborodulin.home.common.util.ReleaseTree
 import com.oborodulin.home.common.util.ResourceUtils
 import com.oborodulin.home.common.util.setLocale
-import com.orhanobut.logger.AndroidLogAdapter
+import com.oborodulin.home.data.local.db.HomeDatabase
+import com.oborodulin.home.data.util.dbVersion
+import com.oborodulin.home.di.ApplicationInjector
 import com.orhanobut.logger.FormatStrategy
-import com.orhanobut.logger.Logger
 import com.orhanobut.logger.PrettyFormatStrategy
 import dagger.hilt.android.HiltAndroidApp
-//import com.oborodulin.home.domain.rate.RateRepository
-//import com.oborodulin.home.domain.service.ServiceRepository
 import timber.log.Timber
 import java.util.*
 
@@ -41,12 +41,12 @@ class HomeApplication : Application(), Configuration.Provider {
 
         if (BuildConfig.DEBUG) {
             Timber.plant(object : Timber.DebugTree() {
-             /*
-                @Override
-                override fun log(priority: Int, tag: String?, message: String, t: Throwable?) {
-                    Logger.log(priority, tag, message, t)
-                }
-*/
+                /*
+                   @Override
+                   override fun log(priority: Int, tag: String?, message: String, t: Throwable?) {
+                       Logger.log(priority, tag, message, t)
+                   }
+   */
                 @Override
                 override fun createStackElementTag(element: StackTraceElement): String? {
                     return String.format(
@@ -60,9 +60,21 @@ class HomeApplication : Application(), Configuration.Provider {
         } else {
             Timber.plant(ReleaseTree())
         }
-        val languages = ResourceUtils.getHashMapResource(this, com.oborodulin.home.common.R.xml.languages)
+        val languages =
+            ResourceUtils.getHashMapResource(this, com.oborodulin.home.common.R.xml.languages)
         Timber.tag(TAG)
-            .i("Version ${BuildConfig.VERSION_NAME} is starting [${Locale.getDefault().language}]")
+            .i(
+                "Version %s is starting [%s]. Database v.%s",
+                BuildConfig.VERSION_NAME,
+                Locale.getDefault().language,
+                dbVersion()
+            )
+        Timber.tag(TAG)
+            .i(
+                "Framework (API %s) SQLite version: %s",
+                android.os.Build.VERSION.SDK_INT,
+                HomeDatabase.sqliteVersion()
+            )
         initialiseDagger()
         Timber.tag(TAG).i("Initialized")
     }

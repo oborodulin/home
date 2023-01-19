@@ -38,9 +38,8 @@ import com.oborodulin.home.common.ui.theme.HomeComposableTheme
 import com.oborodulin.home.common.ui.theme.Typography
 import kotlinx.coroutines.flow.collectLatest
 import timber.log.Timber
-import java.text.DateFormat
 import java.text.DecimalFormat
-import java.util.*
+import java.time.format.DateTimeFormatter
 
 /**
  * Created by tfakioglu on 12.December.2021
@@ -114,7 +113,7 @@ private fun AccountingView(
                         .clip(RoundedCornerShape(30.dp))
                         .weight(4f)
                 ) {
-                    //PrevServiceMeterValues(accountingModel = it, viewModel = meterValueViewModel)
+                    PrevServiceMeterValues(accountingModel = it, viewModel = meterValueViewModel)
                 }
                 Box(
                     modifier = Modifier
@@ -161,14 +160,14 @@ fun PrevServiceMeterValues(
                 Column(
                     modifier = Modifier
                         .fillMaxHeight()
-                        .width(80.dp),
+                        .width(85.dp),
                     horizontalAlignment = Alignment.CenterHorizontally,
                     verticalArrangement = Arrangement.Bottom
                 ) {
                     meterValue.prevLastDate?.let {
                         Text(
-                            text = DateFormat.getDateInstance(DateFormat.SHORT, Locale.GERMAN)
-                                .format(it)
+                            text = it.format(DateTimeFormatter.ISO_LOCAL_DATE)
+                            //DateFormat.getDateInstance(DateFormat.SHORT, Locale.GERMAN).format(it)
                         )
                     }
                     Divider(thickness = 1.dp)
@@ -183,7 +182,7 @@ fun PrevServiceMeterValues(
                 Column(
                     modifier = Modifier
                         .fillMaxHeight()
-                        .width(50.dp),
+                        .width(45.dp),
                     verticalArrangement = Arrangement.Bottom
                 ) {
                     meterValue.measureUnit?.let { Text(text = it) }

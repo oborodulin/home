@@ -86,4 +86,5 @@ dependencies {
     androidTestImplementation deps.dagger.testing
     androidTestImplementation deps.kotlinx.coroutinesTest
     androidTestImplementation deps.test.espressoCore
+    androidTestImplementation deps.test.turbine
 }

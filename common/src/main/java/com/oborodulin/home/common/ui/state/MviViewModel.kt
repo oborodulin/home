@@ -26,7 +26,7 @@ abstract class MviViewModel<T : Any, S : UiState<T>, A : UiAction, E : UiSingleE
     }
 
     init {
-        Timber.tag(TAG).d("init")
+        Timber.tag(TAG).d("init called")
         viewModelScope.launch(errorHandler) {
             Timber.tag(TAG).d("init: Start actionFlow.collect")
             actionFlow.collect {

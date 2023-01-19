@@ -39,6 +39,20 @@ data class MeterTlEntity(
             metersId = meterId
         )
     }
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (javaClass != other?.javaClass) return false
+
+        other as MeterTlEntity
+        if (meterTlId != other.meterTlId) return false
+
+        return true
+    }
+
+    override fun hashCode(): Int {
+        return meterTlId.hashCode()
+    }
 }
 
 

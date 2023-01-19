@@ -76,27 +76,41 @@ class RateEntity(
             servicesId = serviceId, rateValue = BigDecimal.valueOf(77.67)
         )
 
-        fun populateRentRateForPayer(serviceId: UUID, payersServiceId: UUID? = null) = RateEntity(
+        fun populateRentRateForPayer(serviceId: UUID, payersServiceId: UUID) = RateEntity(
             servicesId = serviceId, payersServicesId = payersServiceId,
             rateValue = BigDecimal.valueOf(4.62)
         )
 
-        fun populateHeatingRateForPayer(serviceId: UUID, payersServiceId: UUID? = null) =
+        fun populateHeatingRateForPayer(serviceId: UUID, payersServiceId: UUID) =
             RateEntity(
                 servicesId = serviceId, payersServicesId = payersServiceId,
                 rateValue = BigDecimal.valueOf(14.76)
             )
 
-        fun populateGarbageRateForPayer(serviceId: UUID, payersServiceId: UUID? = null) =
+        fun populateGarbageRateForPayer(serviceId: UUID, payersServiceId: UUID) =
             RateEntity(
                 servicesId = serviceId, payersServicesId = payersServiceId,
                 isPerPerson = true, rateValue = BigDecimal.valueOf(15.73)
             )
 
-        fun populateDoorphoneRateForPayer(serviceId: UUID, payersServiceId: UUID? = null) =
+        fun populateDoorphoneRateForPayer(serviceId: UUID, payersServiceId: UUID) =
             RateEntity(
                 servicesId = serviceId, payersServicesId = payersServiceId,
                 isPerPerson = true, rateValue = BigDecimal.valueOf(15.73)
             )
+    }
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (javaClass != other?.javaClass) return false
+
+        other as RateEntity
+        if (rateId != other.rateId) return false
+
+        return true
+    }
+
+    override fun hashCode(): Int {
+        return rateId.hashCode()
     }
 }

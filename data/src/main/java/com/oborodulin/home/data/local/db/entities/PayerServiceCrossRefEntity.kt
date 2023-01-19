@@ -29,4 +29,18 @@ data class PayerServiceCrossRefEntity(
     companion object {
         const val TABLE_NAME = "payers_services"
     }
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (javaClass != other?.javaClass) return false
+
+        other as PayerServiceCrossRefEntity
+        if (payerServiceId != other.payerServiceId) return false
+
+        return true
+    }
+
+    override fun hashCode(): Int {
+        return payerServiceId.hashCode()
+    }
 }
