@@ -2,10 +2,16 @@ package com.oborodulin.home.common.ui.components.field
 
 import android.content.res.Configuration
 import androidx.annotation.StringRes
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material.*
+import androidx.compose.material.MaterialTheme
+import androidx.compose.material.OutlinedTextField
+import androidx.compose.material.Surface
+import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -71,7 +77,9 @@ fun TextFieldComponent(
 fun PreviewTextFieldComponent() {
     HomeComposableTheme {
         Surface {
-            TextFieldComponent(modifier = Modifier.fillMaxWidth().height(60.dp),
+            TextFieldComponent(modifier = Modifier
+                .fillMaxWidth()
+                .height(60.dp),
                 inputWrapper = InputWrapper(
                     value = stringResource(R.string.preview_blank_text_field_val),
                     errorId = R.string.preview_blank_text_field_err

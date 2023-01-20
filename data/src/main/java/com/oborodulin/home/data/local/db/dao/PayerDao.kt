@@ -13,7 +13,7 @@ import java.util.*
 @Dao
 interface PayerDao {
     // READS:
-    @Query("SELECT * FROM payers")
+    @Query("SELECT * FROM payers ORDER BY isFavorite DESC")
     fun findAll(): Flow<List<PayerEntity>>
 
     @ExperimentalCoroutinesApi
@@ -26,7 +26,7 @@ interface PayerDao {
     fun findByIdDistinctUntilChanged(id: UUID) = findById(id).distinctUntilChanged()
 
     @Transaction
-    @Query("SELECT * FROM payers")
+    @Query("SELECT * FROM payers ORDER BY isFavorite DESC")
     fun findPayersWithServices(): List<PayerWithServices>
 
     // INSERTS:

@@ -501,7 +501,7 @@ abstract class HomeDatabase : RoomDatabase() {
                 )
                 // meter values:
                 insertDefMeterValue(
-                    db, MeterValueEntity.populateElectricityMeterValue2(
+                    db, MeterValueEntity.populateElectricityMeterValue1(
                         electricityPayer2Meter.meterId,
                         currentDateTime.minusMonths(2).withDayOfMonth(1)
                     )
@@ -527,7 +527,7 @@ abstract class HomeDatabase : RoomDatabase() {
                 )
                 // meter values:
                 insertDefMeterValue(
-                    db, MeterValueEntity.populateColdWaterMeterValue2(
+                    db, MeterValueEntity.populateColdWaterMeterValue1(
                         coldWaterPayer2Meter.meterId,
                         currentDateTime.minusMonths(2).withDayOfMonth(1)
                     )
@@ -550,6 +550,25 @@ abstract class HomeDatabase : RoomDatabase() {
                 insertDefMeter(
                     db, hotWaterPayer2Meter,
                     MeterTlEntity.populateHotWaterMeterTl(context, hotWaterPayer2Meter.meterId)
+                )
+                // meter values:
+                insertDefMeterValue(
+                    db, MeterValueEntity.populateHotWaterMeterValue1(
+                        hotWaterPayer2Meter.meterId,
+                        currentDateTime.minusMonths(2).withDayOfMonth(1)
+                    )
+                )
+                insertDefMeterValue(
+                    db, MeterValueEntity.populateHotWaterMeterValue2(
+                        hotWaterPayer2Meter.meterId,
+                        currentDateTime.minusMonths(1).withDayOfMonth(1)
+                    )
+                )
+                insertDefMeterValue(
+                    db, MeterValueEntity.populateHotWaterMeterValue3(
+                        hotWaterPayer2Meter.meterId,
+                        currentDateTime.withDayOfMonth(1)
+                    )
                 )
                 // Payer 2 rates:
                 // rent

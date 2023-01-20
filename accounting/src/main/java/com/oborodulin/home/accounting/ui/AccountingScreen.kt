@@ -1,12 +1,9 @@
 package com.oborodulin.home.accounting.ui
 
 import android.content.res.Configuration
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
+import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Divider
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
@@ -36,6 +33,7 @@ import com.oborodulin.home.common.ui.state.CommonScreen
 import com.oborodulin.home.common.ui.state.UiState
 import com.oborodulin.home.common.ui.theme.HomeComposableTheme
 import com.oborodulin.home.common.ui.theme.Typography
+import com.oborodulin.home.data.util.ServiceType
 import kotlinx.coroutines.flow.collectLatest
 import timber.log.Timber
 import java.text.DecimalFormat
@@ -63,6 +61,7 @@ fun AccountingScreen(
         AccountingView(
             state = state,
             navController = navController,
+            accountingViewModel = viewModel,
             payersListViewModel = payersListViewModel,
             meterValueViewModel = meterValueViewModel,
         )
@@ -84,6 +83,7 @@ fun AccountingScreen(
 private fun AccountingView(
     state: UiState<AccountingModel>,
     navController: NavHostController,
+    accountingViewModel: AccountingViewModel,
     payersListViewModel: PayersListViewModel,
     meterValueViewModel: MeterValueViewModel
 ) {
@@ -93,34 +93,56 @@ private fun AccountingView(
             Column(
                 modifier = Modifier
                     .fillMaxSize()
-                    .background(MaterialTheme.colors.surface),
+                    .background(
+                        MaterialTheme.colors.surface,
+                        shape = RoundedCornerShape(20.dp)
+                    ),
                 horizontalAlignment = Alignment.CenterHorizontally
             )
             {
                 Box(
                     modifier = Modifier
-                        .clip(RoundedCornerShape(30.dp))
+                        .padding(vertical = 4.dp)
+                        .clip(RoundedCornerShape(16.dp))
+                        //.background(MaterialTheme.colors.background, shape = RoundedCornerShape(20.dp))
                         .weight(5f)
+                        .border(
+                            2.dp,
+                            MaterialTheme.colors.primary,
+                            shape = RoundedCornerShape(16.dp)
+                        )
                 ) {
                     PayersListView(
                         viewModel = payersListViewModel,
-                        accountingViewModel = AccountingViewModelImp.previewModel(LocalContext.current),
+                        accountingViewModel = accountingViewModel,
                         navController = navController
                     )
                 }
                 Box(
                     modifier = Modifier
-                        .clip(RoundedCornerShape(30.dp))
+                        .padding(vertical = 4.dp)
+                        .clip(RoundedCornerShape(16.dp))
                         .weight(4f)
+                        .border(
+                            2.dp,
+                            MaterialTheme.colors.primary,
+                            shape = RoundedCornerShape(16.dp)
+                        )
                 ) {
                     PrevServiceMeterValues(accountingModel = it, viewModel = meterValueViewModel)
                 }
                 Box(
                     modifier = Modifier
-                        .clip(RoundedCornerShape(30.dp))
+                        .padding(vertical = 4.dp)
+                        .clip(RoundedCornerShape(16.dp))
                         .weight(1f)
+                        .border(
+                            2.dp,
+                            MaterialTheme.colors.primary,
+                            shape = RoundedCornerShape(16.dp)
+                        )
                 ) {
-
+                    Text(text = "Итого:")
                 }
             }
         }
@@ -139,6 +161,8 @@ fun PrevServiceMeterValues(
         modifier = Modifier
             .fillMaxWidth()
             .fillMaxHeight()
+            .clip(RoundedCornerShape(16.dp))
+            .background(MaterialTheme.colors.background, shape = RoundedCornerShape(16.dp))
             .padding(vertical = 8.dp)
             .verticalScroll(rememberScrollState())
     ) {
@@ -152,10 +176,18 @@ fun PrevServiceMeterValues(
                 horizontalArrangement = Arrangement.Start
             ) {
                 Column(modifier = Modifier.width(95.dp)) {
-                    Text(
-                        text = meterValue.name,
-                        style = Typography.body1.copy(fontWeight = FontWeight.Bold)
-                    )
+                    Column(
+                        modifier = Modifier.fillMaxSize(),
+                        verticalArrangement = Arrangement.Top
+                    ) {
+                        Spacer(modifier = Modifier.height(8.dp))
+                        serviceIcon(meterValue.type)
+                        Spacer(modifier = Modifier.height(4.dp))
+                        Text(
+                            text = meterValue.name,
+                            style = Typography.body1.copy(fontWeight = FontWeight.Bold)
+                        )
+                    }
                 }
                 Column(
                     modifier = Modifier
@@ -171,7 +203,7 @@ fun PrevServiceMeterValues(
                         )
                     }
                     Divider(thickness = 1.dp)
-                    Spacer(modifier = Modifier.height(10.dp))
+                    Spacer(modifier = Modifier.height(8.dp))
                     meterValue.prevValue?.let {
                         Text(
                             text = DecimalFormat(meterValue.valueFormat).format(it),
@@ -192,7 +224,7 @@ fun PrevServiceMeterValues(
                     modifier = Modifier.fillMaxSize(),
                     verticalArrangement = Arrangement.Top
                 ) {
-                    Spacer(modifier = Modifier.height(10.dp))
+                    Spacer(modifier = Modifier.height(8.dp))
                     Image(
                         modifier = Modifier
                             .padding(4.dp)
@@ -202,7 +234,7 @@ fun PrevServiceMeterValues(
                         painter = painterResource(R.drawable.outline_photo_camera_black_24),
                         contentDescription = ""
                     )
-                    Spacer(modifier = Modifier.height(5.dp))
+                    Spacer(modifier = Modifier.height(4.dp))
                     Image(
                         modifier = Modifier
                             .padding(4.dp)
@@ -218,6 +250,40 @@ fun PrevServiceMeterValues(
     }
 }
 
+@Composable
+fun serviceIcon(serviceType: ServiceType?) =
+    when (serviceType) {
+        ServiceType.ELECRICITY -> Image(
+            modifier = Modifier
+                .padding(4.dp)
+                .clip(RoundedCornerShape(8.dp)),
+            painter = painterResource(com.oborodulin.home.presentation.R.drawable.outline_electric_bolt_black_36),
+            contentDescription = ""
+        )
+        ServiceType.COLD_WATER -> Image(
+            modifier = Modifier
+                .padding(4.dp)
+                .clip(RoundedCornerShape(8.dp)),
+            painter = painterResource(com.oborodulin.home.presentation.R.drawable.outline_water_drop_black_36),
+            contentDescription = ""
+        )
+        ServiceType.HOT_WATER -> Image(
+            modifier = Modifier
+                .padding(4.dp)
+                .clip(RoundedCornerShape(8.dp)),
+            painter = painterResource(com.oborodulin.home.presentation.R.drawable.outline_opacity_black_36),
+            contentDescription = ""
+        )
+        ServiceType.HEATING -> Image(
+            modifier = Modifier
+                .padding(4.dp)
+                .clip(RoundedCornerShape(8.dp)),
+            painter = painterResource(com.oborodulin.home.presentation.R.drawable.ic_radiator_36),
+            contentDescription = ""
+        )
+        else -> {}
+    }
+
 @Preview(name = "Night Mode", showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
 @Preview(name = "Day Mode", showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_NO)
 @Composable
@@ -225,6 +291,7 @@ fun PreviewAccountingView() {
     AccountingView(
         state = UiState.Success(AccountingViewModelImp.previewAccountingModel(LocalContext.current)),
         navController = rememberNavController(),
+        accountingViewModel = AccountingViewModelImp.previewModel(LocalContext.current),
         payersListViewModel = PayersListViewModelImp.previewModel(LocalContext.current),
         meterValueViewModel = MeterValueViewModelImp.previewModel
     )

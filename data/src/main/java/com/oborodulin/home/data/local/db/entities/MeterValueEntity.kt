@@ -4,7 +4,6 @@ import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.PrimaryKey
-import com.oborodulin.home.common.util.Utils
 import java.math.BigDecimal
 import java.time.OffsetDateTime
 import java.util.*
@@ -85,6 +84,36 @@ data class MeterValueEntity(
             metersId = meterId,
             valueDate = valueDate,
             meterValue = meterValue ?: BigDecimal.valueOf(1553)
+        )
+
+        fun populateHotWaterMeterValue1(
+            meterId: UUID,
+            valueDate: OffsetDateTime,
+            meterValue: BigDecimal? = null
+        ) = MeterValueEntity(
+            metersId = meterId,
+            valueDate = valueDate,
+            meterValue = meterValue ?: BigDecimal.valueOf(2156)
+        )
+
+        fun populateHotWaterMeterValue2(
+            meterId: UUID,
+            valueDate: OffsetDateTime,
+            meterValue: BigDecimal? = null
+        ) = MeterValueEntity(
+            metersId = meterId,
+            valueDate = valueDate,
+            meterValue = meterValue ?: BigDecimal.valueOf(2160)
+        )
+
+        fun populateHotWaterMeterValue3(
+            meterId: UUID,
+            valueDate: OffsetDateTime,
+            meterValue: BigDecimal? = null
+        ) = MeterValueEntity(
+            metersId = meterId,
+            valueDate = valueDate,
+            meterValue = meterValue ?: BigDecimal.valueOf(2166)
         )
     }
 

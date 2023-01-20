@@ -12,7 +12,7 @@ import java.util.*
             "sv.type, sv.name, sv.pos, mv.meterId, IFNULL(mv.measureUnit, sv.measureUnit) AS measureUnit, " +
             "IFNULL(mvl.valueDate, datetime('now')) AS prevLastDate, mvl.meterValue AS prevValue, p.isFavorite, " +
             "mv.localeCode AS meterlocaleCode, sv.localeCode AS servicelocaleCode, " +
-            "substr('#0.' || '0000000000', 1, 3+(length(cast(mv.maxValue as text)) -  " +
+            "substr('#0.' || '0000000000', 1, 3 + (length(cast(mv.maxValue as text)) -  " +
             "CASE WHEN instr(cast(mv.maxValue as text), '.') = 0 THEN length(cast(mv.maxValue as text)) + 1 ELSE instr(cast(mv.maxValue as text), '.') END)) AS valueFormat  " +
             "FROM meters_view AS mv JOIN services_view AS sv ON sv.serviceId = mv.servicesId  " +
             "JOIN meter_values AS mvl ON mvl.metersId = mv.meterId  " +
