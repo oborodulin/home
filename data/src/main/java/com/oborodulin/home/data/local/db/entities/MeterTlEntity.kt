@@ -38,6 +38,11 @@ data class MeterTlEntity(
             measureUnit = ctx.resources.getString(com.oborodulin.home.common.R.string.m3_unit),
             metersId = meterId
         )
+
+        fun populateHeatingMeterTl(ctx: Context, meterId: UUID) = MeterTlEntity(
+            measureUnit = ctx.resources.getString(com.oborodulin.home.common.R.string.Gcalm2_unit),
+            metersId = meterId
+        )
     }
 
     override fun equals(other: Any?): Boolean {

@@ -11,6 +11,7 @@
     <string name="m3_unit">м3</string>
     <string name="kWh_unit">КВт*ч</string>
     <string name="Gcal_unit">Гкал</string>
+    <string name="Gcalm2_unit">Гкал/м2</string>
     <string name="GJ_unit">ГДж</string>
     <string name="MWh_unit">МВт*ч</string>
 

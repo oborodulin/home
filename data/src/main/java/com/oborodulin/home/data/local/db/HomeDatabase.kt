@@ -14,9 +14,7 @@ import com.oborodulin.home.data.local.db.dao.PayerDao
 import com.oborodulin.home.data.local.db.dao.RateDao
 import com.oborodulin.home.data.local.db.dao.ServiceDao
 import com.oborodulin.home.data.local.db.entities.*
-import com.oborodulin.home.data.local.db.views.MetersView
-import com.oborodulin.home.data.local.db.views.PrevMetersValuesView
-import com.oborodulin.home.data.local.db.views.ServicesView
+import com.oborodulin.home.data.local.db.views.*
 import com.oborodulin.home.data.util.Constants
 import kotlinx.coroutines.*
 import timber.log.Timber
@@ -60,7 +58,8 @@ private val MIGRATION_4_5 = object : Migration(4, 5) {
         RateEntity::class, RatePromotionEntity::class,
         MeterEntity::class, MeterTlEntity::class, MeterValueEntity::class, MeterVerificationEntity::class,
         ReceiptEntity::class],
-    views = [MetersView::class, ServicesView::class, PrevMetersValuesView::class],
+    views = [MetersView::class, ServicesView::class, PrevMetersValuesView::class, LastMetersValuesView::class,
+            PaymentMetersValuesView::class],
     version = 5
 )
 @TypeConverters(HomeTypeConverters::class)
@@ -170,7 +169,7 @@ abstract class HomeDatabase : RoomDatabase() {
                 .i("Database onCreate() ended on thread '%s':", Thread.currentThread().name)
         }
 
-        private suspend fun prePopulateDb(db: SupportSQLiteDatabase) {
+        private fun prePopulateDb(db: SupportSQLiteDatabase) {
             Timber.tag(TAG).i("prePopulateDb(...) called")
             db.beginTransaction()
             try {
@@ -183,7 +182,7 @@ abstract class HomeDatabase : RoomDatabase() {
                     Mapper.toContentValues(payer1Entity)
                 )
                 Timber.tag(TAG)
-                    .i("Default 1 PayerEntity imported: {${jsonLogger?.toJson(payer1Entity)}}")
+                    .i("Default 1 PayerEntity imported: {%s}", jsonLogger?.toJson(payer1Entity))
                 // 2
                 val payer2Entity = PayerEntity.populatePayer2(context)
                 db.insert(
@@ -192,7 +191,7 @@ abstract class HomeDatabase : RoomDatabase() {
                     Mapper.toContentValues(payer2Entity)
                 )
                 Timber.tag(TAG)
-                    .i("Default 2 PayerEntity imported: {${jsonLogger?.toJson(payer2Entity)}}")
+                    .i("Default 2 PayerEntity imported: {%s}", jsonLogger?.toJson(payer2Entity))
                 // Default services:
                 // rent
                 val rentService = ServiceEntity.populateRentService();
@@ -277,6 +276,8 @@ abstract class HomeDatabase : RoomDatabase() {
                 insertDefRate(db, RateEntity.populateGasRate(gasService.serviceId))
                 // cold water
                 insertDefRate(db, RateEntity.populateColdWaterRate(coldWaterService.serviceId))
+                // heating
+                insertDefRate(db, RateEntity.populateHeatingRate(heatingService.serviceId))
                 // waste
                 insertDefRate(db, RateEntity.populateWasteRate(wasteService.serviceId))
                 // hot water
@@ -330,7 +331,7 @@ abstract class HomeDatabase : RoomDatabase() {
                 val ugsoPayer1ServiceId =
                     insertPayerService(db, payer = payer1Entity, serviceId = ugsoService.serviceId)
                 // Meters:
-                // electricity
+                // Electricity
                 val electricityPayer1Meter =
                     MeterEntity.populateElectricityMeter(context, electricityPayer1ServiceId)
                 insertDefMeter(
@@ -340,7 +341,7 @@ abstract class HomeDatabase : RoomDatabase() {
                         electricityPayer1Meter.meterId
                     )
                 )
-                // meter values:
+                // values:
                 insertDefMeterValue(
                     db, MeterValueEntity.populateElectricityMeterValue1(
                         electricityPayer1Meter.meterId,
@@ -359,14 +360,14 @@ abstract class HomeDatabase : RoomDatabase() {
                         currentDateTime.withDayOfMonth(1)
                     )
                 )
-                // cold water
+                // Cold water
                 val coldWaterPayer1Meter =
                     MeterEntity.populateColdWaterMeter(context, coldWaterPayer1ServiceId)
                 insertDefMeter(
                     db, coldWaterPayer1Meter,
                     MeterTlEntity.populateColdWaterMeterTl(context, coldWaterPayer1Meter.meterId)
                 )
-                // meter values:
+                // values:
                 insertDefMeterValue(
                     db, MeterValueEntity.populateColdWaterMeterValue1(
                         coldWaterPayer1Meter.meterId,
@@ -385,12 +386,41 @@ abstract class HomeDatabase : RoomDatabase() {
                         currentDateTime.withDayOfMonth(1)
                     )
                 )
-                // hot water
+                // Hot water
                 val hotWaterPayer1Meter =
                     MeterEntity.populateHotWaterMeter(context, hotWaterPayer1ServiceId)
                 insertDefMeter(
                     db, hotWaterPayer1Meter,
                     MeterTlEntity.populateHotWaterMeterTl(context, hotWaterPayer1Meter.meterId)
+                )
+                // Heating
+                val heatingPayer1Meter =
+                    MeterEntity.populateHeatingMeter(context, heatingPayer1ServiceId)
+                insertDefMeter(
+                    db, heatingPayer1Meter,
+                    MeterTlEntity.populateHeatingMeterTl(
+                        context,
+                        heatingPayer1Meter.meterId
+                    )
+                )
+                // values:
+                insertDefMeterValue(
+                    db, MeterValueEntity.populateHeatingMeterValue1(
+                        heatingPayer1Meter.meterId,
+                        currentDateTime.minusMonths(2).withDayOfMonth(1)
+                    )
+                )
+                insertDefMeterValue(
+                    db, MeterValueEntity.populateHeatingMeterValue2(
+                        heatingPayer1Meter.meterId,
+                        currentDateTime.minusMonths(1).withDayOfMonth(1)
+                    )
+                )
+                insertDefMeterValue(
+                    db, MeterValueEntity.populateHeatingMeterValue3(
+                        heatingPayer1Meter.meterId,
+                        currentDateTime.withDayOfMonth(1)
+                    )
                 )
                 // Payer 1 rates:
                 // rent
@@ -401,12 +431,6 @@ abstract class HomeDatabase : RoomDatabase() {
                     )
                 )
                 // heating
-                insertDefRate(
-                    db, RateEntity.populateHeatingRateForPayer(
-                        heatingService.serviceId,
-                        heatingPayer1ServiceId
-                    )
-                )
                 // garbage
                 insertDefRate(
                     db, RateEntity.populateGarbageRateForPayer(
@@ -434,11 +458,9 @@ abstract class HomeDatabase : RoomDatabase() {
                 )
                 Timber.tag(TAG)
                     .i(
-                        "Default rate promotion imported: {${
-                            jsonLogger?.toJson(
-                                doorphoneRatePromotion
-                            )
-                        }}"
+                        "Default rate promotion imported: {%s}", jsonLogger?.toJson(
+                            doorphoneRatePromotion
+                        )
                     )
 
                 // ==============================
@@ -489,7 +511,7 @@ abstract class HomeDatabase : RoomDatabase() {
                 val ugsoPayer2ServiceId =
                     insertPayerService(db, payer = payer2Entity, serviceId = ugsoService.serviceId)
                 // Meters:
-                // electricity
+                // Electricity
                 val electricityPayer2Meter =
                     MeterEntity.populateElectricityMeter(context, electricityPayer2ServiceId)
                 insertDefMeter(
@@ -499,7 +521,7 @@ abstract class HomeDatabase : RoomDatabase() {
                         electricityPayer2Meter.meterId
                     )
                 )
-                // meter values:
+                // values:
                 insertDefMeterValue(
                     db, MeterValueEntity.populateElectricityMeterValue1(
                         electricityPayer2Meter.meterId,
@@ -518,14 +540,14 @@ abstract class HomeDatabase : RoomDatabase() {
                         currentDateTime.withDayOfMonth(1)
                     )
                 )
-                // cold water
+                // Cold water
                 val coldWaterPayer2Meter =
                     MeterEntity.populateColdWaterMeter(context, coldWaterPayer2ServiceId)
                 insertDefMeter(
                     db, coldWaterPayer2Meter,
                     MeterTlEntity.populateColdWaterMeterTl(context, coldWaterPayer2Meter.meterId)
                 )
-                // meter values:
+                // values:
                 insertDefMeterValue(
                     db, MeterValueEntity.populateColdWaterMeterValue1(
                         coldWaterPayer2Meter.meterId,
@@ -544,14 +566,14 @@ abstract class HomeDatabase : RoomDatabase() {
                         currentDateTime.withDayOfMonth(1)
                     )
                 )
-                // hot water
+                // Hot water
                 val hotWaterPayer2Meter =
                     MeterEntity.populateHotWaterMeter(context, hotWaterPayer2ServiceId)
                 insertDefMeter(
                     db, hotWaterPayer2Meter,
                     MeterTlEntity.populateHotWaterMeterTl(context, hotWaterPayer2Meter.meterId)
                 )
-                // meter values:
+                // values:
                 insertDefMeterValue(
                     db, MeterValueEntity.populateHotWaterMeterValue1(
                         hotWaterPayer2Meter.meterId,
@@ -636,8 +658,9 @@ abstract class HomeDatabase : RoomDatabase() {
             )
             Timber.tag(TAG)
                 .i(
-                    "Default service imported: {\"service\": {${jsonLogger?.toJson(service)}}, " +
-                            "\"tl\": {${jsonLogger?.toJson(textContent)}}}"
+                    "Default service imported: {\"service\": {%s}, \"tl\": {%s}}",
+                    jsonLogger?.toJson(service),
+                    jsonLogger?.toJson(textContent)
                 )
         }
 
@@ -655,7 +678,8 @@ abstract class HomeDatabase : RoomDatabase() {
             )
             Timber.tag(TAG)
                 .i(
-                    "Payer service imported: {\"payerService\": {${jsonLogger?.toJson(payerService)}}}"
+                    "Payer service imported: {\"payerService\": {%s}}",
+                    jsonLogger?.toJson(payerService)
                 )
             return payerService.payerServiceId
         }
@@ -675,8 +699,9 @@ abstract class HomeDatabase : RoomDatabase() {
                 Mapper.toContentValues(textContent)
             )
             Timber.tag(TAG).i(
-                "Default meter imported: {\"meter\": {${jsonLogger?.toJson(meter)}}, " +
-                        "\"tl\": {${jsonLogger?.toJson(textContent)}}}"
+                "Default meter imported: {\"meter\": {%s}, \"tl\": {%s}}",
+                jsonLogger?.toJson(meter),
+                jsonLogger?.toJson(textContent)
             )
         }
 
@@ -689,7 +714,7 @@ abstract class HomeDatabase : RoomDatabase() {
                 SQLiteDatabase.CONFLICT_REPLACE,
                 Mapper.toContentValues(meterValue)
             )
-            Timber.tag(TAG).i("Default meter value imported: {${jsonLogger?.toJson(meterValue)}}")
+            Timber.tag(TAG).i("Default meter value imported: {%s}", jsonLogger?.toJson(meterValue))
         }
 
         private fun insertDefRate(db: SupportSQLiteDatabase, rate: RateEntity): UUID {
@@ -698,7 +723,7 @@ abstract class HomeDatabase : RoomDatabase() {
                 SQLiteDatabase.CONFLICT_REPLACE,
                 Mapper.toContentValues(rate)
             )
-            Timber.tag(TAG).i("Default rate imported: {${jsonLogger?.toJson(rate)}}")
+            Timber.tag(TAG).i("Default rate imported: {%s}", jsonLogger?.toJson(rate))
             return rate.rateId
         }
     }

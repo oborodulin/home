@@ -6,6 +6,8 @@ package com.oborodulin.home.data.util
 object Constants {
     const val DATABASE_NAME = "home-database.sqlite"
 
+    const val DEF_PAYMENT_DAY = 20
+
     const val TMDB_BASE_URL = "https://api.themoviedb.org/3/"
 
     private const val IMAGE_BASE_URL = "https://image.tmdb.org/t/p/"

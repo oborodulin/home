@@ -4,6 +4,7 @@ import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.PrimaryKey
+import java.math.BigDecimal
 import java.time.OffsetDateTime
 import java.util.*
 
@@ -20,6 +21,8 @@ data class MeterVerificationEntity(
     @PrimaryKey var meterVerificationId: UUID = UUID.randomUUID(),
     val startDate: OffsetDateTime = OffsetDateTime.now(),
     val endDate: OffsetDateTime?,
+    val startMeterValue: BigDecimal,
+    val endMeterValue: BigDecimal? = null,
     val isOk: Boolean = false,
     @ColumnInfo(index = true) var metersId: UUID,
 ) {

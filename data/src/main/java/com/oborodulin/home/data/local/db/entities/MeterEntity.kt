@@ -46,6 +46,12 @@ data class MeterEntity(
             payersServicesId = payersServiceId,
             maxValue = BigDecimal.valueOf(99999.999)
         )
+
+        fun populateHeatingMeter(ctx: Context, payersServiceId: UUID) = MeterEntity(
+            num = ctx.resources.getString(R.string.def_meter_num),
+            payersServicesId = payersServiceId,
+            maxValue = BigDecimal.valueOf(9.99999)
+        )
     }
 
     override fun equals(other: Any?): Boolean {

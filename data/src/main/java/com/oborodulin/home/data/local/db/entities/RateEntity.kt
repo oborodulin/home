@@ -72,6 +72,16 @@ class RateEntity(
             servicesId = serviceId, rateValue = BigDecimal.valueOf(11.61)
         )
 
+        fun populateHeatingRate(serviceId: UUID) = RateEntity(
+            servicesId = serviceId, rateValue = BigDecimal.valueOf(1160.33)
+        )
+
+        fun populateHeatingRateForPayer(serviceId: UUID, payersServiceId: UUID) =
+            RateEntity(
+                servicesId = serviceId, payersServicesId = payersServiceId,
+                rateValue = BigDecimal.valueOf(14.76)
+            )
+
         fun populateHotWaterRate(serviceId: UUID) = RateEntity(
             servicesId = serviceId, rateValue = BigDecimal.valueOf(77.67)
         )
@@ -80,12 +90,6 @@ class RateEntity(
             servicesId = serviceId, payersServicesId = payersServiceId,
             rateValue = BigDecimal.valueOf(4.62)
         )
-
-        fun populateHeatingRateForPayer(serviceId: UUID, payersServiceId: UUID) =
-            RateEntity(
-                servicesId = serviceId, payersServicesId = payersServiceId,
-                rateValue = BigDecimal.valueOf(14.76)
-            )
 
         fun populateGarbageRateForPayer(serviceId: UUID, payersServiceId: UUID) =
             RateEntity(

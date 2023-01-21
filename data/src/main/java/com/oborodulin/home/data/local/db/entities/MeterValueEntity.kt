@@ -115,6 +115,36 @@ data class MeterValueEntity(
             valueDate = valueDate,
             meterValue = meterValue ?: BigDecimal.valueOf(2166)
         )
+
+        fun populateHeatingMeterValue1(
+            meterId: UUID,
+            valueDate: OffsetDateTime,
+            meterValue: BigDecimal? = null
+        ) = MeterValueEntity(
+            metersId = meterId,
+            valueDate = valueDate,
+            meterValue = meterValue ?: BigDecimal.valueOf(0.02185)
+        )
+
+        fun populateHeatingMeterValue2(
+            meterId: UUID,
+            valueDate: OffsetDateTime,
+            meterValue: BigDecimal? = null
+        ) = MeterValueEntity(
+            metersId = meterId,
+            valueDate = valueDate,
+            meterValue = meterValue ?: BigDecimal.valueOf(0.02254)
+        )
+
+        fun populateHeatingMeterValue3(
+            meterId: UUID,
+            valueDate: OffsetDateTime,
+            meterValue: BigDecimal? = null
+        ) = MeterValueEntity(
+            metersId = meterId,
+            valueDate = valueDate,
+            meterValue = meterValue ?: BigDecimal.valueOf(0.02394)
+        )
     }
 
     override fun equals(other: Any?): Boolean {

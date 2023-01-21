@@ -3,6 +3,7 @@ package com.oborodulin.home.data.local.db.converters
 import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.room.TypeConverter
+import com.oborodulin.home.common.util.Constants.CONV_COEFF_BIGDECIMAL
 import com.oborodulin.home.data.util.ServiceType
 import java.math.BigDecimal
 import java.time.*
@@ -62,11 +63,11 @@ object HomeTypeConverters {
 
     @TypeConverter
     fun toBigDecimal(value: Long?): BigDecimal? =
-        value?.let { BigDecimal(it).divide(BigDecimal(1000)) }
+        value?.let { BigDecimal(it).divide(BigDecimal(CONV_COEFF_BIGDECIMAL)) }
 
     @TypeConverter
     fun fromBigDecimal(bigDecimal: BigDecimal?): Long? =
-        bigDecimal?.multiply(BigDecimal(1000))?.toLong()
+        bigDecimal?.multiply(BigDecimal(CONV_COEFF_BIGDECIMAL))?.toLong()
 
     @TypeConverter
     fun toServiceType(value: String) = enumValueOf<ServiceType>(value)
