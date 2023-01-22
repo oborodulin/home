@@ -2,6 +2,7 @@ package com.oborodulin.home.ui.main
 
 //import com.oborodulin.home.popular.PopularScreen
 //import com.oborodulin.home.upcoming.UpcomingScreen
+import android.content.Context
 import android.content.res.Configuration
 import android.widget.Toast
 import androidx.compose.foundation.layout.PaddingValues
@@ -10,10 +11,12 @@ import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.Menu
+import androidx.compose.material.icons.filled.Settings
+import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
@@ -40,6 +43,7 @@ import com.oborodulin.home.accounting.ui.AccountingScreen
 import com.oborodulin.home.accounting.ui.payer.single.PayerScreen
 import com.oborodulin.home.common.ui.components.FabComponent
 import com.oborodulin.home.common.ui.theme.SpeechRed
+import com.oborodulin.home.common.util.toast
 import com.oborodulin.home.presentation.navigation.NavRoutes
 import timber.log.Timber
 import kotlin.math.roundToInt
@@ -58,6 +62,11 @@ fun MainScreen() {
 @Composable
 fun SettingUpBottomNavigationBarAndCollapsing() {
     Timber.tag(TAG).d("SettingUpBottomNavigationBarAndCollapsing() called")
+    val context = LocalContext.current
+    var actionBarTitle by remember { mutableStateOf(context.getString(R.string.app_name)) }
+    var actionBarSubtitle by remember { mutableStateOf("") }
+
+    var currentRoute by remember { mutableStateOf("") }
 
     val bottomBarHeight = 56.dp
     val bottomBarHeightPx = with(LocalDensity.current) {
@@ -81,11 +90,49 @@ fun SettingUpBottomNavigationBarAndCollapsing() {
 
     val scaffoldState = rememberScaffoldState()
     val navController = rememberNavController()
+
+    LaunchedEffect(navController) {
+        navController.currentBackStackEntryFlow.collect { backStackEntry ->
+            // You can map the title based on the route using:
+            backStackEntry.destination.route?.let {
+                currentRoute = it
+                actionBarTitle = getTitleByRoute(context, it)
+            }
+        }
+    }
+    val showBackButton = when (currentRoute) {
+        NavRoutes.Payer.route -> true
+        else -> false
+    }
     Scaffold(modifier = Modifier.nestedScroll(nestedScrollConnection),
         scaffoldState = scaffoldState,
+        topBar = {
+            TopAppBar(
+                elevation = 4.dp,
+                title = { Text(actionBarTitle) },
+                backgroundColor = MaterialTheme.colors.primarySurface,
+                navigationIcon = {
+                    if (showBackButton) {
+                        IconButton(onClick = { navController.popBackStack() }) {
+                            Icon(Icons.Filled.ArrowBack, null)
+                        }
+                    } else {
+                        IconButton(onClick = { context.toast("Menu button clicked...") }) {
+                            Icon(Icons.Filled.Menu, null)
+                        }
+                    }
+                }, actions = {
+                    IconButton(onClick = { navController.navigate(NavRoutes.Payer.route) }) {
+                        Icon(Icons.Filled.Add, null)
+                    }
+                    IconButton(onClick = { context.toast("Settings button clicked...") }) {
+                        Icon(Icons.Filled.Settings, null)
+                    }
+                }
+            )
+        },
         floatingActionButtonPosition = FabPosition.End,
         floatingActionButton = {
-            val context = LocalContext.current
             FabComponent(text = "TODO", onClick = {
                 Toast.makeText(context, "Added Todo", Toast.LENGTH_SHORT).show()
             }
@@ -104,6 +151,17 @@ fun SettingUpBottomNavigationBarAndCollapsing() {
             navController,
             it
         )
+    }
+}
+
+fun getTitleByRoute(context: Context, route: String): String {
+    return when (route) {
+        NavRoutes.Accounting.route -> context.getString(NavRoutes.Accounting.titleResId)
+        NavRoutes.Payer.route -> context.getString(NavRoutes.Payer.titleResId)
+        NavRoutes.Billing.route -> context.getString(NavRoutes.Billing.titleResId)
+        NavRoutes.Metering.route -> context.getString(NavRoutes.Metering.titleResId)
+        NavRoutes.Reporting.route -> context.getString(NavRoutes.Reporting.titleResId)
+        else -> context.getString(R.string.app_name)
     }
 }
 

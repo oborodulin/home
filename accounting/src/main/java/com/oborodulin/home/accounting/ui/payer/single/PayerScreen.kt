@@ -26,7 +26,6 @@ import androidx.lifecycle.compose.ExperimentalLifecycleComposeApi
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.flowWithLifecycle
 import com.oborodulin.home.accounting.R
-import com.oborodulin.home.accounting.ui.meter.MeterValueViewModelImp
 import com.oborodulin.home.common.ui.components.field.ScreenEvent
 import com.oborodulin.home.common.ui.components.field.TextFieldComponent
 import com.oborodulin.home.common.ui.state.CommonScreen
@@ -41,9 +40,9 @@ fun PayerScreen(
     viewModel: PayerViewModelImp = hiltViewModel(),
     payerInput: PayerInput
 ) {
-    Timber.tag(TAG).d("PayerScreen(...) called: payerInput = %s".format(payerInput))
+    Timber.tag(TAG).d("PayerScreen(...) called: payerInput = %s", payerInput)
     viewModel.uiStateFlow.collectAsState().value.let { state ->
-        Timber.tag(TAG).d("Collect ui state flow: %s".format(state))
+        Timber.tag(TAG).d("Collect ui state flow: %s", state)
         CommonScreen(state) { payerModel ->
             Payer(viewModel) {
                 viewModel.submitAction(PayerUiAction.Save)
@@ -83,7 +82,7 @@ fun Payer(viewModel: PayerViewModel, onSubmit: () -> Unit) {
     LaunchedEffect(Unit) {
         Timber.tag(TAG).d("Payer: LaunchedEffect()")
         events.collect { event ->
-            Timber.tag(TAG).d("Collect input events flow: %s".format(event.javaClass.name))
+            Timber.tag(TAG).d("Collect input events flow: %s", event.javaClass.name)
             when (event) {
                 is ScreenEvent.ShowToast -> context.toast(event.messageId)
                 is ScreenEvent.UpdateKeyboard -> {
@@ -127,7 +126,7 @@ fun Payer(viewModel: PayerViewModel, onSubmit: () -> Unit) {
             onValueChange = { viewModel.onTextFieldEntered(PayerInputEvent.ErcCode(it)) },
             onImeKeyAction = viewModel::moveFocusImeAction
         )
-        Spacer(Modifier.height(16.dp))
+        Spacer(Modifier.height(8.dp))
         TextFieldComponent(
             modifier = Modifier
                 .focusRequester(fullNameFocusRequester)

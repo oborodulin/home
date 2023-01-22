@@ -41,6 +41,8 @@ class MeterMapper {
         val meterVerification = MeterVerification(
             startDate = meterVerificationEntity.startDate,
             endDate = meterVerificationEntity.endDate,
+            startMeterValue = meterVerificationEntity.startMeterValue,
+            endMeterValue = meterVerificationEntity.endMeterValue,
             isOk = meterVerificationEntity.isOk,
         )
         meterVerification.id = meterVerificationEntity.meterVerificationId
@@ -89,6 +91,8 @@ class MeterMapper {
             MeterVerificationEntity(
                 startDate = it.startDate,
                 endDate = it.endDate,
+                startMeterValue = it.startMeterValue,
+                endMeterValue = it.endMeterValue,
                 isOk = it.isOk,
                 metersId = meter.id
             )
