@@ -67,12 +67,10 @@ dependencies {
     // Logging
     implementation deps.logging.timber
     implementation deps.logging.logger
-
     // Room
     kapt deps.room.compiler
     implementation deps.room.runtime
     implementation deps.room.ktx
-
     // Dagger - Hilt
     kapt deps.dagger.compiler
     implementation deps.dagger.hilt

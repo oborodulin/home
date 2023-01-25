@@ -1,8 +1,6 @@
 package com.oborodulin.home.common.ui.state
 
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.*
 import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.Snackbar
 import androidx.compose.material.Text
@@ -14,14 +12,24 @@ import timber.log.Timber
 private const val TAG = "Common.ui.CommonScreen"
 
 @Composable
-fun <T : Any> CommonScreen(state: UiState<T>, onSuccess: @Composable (T) -> Unit) {
+fun <T : Any> CommonScreen(
+    paddingValues: PaddingValues? = null,
+    state: UiState<T>,
+    onSuccess: @Composable (T) -> Unit
+) {
     Timber.tag(TAG).d("CommonScreen(...) called")
+    val modifier = when (paddingValues) {
+        null -> Modifier.fillMaxSize()
+        else -> Modifier
+            .fillMaxSize()
+            .padding(paddingValues)
+    }
     when (state) {
         is UiState.Loading -> {
-            Loading()
+            Loading(modifier)
         }
         is UiState.Error -> {
-            Error(state.errorMessage)
+            Error(modifier, state.errorMessage)
         }
         is UiState.Success -> {
             Timber.tag(TAG).d("onSuccess(...) called: %s", state.data)
@@ -31,10 +39,10 @@ fun <T : Any> CommonScreen(state: UiState<T>, onSuccess: @Composable (T) -> Unit
 }
 
 @Composable
-fun Error(errorMessage: String) {
+fun Error(modifier: Modifier, errorMessage: String) {
     Timber.tag(TAG).d("Error(...) called: %s", errorMessage)
     Column(
-        modifier = Modifier.fillMaxSize(),
+        modifier = modifier,
         verticalArrangement = Arrangement.Bottom
     ) {
         Snackbar {
@@ -44,10 +52,10 @@ fun Error(errorMessage: String) {
 }
 
 @Composable
-fun Loading() {
+fun Loading(modifier: Modifier) {
     Timber.tag(TAG).d("Loading() called")
     Column(
-        modifier = Modifier.fillMaxSize(),
+        modifier = modifier,
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {

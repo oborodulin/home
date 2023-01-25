@@ -1,9 +1,6 @@
 package com.oborodulin.home.data.local.db.views
 
 import androidx.room.DatabaseView
-import androidx.room.Embedded
-import com.oborodulin.home.data.local.db.entities.MeterEntity
-import com.oborodulin.home.data.util.Constants
 import java.math.BigDecimal
 import java.util.*
 

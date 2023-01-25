@@ -72,6 +72,8 @@ dependencies {
     implementation deps.dagger.hilt
     kapt deps.dagger.compiler
     implementation deps.hilt.navigationCompose
+    // Navigation
+    implementation deps.navigation.compose
     // Paging
     implementation deps.paging.compose
     // Sweet Toast
@@ -89,7 +91,7 @@ dependencies {
     implementation deps.lifecycle.runtimeKtx
     implementation deps.lifecycle.viewmodelCompose
     implementation deps.google.gson
-    implementation deps.navigation.compose
+
     //debugImplementation deps.compose.uiTooling
 
     // Testing dependencies

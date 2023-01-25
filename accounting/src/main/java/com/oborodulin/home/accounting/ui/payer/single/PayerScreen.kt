@@ -25,11 +25,14 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.ExperimentalLifecycleComposeApi
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.flowWithLifecycle
+import androidx.navigation.NavController
+import androidx.navigation.compose.rememberNavController
 import com.oborodulin.home.accounting.R
 import com.oborodulin.home.common.ui.components.field.ScreenEvent
 import com.oborodulin.home.common.ui.components.field.TextFieldComponent
 import com.oborodulin.home.common.ui.state.CommonScreen
 import com.oborodulin.home.common.util.toast
+import com.oborodulin.home.presentation.navigation.NavRoutes
 import com.oborodulin.home.presentation.navigation.PayerInput
 import timber.log.Timber
 
@@ -37,27 +40,31 @@ private const val TAG = "Accounting.ui.PayerScreen"
 
 @Composable
 fun PayerScreen(
+    navController: NavController,
     viewModel: PayerViewModelImp = hiltViewModel(),
-    payerInput: PayerInput
+    payerInput: PayerInput? = null
 ) {
     Timber.tag(TAG).d("PayerScreen(...) called: payerInput = %s", payerInput)
     viewModel.uiStateFlow.collectAsState().value.let { state ->
         Timber.tag(TAG).d("Collect ui state flow: %s", state)
-        CommonScreen(state) { payerModel ->
-            Payer(viewModel) {
+        CommonScreen(state = state) { payerModel ->
+            Payer(navController, viewModel) {
                 viewModel.submitAction(PayerUiAction.Save)
             }
         }
     }
-    LaunchedEffect(payerInput.payerId) {
+    LaunchedEffect(payerInput?.payerId) {
         Timber.tag(TAG).d("PayerScreen: LaunchedEffect() AFTER collect ui state flow")
-        viewModel.submitAction(PayerUiAction.Load(payerInput.payerId))
+        when (payerInput) {
+            null -> viewModel.submitAction(PayerUiAction.Create)
+            else -> viewModel.submitAction(PayerUiAction.Load(payerInput.payerId))
+        }
     }
 }
 
 @OptIn(ExperimentalComposeUiApi::class, ExperimentalLifecycleComposeApi::class)
 @Composable
-fun Payer(viewModel: PayerViewModel, onSubmit: () -> Unit) {
+fun Payer(navController: NavController, viewModel: PayerViewModel, onSubmit: () -> Unit) {
     Timber.tag(TAG).d("Payer(...) called")
     val context = LocalContext.current
     val lifecycleOwner = LocalLifecycleOwner.current
@@ -76,6 +83,7 @@ fun Payer(viewModel: PayerViewModel, onSubmit: () -> Unit) {
     val fullName by viewModel.fullName.collectAsStateWithLifecycle()
     val areInputsValid by viewModel.areInputsValid.collectAsStateWithLifecycle()
 
+    Timber.tag(TAG).d("Init Focus Requesters for all payer fields")
     val ercCodeFocusRequester = remember { FocusRequester() }
     val fullNameFocusRequester = remember { FocusRequester() }
 
@@ -146,10 +154,19 @@ fun Payer(viewModel: PayerViewModel, onSubmit: () -> Unit) {
             //  visualTransformation = ::creditCardFilter,
             inputWrapper = fullName,
             onValueChange = { viewModel.onTextFieldEntered(PayerInputEvent.FullName(it)) },
-            onImeKeyAction = { viewModel.onContinueClick { onSubmit() } }
+            onImeKeyAction = { } //viewModel.onContinueClick { onSubmit() }
         )
         Spacer(Modifier.height(32.dp))
-        Button(onClick = { viewModel.onContinueClick { onSubmit() } }, enabled = areInputsValid) {
+        Button(onClick = {
+            viewModel.onContinueClick {
+                onSubmit()
+                navController.popBackStack()
+                navController.navigate(NavRoutes.Home.route) {
+                    popUpTo(navController.graph.startDestinationId)
+                    launchSingleTop = true
+                }
+            }
+        }, enabled = areInputsValid) {
             Text(text = "Continue")
         }
     }
@@ -159,5 +176,8 @@ fun Payer(viewModel: PayerViewModel, onSubmit: () -> Unit) {
 @Preview(name = "Day Mode", showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_NO)
 @Composable
 fun PreviewPayer() {
-    Payer(viewModel = PayerViewModelImp.previewModel, onSubmit = {})
+    Payer(
+        navController = rememberNavController(),
+        viewModel = PayerViewModelImp.previewModel,
+        onSubmit = {})
 }

@@ -1,7 +1,6 @@
 package com.oborodulin.home.data.local.db.entities
 
 import androidx.room.*
-import java.math.BigDecimal
 import java.util.*
 
 @Entity(
@@ -12,8 +11,8 @@ import java.util.*
         parentColumns = arrayOf("payerId"),
         childColumns = arrayOf("payersId"),
         onDelete = ForeignKey.CASCADE
-        )]
-    )
+    )]
+)
 class ReceiptEntity(
     @PrimaryKey var receiptId: UUID = UUID.randomUUID(),
     var receiptMonth: Int,

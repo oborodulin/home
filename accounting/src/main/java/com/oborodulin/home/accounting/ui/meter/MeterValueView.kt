@@ -62,7 +62,7 @@ fun MeterValue(viewModel: MeterValueViewModel, onSubmit: () -> Unit) {
     val focusManager = LocalFocusManager.current
     val keyboardController = LocalSoftwareKeyboardController.current
 
-    Timber.tag(TAG).d("CollectAsStateWithLifecycle for all payer fields")
+    Timber.tag(TAG).d("CollectAsStateWithLifecycle for current Meter Value")
     val currentValue by viewModel.currentValue.collectAsStateWithLifecycle()
     val areInputsValid by viewModel.areInputsValid.collectAsStateWithLifecycle()
 
