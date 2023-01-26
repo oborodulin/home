@@ -56,7 +56,7 @@ fun PayersListView(
     LaunchedEffect(Unit) {
         Timber.tag(TAG).d("PayersListView: LaunchedEffect() AFTER collect ui state flow")
         viewModel.singleEventFlow.collectLatest {
-            Timber.tag(TAG).d("Collect Latest UiSingleEvent: %s".format(it.javaClass.name))
+            Timber.tag(TAG).d("Collect Latest UiSingleEvent: %s", it.javaClass.name)
             when (it) {
                 is PayersListUiSingleEvent.OpenPayerScreen -> {
                     navController.navigate(it.navRoute)

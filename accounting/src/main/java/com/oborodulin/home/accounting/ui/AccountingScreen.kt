@@ -7,7 +7,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -18,7 +17,6 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -34,7 +32,6 @@ import com.oborodulin.home.accounting.ui.payer.list.PayersListView
 import com.oborodulin.home.accounting.ui.payer.list.PayersListViewModel
 import com.oborodulin.home.accounting.ui.payer.list.PayersListViewModelImp
 import com.oborodulin.home.common.ui.state.CommonScreen
-import com.oborodulin.home.common.ui.state.UiState
 import com.oborodulin.home.common.ui.theme.HomeComposableTheme
 import com.oborodulin.home.common.ui.theme.Typography
 import com.oborodulin.home.common.util.toast
@@ -90,44 +87,32 @@ fun AccountingScreen(
     */
     viewModel.uiStateFlow.collectAsState().value.let { state ->
         Timber.tag(TAG).d("Collect ui state flow: %s", state)
-        ScaffoldComponent(
-            appState = appState,
-            nestedScrollConnection = nestedScrollConnection,
-            bottomBar = bottomBar,
-            topBar = {
-                TopAppBar(
-                    elevation = 4.dp,
-                    title = { Text(appState.appName + " - " + stringResource(com.oborodulin.home.presentation.R.string.nav_item_accounting)) },
-                    backgroundColor = MaterialTheme.colors.primarySurface,
-                    navigationIcon = {
-                        /*                  if (showBackButton) {
-                                              IconButton(onClick = { navController.popBackStack() }) {
-                                                  Icon(Icons.Filled.ArrowBack, null)
-                                              }
-                                          } else {*/
-                        IconButton(onClick = { context.toast("Menu button clicked...") }) {
-                            Icon(Icons.Filled.Menu, null)
-                        }
-                        //}
-                    }, actions = {
-                        IconButton(onClick = { appState.navController.navigate(NavRoutes.Payer.routeForPayer()) }) {
-                            Icon(Icons.Filled.Add, null)
-                        }
-                        IconButton(onClick = { context.toast("Settings button clicked...") }) {
-                            Icon(Icons.Filled.Settings, null)
-                        }
+        HomeComposableTheme { //(darkTheme = true)
+            ScaffoldComponent(
+                appState = appState,
+                scaffoldState = appState.accountingScaffoldState,
+                nestedScrollConnection = nestedScrollConnection,
+                topBarTitleId = com.oborodulin.home.presentation.R.string.nav_item_accounting,
+                topBarActions = {
+                    IconButton(onClick = { appState.commonNavController.navigate(NavRoutes.Payer.routeForPayer()) }) {
+                        Icon(Icons.Filled.Add, null)
                     }
-                )
+                    IconButton(onClick = { context.toast("Settings button clicked...") }) {
+                        Icon(Icons.Filled.Settings, null)
+                    }
+                },
+                bottomBar = bottomBar
+            ) {
+                CommonScreen(paddingValues = it, state = state) { accountingModel ->
+                    AccountingView(
+                        accountingModel = accountingModel,
+                        navController = appState.commonNavController,
+                        accountingViewModel = viewModel,
+                        payersListViewModel = payersListViewModel,
+                        meterValueViewModel = meterValueViewModel
+                    )
+                }
             }
-        ) {
-            AccountingView(
-                state = state,
-                navController = appState.navController,
-                accountingViewModel = viewModel,
-                payersListViewModel = payersListViewModel,
-                meterValueViewModel = meterValueViewModel,
-                it
-            )
         }
         LaunchedEffect(Unit) {
             Timber.tag(TAG).d("AccountingScreen: LaunchedEffect() AFTER collect ui state flow")
@@ -135,7 +120,7 @@ fun AccountingScreen(
                 Timber.tag(TAG).d("Collect Latest UiSingleEvent: %s", it.javaClass.name)
                 when (it) {
                     is AccountingUiSingleEvent.OpenPayerScreen -> {
-                        appState.navController.navigate(it.navRoute)
+                        appState.commonNavController.navigate(it.navRoute)
                     }
                 }
             }
@@ -145,76 +130,71 @@ fun AccountingScreen(
 
 @Composable
 private fun AccountingView(
-    state: UiState<AccountingModel>,
+    accountingModel: AccountingModel,
     navController: NavHostController,
     accountingViewModel: AccountingViewModel,
     payersListViewModel: PayersListViewModel,
-    meterValueViewModel: MeterValueViewModel,
-    paddingValues: PaddingValues? = null
+    meterValueViewModel: MeterValueViewModel
 ) {
     Timber.tag(TAG).d("AccountingView(...) called")
-    HomeComposableTheme { //(darkTheme = true)
-        CommonScreen(paddingValues = paddingValues, state = state) {
-            Column(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .background(
-                        MaterialTheme.colors.surface,
-                        shape = RoundedCornerShape(20.dp)
-                    )
-                    .padding(horizontal = 4.dp),
-                horizontalAlignment = Alignment.CenterHorizontally
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(
+                MaterialTheme.colors.surface,
+                shape = RoundedCornerShape(20.dp)
             )
-            {
-                Box(
-                    modifier = Modifier
-                        .padding(vertical = 4.dp)
-                        .clip(RoundedCornerShape(16.dp))
-                        //.background(MaterialTheme.colors.background, shape = RoundedCornerShape(20.dp))
-                        .weight(5f)
-                        .border(
-                            2.dp,
-                            MaterialTheme.colors.primary,
-                            shape = RoundedCornerShape(16.dp)
-                        )
-                ) {
-                    PayersListView(
-                        viewModel = payersListViewModel,
-                        accountingViewModel = accountingViewModel,
-                        navController = navController
-                    )
-                }
-                Box(
-                    modifier = Modifier
-                        .padding(vertical = 4.dp)
-                        .clip(RoundedCornerShape(16.dp))
-                        .weight(4f)
-                        .border(
-                            2.dp,
-                            MaterialTheme.colors.primary,
-                            shape = RoundedCornerShape(16.dp)
-                        )
-                ) {
-                    PrevServiceMeterValues(
-                        accountingModel = it,
-                        viewModel = meterValueViewModel
-                    )
-                }
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(vertical = 4.dp)
-                        .clip(RoundedCornerShape(16.dp))
-                        .weight(1f)
-                        .border(
-                            2.dp,
-                            MaterialTheme.colors.primary,
-                            shape = RoundedCornerShape(16.dp)
-                        )
-                ) {
-                    Text(text = "Итого:")
-                }
-            }
+            .padding(horizontal = 4.dp),
+        horizontalAlignment = Alignment.CenterHorizontally
+    )
+    {
+        Box(
+            modifier = Modifier
+                .padding(vertical = 4.dp)
+                .clip(RoundedCornerShape(16.dp))
+                //.background(MaterialTheme.colors.background, shape = RoundedCornerShape(20.dp))
+                .weight(5f)
+                .border(
+                    2.dp,
+                    MaterialTheme.colors.primary,
+                    shape = RoundedCornerShape(16.dp)
+                )
+        ) {
+            PayersListView(
+                viewModel = payersListViewModel,
+                accountingViewModel = accountingViewModel,
+                navController = navController
+            )
+        }
+        Box(
+            modifier = Modifier
+                .padding(vertical = 4.dp)
+                .clip(RoundedCornerShape(16.dp))
+                .weight(4f)
+                .border(
+                    2.dp,
+                    MaterialTheme.colors.primary,
+                    shape = RoundedCornerShape(16.dp)
+                )
+        ) {
+            PrevServiceMeterValues(
+                accountingModel = accountingModel,
+                viewModel = meterValueViewModel
+            )
+        }
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(vertical = 4.dp)
+                .clip(RoundedCornerShape(16.dp))
+                .weight(1f)
+                .border(
+                    2.dp,
+                    MaterialTheme.colors.primary,
+                    shape = RoundedCornerShape(16.dp)
+                )
+        ) {
+            Text(text = "Итого:")
         }
     }
 }
@@ -359,7 +339,8 @@ fun ServiceIcon(serviceType: ServiceType?) =
 @Composable
 fun PreviewAccountingView() {
     AccountingView(
-        state = UiState.Success(AccountingViewModelImp.previewAccountingModel(LocalContext.current)),
+        //UiState.Success(AccountingViewModelImp.previewAccountingModel(LocalContext.current)),
+        accountingModel = AccountingModel(),
         navController = rememberNavController(),
         accountingViewModel = AccountingViewModelImp.previewModel(LocalContext.current),
         payersListViewModel = PayersListViewModelImp.previewModel(LocalContext.current),

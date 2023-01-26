@@ -60,7 +60,7 @@ sealed class NavRoutes constructor(
     object Payer : NavRoutes(
         String.format(ROUTE_PAYER, "{$ARG_PAYER_ID}"),
         R.drawable.outline_person_black_24,
-        R.string.nav_item_payer_detail,
+        R.string.nav_item_payer,
         arguments = listOf(navArgument(ARG_PAYER_ID) {
             type = NavType.StringType
             nullable = true

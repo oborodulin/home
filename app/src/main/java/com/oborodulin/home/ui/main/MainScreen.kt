@@ -84,17 +84,17 @@ private fun HomeNavigationHost(
     bottomBar: @Composable () -> Unit
 ) {
     Timber.tag(TAG).d("HomeNavigationHost(...) called")
-    NavHost(appState.navController, startDestination = NavRoutes.Home.route) {
+    NavHost(appState.commonNavController, startDestination = NavRoutes.Home.route) {
         composable(route = NavRoutes.Payer.routeForPayer()) {
             Timber.tag(TAG)
                 .d("Navigation Graph: to PayerScreen [route = '%s']", it.destination.route)
-            PayerScreen(navController = appState.navController)
+            PayerScreen(appState = appState)
         }
         composable(route = NavRoutes.Payer.route, arguments = NavRoutes.Payer.arguments) {
             Timber.tag(TAG)
                 .d("Navigation Graph: to PayerScreen [route = '%s']", it.destination.route)
             PayerScreen(
-                navController = appState.navController,
+                appState = appState,
                 payerInput = NavRoutes.Payer.fromEntry(it)
             )
         }

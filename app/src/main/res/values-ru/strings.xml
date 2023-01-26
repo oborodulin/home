@@ -7,15 +7,11 @@
     <string name="amount_of_payment_text">Сумма платежа</string>
     <string name="payer_text">Плательщик</string>
     <string name="rent_text">Квартплата</string>
-    <!--МЕНЮ плательщика -->
-    <string name="add">Добавить</string>
-    <string name="delete">Удалить</string>
-    <string name="select_all">Выбрать все</string>
+
     <!--МЕНЮ: -->
-    <!--плательщика -->
-    <string name="new_payer_menu_item">Новый плательщик</string>
     <!--услуги -->
     <string name="new_service_menu_item">Новая услуга</string>
+
     <!--СПИСОК: -->
     <!--услуги -->
     <string name="service_list_empty_text">Услуг пока нет. Добавте, пожалуйста, хотя бы одну</string>

@@ -19,15 +19,29 @@ import kotlinx.coroutines.CoroutineScope
  */
 @Composable
 fun rememberAppState(
-    scaffoldState: ScaffoldState = rememberScaffoldState(),
-    navController: NavHostController = rememberNavController(),
+    accountingScaffoldState: ScaffoldState = rememberScaffoldState(),
+    payerScaffoldState: ScaffoldState = rememberScaffoldState(),
+    commonNavController: NavHostController = rememberNavController(),
     navBarNavController: NavHostController = rememberNavController(),
     resources: Resources = LocalContext.current.resources,
     coroutineScope: CoroutineScope = rememberCoroutineScope(),
     appName: String = ""
 ) =
-    remember(scaffoldState, navController, navBarNavController, resources, coroutineScope) {
-        AppState(scaffoldState, navController, navBarNavController, appName)
+    remember(
+        accountingScaffoldState,
+        payerScaffoldState,
+        commonNavController,
+        navBarNavController,
+        resources,
+        coroutineScope
+    ) {
+        AppState(
+            accountingScaffoldState,
+            payerScaffoldState,
+            commonNavController,
+            navBarNavController,
+            appName
+        )
     }
 
 /**
@@ -35,8 +49,9 @@ fun rememberAppState(
  */
 @Stable
 class AppState(
-    val scaffoldState: ScaffoldState,
-    val navController: NavHostController,
+    val accountingScaffoldState: ScaffoldState,
+    val payerScaffoldState: ScaffoldState,
+    val commonNavController: NavHostController,
     val navBarNavController: NavHostController,
     val appName: String
 ) {
@@ -49,7 +64,7 @@ class AppState(
 
     // Атрибут отображения навигационного меню bottomBar
     val shouldShowBottomNavBar: Boolean
-        @Composable get() = navController
+        @Composable get() = commonNavController
             .currentBackStackEntryAsState().value?.destination?.route in bottomNavBarRoutes
 
     // ----------------------------------------------------------
@@ -57,16 +72,25 @@ class AppState(
     // ----------------------------------------------------------
 
     val navBarCurrentRoute: String?
-        get() = navBarNavController.currentDestination?.route
+        get() = this.navBarNavController.currentDestination?.route
 
     fun navBarUpPress() {
-        navBarNavController.navigateUp()
+        this.navBarNavController.navigateUp()
+    }
+
+    // Возврат к экрану из главного меню нижней панели.
+    fun backToBottomBarScreen() {
+        this.commonNavController.popBackStack()
+        this.commonNavController.navigate(NavRoutes.Home.route) {
+            popUpTo(commonNavController.graph.startDestinationId)
+            launchSingleTop = true
+        }
     }
 
     // Клик по навигационному меню, вкладке.
     fun navigateToBottomBarRoute(route: String) {
-        if (route != navBarCurrentRoute) {
-            navBarNavController.navigate(route) {
+        if (route != this.navBarCurrentRoute) {
+            this.navBarNavController.navigate(route) {
                 // Pop up to the start destination of the graph to
                 // avoid building up a large stack of destinations
                 // on the back stack as users select items
@@ -87,7 +111,6 @@ class AppState(
                 // Avoid multiple copies of the same destination when
                 // reselecting the same item
                 launchSingleTop = true
-
                 // Restore state when reselecting a previously selected item
                 restoreState = true
             }

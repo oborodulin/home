@@ -32,7 +32,7 @@ abstract class SingleViewModel<T : Any, S : UiState<T>, A : UiAction, E : UiSing
     val inputEvents = Channel<Inputable>(Channel.CONFLATED)
 
     private val errorHandler = CoroutineExceptionHandler { _, exception ->
-        Timber.tag(TAG).e(exception, exception.message)
+        Timber.tag(TAG).e(exception)
         //_uiState.value = _uiState.value.copy(error = exception.message, isLoading = false)
     }
 
@@ -52,13 +52,13 @@ abstract class SingleViewModel<T : Any, S : UiState<T>, A : UiAction, E : UiSing
     abstract suspend fun observeInputEvents()
 
     fun onTextFieldEntered(inputEvent: Inputable) {
-        Timber.tag(TAG).d("onTextFieldEntered: %s".format(inputEvent.javaClass.name))
+        Timber.tag(TAG).d("onTextFieldEntered: %s", inputEvent.javaClass.name)
         inputEvents.trySend(inputEvent)
     }
 
     fun onTextFieldFocusChanged(focusedField: Focusable, isFocused: Boolean) {
         Timber.tag(TAG)
-            .d("onTextFieldFocusChanged: %s - %s".format(focusedField.javaClass.name, isFocused))
+            .d("onTextFieldFocusChanged: %s - %s", focusedField.javaClass.name, isFocused)
         focusedTextField.key = if (isFocused) focusedField.key() else null
     }
 

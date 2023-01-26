@@ -52,13 +52,54 @@ class PayerViewModelImp @Inject constructor(
             InputWrapper()
         )
     }
+    override val address: StateFlow<InputWrapper> by lazy {
+        state.getStateFlow(
+            PayerFields.ADDRESS.name,
+            InputWrapper()
+        )
+    }
+    override val totalArea: StateFlow<InputWrapper> by lazy {
+        state.getStateFlow(
+            PayerFields.TOTAL_AREA.name,
+            InputWrapper()
+        )
+    }
+    override val livingSpace: StateFlow<InputWrapper> by lazy {
+        state.getStateFlow(
+            PayerFields.LIVING_SPACE.name,
+            InputWrapper()
+        )
+    }
+    override val heatedVolume: StateFlow<InputWrapper> by lazy {
+        state.getStateFlow(
+            PayerFields.HEATED_VOLUME.name,
+            InputWrapper()
+        )
+    }
 
-    override val areInputsValid = combine(ercCode, fullName) { ercCode, fullName ->
-        ercCode.errorId == null && fullName.errorId == null
-    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), false)
+    override val areInputsValid =
+        combine(
+            combine(
+                ercCode,
+                fullName,
+                address,
+                totalArea
+            ) { ercCode, fullName, address, totalArea ->
+                ercCode.errorId == null && fullName.errorId == null && address.errorId == null && totalArea.errorId == null
+            },
+            combine(
+                livingSpace,
+                heatedVolume
+            ) { livingSpace, heatedVolume ->
+                livingSpace.errorId == null && heatedVolume.errorId == null
+            }) { fieldsPartOne, fieldsPartTwo -> fieldsPartOne && fieldsPartTwo }.stateIn(
+            viewModelScope,
+            SharingStarted.WhileSubscribed(5000),
+            false
+        )
 
     private val errorHandler = CoroutineExceptionHandler { _, exception ->
-        Timber.tag(TAG).e(exception, exception.message)
+        Timber.tag(TAG).e(exception)
         //_uiState.value = _uiState.value.copy(error = exception.message, isLoading = false)
     }
 
@@ -101,7 +142,11 @@ class PayerViewModelImp @Inject constructor(
                         PayerModel(
                             id = UUID.fromString(payerId.value.value),
                             ercCode = ercCode.value.value,
-                            fullName = fullName.value.value
+                            fullName = fullName.value.value,
+                            address = address.value.value,
+                            totalArea = totalArea.value.value.toBigDecimalOrNull(),
+                            livingSpace = livingSpace.value.value.toBigDecimalOrNull(),
+                            heatedVolume = heatedVolume.value.value.toBigDecimalOrNull()
                         )
                     )
                 )
@@ -116,6 +161,13 @@ class PayerViewModelImp @Inject constructor(
         state[PayerFields.PAYER_ID.name] = InputWrapper(payerModel.id.toString())
         state[PayerFields.ERC_CODE.name] = InputWrapper(payerModel.ercCode)
         state[PayerFields.FULL_NAME.name] = InputWrapper(payerModel.fullName)
+        state[PayerFields.ADDRESS.name] = InputWrapper(payerModel.address)
+        state[PayerFields.TOTAL_AREA.name] = InputWrapper(payerModel.totalArea?.toString() ?: "")
+        state[PayerFields.LIVING_SPACE.name] =
+            InputWrapper(payerModel.livingSpace?.toString() ?: "")
+        state[PayerFields.HEATED_VOLUME.name] =
+            InputWrapper(payerModel.heatedVolume?.toString() ?: "")
+        submitState(UiState.Success(payerModel))
     }
 
     override suspend fun observeInputEvents() {
@@ -134,7 +186,8 @@ class PayerViewModelImp @Inject constructor(
                                     ercCode.value.copy(value = event.input)
                             }
                         }
-                        Timber.tag(TAG).d("Validate: %s", ercCode.value)
+                        Timber.tag(TAG)
+                            .d("Validate: %s = %s", PayerFields.ERC_CODE.name, ercCode.value)
                     }
                     is PayerInputEvent.FullName -> {
                         when (PayerInputValidator.FullName.errorIdOrNull(event.input)) {
@@ -149,7 +202,78 @@ class PayerViewModelImp @Inject constructor(
                                     fullName.value.copy(value = event.input)
                             }
                         }
-                        Timber.tag(TAG).d("Validate: %s", fullName.value)
+                        Timber.tag(TAG)
+                            .d("Validate: %s = %s", PayerFields.FULL_NAME.name, fullName.value)
+                    }
+                    is PayerInputEvent.Address -> {
+                        when (PayerInputValidator.Address.errorIdOrNull(event.input)) {
+                            null -> {
+                                state[PayerFields.ADDRESS.name] = address.value.copy(
+                                    value = event.input,
+                                    errorId = null
+                                )
+                            }
+                            else -> {
+                                state[PayerFields.ADDRESS.name] =
+                                    address.value.copy(value = event.input)
+                            }
+                        }
+                        Timber.tag(TAG)
+                            .d("Validate: %s = %s", PayerFields.ADDRESS.name, address.value)
+                    }
+                    is PayerInputEvent.TotalArea -> {
+                        when (PayerInputValidator.TotalArea.errorIdOrNull(event.input)) {
+                            null -> {
+                                state[PayerFields.TOTAL_AREA.name] = totalArea.value.copy(
+                                    value = event.input,
+                                    errorId = null
+                                )
+                            }
+                            else -> {
+                                state[PayerFields.TOTAL_AREA.name] =
+                                    totalArea.value.copy(value = event.input)
+                            }
+                        }
+                        Timber.tag(TAG)
+                            .d("Validate: %s = %s", PayerFields.TOTAL_AREA.name, totalArea.value)
+                    }
+                    is PayerInputEvent.LivingSpace -> {
+                        when (PayerInputValidator.LivingSpace.errorIdOrNull(event.input)) {
+                            null -> {
+                                state[PayerFields.LIVING_SPACE.name] = livingSpace.value.copy(
+                                    value = event.input,
+                                    errorId = null
+                                )
+                            }
+                            else -> {
+                                state[PayerFields.LIVING_SPACE.name] =
+                                    livingSpace.value.copy(value = event.input)
+                            }
+                        }
+                        Timber.tag(TAG).d(
+                            "Validate: %s = %s",
+                            PayerFields.LIVING_SPACE.name,
+                            livingSpace.value
+                        )
+                    }
+                    is PayerInputEvent.HeatedVolume -> {
+                        when (PayerInputValidator.HeatedVolume.errorIdOrNull(event.input)) {
+                            null -> {
+                                state[PayerFields.HEATED_VOLUME.name] = heatedVolume.value.copy(
+                                    value = event.input,
+                                    errorId = null
+                                )
+                            }
+                            else -> {
+                                state[PayerFields.HEATED_VOLUME.name] =
+                                    heatedVolume.value.copy(value = event.input)
+                            }
+                        }
+                        Timber.tag(TAG).d(
+                            "Validate: %s = %s",
+                            PayerFields.HEATED_VOLUME.name,
+                            heatedVolume.value
+                        )
                     }
                 }
             }
@@ -160,8 +284,8 @@ class PayerViewModelImp @Inject constructor(
                         val errorId = PayerInputValidator.ErcCode.errorIdOrNull(event.input)
                         state[PayerFields.ERC_CODE.name] = ercCode.value.copy(errorId = errorId)
                         Timber.tag(TAG).d(
-                            "Validate (debounce): %s - %s", PayerFields.ERC_CODE.name,
-                            errorId.toString()
+                            "Validate (debounce): %s - ERR[%s]", PayerFields.ERC_CODE.name,
+                            errorId?.toString()
                         )
                     }
                     is PayerInputEvent.FullName -> {
@@ -169,8 +293,44 @@ class PayerViewModelImp @Inject constructor(
                         state[PayerFields.FULL_NAME.name] =
                             fullName.value.copy(errorId = errorId)
                         Timber.tag(TAG).d(
-                            "Validate (debounce): %s - %s", PayerFields.FULL_NAME.name,
-                            errorId.toString()
+                            "Validate (debounce): %s - ERR[%s]", PayerFields.FULL_NAME.name,
+                            errorId?.toString()
+                        )
+                    }
+                    is PayerInputEvent.Address -> {
+                        val errorId = PayerInputValidator.Address.errorIdOrNull(event.input)
+                        state[PayerFields.ADDRESS.name] =
+                            address.value.copy(errorId = errorId)
+                        Timber.tag(TAG).d(
+                            "Validate (debounce): %s - ERR[%s]", PayerFields.ADDRESS.name,
+                            errorId?.toString()
+                        )
+                    }
+                    is PayerInputEvent.TotalArea -> {
+                        val errorId = PayerInputValidator.TotalArea.errorIdOrNull(event.input)
+                        state[PayerFields.TOTAL_AREA.name] =
+                            totalArea.value.copy(errorId = errorId)
+                        Timber.tag(TAG).d(
+                            "Validate (debounce): %s - ERR[%s]", PayerFields.TOTAL_AREA.name,
+                            errorId?.toString()
+                        )
+                    }
+                    is PayerInputEvent.LivingSpace -> {
+                        val errorId = PayerInputValidator.LivingSpace.errorIdOrNull(event.input)
+                        state[PayerFields.LIVING_SPACE.name] =
+                            livingSpace.value.copy(errorId = errorId)
+                        Timber.tag(TAG).d(
+                            "Validate (debounce): %s - ERR[%s]", PayerFields.LIVING_SPACE.name,
+                            errorId?.toString()
+                        )
+                    }
+                    is PayerInputEvent.HeatedVolume -> {
+                        val errorId = PayerInputValidator.HeatedVolume.errorIdOrNull(event.input)
+                        state[PayerFields.HEATED_VOLUME.name] =
+                            heatedVolume.value.copy(errorId = errorId)
+                        Timber.tag(TAG).d(
+                            "Validate (debounce): %s - ERR[%s]", PayerFields.HEATED_VOLUME.name,
+                            errorId?.toString()
                         )
                     }
                 }
@@ -186,16 +346,32 @@ class PayerViewModelImp @Inject constructor(
         PayerInputValidator.FullName.errorIdOrNull(fullName.value.value)?.let {
             inputErrors.add(InputError(PayerFields.FULL_NAME.name, it))
         }
+        PayerInputValidator.Address.errorIdOrNull(address.value.value)?.let {
+            inputErrors.add(InputError(PayerFields.ADDRESS.name, it))
+        }
+        PayerInputValidator.TotalArea.errorIdOrNull(totalArea.value.value)?.let {
+            inputErrors.add(InputError(PayerFields.TOTAL_AREA.name, it))
+        }
+        PayerInputValidator.LivingSpace.errorIdOrNull(livingSpace.value.value)?.let {
+            inputErrors.add(InputError(PayerFields.LIVING_SPACE.name, it))
+        }
+        PayerInputValidator.HeatedVolume.errorIdOrNull(heatedVolume.value.value)?.let {
+            inputErrors.add(InputError(PayerFields.HEATED_VOLUME.name, it))
+        }
         return if (inputErrors.isEmpty()) null else inputErrors
     }
 
     override fun displayInputErrors(inputErrors: List<InputError>) {
         Timber.tag(TAG)
-            .d("displayInputErrors() called: inputErrors.count = %d", inputErrors?.size)
+            .d("displayInputErrors() called: inputErrors.count = %d", inputErrors.size)
         for (error in inputErrors) {
             state[error.fieldName] = when (error.fieldName) {
                 PayerFields.ERC_CODE.name -> ercCode.value.copy(errorId = error.errorId)
                 PayerFields.FULL_NAME.name -> fullName.value.copy(errorId = error.errorId)
+                PayerFields.ADDRESS.name -> address.value.copy(errorId = error.errorId)
+                PayerFields.TOTAL_AREA.name -> totalArea.value.copy(errorId = error.errorId)
+                PayerFields.LIVING_SPACE.name -> livingSpace.value.copy(errorId = error.errorId)
+                PayerFields.HEATED_VOLUME.name -> heatedVolume.value.copy(errorId = error.errorId)
                 else -> null
             }
         }
@@ -207,6 +383,11 @@ class PayerViewModelImp @Inject constructor(
                 override val events = Channel<ScreenEvent>().receiveAsFlow()
                 override val ercCode = MutableStateFlow(InputWrapper())
                 override val fullName = MutableStateFlow(InputWrapper())
+                override val address = MutableStateFlow(InputWrapper())
+                override val totalArea = MutableStateFlow(InputWrapper())
+                override val livingSpace = MutableStateFlow(InputWrapper())
+                override val heatedVolume = MutableStateFlow(InputWrapper())
+
                 override val areInputsValid = MutableStateFlow(true)
 
                 override fun onTextFieldEntered(inputEvent: Inputable) {}

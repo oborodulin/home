@@ -1,10 +1,14 @@
 <resources>
     <string name="app_name">Home-Common</string>
-    <!--СООБЩЕНИЯ ОБ ОШИБКАХ -->
+    <!--ОБЩИЕ СООБЩЕНИЯ ОБ ОШИБКАХ -->
     <string name="success">success</string>
     <string name="number_negative_error">Укажите, пожалуйста, положительное число!</string>
     <string name="name_too_short_error">Name is too short!</string>
     <string name="card_number_too_short_error">Number is too short!</string>
+
+    <!--ОБЩИЕ МЕТКИ UI -->
+    <string name="btn_save_lbl">Сохранить</string>
+    <string name="btn_cancel_lbl">Отменить</string>
 
     <!--ЕДИНИЦЫ ИЗМЕРЕНИЯ -->
     <string name="m2_unit">м2</string>

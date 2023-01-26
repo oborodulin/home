@@ -30,6 +30,8 @@ fun TextFieldComponent(
     modifier: Modifier,
     inputWrapper: InputWrapper,
     @StringRes labelResId: Int? = null,
+    leadingIcon: @Composable (() -> Unit)? = null,
+    maxLines: Int = Int.MAX_VALUE,
     keyboardOptions: KeyboardOptions = remember {
         KeyboardOptions.Default
     },
@@ -51,6 +53,8 @@ fun TextFieldComponent(
                 onValueChange(it.text)
             },
             label = { labelResId?.let { Text(stringResource(it)) } },
+            leadingIcon = leadingIcon,
+            maxLines = maxLines,
             isError = inputWrapper.errorId != null,
             visualTransformation = visualTransformation,
             keyboardOptions = keyboardOptions,

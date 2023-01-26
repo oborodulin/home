@@ -11,6 +11,11 @@ interface PayerViewModel {
     val events: Flow<ScreenEvent>
     val ercCode: StateFlow<InputWrapper>
     val fullName: StateFlow<InputWrapper>
+    val address: StateFlow<InputWrapper>
+    val totalArea: StateFlow<InputWrapper>
+    val livingSpace: StateFlow<InputWrapper>
+    val heatedVolume: StateFlow<InputWrapper>
+
     val areInputsValid: StateFlow<Boolean>
 
     fun onTextFieldEntered(inputEvent: Inputable)

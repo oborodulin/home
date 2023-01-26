@@ -2,7 +2,6 @@ package com.oborodulin.home.accounting.ui.meter
 
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
-import com.oborodulin.home.accounting.ui.payer.list.PayersListUiAction
 import com.oborodulin.home.common.ui.components.*
 import com.oborodulin.home.common.ui.components.field.*
 import com.oborodulin.home.common.ui.state.SingleViewModel
@@ -58,7 +57,7 @@ class MeterValueViewModelImp @Inject constructor(
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), false)
 
     private val errorHandler = CoroutineExceptionHandler { _, exception ->
-        Timber.tag(TAG).e(exception, exception.message)
+        Timber.tag(TAG).e(exception)
         //_uiState.value = _uiState.value.copy(error = exception.message, isLoading = false)
     }
 
@@ -66,7 +65,7 @@ class MeterValueViewModelImp @Inject constructor(
 
     override suspend fun handleAction(action: MeterValueUiAction) {
         Timber.tag(TAG)
-            .d("handleAction(MeterValueUiAction) called: %s".format(action.javaClass.name))
+            .d("handleAction(MeterValueUiAction) called: %s", action.javaClass.name)
         when (action) {
             is MeterValueUiAction.Save -> {
                 saveMeterValue()
@@ -95,9 +94,8 @@ class MeterValueViewModelImp @Inject constructor(
         super.initFieldStatesByUiModel(meterValueModel)
         Timber.tag(TAG)
             .d(
-                "initFieldStatesByUiModel(MeterValueModel) called: meterValueModel = %s".format(
-                    meterValueModel
-                )
+                "initFieldStatesByUiModel(MeterValueModel) called: meterValueModel = %s",
+                meterValueModel
             )
         state[MeterValueFields.METER_VALUE_ID.name] = InputWrapper(meterValueModel.id.toString())
         state[MeterValueFields.METERS_ID.name] = InputWrapper(meterValueModel.metersId.toString())
@@ -105,6 +103,7 @@ class MeterValueViewModelImp @Inject constructor(
             state[MeterValueFields.METER_CURR_VALUE.name] =
                 InputWrapper(it.toString())
         }
+        submitState(UiState.Success(meterValueModel))
     }
 
     override suspend fun observeInputEvents() {
@@ -137,10 +136,9 @@ class MeterValueViewModelImp @Inject constructor(
                         state[MeterValueFields.METER_CURR_VALUE.name] =
                             currentValue.value.copy(errorId = errorId)
                         Timber.tag(TAG).d(
-                            "Validate (debounce): %s - %s".format(
-                                MeterValueFields.METER_CURR_VALUE.name,
-                                errorId
-                            )
+                            "Validate (debounce): %s - %s",
+                            MeterValueFields.METER_CURR_VALUE.name,
+                            errorId
                         )
                     }
                 }
@@ -158,7 +156,7 @@ class MeterValueViewModelImp @Inject constructor(
 
     override fun displayInputErrors(inputErrors: List<InputError>) {
         Timber.tag(TAG)
-            .d("displayInputErrors() called: inputErrors.count = %d".format(inputErrors?.size))
+            .d("displayInputErrors() called: inputErrors.count = %d", inputErrors.size)
         for (error in inputErrors) {
             state[error.fieldName] = when (error.fieldName) {
                 MeterValueFields.METER_CURR_VALUE.name -> currentValue.value.copy(errorId = error.errorId)
