@@ -8,10 +8,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.OutlinedTextField
-import androidx.compose.material.Surface
-import androidx.compose.material.Text
+import androidx.compose.material.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -28,9 +25,12 @@ import com.oborodulin.home.common.ui.theme.HomeComposableTheme
 @Composable
 fun TextFieldComponent(
     modifier: Modifier,
+    enabled: Boolean = true,
+    readOnly: Boolean = false,
     inputWrapper: InputWrapper,
     @StringRes labelResId: Int? = null,
     leadingIcon: @Composable (() -> Unit)? = null,
+    trailingIcon: @Composable (() -> Unit)? = null,
     maxLines: Int = Int.MAX_VALUE,
     keyboardOptions: KeyboardOptions = remember {
         KeyboardOptions.Default
@@ -39,14 +39,19 @@ fun TextFieldComponent(
         VisualTransformation.None
     },
     onValueChange: OnValueChange,
-    onImeKeyAction: OnImeKeyAction
+    onImeKeyAction: OnImeKeyAction,
+    colors: TextFieldColors = TextFieldDefaults.outlinedTextFieldColors()
 ) {
     val fieldValue = remember {
         mutableStateOf(TextFieldValue(inputWrapper.value, TextRange(inputWrapper.value.length)))
     }
     Column {
         OutlinedTextField(
-            modifier = modifier,
+            modifier = modifier
+                .fillMaxWidth()
+                .padding(vertical = 4.dp, horizontal = 8.dp),//.weight(1f),
+            enabled = enabled,
+            readOnly = readOnly,
             value = fieldValue.value,
             onValueChange = {
                 fieldValue.value = it
@@ -54,6 +59,7 @@ fun TextFieldComponent(
             },
             label = { labelResId?.let { Text(stringResource(it)) } },
             leadingIcon = leadingIcon,
+            trailingIcon = trailingIcon,
             maxLines = maxLines,
             isError = inputWrapper.errorId != null,
             visualTransformation = visualTransformation,
@@ -61,6 +67,7 @@ fun TextFieldComponent(
             keyboardActions = remember {
                 KeyboardActions(onAny = { onImeKeyAction() })
             },
+            colors = colors
         )
         val errorMessage =
             if (inputWrapper.errorId != null) stringResource(inputWrapper.errorId) else inputWrapper.errorMsg

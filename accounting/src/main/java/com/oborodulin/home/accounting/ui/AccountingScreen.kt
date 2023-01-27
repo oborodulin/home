@@ -209,19 +209,18 @@ fun PrevServiceMeterValues(
     Timber.tag(TAG).d("PrevServiceMeterValues(...) called")
     Column(
         modifier = Modifier
-            .fillMaxWidth()
-            .fillMaxHeight()
+            .fillMaxSize()
             .clip(RoundedCornerShape(16.dp))
             .background(MaterialTheme.colors.background, shape = RoundedCornerShape(16.dp))
-            .padding(vertical = 8.dp)
             .verticalScroll(rememberScrollState())
+            .padding(vertical = 8.dp)
     ) {
         for (meterValue in accountingModel.serviceMeterVals) {
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(horizontal = 8.dp, vertical = 4.dp)
-                    .height(IntrinsicSize.Min),
+                    .height(IntrinsicSize.Min)
+                    .padding(horizontal = 8.dp, vertical = 4.dp),
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.Start
             ) {
@@ -277,8 +276,8 @@ fun PrevServiceMeterValues(
                     Spacer(modifier = Modifier.height(8.dp))
                     Image(
                         modifier = Modifier
-                            .padding(4.dp)
                             .clip(RoundedCornerShape(8.dp))
+                            .padding(4.dp)
                         //.clickable { onEdit(item) }
                         ,
                         painter = painterResource(R.drawable.outline_photo_camera_black_24),
@@ -287,8 +286,8 @@ fun PrevServiceMeterValues(
                     Spacer(modifier = Modifier.height(4.dp))
                     Image(
                         modifier = Modifier
-                            .padding(4.dp)
                             .clip(RoundedCornerShape(8.dp))
+                            .padding(4.dp)
                         //.clickable { onDelete(item) }
                         ,
                         painter = painterResource(com.oborodulin.home.common.R.drawable.outline_delete_black_24),
@@ -305,29 +304,29 @@ fun ServiceIcon(serviceType: ServiceType?) =
     when (serviceType) {
         ServiceType.ELECRICITY -> Image(
             modifier = Modifier
-                .padding(4.dp)
-                .clip(RoundedCornerShape(8.dp)),
+                .clip(RoundedCornerShape(8.dp))
+                .padding(4.dp),
             painter = painterResource(com.oborodulin.home.presentation.R.drawable.outline_electric_bolt_black_36),
             contentDescription = ""
         )
         ServiceType.COLD_WATER -> Image(
             modifier = Modifier
-                .padding(4.dp)
-                .clip(RoundedCornerShape(8.dp)),
+                .clip(RoundedCornerShape(8.dp))
+                .padding(4.dp),
             painter = painterResource(com.oborodulin.home.presentation.R.drawable.outline_water_drop_black_36),
             contentDescription = ""
         )
         ServiceType.HOT_WATER -> Image(
             modifier = Modifier
-                .padding(4.dp)
-                .clip(RoundedCornerShape(8.dp)),
+                .clip(RoundedCornerShape(8.dp))
+                .padding(4.dp),
             painter = painterResource(com.oborodulin.home.presentation.R.drawable.outline_opacity_black_36),
             contentDescription = ""
         )
         ServiceType.HEATING -> Image(
             modifier = Modifier
-                .padding(4.dp)
-                .clip(RoundedCornerShape(8.dp)),
+                .clip(RoundedCornerShape(8.dp))
+                .padding(4.dp),
             painter = painterResource(com.oborodulin.home.presentation.R.drawable.ic_radiator_36),
             contentDescription = ""
         )

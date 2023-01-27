@@ -15,6 +15,7 @@ import com.oborodulin.home.metering.domain.usecases.GetPrevServiceMeterValuesUse
 import com.oborodulin.home.metering.ui.model.MeterValueModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineExceptionHandler
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.map
@@ -22,7 +23,6 @@ import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 import timber.log.Timber
 import java.math.BigDecimal
-import java.text.SimpleDateFormat
 import java.time.OffsetDateTime
 import java.util.*
 import javax.inject.Inject
@@ -46,13 +46,12 @@ class AccountingViewModelImp @Inject constructor(
             get() = _uiState
     */
     private val errorHandler = CoroutineExceptionHandler { _, exception ->
-        Timber.tag(TAG).e(exception, exception.message)
-        //_uiState.value = _uiState.value.copy(error = exception.message, isLoading = false)
+        Timber.tag(TAG).e(exception)
     }
 
     override fun initState(): UiState<AccountingModel> = UiState.Loading
 
-    override suspend fun handleAction(action: AccountingUiAction) {
+    override suspend fun handleAction(action: AccountingUiAction): Job {
         Timber.tag(TAG)
             .d(
                 "handleAction(AccountingUiAction) called: %s [HomeDatabase.isImportExecute = %s]",
@@ -66,15 +65,17 @@ class AccountingViewModelImp @Inject constructor(
                 HomeDatabase.isImportExecute,
                 HomeDatabase.isImportDone
             )
-        when (action) {
+        val job = when (action) {
             is AccountingUiAction.Init -> loadPrevServiceMeterValues()
             is AccountingUiAction.Load -> loadPrevServiceMeterValues(action.payerId)
         }
+        return job
     }
 
-    private fun loadPrevServiceMeterValues(payerId: UUID? = null) {
-        Timber.tag(TAG).d("loadPrevServiceMeterValues(UUID?) called: payerId = %s", payerId.toString())
-        viewModelScope.launch {
+    private fun loadPrevServiceMeterValues(payerId: UUID? = null): Job {
+        Timber.tag(TAG)
+            .d("loadPrevServiceMeterValues(UUID?) called: payerId = %s", payerId.toString())
+        val job = viewModelScope.launch(errorHandler) {
             accountingUseCases.getPrevServiceMeterValuesUseCase.execute(
                 GetPrevServiceMeterValuesUseCase.Request(payerId)
             ).map {
@@ -83,10 +84,10 @@ class AccountingViewModelImp @Inject constructor(
                 submitState(it)
             }
         }
+        return job
     }
 
-    override fun initFieldStatesByUiModel(uiModel: Any) {}
-
+    override fun initFieldStatesByUiModel(uiModel: Any): Job? = null
 
     /*    private fun getPayers() {
             viewModelScope.launch(errorHandler) {
@@ -124,7 +125,9 @@ class AccountingViewModelImp @Inject constructor(
                     MutableStateFlow(UiState.Success(previewAccountingModel(ctx)))
                 override val singleEventFlow = Channel<AccountingUiSingleEvent>().receiveAsFlow()
 
-                override fun submitAction(action: AccountingUiAction) {}
+                override fun submitAction(action: AccountingUiAction): Job? {
+                    return null
+                }
             }
 
         fun previewAccountingModel(ctx: Context) =

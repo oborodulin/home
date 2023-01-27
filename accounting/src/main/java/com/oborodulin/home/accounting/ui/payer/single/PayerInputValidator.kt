@@ -54,4 +54,20 @@ sealed class PayerInputValidator : Validatable {
                 else -> null
             }
     }
+
+    object PaymentDay : PayerInputValidator() {
+        override fun errorIdOrNull(input: String): Int? =
+            when {
+                input.isEmpty() -> R.string.payment_day_empty_error
+                else -> null
+            }
+    }
+
+    object PersonsNum : PayerInputValidator() {
+        override fun errorIdOrNull(input: String): Int? =
+            when {
+                input.isEmpty() -> R.string.persons_num_empty_error
+                else -> null
+            }
+    }
 }

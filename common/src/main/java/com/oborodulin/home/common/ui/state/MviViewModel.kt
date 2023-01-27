@@ -3,6 +3,7 @@ package com.oborodulin.home.common.ui.state
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.CoroutineExceptionHandler
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
@@ -15,13 +16,16 @@ abstract class MviViewModel<T : Any, S : UiState<T>, A : UiAction, E : UiSingleE
     private val _uiStateFlow: MutableStateFlow<S> by lazy { MutableStateFlow(initState()) }
     val uiStateFlow: StateFlow<S> = _uiStateFlow
 
-    private val actionFlow: MutableSharedFlow<A> = MutableSharedFlow()
+    private val _actionsFlow: MutableSharedFlow<A> = MutableSharedFlow()
+    private val _actionsJobFlow: MutableSharedFlow<Job?> = MutableSharedFlow()
+    val actionsJobFlow: SharedFlow<Job?> = _actionsJobFlow
+
 
     private val _singleEventFlow = Channel<E>()
     val singleEventFlow = _singleEventFlow.receiveAsFlow()
 
     private val errorHandler = CoroutineExceptionHandler { _, exception ->
-        Timber.tag(TAG).e(exception, exception.message)
+        Timber.tag(TAG).e(exception)
         //_uiState.value = _uiState.value.copy(error = exception.message, isLoading = false)
     }
 
@@ -29,37 +33,42 @@ abstract class MviViewModel<T : Any, S : UiState<T>, A : UiAction, E : UiSingleE
         Timber.tag(TAG).d("init called")
         viewModelScope.launch(errorHandler) {
             Timber.tag(TAG).d("init: Start actionFlow.collect")
-            actionFlow.collect {
-                handleAction(it)
+            _actionsFlow.collect {
+                _actionsJobFlow.emit(handleAction(it))
             }
         }
     }
 
     abstract fun initState(): S
 
-    abstract suspend fun handleAction(action: A)
+    abstract suspend fun handleAction(action: A): Job?
 
-    abstract fun initFieldStatesByUiModel(uiModel: Any)
+    abstract fun initFieldStatesByUiModel(uiModel: Any): Job?
 
-    fun submitAction(action: A) {
-        Timber.tag(TAG).d("submitAction: emit action = %s", action.javaClass.name)
-        viewModelScope.launch(errorHandler) {
-            actionFlow.emit(action)
+    fun viewModelScope() = viewModelScope
+
+    fun submitAction(action: A): Job {
+        Timber.tag(TAG).d("submitAction(action): emit action = %s", action.javaClass.name)
+        val job = viewModelScope.launch(errorHandler) {
+            _actionsFlow.emit(action)
         }
+        return job
     }
 
-    fun submitState(state: S) {
+    fun submitState(state: S): Job {
         Timber.tag(TAG).d("submitState: change ui state = %s", state.javaClass.name)
-        viewModelScope.launch() {
+        val job = viewModelScope.launch(errorHandler) {
             _uiStateFlow.value = state
-            if (state is UiState.Success<*>) initFieldStatesByUiModel((state as UiState.Success<T>).data)
+            if (state is UiState.Success<*>) initFieldStatesByUiModel(state.data)
         }
+        return job
     }
 
-    fun submitSingleEvent(event: E) {
+    fun submitSingleEvent(event: E): Job {
         Timber.tag(TAG).d("submitSingleEvent: send single event = %s", event.javaClass.name)
-        viewModelScope.launch(errorHandler) {
+        val job = viewModelScope.launch(errorHandler) {
             _singleEventFlow.send(event)
         }
+        return job
     }
 }

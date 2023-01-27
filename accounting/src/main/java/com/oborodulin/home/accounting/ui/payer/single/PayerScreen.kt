@@ -1,18 +1,20 @@
 package com.oborodulin.home.accounting.ui.payer.single
 
 import android.content.res.Configuration
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material.Button
-import androidx.compose.material.Icon
-import androidx.compose.material.IconButton
-import androidx.compose.material.Text
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.focus.onFocusChanged
@@ -32,6 +34,7 @@ import androidx.lifecycle.compose.ExperimentalLifecycleComposeApi
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.flowWithLifecycle
 import com.oborodulin.home.accounting.R
+import com.oborodulin.home.common.ui.components.field.InputWrapper
 import com.oborodulin.home.common.ui.components.field.ScreenEvent
 import com.oborodulin.home.common.ui.components.field.TextFieldComponent
 import com.oborodulin.home.common.ui.state.CommonScreen
@@ -41,6 +44,7 @@ import com.oborodulin.home.presentation.AppState
 import com.oborodulin.home.presentation.components.ScaffoldComponent
 import com.oborodulin.home.presentation.navigation.PayerInput
 import com.oborodulin.home.presentation.rememberAppState
+import kotlinx.coroutines.launch
 import timber.log.Timber
 
 private const val TAG = "Accounting.ui.PayerScreen"
@@ -75,8 +79,9 @@ fun PayerScreen(
                         Icon(Icons.Filled.ArrowBack, null)
                     }
                 }
-            ) {
+            ) { it ->
                 CommonScreen(paddingValues = it, state = state) {
+                    //viewModel.initFieldStatesByUiModel(payerModel)
                     Payer(appState, viewModel) {
                         viewModel.submitAction(PayerUiAction.Save)
                     }
@@ -86,7 +91,10 @@ fun PayerScreen(
     }
 }
 
-@OptIn(ExperimentalComposeUiApi::class, ExperimentalLifecycleComposeApi::class)
+@OptIn(
+    ExperimentalComposeUiApi::class, ExperimentalLifecycleComposeApi::class,
+    ExperimentalMaterialApi::class
+)
 @Composable
 fun Payer(appState: AppState, viewModel: PayerViewModel, onSubmit: () -> Unit) {
     Timber.tag(TAG).d("Payer(...) called")
@@ -109,6 +117,8 @@ fun Payer(appState: AppState, viewModel: PayerViewModel, onSubmit: () -> Unit) {
     val totalArea by viewModel.totalArea.collectAsStateWithLifecycle()
     val livingSpace by viewModel.livingSpace.collectAsStateWithLifecycle()
     val heatedVolume by viewModel.heatedVolume.collectAsStateWithLifecycle()
+    val paymentDay by viewModel.paymentDay.collectAsStateWithLifecycle()
+    val personsNum by viewModel.personsNum.collectAsStateWithLifecycle()
 
     val areInputsValid by viewModel.areInputsValid.collectAsStateWithLifecycle()
 
@@ -119,6 +129,8 @@ fun Payer(appState: AppState, viewModel: PayerViewModel, onSubmit: () -> Unit) {
     val totalAreaFocusRequester = remember { FocusRequester() }
     val livingSpaceFocusRequester = remember { FocusRequester() }
     val heatedVolumeFocusRequester = remember { FocusRequester() }
+    val paymentDayFocusRequester = remember { FocusRequester() }
+    val personsNumFocusRequester = remember { FocusRequester() }
 
     LaunchedEffect(Unit) {
         Timber.tag(TAG).d("Payer(...): LaunchedEffect()")
@@ -138,6 +150,8 @@ fun Payer(appState: AppState, viewModel: PayerViewModel, onSubmit: () -> Unit) {
                         PayerFields.TOTAL_AREA -> totalAreaFocusRequester.requestFocus()
                         PayerFields.LIVING_SPACE -> livingSpaceFocusRequester.requestFocus()
                         PayerFields.HEATED_VOLUME -> heatedVolumeFocusRequester.requestFocus()
+                        PayerFields.PAYMENT_DAY -> paymentDayFocusRequester.requestFocus()
+                        PayerFields.PERSONS_NUM -> personsNumFocusRequester.requestFocus()
                         else -> {}
                     }
                 }
@@ -147,9 +161,19 @@ fun Payer(appState: AppState, viewModel: PayerViewModel, onSubmit: () -> Unit) {
     }
 
     Column(
-        modifier = Modifier.fillMaxSize(),
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(4.dp)
+            .height(IntrinsicSize.Min)
+            .clip(RoundedCornerShape(16.dp))
+            .border(
+                2.dp,
+                MaterialTheme.colors.primary,
+                shape = RoundedCornerShape(16.dp)
+            )
+            .verticalScroll(rememberScrollState()),
         verticalArrangement = Arrangement.Top,
-        horizontalAlignment = Alignment.CenterHorizontally
+        horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         TextFieldComponent(
             modifier = Modifier
@@ -163,7 +187,7 @@ fun Payer(appState: AppState, viewModel: PayerViewModel, onSubmit: () -> Unit) {
             labelResId = R.string.erc_code_hint,
             leadingIcon = {
                 Icon(
-                    painterResource(com.oborodulin.home.common.R.drawable.outline_123_black_24),
+                    painterResource(com.oborodulin.home.common.R.drawable.outline_123_black_36),
                     null
                 )
             },
@@ -177,7 +201,6 @@ fun Payer(appState: AppState, viewModel: PayerViewModel, onSubmit: () -> Unit) {
             onValueChange = { viewModel.onTextFieldEntered(PayerInputEvent.ErcCode(it)) },
             onImeKeyAction = viewModel::moveFocusImeAction
         )
-        Spacer(Modifier.height(8.dp))
         TextFieldComponent(
             modifier = Modifier
                 .focusRequester(fullNameFocusRequester)
@@ -190,7 +213,7 @@ fun Payer(appState: AppState, viewModel: PayerViewModel, onSubmit: () -> Unit) {
             labelResId = R.string.full_name_hint,
             leadingIcon = {
                 Icon(
-                    painterResource(com.oborodulin.home.presentation.R.drawable.outline_person_24),
+                    painterResource(com.oborodulin.home.presentation.R.drawable.outline_person_black_36),
                     null
                 )
             },
@@ -205,10 +228,9 @@ fun Payer(appState: AppState, viewModel: PayerViewModel, onSubmit: () -> Unit) {
             onValueChange = { viewModel.onTextFieldEntered(PayerInputEvent.FullName(it)) },
             onImeKeyAction = viewModel::moveFocusImeAction
         )
-        Spacer(Modifier.height(8.dp))
         TextFieldComponent(
             modifier = Modifier
-                .height(80.dp)
+                .height(90.dp)
                 .focusRequester(addressFocusRequester)
                 .onFocusChanged { focusState ->
                     viewModel.onTextFieldFocusChanged(
@@ -219,7 +241,7 @@ fun Payer(appState: AppState, viewModel: PayerViewModel, onSubmit: () -> Unit) {
             labelResId = R.string.address_hint,
             leadingIcon = {
                 Icon(
-                    painterResource(com.oborodulin.home.presentation.R.drawable.outline_house_black_24),
+                    painterResource(com.oborodulin.home.presentation.R.drawable.outline_house_black_36),
                     null
                 )
             },
@@ -235,7 +257,6 @@ fun Payer(appState: AppState, viewModel: PayerViewModel, onSubmit: () -> Unit) {
             onValueChange = { viewModel.onTextFieldEntered(PayerInputEvent.Address(it)) },
             onImeKeyAction = viewModel::moveFocusImeAction
         )
-        Spacer(Modifier.height(8.dp))
         TextFieldComponent(
             modifier = Modifier
                 .focusRequester(totalAreaFocusRequester)
@@ -248,7 +269,7 @@ fun Payer(appState: AppState, viewModel: PayerViewModel, onSubmit: () -> Unit) {
             labelResId = R.string.total_area_hint,
             leadingIcon = {
                 Icon(
-                    painterResource(com.oborodulin.home.presentation.R.drawable.outline_space_dashboard_black_24),
+                    painterResource(com.oborodulin.home.presentation.R.drawable.outline_space_dashboard_black_36),
                     null
                 )
             },
@@ -262,7 +283,6 @@ fun Payer(appState: AppState, viewModel: PayerViewModel, onSubmit: () -> Unit) {
             onValueChange = { viewModel.onTextFieldEntered(PayerInputEvent.TotalArea(it)) },
             onImeKeyAction = viewModel::moveFocusImeAction
         )
-        Spacer(Modifier.height(8.dp))
         TextFieldComponent(
             modifier = Modifier
                 .focusRequester(livingSpaceFocusRequester)
@@ -275,7 +295,7 @@ fun Payer(appState: AppState, viewModel: PayerViewModel, onSubmit: () -> Unit) {
             labelResId = R.string.living_space_hint,
             leadingIcon = {
                 Icon(
-                    painterResource(com.oborodulin.home.presentation.R.drawable.outline_aspect_ratio_black_24),
+                    painterResource(com.oborodulin.home.presentation.R.drawable.outline_aspect_ratio_black_36),
                     null
                 )
             },
@@ -289,7 +309,6 @@ fun Payer(appState: AppState, viewModel: PayerViewModel, onSubmit: () -> Unit) {
             onValueChange = { viewModel.onTextFieldEntered(PayerInputEvent.LivingSpace(it)) },
             onImeKeyAction = viewModel::moveFocusImeAction
         )
-        Spacer(Modifier.height(8.dp))
         TextFieldComponent(
             modifier = Modifier
                 .focusRequester(heatedVolumeFocusRequester)
@@ -302,25 +321,117 @@ fun Payer(appState: AppState, viewModel: PayerViewModel, onSubmit: () -> Unit) {
             labelResId = R.string.heated_volume_hint,
             leadingIcon = {
                 Icon(
-                    painterResource(com.oborodulin.home.presentation.R.drawable.outline_outbox_black_24),
+                    painterResource(com.oborodulin.home.presentation.R.drawable.outline_outbox_black_36),
                     null
                 )
             },
             keyboardOptions = remember {
                 KeyboardOptions(
                     keyboardType = KeyboardType.Number,
-                    imeAction = ImeAction.Done
+                    imeAction = ImeAction.Next
                 )
             },
             inputWrapper = heatedVolume,
             onValueChange = { viewModel.onTextFieldEntered(PayerInputEvent.HeatedVolume(it)) },
-            onImeKeyAction = { } //viewModel.onContinueClick { onSubmit() }
+            onImeKeyAction = viewModel::moveFocusImeAction
         )
-        Spacer(Modifier.height(24.dp))
+        val selectedItem = remember { mutableStateOf(paymentDay.value) }
+        var expanded by remember { mutableStateOf(false) }
+        // the box
+        ExposedDropdownMenuBox(
+            expanded = expanded,
+            onExpandedChange = {
+                expanded = !expanded
+            }
+        ) {
+            // text field
+            TextFieldComponent(
+                modifier = Modifier
+                    .focusRequester(paymentDayFocusRequester)
+                    .onFocusChanged { focusState ->
+                        viewModel.onTextFieldFocusChanged(
+                            focusedField = PayerFields.PAYMENT_DAY,
+                            isFocused = focusState.isFocused
+                        )
+                    },
+                labelResId = R.string.payment_day_hint,
+                readOnly = true,
+                leadingIcon = {
+                    Icon(
+                        painterResource(com.oborodulin.home.common.R.drawable.outline_calendar_month_black_36),
+                        null
+                    )
+                },
+                trailingIcon = {
+                    ExposedDropdownMenuDefaults.TrailingIcon(
+                        expanded = expanded
+                    )
+                },
+                keyboardOptions = remember {
+                    KeyboardOptions(
+                        keyboardType = KeyboardType.Number,
+                        imeAction = ImeAction.Next
+                    )
+                },
+                inputWrapper = InputWrapper(selectedItem.value),
+                onValueChange = { viewModel.onTextFieldEntered(PayerInputEvent.PaymentDay(it)) },
+                onImeKeyAction = viewModel::moveFocusImeAction,
+                //colors = ExposedDropdownMenuDefaults.textFieldColors()
+            )
+            ExposedDropdownMenu(
+                expanded = expanded,
+                onDismissRequest = { expanded = false }
+            ) {
+                (1..28).forEach { selectedOption ->
+                    // menu item
+                    DropdownMenuItem(onClick = {
+                        selectedItem.value = selectedOption.toString()
+                        //viewModel.onTextFieldEntered(PayerInputEvent.PaymentDay(selectedItem.value))
+                        expanded = false
+                    }) {
+                        Text(text = selectedOption.toString())
+                    }
+                }
+            }
+        }
+        TextFieldComponent(
+            modifier = Modifier
+                .focusRequester(personsNumFocusRequester)
+                .onFocusChanged { focusState ->
+                    viewModel.onTextFieldFocusChanged(
+                        focusedField = PayerFields.PERSONS_NUM,
+                        isFocused = focusState.isFocused
+                    )
+                },
+            labelResId = R.string.persons_num_hint,
+            leadingIcon = {
+                Icon(
+                    painterResource(com.oborodulin.home.presentation.R.drawable.outline_people_black_36),
+                    null
+                )
+            },
+            keyboardOptions = remember {
+                KeyboardOptions(
+                    keyboardType = KeyboardType.Decimal,
+                    imeAction = ImeAction.Next
+                    //imeAction = ImeAction.Done
+                )
+            },
+            inputWrapper = personsNum,
+            onValueChange = { viewModel.onTextFieldEntered(PayerInputEvent.PersonsNum(it)) },
+            onImeKeyAction = viewModel::moveFocusImeAction
+            //onImeKeyAction = { } //viewModel.onContinueClick { onSubmit() }
+        )
+        Spacer(Modifier.height(12.dp))
         Button(onClick = {
             viewModel.onContinueClick {
                 onSubmit()
-                appState.backToBottomBarScreen()
+                viewModel.viewModelScope().launch {
+                    viewModel.actionsJobFlow.collect {
+                        it?.join()
+                        appState.backToBottomBarScreen()
+                    }
+                }
             }
         }, enabled = areInputsValid) {
             Text(text = stringResource(com.oborodulin.home.common.R.string.btn_save_lbl))

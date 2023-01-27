@@ -33,7 +33,6 @@ abstract class SingleViewModel<T : Any, S : UiState<T>, A : UiAction, E : UiSing
 
     private val errorHandler = CoroutineExceptionHandler { _, exception ->
         Timber.tag(TAG).e(exception)
-        //_uiState.value = _uiState.value.copy(error = exception.message, isLoading = false)
     }
 
     init {
@@ -47,7 +46,7 @@ abstract class SingleViewModel<T : Any, S : UiState<T>, A : UiAction, E : UiSing
         }
     }
 
-    override fun initFieldStatesByUiModel(uiModel: Any) {}
+    override fun initFieldStatesByUiModel(uiModel: Any): Job? = null
 
     abstract suspend fun observeInputEvents()
 

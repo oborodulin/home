@@ -9,6 +9,8 @@ sealed class PayerInputEvent(val value: String) : Inputable {
     data class TotalArea(val input: String) : PayerInputEvent(input)
     data class LivingSpace(val input: String) : PayerInputEvent(input)
     data class HeatedVolume(val input: String) : PayerInputEvent(input)
+    data class PaymentDay(val input: String) : PayerInputEvent(input)
+    data class PersonsNum(val input: String) : PayerInputEvent(input)
 
     override fun value(): String {
         return this.value

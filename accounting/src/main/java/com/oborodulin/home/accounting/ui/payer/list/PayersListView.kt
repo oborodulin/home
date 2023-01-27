@@ -5,24 +5,20 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.selection.selectableGroup
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.oborodulin.home.accounting.R
 import com.oborodulin.home.accounting.ui.AccountingUiAction
 import com.oborodulin.home.accounting.ui.AccountingViewModel
-import com.oborodulin.home.accounting.ui.AccountingViewModelImp
 import com.oborodulin.home.accounting.ui.model.PayerListItemModel
 import com.oborodulin.home.common.ui.components.items.ListItemComponent
 import com.oborodulin.home.common.ui.state.CommonScreen
@@ -82,8 +78,8 @@ fun PayersList(
         LazyColumn(
             state = listState,
             modifier = Modifier
-                .padding(8.dp)
                 .selectableGroup() // Optional, for accessibility purpose
+                .padding(8.dp)
         ) {
             items(payers.size) { index ->
                 payers[index].let { payer ->

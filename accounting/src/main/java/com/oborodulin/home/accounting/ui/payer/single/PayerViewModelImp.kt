@@ -13,11 +13,9 @@ import com.oborodulin.home.domain.usecase.GetPayerUseCase
 import com.oborodulin.home.domain.usecase.PayerUseCases
 import com.oborodulin.home.domain.usecase.SavePayerUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.CoroutineExceptionHandler
-import kotlinx.coroutines.FlowPreview
+import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.*
-import kotlinx.coroutines.launch
 import timber.log.Timber
 import java.util.*
 import javax.inject.Inject
@@ -29,7 +27,7 @@ private const val TAG = "Accounting.ui.PayerViewModel"
 class PayerViewModelImp @Inject constructor(
     private val state: SavedStateHandle,
     private val payerUseCases: PayerUseCases,
-    private val converter: PayerConverter,
+    private val converter: PayerConverter
 ) : PayerViewModel, SingleViewModel<PayerModel, UiState<PayerModel>, PayerUiAction, UiSingleEvent>(
     state,
     PayerFields.ERC_CODE
@@ -76,6 +74,18 @@ class PayerViewModelImp @Inject constructor(
             InputWrapper()
         )
     }
+    override val paymentDay: StateFlow<InputWrapper> by lazy {
+        state.getStateFlow(
+            PayerFields.PAYMENT_DAY.name,
+            InputWrapper()
+        )
+    }
+    override val personsNum: StateFlow<InputWrapper> by lazy {
+        state.getStateFlow(
+            PayerFields.PERSONS_NUM.name,
+            InputWrapper()
+        )
+    }
 
     override val areInputsValid =
         combine(
@@ -89,9 +99,11 @@ class PayerViewModelImp @Inject constructor(
             },
             combine(
                 livingSpace,
-                heatedVolume
-            ) { livingSpace, heatedVolume ->
-                livingSpace.errorId == null && heatedVolume.errorId == null
+                heatedVolume,
+                paymentDay,
+                personsNum
+            ) { livingSpace, heatedVolume, paymentDay, personsNum ->
+                livingSpace.errorId == null && heatedVolume.errorId == null && paymentDay.errorId == null && personsNum.errorId == null
             }) { fieldsPartOne, fieldsPartTwo -> fieldsPartOne && fieldsPartTwo }.stateIn(
             viewModelScope,
             SharingStarted.WhileSubscribed(5000),
@@ -105,11 +117,11 @@ class PayerViewModelImp @Inject constructor(
 
     override fun initState(): UiState<PayerModel> = UiState.Loading
 
-    override suspend fun handleAction(action: PayerUiAction) {
+    override suspend fun handleAction(action: PayerUiAction): Job {
         Timber.tag(TAG).d("handleAction(PayerUiAction) called: %s", action.javaClass.name)
-        when (action) {
+        val job = when (action) {
             is PayerUiAction.Create -> {
-                initFieldStatesByUiModel(PayerModel())
+                submitState(UiState.Success(PayerModel()))
             }
             is PayerUiAction.Load -> {
                 loadPayer(action.payerId)
@@ -118,11 +130,12 @@ class PayerViewModelImp @Inject constructor(
                 savePayer()
             }
         }
+        return job
     }
 
-    private fun loadPayer(payerId: UUID) {
+    private fun loadPayer(payerId: UUID): Job {
         Timber.tag(TAG).d("loadPayer(UUID) called: %s", payerId.toString())
-        viewModelScope.launch(errorHandler) {
+        val job = viewModelScope.launch(errorHandler) {
             payerUseCases.getPayerUseCase.execute(GetPayerUseCase.Request(payerId))
                 .map {
                     converter.convert(it)
@@ -131,11 +144,12 @@ class PayerViewModelImp @Inject constructor(
                     submitState(it)
                 }
         }
+        return job
     }
 
-    private fun savePayer() {
+    private fun savePayer(): Job {
         Timber.tag(TAG).d("savePayer() called")
-        viewModelScope.launch(errorHandler) {
+        val job = viewModelScope.launch(errorHandler) {
             payerUseCases.savePayerUseCase.execute(
                 SavePayerUseCase.Request(
                     converter.toPayer(
@@ -146,28 +160,40 @@ class PayerViewModelImp @Inject constructor(
                             address = address.value.value,
                             totalArea = totalArea.value.value.toBigDecimalOrNull(),
                             livingSpace = livingSpace.value.value.toBigDecimalOrNull(),
-                            heatedVolume = heatedVolume.value.value.toBigDecimalOrNull()
+                            heatedVolume = heatedVolume.value.value.toBigDecimalOrNull(),
+                            paymentDay = paymentDay.value.value.toIntOrNull(),
+                            personsNum = personsNum.value.value.toIntOrNull()
                         )
                     )
                 )
             ).collect {}
         }
+        return job
     }
 
-    private fun initFieldStatesByUiModel(payerModel: PayerModel) {
-        super.initFieldStatesByUiModel(payerModel)
+    override fun initFieldStatesByUiModel(uiModel: Any): Job? {
+        super.initFieldStatesByUiModel(uiModel)
+        val payerModel = uiModel as PayerModel
         Timber.tag(TAG)
             .d("initFieldStatesByUiModel(PayerModel) called: payerModel = %s", payerModel)
-        state[PayerFields.PAYER_ID.name] = InputWrapper(payerModel.id.toString())
-        state[PayerFields.ERC_CODE.name] = InputWrapper(payerModel.ercCode)
-        state[PayerFields.FULL_NAME.name] = InputWrapper(payerModel.fullName)
-        state[PayerFields.ADDRESS.name] = InputWrapper(payerModel.address)
-        state[PayerFields.TOTAL_AREA.name] = InputWrapper(payerModel.totalArea?.toString() ?: "")
-        state[PayerFields.LIVING_SPACE.name] =
-            InputWrapper(payerModel.livingSpace?.toString() ?: "")
+        state[PayerFields.PAYER_ID.name] = payerId.value.copy(value = payerModel.id.toString())
+        state[PayerFields.ERC_CODE.name] = ercCode.value.copy(value = payerModel.ercCode)
+        state[PayerFields.FULL_NAME.name] = fullName.value.copy(value = payerModel.fullName)
+        state[PayerFields.ADDRESS.name] = address.value.copy(value = payerModel.address)
+
+        val strTotalArea = payerModel.totalArea?.toString() ?: ""
+        state[PayerFields.TOTAL_AREA.name] = totalArea.value.copy(value = strTotalArea)
+
+        val strlivingSpace = payerModel.livingSpace?.toString() ?: ""
+        state[PayerFields.LIVING_SPACE.name] = livingSpace.value.copy(value = strlivingSpace)
+
         state[PayerFields.HEATED_VOLUME.name] =
-            InputWrapper(payerModel.heatedVolume?.toString() ?: "")
-        submitState(UiState.Success(payerModel))
+            heatedVolume.value.copy(value = payerModel.heatedVolume?.toString() ?: "")
+        state[PayerFields.PAYMENT_DAY.name] =
+            paymentDay.value.copy(value = payerModel.paymentDay?.toString() ?: "")
+        state[PayerFields.PERSONS_NUM.name] =
+            personsNum.value.copy(value = payerModel.personsNum?.toString() ?: "")
+        return null
     }
 
     override suspend fun observeInputEvents() {
@@ -275,6 +301,44 @@ class PayerViewModelImp @Inject constructor(
                             heatedVolume.value
                         )
                     }
+                    is PayerInputEvent.PaymentDay -> {
+                        when (PayerInputValidator.PaymentDay.errorIdOrNull(event.input)) {
+                            null -> {
+                                state[PayerFields.PAYMENT_DAY.name] = paymentDay.value.copy(
+                                    value = event.input,
+                                    errorId = null
+                                )
+                            }
+                            else -> {
+                                state[PayerFields.PAYMENT_DAY.name] =
+                                    paymentDay.value.copy(value = event.input)
+                            }
+                        }
+                        Timber.tag(TAG).d(
+                            "Validate: %s = %s",
+                            PayerFields.PAYMENT_DAY.name,
+                            paymentDay.value
+                        )
+                    }
+                    is PayerInputEvent.PersonsNum -> {
+                        when (PayerInputValidator.PersonsNum.errorIdOrNull(event.input)) {
+                            null -> {
+                                state[PayerFields.PERSONS_NUM.name] = personsNum.value.copy(
+                                    value = event.input,
+                                    errorId = null
+                                )
+                            }
+                            else -> {
+                                state[PayerFields.PERSONS_NUM.name] =
+                                    personsNum.value.copy(value = event.input)
+                            }
+                        }
+                        Timber.tag(TAG).d(
+                            "Validate: %s = %s",
+                            PayerFields.PERSONS_NUM.name,
+                            personsNum.value
+                        )
+                    }
                 }
             }
             .debounce(350)
@@ -333,6 +397,24 @@ class PayerViewModelImp @Inject constructor(
                             errorId?.toString()
                         )
                     }
+                    is PayerInputEvent.PaymentDay -> {
+                        val errorId = PayerInputValidator.PaymentDay.errorIdOrNull(event.input)
+                        state[PayerFields.PAYMENT_DAY.name] =
+                            paymentDay.value.copy(errorId = errorId)
+                        Timber.tag(TAG).d(
+                            "Validate (debounce): %s - ERR[%s]", PayerFields.PAYMENT_DAY.name,
+                            errorId?.toString()
+                        )
+                    }
+                    is PayerInputEvent.PersonsNum -> {
+                        val errorId = PayerInputValidator.PersonsNum.errorIdOrNull(event.input)
+                        state[PayerFields.PERSONS_NUM.name] =
+                            personsNum.value.copy(errorId = errorId)
+                        Timber.tag(TAG).d(
+                            "Validate (debounce): %s - ERR[%s]", PayerFields.PERSONS_NUM.name,
+                            errorId?.toString()
+                        )
+                    }
                 }
             }
     }
@@ -358,6 +440,12 @@ class PayerViewModelImp @Inject constructor(
         PayerInputValidator.HeatedVolume.errorIdOrNull(heatedVolume.value.value)?.let {
             inputErrors.add(InputError(PayerFields.HEATED_VOLUME.name, it))
         }
+        PayerInputValidator.PaymentDay.errorIdOrNull(paymentDay.value.value)?.let {
+            inputErrors.add(InputError(PayerFields.PAYMENT_DAY.name, it))
+        }
+        PayerInputValidator.PersonsNum.errorIdOrNull(personsNum.value.value)?.let {
+            inputErrors.add(InputError(PayerFields.PERSONS_NUM.name, it))
+        }
         return if (inputErrors.isEmpty()) null else inputErrors
     }
 
@@ -372,6 +460,8 @@ class PayerViewModelImp @Inject constructor(
                 PayerFields.TOTAL_AREA.name -> totalArea.value.copy(errorId = error.errorId)
                 PayerFields.LIVING_SPACE.name -> livingSpace.value.copy(errorId = error.errorId)
                 PayerFields.HEATED_VOLUME.name -> heatedVolume.value.copy(errorId = error.errorId)
+                PayerFields.PAYMENT_DAY.name -> paymentDay.value.copy(errorId = error.errorId)
+                PayerFields.PERSONS_NUM.name -> personsNum.value.copy(errorId = error.errorId)
                 else -> null
             }
         }
@@ -381,15 +471,20 @@ class PayerViewModelImp @Inject constructor(
         val previewModel =
             object : PayerViewModel {
                 override val events = Channel<ScreenEvent>().receiveAsFlow()
+                override val actionsJobFlow: SharedFlow<Job?> = MutableSharedFlow()
+
                 override val ercCode = MutableStateFlow(InputWrapper())
                 override val fullName = MutableStateFlow(InputWrapper())
                 override val address = MutableStateFlow(InputWrapper())
                 override val totalArea = MutableStateFlow(InputWrapper())
                 override val livingSpace = MutableStateFlow(InputWrapper())
                 override val heatedVolume = MutableStateFlow(InputWrapper())
+                override val paymentDay = MutableStateFlow(InputWrapper())
+                override val personsNum = MutableStateFlow(InputWrapper())
 
                 override val areInputsValid = MutableStateFlow(true)
 
+                override fun viewModelScope(): CoroutineScope = CoroutineScope(Dispatchers.Main)
                 override fun onTextFieldEntered(inputEvent: Inputable) {}
                 override fun onTextFieldFocusChanged(focusedField: Focusable, isFocused: Boolean) {}
                 override fun moveFocusImeAction() {}

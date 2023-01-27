@@ -47,37 +47,44 @@ fun ListItemComponent(
         .d("ListItemComponent(...) called: {\"listItem\": {\"icon\": $icon, \"title\": \"${item.title}\", \"desc\": \"${item.descr}\"}}")
     Card(
         modifier = Modifier
-            .padding(horizontal = 8.dp, vertical = 4.dp)
             .fillMaxWidth()
             .height(88.dp)
             .clip(RoundedCornerShape(8.dp))
             .background(background)
-            .selectable(selected = selected, onClick = { if (onClick !== EMPTY) onClick(item) }),
+            .selectable(selected = selected, onClick = { if (onClick !== EMPTY) onClick(item) })
+            .padding(horizontal = 8.dp, vertical = 4.dp),
         //.background(color = MaterialTheme.colors.background)
         //.clickable {}
         elevation = 10.dp
     ) {
         Row(
             Modifier
-                .padding(all = 4.dp)
                 .fillMaxSize()
+                .padding(all = 4.dp)
         ) {
-            icon?.let {
-                Image(
-                    modifier = Modifier
-                        .padding(4.dp)
-                        .size(80.dp)
-                        .clip(RoundedCornerShape(8.dp)),
-                    painter = painterResource(icon),
-                    contentScale = ContentScale.Crop,
-                    contentDescription = ""
-                )
+            Column(
+                Modifier
+                    .weight(1f)
+                    .width(80.dp)
+            ) {
+                icon?.let {
+                    Image(
+                        modifier = Modifier
+                            .size(80.dp)
+                            .clip(RoundedCornerShape(8.dp))
+                            .padding(4.dp),
+                        painter = painterResource(icon),
+                        contentScale = ContentScale.Crop,
+                        contentDescription = ""
+                    )
+                }
             }
             Column(
                 verticalArrangement = Top,
                 modifier = Modifier
-                    .padding(vertical = 4.dp, horizontal = 8.dp)
                     .fillMaxHeight()
+                    .weight(2.5f)
+                    //.padding(horizontal = 8.dp)
             ) {
                 Text(
                     text = item.title,
@@ -85,45 +92,42 @@ fun ListItemComponent(
                 )
                 item.descr?.let {
                     Text(
+                        modifier = Modifier.padding(vertical = 4.dp),
                         text = item.descr,
-                        modifier = Modifier.padding(vertical = 8.dp),
                         maxLines = 2,
                         overflow = TextOverflow.Ellipsis
                     )
                 }
             }
             Column(
-                verticalArrangement = Top,
-                modifier = Modifier
-                    .padding(all = 4.dp)
-                    .fillMaxHeight()
+                modifier = Modifier.fillMaxHeight()
+                .weight(0.5f),
+                verticalArrangement = Top
             ) {
                 Row(
-                    modifier = Modifier
-                        .padding(all = 4.dp)
-                        .fillMaxSize(),
-                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier.fillMaxSize(),
                     horizontalArrangement = Arrangement.End
                 ) {
-                    if (onEdit !== EMPTY) {
-                        Image(
-                            modifier = Modifier
-                                .padding(4.dp)
-                                .clip(RoundedCornerShape(8.dp))
-                                .clickable { onEdit(item) },
-                            painter = painterResource(R.drawable.outline_mode_edit_black_24),
-                            contentDescription = ""
-                        )
-                    }
-                    if (onDelete !== EMPTY) {
-                        Image(
-                            modifier = Modifier
-                                .padding(4.dp)
-                                .clip(RoundedCornerShape(8.dp))
-                                .clickable { onDelete(item) },
-                            painter = painterResource(R.drawable.outline_delete_black_24),
-                            contentDescription = ""
-                        )
+                    Column {
+                        if (onEdit !== EMPTY) {
+                            Image(
+                                modifier = Modifier
+                                    .clip(RoundedCornerShape(8.dp))
+                                    .clickable { onEdit(item) },
+                                painter = painterResource(R.drawable.outline_mode_edit_black_24),
+                                contentDescription = ""
+                            )
+                        }
+                        Spacer(Modifier.height(24.dp))
+                        if (onDelete !== EMPTY) {
+                            Image(
+                                modifier = Modifier
+                                    .clip(RoundedCornerShape(8.dp))
+                                    .clickable { onDelete(item) },
+                                painter = painterResource(R.drawable.outline_delete_black_24),
+                                contentDescription = ""
+                            )
+                        }
                     }
                 }
             }

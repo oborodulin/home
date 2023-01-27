@@ -14,6 +14,7 @@ import com.oborodulin.home.metering.ui.model.converters.MeterValueConverter
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.FlowPreview
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
@@ -63,19 +64,20 @@ class MeterValueViewModelImp @Inject constructor(
 
     override fun initState() = UiState.Loading
 
-    override suspend fun handleAction(action: MeterValueUiAction) {
+    override suspend fun handleAction(action: MeterValueUiAction): Job {
         Timber.tag(TAG)
             .d("handleAction(MeterValueUiAction) called: %s", action.javaClass.name)
-        when (action) {
+        val job = when (action) {
             is MeterValueUiAction.Save -> {
                 saveMeterValue()
             }
         }
+        return job
     }
 
-    private fun saveMeterValue() {
+    private fun saveMeterValue(): Job {
         Timber.tag(TAG).d("saveMeterValue() called")
-        viewModelScope.launch(errorHandler) {
+        val job = viewModelScope.launch(errorHandler) {
             meterUseCases.saveMeterValueUseCase.execute(
                 SaveMeterValueUseCase.Request(
                     converter.toMeterValue(
@@ -88,22 +90,26 @@ class MeterValueViewModelImp @Inject constructor(
                 )
             ).collect {}
         }
+        return job
     }
 
-    override fun initFieldStatesByUiModel(meterValueModel: MeterValueModel) {
-        super.initFieldStatesByUiModel(meterValueModel)
+    override fun initFieldStatesByUiModel(uiModel: Any): Job? {
+        super.initFieldStatesByUiModel(uiModel)
+        val meterValueModel = uiModel as MeterValueModel
         Timber.tag(TAG)
             .d(
                 "initFieldStatesByUiModel(MeterValueModel) called: meterValueModel = %s",
                 meterValueModel
             )
-        state[MeterValueFields.METER_VALUE_ID.name] = InputWrapper(meterValueModel.id.toString())
-        state[MeterValueFields.METERS_ID.name] = InputWrapper(meterValueModel.metersId.toString())
+        state[MeterValueFields.METER_VALUE_ID.name] =
+            meterValueId.value.copy(value = meterValueModel.id.toString())
+        state[MeterValueFields.METERS_ID.name] =
+            meterValueId.value.copy(value = meterValueModel.metersId.toString())
         meterValueModel.currentValue?.let {
             state[MeterValueFields.METER_CURR_VALUE.name] =
-                InputWrapper(it.toString())
+                currentValue.value.copy(value = it.toString())
         }
-        submitState(UiState.Success(meterValueModel))
+        return null
     }
 
     override suspend fun observeInputEvents() {
@@ -169,14 +175,15 @@ class MeterValueViewModelImp @Inject constructor(
         val previewModel =
             object : MeterValueViewModel {
                 override val events = Channel<ScreenEvent>().receiveAsFlow()
+
                 override val currentValue = MutableStateFlow(InputWrapper())
                 override val areInputsValid = MutableStateFlow(true)
 
-                override fun initFieldStatesByUiModel(meterValueModel: MeterValueModel) {}
+                override fun initFieldStatesByUiModel(uiModel: Any): Job? = null
                 override fun onTextFieldEntered(inputEvent: Inputable) {}
                 override fun onTextFieldFocusChanged(focusedField: Focusable, isFocused: Boolean) {}
                 override fun onContinueClick(onSuccess: () -> Unit) {}
-                override fun submitAction(action: MeterValueUiAction) {}
+                override fun submitAction(action: MeterValueUiAction): Job? = null
             }
     }
 }

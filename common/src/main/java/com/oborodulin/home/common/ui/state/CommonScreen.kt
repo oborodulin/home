@@ -18,11 +18,9 @@ fun <T : Any> CommonScreen(
     onSuccess: @Composable (T) -> Unit
 ) {
     Timber.tag(TAG).d("CommonScreen(...) called")
-    val modifier = when (paddingValues) {
-        null -> Modifier.fillMaxSize()
-        else -> Modifier
-            .fillMaxSize()
-            .padding(paddingValues)
+    val modifier = Modifier.fillMaxSize()
+    if (paddingValues != null) {
+        modifier.padding(paddingValues)
     }
     when (state) {
         is UiState.Loading -> {

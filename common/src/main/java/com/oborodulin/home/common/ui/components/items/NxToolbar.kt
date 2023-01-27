@@ -33,11 +33,11 @@ fun NxToolbar(clickBackButton: () -> Unit = {}) {
 
         Box(
             modifier = Modifier
-                .padding(start = 8.dp)
                 .weight(1f)
                 .clickable {
                        clickBackButton.invoke()
-                },
+                }
+                .padding(start = 8.dp),
             contentAlignment = Alignment.CenterStart
         ) {
             Icon(

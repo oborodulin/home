@@ -15,9 +15,9 @@ fun ShimmerGridItem(brush: Brush) {
     Box(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(8.dp)
             .clip(RoundedCornerShape(6.dp))
             .background(color = MaterialTheme.colors.background)
+            .padding(8.dp)
     ) {
         Column(
             modifier = Modifier

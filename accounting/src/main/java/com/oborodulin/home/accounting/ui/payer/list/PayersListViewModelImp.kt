@@ -11,7 +11,7 @@ import com.oborodulin.home.domain.usecase.PayerUseCases
 import com.oborodulin.home.presentation.navigation.NavRoutes
 import com.oborodulin.home.presentation.navigation.PayerInput
 import dagger.hilt.android.lifecycle.HiltViewModel
-import dagger.hilt.android.qualifiers.ApplicationContext
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.map
@@ -19,7 +19,7 @@ import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 import timber.log.Timber
 import java.math.BigDecimal
-import java.util.UUID
+import java.util.*
 import javax.inject.Inject
 
 private const val TAG = "Accounting.ui.PayersListViewModel"
@@ -33,10 +33,10 @@ class PayersListViewModelImp @Inject constructor(
 
     override fun initState() = UiState.Loading
 
-    override suspend fun handleAction(action: PayersListUiAction) {
+    override suspend fun handleAction(action: PayersListUiAction): Job? {
         Timber.tag(TAG)
             .d("handleAction(PayersListUiAction) called: %s", action.javaClass.name)
-        when (action) {
+        val job = when (action) {
             is PayersListUiAction.Load -> {
                 loadPayers()
             }
@@ -50,6 +50,7 @@ class PayersListViewModelImp @Inject constructor(
                 )
             }
             is PayersListUiAction.DeletePayer -> {
+                null
             }
             /*is PostListUiAction.UserClick -> {
                 updateInteraction(action.interaction)
@@ -62,11 +63,12 @@ class PayersListViewModelImp @Inject constructor(
                 )
             }*/
         }
+        return job
     }
 
-    private fun loadPayers() {
+    private fun loadPayers(): Job {
         Timber.tag(TAG).d("loadPayers() called")
-        viewModelScope.launch {
+        val job = viewModelScope.launch {
             payerUseCases.getPayersUseCase.execute(GetPayersUseCase.Request).map {
                 converter.convert(it)
             }
@@ -74,9 +76,10 @@ class PayersListViewModelImp @Inject constructor(
                     submitState(it)
                 }
         }
+        return job
     }
 
-    override fun initFieldStatesByUiModel(uiModel: Any) {}
+    override fun initFieldStatesByUiModel(uiModel: Any): Job? = null
 
     /*    private fun getPayers() {
             viewModelScope.launch(errorHandler) {
@@ -113,7 +116,9 @@ class PayersListViewModelImp @Inject constructor(
                 override val uiStateFlow = MutableStateFlow(UiState.Success(previewList(ctx)))
                 override val singleEventFlow = Channel<PayersListUiSingleEvent>().receiveAsFlow()
 
-                override fun submitAction(action: PayersListUiAction) {}
+                override fun submitAction(action: PayersListUiAction): Job? {
+                    return null
+                }
             }
 
         fun previewList(ctx: Context) = listOf(
