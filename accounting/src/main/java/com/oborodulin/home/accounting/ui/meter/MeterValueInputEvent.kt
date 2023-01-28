@@ -1,6 +1,6 @@
 package com.oborodulin.home.accounting.ui.meter
 
-import com.oborodulin.home.common.ui.components.field.Inputable
+import com.oborodulin.home.common.ui.components.field.util.Inputable
 
 sealed class MeterValueInputEvent(val value: String) : Inputable {
     data class CurrentValue(val input: String) : MeterValueInputEvent(input)

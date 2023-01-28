@@ -1,14 +1,9 @@
-package com.oborodulin.home.common.ui.state
+package com.oborodulin.home.common.ui.components.field.util
 
 import android.content.Context
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.focus.FocusManager
-import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalFocusManager
-import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.platform.SoftwareKeyboardController
-import com.oborodulin.home.common.ui.components.field.InputFocusRequester
-import com.oborodulin.home.common.ui.components.field.ScreenEvent
 import com.oborodulin.home.common.util.toast
 import timber.log.Timber
 

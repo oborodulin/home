@@ -13,10 +13,13 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.oborodulin.home.presentation.navigation.NavRoutes
 import kotlinx.coroutines.CoroutineScope
+import timber.log.Timber
 
 /**
  * Remembers and creates an instance of [AppState]
  */
+private const val TAG = "Presentation.AppState"
+
 @Composable
 fun rememberAppState(
     accountingScaffoldState: ScaffoldState = rememberScaffoldState(),
@@ -80,6 +83,7 @@ class AppState(
 
     // Возврат к экрану из главного меню нижней панели.
     fun backToBottomBarScreen() {
+        Timber.tag(TAG).d("backToBottomBarScreen() called")
         this.commonNavController.popBackStack()
         this.commonNavController.navigate(NavRoutes.Home.route) {
             popUpTo(commonNavController.graph.startDestinationId)

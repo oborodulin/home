@@ -9,7 +9,7 @@ data class Payer(
     var totalArea: BigDecimal? = null,
     var livingSpace: BigDecimal? = null,
     var heatedVolume: BigDecimal? = null,
-    var paymentDay: Int? = null,
-    var personsNum: Int? = null,
+    var paymentDay: Int = 20,
+    var personsNum: Int = 1,
     var isFavorite: Boolean = false,
 ) : DomainModel()

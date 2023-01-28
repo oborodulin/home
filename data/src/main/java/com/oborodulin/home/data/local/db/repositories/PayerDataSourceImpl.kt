@@ -34,7 +34,11 @@ class PayerDataSourceImpl @Inject constructor(
         payerDao.findByIdDistinctUntilChanged(payerId).map { payerEntityMapper.toPayer(it) }
 
     override suspend fun savePayer(payer: Payer) = withContext(dispatcher) {
-        payerDao.insert(payerEntityMapper.toPayerEntity(payer))
+        if (payer.id == null) {
+            payerDao.insert(payerEntityMapper.toPayerEntity(payer))
+        } else {
+            payerDao.update(payerEntityMapper.toPayerEntity(payer))
+        }
     }
 
     override suspend fun deletePayer(payer: Payer) = withContext(dispatcher) {

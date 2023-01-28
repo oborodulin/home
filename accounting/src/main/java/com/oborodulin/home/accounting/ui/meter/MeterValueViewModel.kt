@@ -1,10 +1,9 @@
 package com.oborodulin.home.accounting.ui.meter
 
-import com.oborodulin.home.common.ui.components.field.Focusable
-import com.oborodulin.home.common.ui.components.field.InputWrapper
-import com.oborodulin.home.common.ui.components.field.Inputable
-import com.oborodulin.home.common.ui.components.field.ScreenEvent
-import com.oborodulin.home.metering.ui.model.MeterValueModel
+import com.oborodulin.home.common.ui.components.field.util.Focusable
+import com.oborodulin.home.common.ui.components.field.util.InputWrapper
+import com.oborodulin.home.common.ui.components.field.util.Inputable
+import com.oborodulin.home.common.ui.components.field.util.ScreenEvent
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.StateFlow

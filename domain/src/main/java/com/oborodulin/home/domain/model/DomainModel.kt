@@ -4,6 +4,6 @@ import java.io.Serializable
 import java.util.*
 
 open class DomainModel(
-    var id: UUID = UUID.randomUUID(),
+    var id: UUID? = null,
 ) : Serializable
 

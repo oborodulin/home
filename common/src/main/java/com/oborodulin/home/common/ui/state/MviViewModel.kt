@@ -10,6 +10,7 @@ import kotlinx.coroutines.launch
 import timber.log.Timber
 
 private const val TAG = "Common.MviViewModel"
+const val FOCUSED_FIELD_KEY = "focusedTextField"
 
 abstract class MviViewModel<T : Any, S : UiState<T>, A : UiAction, E : UiSingleEvent> :
     ViewModel() {
@@ -34,7 +35,9 @@ abstract class MviViewModel<T : Any, S : UiState<T>, A : UiAction, E : UiSingleE
         viewModelScope.launch(errorHandler) {
             Timber.tag(TAG).d("init: Start actionFlow.collect")
             _actionsFlow.collect {
-                _actionsJobFlow.emit(handleAction(it))
+                val job = handleAction(it)
+                _actionsJobFlow.emit(job)
+                Timber.tag(TAG).d("actionFlow.collect: emitted job = %s", job)
             }
         }
     }
@@ -59,7 +62,9 @@ abstract class MviViewModel<T : Any, S : UiState<T>, A : UiAction, E : UiSingleE
         Timber.tag(TAG).d("submitState: change ui state = %s", state.javaClass.name)
         val job = viewModelScope.launch(errorHandler) {
             _uiStateFlow.value = state
-            if (state is UiState.Success<*>) initFieldStatesByUiModel(state.data)
+            if (state is UiState.Success<*>) {
+                initFieldStatesByUiModel(state.data)
+            }
         }
         return job
     }

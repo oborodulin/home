@@ -14,7 +14,8 @@ import java.util.*
         entity = PayerServiceCrossRefEntity::class,
         parentColumns = arrayOf("payerServiceId"),
         childColumns = arrayOf("payersServicesId"),
-        onDelete = ForeignKey.CASCADE
+        onDelete = ForeignKey.CASCADE,
+        deferred = true
     )]
 )
 data class MeterEntity(

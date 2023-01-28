@@ -4,6 +4,7 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
 import com.oborodulin.home.common.ui.components.*
 import com.oborodulin.home.common.ui.components.field.*
+import com.oborodulin.home.common.ui.components.field.util.*
 import com.oborodulin.home.common.ui.state.SingleViewModel
 import com.oborodulin.home.common.ui.state.UiSingleEvent
 import com.oborodulin.home.common.ui.state.UiState
@@ -92,6 +93,8 @@ class MeterValueViewModelImp @Inject constructor(
         }
         return job
     }
+
+    override fun stateInputFields() = enumValues<MeterValueFields>().map { it.name }
 
     override fun initFieldStatesByUiModel(uiModel: Any): Job? {
         super.initFieldStatesByUiModel(uiModel)

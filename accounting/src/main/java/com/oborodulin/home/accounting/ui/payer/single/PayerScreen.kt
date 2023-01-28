@@ -34,9 +34,9 @@ import androidx.lifecycle.compose.ExperimentalLifecycleComposeApi
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.flowWithLifecycle
 import com.oborodulin.home.accounting.R
-import com.oborodulin.home.common.ui.components.field.InputWrapper
-import com.oborodulin.home.common.ui.components.field.ScreenEvent
+import com.oborodulin.home.common.ui.components.field.ExposedDropdownMenuBoxComponent
 import com.oborodulin.home.common.ui.components.field.TextFieldComponent
+import com.oborodulin.home.common.ui.components.field.util.ScreenEvent
 import com.oborodulin.home.common.ui.state.CommonScreen
 import com.oborodulin.home.common.ui.theme.HomeComposableTheme
 import com.oborodulin.home.common.util.toast
@@ -335,65 +335,34 @@ fun Payer(appState: AppState, viewModel: PayerViewModel, onSubmit: () -> Unit) {
             onValueChange = { viewModel.onTextFieldEntered(PayerInputEvent.HeatedVolume(it)) },
             onImeKeyAction = viewModel::moveFocusImeAction
         )
-        val selectedItem = remember { mutableStateOf(paymentDay.value) }
-        var expanded by remember { mutableStateOf(false) }
-        // the box
-        ExposedDropdownMenuBox(
-            expanded = expanded,
-            onExpandedChange = {
-                expanded = !expanded
-            }
-        ) {
-            // text field
-            TextFieldComponent(
-                modifier = Modifier
-                    .focusRequester(paymentDayFocusRequester)
-                    .onFocusChanged { focusState ->
-                        viewModel.onTextFieldFocusChanged(
-                            focusedField = PayerFields.PAYMENT_DAY,
-                            isFocused = focusState.isFocused
-                        )
-                    },
-                labelResId = R.string.payment_day_hint,
-                readOnly = true,
-                leadingIcon = {
-                    Icon(
-                        painterResource(com.oborodulin.home.common.R.drawable.outline_calendar_month_black_36),
-                        null
+        ExposedDropdownMenuBoxComponent(
+            modifier = Modifier
+                .focusRequester(paymentDayFocusRequester)
+                .onFocusChanged { focusState ->
+                    viewModel.onTextFieldFocusChanged(
+                        focusedField = PayerFields.PAYMENT_DAY,
+                        isFocused = focusState.isFocused
                     )
                 },
-                trailingIcon = {
-                    ExposedDropdownMenuDefaults.TrailingIcon(
-                        expanded = expanded
-                    )
-                },
-                keyboardOptions = remember {
-                    KeyboardOptions(
-                        keyboardType = KeyboardType.Number,
-                        imeAction = ImeAction.Next
-                    )
-                },
-                inputWrapper = InputWrapper(selectedItem.value),
-                onValueChange = { viewModel.onTextFieldEntered(PayerInputEvent.PaymentDay(it)) },
-                onImeKeyAction = viewModel::moveFocusImeAction,
-                //colors = ExposedDropdownMenuDefaults.textFieldColors()
-            )
-            ExposedDropdownMenu(
-                expanded = expanded,
-                onDismissRequest = { expanded = false }
-            ) {
-                (1..28).forEach { selectedOption ->
-                    // menu item
-                    DropdownMenuItem(onClick = {
-                        selectedItem.value = selectedOption.toString()
-                        //viewModel.onTextFieldEntered(PayerInputEvent.PaymentDay(selectedItem.value))
-                        expanded = false
-                    }) {
-                        Text(text = selectedOption.toString())
-                    }
-                }
-            }
-        }
+            labelResId = R.string.payment_day_hint,
+            leadingIcon = {
+                Icon(
+                    painterResource(com.oborodulin.home.common.R.drawable.outline_calendar_month_black_36),
+                    null
+                )
+            },
+            keyboardOptions = remember {
+                KeyboardOptions(
+                    keyboardType = KeyboardType.Number,
+                    imeAction = ImeAction.Next
+                )
+            },
+            inputWrapper = paymentDay,
+            listItems = (1..28).map { it.toString() },
+            onValueChange = { viewModel.onTextFieldEntered(PayerInputEvent.PaymentDay(it)) },
+            onImeKeyAction = viewModel::moveFocusImeAction,
+            //colors = ExposedDropdownMenuDefaults.textFieldColors()
+        )
         TextFieldComponent(
             modifier = Modifier
                 .focusRequester(personsNumFocusRequester)
@@ -422,16 +391,22 @@ fun Payer(appState: AppState, viewModel: PayerViewModel, onSubmit: () -> Unit) {
             onImeKeyAction = viewModel::moveFocusImeAction
             //onImeKeyAction = { } //viewModel.onContinueClick { onSubmit() }
         )
-        Spacer(Modifier.height(12.dp))
+        Spacer(Modifier.height(8.dp))
         Button(onClick = {
             viewModel.onContinueClick {
-                onSubmit()
+                Timber.tag(TAG).d("PayerScreen(...): Start viewModelScope.launch")
                 viewModel.viewModelScope().launch {
                     viewModel.actionsJobFlow.collect {
+                        Timber.tag(TAG).d(
+                            "PayerScreen(...): Start actionsJobFlow.collect [job = %s]",
+                            it?.toString()
+                        )
                         it?.join()
                         appState.backToBottomBarScreen()
                     }
                 }
+                onSubmit()
+                Timber.tag(TAG).d("PayerScreen(...): onSubmit() executed")
             }
         }, enabled = areInputsValid) {
             Text(text = stringResource(com.oborodulin.home.common.R.string.btn_save_lbl))

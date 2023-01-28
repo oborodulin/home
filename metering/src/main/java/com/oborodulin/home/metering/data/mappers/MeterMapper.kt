@@ -13,7 +13,7 @@ import java.util.*
 
 class MeterMapper {
     fun toMeter(metersView: MetersView): Meter {
-        val tl = MeterTl(measureUnit = metersView.tl.measureUnit ?: "", descr = metersView.tl.descr)
+        val tl = MeterTl(measureUnit = metersView.tl.measureUnit, descr = metersView.tl.descr)
         tl.id = metersView.tl.meterTlId
         val meter = Meter(
             payersServicesId = metersView.ps.payerServiceId,
@@ -49,20 +49,19 @@ class MeterMapper {
         return meterVerification
     }
 
-    fun toMeterEntity(meter: Meter) =
-        MeterEntity(
-            meterId = meter.id,
-            num = meter.num,
-            maxValue = meter.maxValue,
-            passportDate = meter.passportDate,
-            verificationPeriod = meter.verificationPeriod,
-            payersServicesId = meter.payersServicesId,
-        )
+    fun toMeterEntity(meter: Meter) = MeterEntity(
+        meterId = meter.id ?: meter.apply { id = UUID.randomUUID() }.id!!,
+        num = meter.num,
+        maxValue = meter.maxValue,
+        passportDate = meter.passportDate,
+        verificationPeriod = meter.verificationPeriod,
+        payersServicesId = meter.payersServicesId,
+    )
 
     fun toMeterTlEntity(meter: Meter) =
         MeterTlEntity(
-            meterTlId = meter.tl.id,
-            metersId = meter.id,
+            meterTlId = meter.tl.id ?: meter.tl.apply { id = UUID.randomUUID() }.id!!,
+            metersId = meter.id ?: meter.apply { id = UUID.randomUUID() }.id!!,
             localeCode = Locale.getDefault().language,
             measureUnit = meter.tl.measureUnit,
             descr = meter.tl.descr,
@@ -70,7 +69,7 @@ class MeterMapper {
 
     fun toMeterValueEntity(meterValue: MeterValue) =
         MeterValueEntity(
-            meterValueId = meterValue.id,
+            meterValueId = meterValue.id ?: meterValue.apply { id = UUID.randomUUID() }.id!!,
             valueDate = meterValue.valueDate,
             meterValue = meterValue.meterValue,
             metersId = meterValue.metersId
@@ -79,10 +78,10 @@ class MeterMapper {
     fun toMeterValueEntityList(meter: Meter) =
         meter.meterValues?.map {
             MeterValueEntity(
-                meterValueId = it.id,
+                meterValueId = it.id ?: it.apply { id = UUID.randomUUID() }.id!!,
+                metersId = meter.id ?: meter.apply { id = UUID.randomUUID() }.id!!,
                 valueDate = it.valueDate,
                 meterValue = it.meterValue,
-                metersId = meter.id
             )
         }
 
@@ -94,7 +93,7 @@ class MeterMapper {
                 startMeterValue = it.startMeterValue,
                 endMeterValue = it.endMeterValue,
                 isOk = it.isOk,
-                metersId = meter.id
+                metersId = meter.id ?: meter.apply { id = UUID.randomUUID() }.id!!,
             )
         }
 }

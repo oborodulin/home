@@ -26,6 +26,7 @@ import com.oborodulin.home.common.R
 import com.oborodulin.home.common.ui.model.ListItemModel
 import com.oborodulin.home.common.ui.theme.Typography
 import timber.log.Timber
+import java.util.*
 
 /**
  * Created by tfakioglu on 12.December.2021
@@ -44,7 +45,7 @@ fun ListItemComponent(
     onDelete: (ListItemModel) -> Unit = EMPTY
 ) {
     Timber.tag(TAG)
-        .d("ListItemComponent(...) called: {\"listItem\": {\"icon\": $icon, \"title\": \"${item.title}\", \"desc\": \"${item.descr}\"}}")
+        .d("ListItemComponent(...) called: {\"listItem\": {\"icon\": $icon, \"itemId\": \"${item.itemId}\", \"title\": \"${item.title}\", \"desc\": \"${item.descr}\"}}")
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -84,7 +85,7 @@ fun ListItemComponent(
                 modifier = Modifier
                     .fillMaxHeight()
                     .weight(2.5f)
-                    //.padding(horizontal = 8.dp)
+                //.padding(horizontal = 8.dp)
             ) {
                 Text(
                     text = item.title,
@@ -100,8 +101,9 @@ fun ListItemComponent(
                 }
             }
             Column(
-                modifier = Modifier.fillMaxHeight()
-                .weight(0.5f),
+                modifier = Modifier
+                    .fillMaxHeight()
+                    .weight(0.5f),
                 verticalArrangement = Top
             ) {
                 Row(
@@ -143,6 +145,7 @@ fun PreviewListItemComponent() {
     ListItemComponent(
         icon = R.drawable.outline_photo_24,
         item = ListItemModel(
+            itemId = UUID.randomUUID(),
             title = context.resources.getString(R.string.preview_blank_title),
             descr = context.resources.getString(R.string.preview_blank_descr),
         ),

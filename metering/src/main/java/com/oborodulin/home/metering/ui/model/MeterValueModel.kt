@@ -6,7 +6,7 @@ import java.time.OffsetDateTime
 import java.util.*
 
 data class MeterValueModel(
-    var id: UUID? = UUID.randomUUID(),
+    var id: UUID? = null,
     var metersId: UUID,
     var type: ServiceType? = null,
     val name: String = "",

@@ -12,7 +12,8 @@ import java.util.*
         entity = RateEntity::class,
         parentColumns = arrayOf("rateId"),
         childColumns = arrayOf("ratesId"),
-        onDelete = ForeignKey.CASCADE
+        onDelete = ForeignKey.CASCADE,
+        deferred = true
     )]
 )
 class RatePromotionEntity(

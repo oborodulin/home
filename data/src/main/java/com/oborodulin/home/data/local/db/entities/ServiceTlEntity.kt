@@ -12,7 +12,8 @@ import java.util.*
         entity = ServiceEntity::class,
         parentColumns = arrayOf("serviceId"),
         childColumns = arrayOf("servicesId"),
-        onDelete = ForeignKey.CASCADE
+        onDelete = ForeignKey.CASCADE,
+        deferred = true
     )]
 )
 class ServiceTlEntity(

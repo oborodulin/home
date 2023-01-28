@@ -4,6 +4,7 @@ import android.content.Context
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 import com.oborodulin.home.data.R
+import com.oborodulin.home.data.util.Constants.DEF_PAYMENT_DAY
 import java.math.BigDecimal
 import java.util.*
 
@@ -16,8 +17,8 @@ class PayerEntity(
     var totalArea: BigDecimal? = null,
     var livingSpace: BigDecimal? = null,
     var heatedVolume: BigDecimal? = null,
-    var paymentDay: Int? = null,
-    var personsNum: Int? = null,
+    var paymentDay: Int = DEF_PAYMENT_DAY,
+    var personsNum: Int = 1,
     var isFavorite: Boolean = false,
 ) {
     companion object {

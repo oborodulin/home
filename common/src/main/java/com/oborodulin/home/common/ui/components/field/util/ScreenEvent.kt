@@ -1,4 +1,4 @@
-package com.oborodulin.home.common.ui.components.field
+package com.oborodulin.home.common.ui.components.field.util
 
 import androidx.compose.ui.focus.FocusDirection
 

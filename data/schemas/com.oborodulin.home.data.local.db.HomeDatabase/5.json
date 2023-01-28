@@ -2,11 +2,11 @@
   "formatVersion": 1,
   "database": {
     "version": 5,
-    "identityHash": "a19cedd5fff830f4a1f332af5a1152fe",
+    "identityHash": "f50c5afcf18ebcd4844251eb64eaa42e",
     "entities": [
       {
         "tableName": "payers",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`payerId` TEXT NOT NULL, `ercCode` TEXT NOT NULL, `fullName` TEXT NOT NULL, `address` TEXT NOT NULL, `totalArea` INTEGER, `livingSpace` INTEGER, `heatedVolume` INTEGER, `paymentDay` INTEGER, `personsNum` INTEGER, `isFavorite` INTEGER NOT NULL, PRIMARY KEY(`payerId`))",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`payerId` TEXT NOT NULL, `ercCode` TEXT NOT NULL, `fullName` TEXT NOT NULL, `address` TEXT NOT NULL, `totalArea` INTEGER, `livingSpace` INTEGER, `heatedVolume` INTEGER, `paymentDay` INTEGER NOT NULL, `personsNum` INTEGER NOT NULL, `isFavorite` INTEGER NOT NULL, PRIMARY KEY(`payerId`))",
         "fields": [
           {
             "fieldPath": "payerId",
@@ -54,13 +54,13 @@
             "fieldPath": "paymentDay",
             "columnName": "paymentDay",
             "affinity": "INTEGER",
-            "notNull": false
+            "notNull": true
           },
           {
             "fieldPath": "personsNum",
             "columnName": "personsNum",
             "affinity": "INTEGER",
-            "notNull": false
+            "notNull": true
           },
           {
             "fieldPath": "isFavorite",
@@ -870,7 +870,7 @@
     ],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'a19cedd5fff830f4a1f332af5a1152fe')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'f50c5afcf18ebcd4844251eb64eaa42e')"
     ]
   }
 }

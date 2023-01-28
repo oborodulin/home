@@ -14,7 +14,8 @@ import java.util.*
         entity = MeterEntity::class,
         parentColumns = arrayOf("meterId"),
         childColumns = arrayOf("metersId"),
-        onDelete = ForeignKey.CASCADE
+        onDelete = ForeignKey.CASCADE,
+        deferred = true
     )]
 )
 data class MeterValueEntity(

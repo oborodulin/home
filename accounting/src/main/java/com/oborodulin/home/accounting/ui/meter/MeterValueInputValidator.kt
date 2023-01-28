@@ -1,7 +1,7 @@
 package com.oborodulin.home.accounting.ui.meter
 
 import com.oborodulin.home.common.R
-import com.oborodulin.home.common.ui.components.field.Validatable
+import com.oborodulin.home.common.ui.components.field.util.Validatable
 
 private const val TAG = "Accounting.ui.MeterValueInputValidator"
 

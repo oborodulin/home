@@ -6,6 +6,7 @@ import com.oborodulin.home.accounting.ui.model.PayerModel
 import com.oborodulin.home.accounting.ui.model.converters.PayerConverter
 import com.oborodulin.home.common.ui.components.*
 import com.oborodulin.home.common.ui.components.field.*
+import com.oborodulin.home.common.ui.components.field.util.*
 import com.oborodulin.home.common.ui.state.SingleViewModel
 import com.oborodulin.home.common.ui.state.UiSingleEvent
 import com.oborodulin.home.common.ui.state.UiState
@@ -148,51 +149,54 @@ class PayerViewModelImp @Inject constructor(
     }
 
     private fun savePayer(): Job {
-        Timber.tag(TAG).d("savePayer() called")
+        val payerModel = PayerModel(
+            id = if (payerId.value.value.isNotEmpty()) {
+                UUID.fromString(payerId.value.value)
+            } else null,
+            ercCode = ercCode.value.value,
+            fullName = fullName.value.value,
+            address = address.value.value,
+            totalArea = totalArea.value.value.toBigDecimalOrNull(),
+            livingSpace = livingSpace.value.value.toBigDecimalOrNull(),
+            heatedVolume = heatedVolume.value.value.toBigDecimalOrNull(),
+            paymentDay = paymentDay.value.value.toInt(),
+            personsNum = personsNum.value.value.toInt()
+        )
+        Timber.tag(TAG).d("savePayer() called: UI model %s", payerModel)
         val job = viewModelScope.launch(errorHandler) {
             payerUseCases.savePayerUseCase.execute(
-                SavePayerUseCase.Request(
-                    converter.toPayer(
-                        PayerModel(
-                            id = UUID.fromString(payerId.value.value),
-                            ercCode = ercCode.value.value,
-                            fullName = fullName.value.value,
-                            address = address.value.value,
-                            totalArea = totalArea.value.value.toBigDecimalOrNull(),
-                            livingSpace = livingSpace.value.value.toBigDecimalOrNull(),
-                            heatedVolume = heatedVolume.value.value.toBigDecimalOrNull(),
-                            paymentDay = paymentDay.value.value.toIntOrNull(),
-                            personsNum = personsNum.value.value.toIntOrNull()
-                        )
-                    )
-                )
+                SavePayerUseCase.Request(converter.toPayer(payerModel))
             ).collect {}
         }
         return job
     }
+
+    override fun stateInputFields() = enumValues<PayerFields>().map { it.name }
 
     override fun initFieldStatesByUiModel(uiModel: Any): Job? {
         super.initFieldStatesByUiModel(uiModel)
         val payerModel = uiModel as PayerModel
         Timber.tag(TAG)
             .d("initFieldStatesByUiModel(PayerModel) called: payerModel = %s", payerModel)
-        state[PayerFields.PAYER_ID.name] = payerId.value.copy(value = payerModel.id.toString())
-        state[PayerFields.ERC_CODE.name] = ercCode.value.copy(value = payerModel.ercCode)
-        state[PayerFields.FULL_NAME.name] = fullName.value.copy(value = payerModel.fullName)
-        state[PayerFields.ADDRESS.name] = address.value.copy(value = payerModel.address)
-
-        val strTotalArea = payerModel.totalArea?.toString() ?: ""
-        state[PayerFields.TOTAL_AREA.name] = totalArea.value.copy(value = strTotalArea)
-
-        val strlivingSpace = payerModel.livingSpace?.toString() ?: ""
-        state[PayerFields.LIVING_SPACE.name] = livingSpace.value.copy(value = strlivingSpace)
-
-        state[PayerFields.HEATED_VOLUME.name] =
-            heatedVolume.value.copy(value = payerModel.heatedVolume?.toString() ?: "")
-        state[PayerFields.PAYMENT_DAY.name] =
-            paymentDay.value.copy(value = payerModel.paymentDay?.toString() ?: "")
-        state[PayerFields.PERSONS_NUM.name] =
-            personsNum.value.copy(value = payerModel.personsNum?.toString() ?: "")
+        payerModel.id?.let {
+            initStateValue(PayerFields.PAYER_ID, payerId, payerModel.id.toString())
+        }
+        initStateValue(PayerFields.ERC_CODE, ercCode, payerModel.ercCode)
+        initStateValue(PayerFields.FULL_NAME, fullName, payerModel.fullName)
+        initStateValue(PayerFields.ADDRESS, address, payerModel.address)
+        initStateValue(PayerFields.TOTAL_AREA, totalArea, payerModel.totalArea?.toString() ?: "")
+        initStateValue(
+            PayerFields.LIVING_SPACE,
+            livingSpace,
+            payerModel.livingSpace?.toString() ?: ""
+        )
+        initStateValue(
+            PayerFields.HEATED_VOLUME,
+            heatedVolume,
+            payerModel.heatedVolume?.toString() ?: ""
+        )
+        initStateValue(PayerFields.PAYMENT_DAY, paymentDay, payerModel.paymentDay.toString())
+        initStateValue(PayerFields.PERSONS_NUM, personsNum, payerModel.personsNum.toString())
         return null
     }
 
@@ -203,218 +207,133 @@ class PayerViewModelImp @Inject constructor(
                 when (event) {
                     is PayerInputEvent.ErcCode -> {
                         when (PayerInputValidator.ErcCode.errorIdOrNull(event.input)) {
-                            null -> {
-                                state[PayerFields.ERC_CODE.name] =
-                                    ercCode.value.copy(value = event.input, errorId = null)
-                            }
-                            else -> {
-                                state[PayerFields.ERC_CODE.name] =
-                                    ercCode.value.copy(value = event.input)
-                            }
+                            null -> setStateValidValue(PayerFields.ERC_CODE, ercCode, event.input)
+                            else -> setStateValue(PayerFields.ERC_CODE, ercCode, event.input)
                         }
-                        Timber.tag(TAG)
-                            .d("Validate: %s = %s", PayerFields.ERC_CODE.name, ercCode.value)
                     }
                     is PayerInputEvent.FullName -> {
                         when (PayerInputValidator.FullName.errorIdOrNull(event.input)) {
-                            null -> {
-                                state[PayerFields.FULL_NAME.name] = fullName.value.copy(
-                                    value = event.input,
-                                    errorId = null
-                                )
-                            }
-                            else -> {
-                                state[PayerFields.FULL_NAME.name] =
-                                    fullName.value.copy(value = event.input)
-                            }
+                            null -> setStateValidValue(PayerFields.FULL_NAME, fullName, event.input)
+                            else -> setStateValue(PayerFields.FULL_NAME, fullName, event.input)
                         }
-                        Timber.tag(TAG)
-                            .d("Validate: %s = %s", PayerFields.FULL_NAME.name, fullName.value)
                     }
                     is PayerInputEvent.Address -> {
                         when (PayerInputValidator.Address.errorIdOrNull(event.input)) {
-                            null -> {
-                                state[PayerFields.ADDRESS.name] = address.value.copy(
-                                    value = event.input,
-                                    errorId = null
-                                )
-                            }
-                            else -> {
-                                state[PayerFields.ADDRESS.name] =
-                                    address.value.copy(value = event.input)
-                            }
+                            null -> setStateValidValue(PayerFields.ADDRESS, address, event.input)
+                            else -> setStateValue(PayerFields.ADDRESS, address, event.input)
                         }
-                        Timber.tag(TAG)
-                            .d("Validate: %s = %s", PayerFields.ADDRESS.name, address.value)
                     }
                     is PayerInputEvent.TotalArea -> {
                         when (PayerInputValidator.TotalArea.errorIdOrNull(event.input)) {
-                            null -> {
-                                state[PayerFields.TOTAL_AREA.name] = totalArea.value.copy(
-                                    value = event.input,
-                                    errorId = null
-                                )
-                            }
-                            else -> {
-                                state[PayerFields.TOTAL_AREA.name] =
-                                    totalArea.value.copy(value = event.input)
-                            }
+                            null -> setStateValidValue(
+                                PayerFields.TOTAL_AREA,
+                                totalArea,
+                                event.input
+                            )
+                            else -> setStateValue(PayerFields.TOTAL_AREA, totalArea, event.input)
                         }
-                        Timber.tag(TAG)
-                            .d("Validate: %s = %s", PayerFields.TOTAL_AREA.name, totalArea.value)
                     }
                     is PayerInputEvent.LivingSpace -> {
                         when (PayerInputValidator.LivingSpace.errorIdOrNull(event.input)) {
-                            null -> {
-                                state[PayerFields.LIVING_SPACE.name] = livingSpace.value.copy(
-                                    value = event.input,
-                                    errorId = null
-                                )
-                            }
-                            else -> {
-                                state[PayerFields.LIVING_SPACE.name] =
-                                    livingSpace.value.copy(value = event.input)
-                            }
+                            null -> setStateValidValue(
+                                PayerFields.LIVING_SPACE,
+                                livingSpace,
+                                event.input
+                            )
+                            else -> setStateValue(
+                                PayerFields.LIVING_SPACE,
+                                livingSpace,
+                                event.input
+                            )
                         }
-                        Timber.tag(TAG).d(
-                            "Validate: %s = %s",
-                            PayerFields.LIVING_SPACE.name,
-                            livingSpace.value
-                        )
                     }
                     is PayerInputEvent.HeatedVolume -> {
                         when (PayerInputValidator.HeatedVolume.errorIdOrNull(event.input)) {
-                            null -> {
-                                state[PayerFields.HEATED_VOLUME.name] = heatedVolume.value.copy(
-                                    value = event.input,
-                                    errorId = null
-                                )
-                            }
-                            else -> {
-                                state[PayerFields.HEATED_VOLUME.name] =
-                                    heatedVolume.value.copy(value = event.input)
-                            }
+                            null -> setStateValidValue(
+                                PayerFields.HEATED_VOLUME,
+                                heatedVolume,
+                                event.input
+                            )
+                            else -> setStateValue(
+                                PayerFields.HEATED_VOLUME,
+                                heatedVolume,
+                                event.input
+                            )
                         }
-                        Timber.tag(TAG).d(
-                            "Validate: %s = %s",
-                            PayerFields.HEATED_VOLUME.name,
-                            heatedVolume.value
-                        )
                     }
                     is PayerInputEvent.PaymentDay -> {
                         when (PayerInputValidator.PaymentDay.errorIdOrNull(event.input)) {
-                            null -> {
-                                state[PayerFields.PAYMENT_DAY.name] = paymentDay.value.copy(
-                                    value = event.input,
-                                    errorId = null
-                                )
-                            }
-                            else -> {
-                                state[PayerFields.PAYMENT_DAY.name] =
-                                    paymentDay.value.copy(value = event.input)
-                            }
+                            null -> setStateValidValue(
+                                PayerFields.PAYMENT_DAY,
+                                paymentDay,
+                                event.input
+                            )
+                            else -> setStateValue(PayerFields.PAYMENT_DAY, paymentDay, event.input)
                         }
-                        Timber.tag(TAG).d(
-                            "Validate: %s = %s",
-                            PayerFields.PAYMENT_DAY.name,
-                            paymentDay.value
-                        )
                     }
                     is PayerInputEvent.PersonsNum -> {
                         when (PayerInputValidator.PersonsNum.errorIdOrNull(event.input)) {
-                            null -> {
-                                state[PayerFields.PERSONS_NUM.name] = personsNum.value.copy(
-                                    value = event.input,
-                                    errorId = null
-                                )
-                            }
-                            else -> {
-                                state[PayerFields.PERSONS_NUM.name] =
-                                    personsNum.value.copy(value = event.input)
-                            }
+                            null -> setStateValidValue(
+                                PayerFields.PERSONS_NUM,
+                                personsNum,
+                                event.input
+                            )
+                            else -> setStateValue(PayerFields.PERSONS_NUM, personsNum, event.input)
                         }
-                        Timber.tag(TAG).d(
-                            "Validate: %s = %s",
-                            PayerFields.PERSONS_NUM.name,
-                            personsNum.value
-                        )
                     }
                 }
             }
             .debounce(350)
             .collect { event ->
                 when (event) {
-                    is PayerInputEvent.ErcCode -> {
-                        val errorId = PayerInputValidator.ErcCode.errorIdOrNull(event.input)
-                        state[PayerFields.ERC_CODE.name] = ercCode.value.copy(errorId = errorId)
-                        Timber.tag(TAG).d(
-                            "Validate (debounce): %s - ERR[%s]", PayerFields.ERC_CODE.name,
-                            errorId?.toString()
+                    is PayerInputEvent.ErcCode ->
+                        setStateValue(
+                            PayerFields.ERC_CODE,
+                            ercCode,
+                            PayerInputValidator.ErcCode.errorIdOrNull(event.input)
                         )
-                    }
-                    is PayerInputEvent.FullName -> {
-                        val errorId = PayerInputValidator.FullName.errorIdOrNull(event.input)
-                        state[PayerFields.FULL_NAME.name] =
-                            fullName.value.copy(errorId = errorId)
-                        Timber.tag(TAG).d(
-                            "Validate (debounce): %s - ERR[%s]", PayerFields.FULL_NAME.name,
-                            errorId?.toString()
+                    is PayerInputEvent.FullName ->
+                        setStateValue(
+                            PayerFields.FULL_NAME,
+                            fullName,
+                            PayerInputValidator.FullName.errorIdOrNull(event.input)
                         )
-                    }
-                    is PayerInputEvent.Address -> {
-                        val errorId = PayerInputValidator.Address.errorIdOrNull(event.input)
-                        state[PayerFields.ADDRESS.name] =
-                            address.value.copy(errorId = errorId)
-                        Timber.tag(TAG).d(
-                            "Validate (debounce): %s - ERR[%s]", PayerFields.ADDRESS.name,
-                            errorId?.toString()
+                    is PayerInputEvent.Address ->
+                        setStateValue(
+                            PayerFields.ADDRESS,
+                            address,
+                            PayerInputValidator.Address.errorIdOrNull(event.input)
                         )
-                    }
-                    is PayerInputEvent.TotalArea -> {
-                        val errorId = PayerInputValidator.TotalArea.errorIdOrNull(event.input)
-                        state[PayerFields.TOTAL_AREA.name] =
-                            totalArea.value.copy(errorId = errorId)
-                        Timber.tag(TAG).d(
-                            "Validate (debounce): %s - ERR[%s]", PayerFields.TOTAL_AREA.name,
-                            errorId?.toString()
+                    is PayerInputEvent.TotalArea ->
+                        setStateValue(
+                            PayerFields.TOTAL_AREA,
+                            totalArea,
+                            PayerInputValidator.TotalArea.errorIdOrNull(event.input)
                         )
-                    }
-                    is PayerInputEvent.LivingSpace -> {
-                        val errorId = PayerInputValidator.LivingSpace.errorIdOrNull(event.input)
-                        state[PayerFields.LIVING_SPACE.name] =
-                            livingSpace.value.copy(errorId = errorId)
-                        Timber.tag(TAG).d(
-                            "Validate (debounce): %s - ERR[%s]", PayerFields.LIVING_SPACE.name,
-                            errorId?.toString()
+                    is PayerInputEvent.LivingSpace ->
+                        setStateValue(
+                            PayerFields.LIVING_SPACE,
+                            livingSpace,
+                            PayerInputValidator.LivingSpace.errorIdOrNull(event.input)
                         )
-                    }
-                    is PayerInputEvent.HeatedVolume -> {
-                        val errorId = PayerInputValidator.HeatedVolume.errorIdOrNull(event.input)
-                        state[PayerFields.HEATED_VOLUME.name] =
-                            heatedVolume.value.copy(errorId = errorId)
-                        Timber.tag(TAG).d(
-                            "Validate (debounce): %s - ERR[%s]", PayerFields.HEATED_VOLUME.name,
-                            errorId?.toString()
+                    is PayerInputEvent.HeatedVolume ->
+                        setStateValue(
+                            PayerFields.HEATED_VOLUME,
+                            heatedVolume,
+                            PayerInputValidator.HeatedVolume.errorIdOrNull(event.input)
                         )
-                    }
-                    is PayerInputEvent.PaymentDay -> {
-                        val errorId = PayerInputValidator.PaymentDay.errorIdOrNull(event.input)
-                        state[PayerFields.PAYMENT_DAY.name] =
-                            paymentDay.value.copy(errorId = errorId)
-                        Timber.tag(TAG).d(
-                            "Validate (debounce): %s - ERR[%s]", PayerFields.PAYMENT_DAY.name,
-                            errorId?.toString()
+                    is PayerInputEvent.PaymentDay ->
+                        setStateValue(
+                            PayerFields.PAYMENT_DAY,
+                            paymentDay,
+                            PayerInputValidator.PaymentDay.errorIdOrNull(event.input)
                         )
-                    }
-                    is PayerInputEvent.PersonsNum -> {
-                        val errorId = PayerInputValidator.PersonsNum.errorIdOrNull(event.input)
-                        state[PayerFields.PERSONS_NUM.name] =
-                            personsNum.value.copy(errorId = errorId)
-                        Timber.tag(TAG).d(
-                            "Validate (debounce): %s - ERR[%s]", PayerFields.PERSONS_NUM.name,
-                            errorId?.toString()
+                    is PayerInputEvent.PersonsNum ->
+                        setStateValue(
+                            PayerFields.PERSONS_NUM,
+                            personsNum,
+                            PayerInputValidator.PersonsNum.errorIdOrNull(event.input)
                         )
-                    }
                 }
             }
     }

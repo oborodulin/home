@@ -10,12 +10,14 @@ import java.util.*
         entity = PayerEntity::class,
         parentColumns = arrayOf("payerId"),
         childColumns = arrayOf("payersId"),
-        onDelete = ForeignKey.CASCADE
+        onDelete = ForeignKey.CASCADE,
+        deferred = true
     ), ForeignKey(
         entity = ServiceEntity::class,
         parentColumns = arrayOf("serviceId"),
         childColumns = arrayOf("servicesId"),
-        onDelete = ForeignKey.CASCADE
+        onDelete = ForeignKey.CASCADE,
+        deferred = true
     )]
 )
 data class PayerServiceCrossRefEntity(

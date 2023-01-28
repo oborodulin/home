@@ -10,7 +10,8 @@ import java.util.*
         entity = PayerEntity::class,
         parentColumns = arrayOf("payerId"),
         childColumns = arrayOf("payersId"),
-        onDelete = ForeignKey.CASCADE
+        onDelete = ForeignKey.CASCADE,
+        deferred = true
     )]
 )
 class ReceiptEntity(

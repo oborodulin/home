@@ -21,15 +21,14 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.ExperimentalLifecycleComposeApi
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.flowWithLifecycle
 import com.oborodulin.home.metering.ui.model.MeterValueModel
-import com.oborodulin.home.common.ui.components.field.InputFocusRequester
+import com.oborodulin.home.common.ui.components.field.util.InputFocusRequester
 import com.oborodulin.home.common.ui.components.field.TextFieldComponent
-import com.oborodulin.home.common.ui.state.inputProcess
+import com.oborodulin.home.common.ui.components.field.util.inputProcess
 import timber.log.Timber
 
 private const val TAG = "Accounting.ui.MeterValueView"

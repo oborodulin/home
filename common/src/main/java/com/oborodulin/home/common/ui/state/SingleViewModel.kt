@@ -1,19 +1,17 @@
 package com.oborodulin.home.common.ui.state
 
+import androidx.annotation.StringRes
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
-import com.oborodulin.home.common.ui.components.*
-import com.oborodulin.home.common.ui.components.field.*
+import com.oborodulin.home.common.ui.components.field.util.*
 import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.Channel
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.receiveAsFlow
 import timber.log.Timber
-import java.util.*
 
 private const val TAG = "Common.SingleViewModel"
-private const val FOCUSED_FIELD_KEY = "focusedTextField"
 
-@OptIn(FlowPreview::class)
 abstract class SingleViewModel<T : Any, S : UiState<T>, A : UiAction, E : UiSingleEvent>(
     private val state: SavedStateHandle,
     private val initFocusedTextField: Focusable? = null,
@@ -50,6 +48,37 @@ abstract class SingleViewModel<T : Any, S : UiState<T>, A : UiAction, E : UiSing
 
     abstract suspend fun observeInputEvents()
 
+    fun initStateValue(field: Focusable, property: StateFlow<InputWrapper>, value: String) {
+        Timber.tag(TAG).d(
+            "initStateValue(...): exists state %s = '%s'", field.key(),
+            state[field.key()]
+        )
+        if (property.value.isEmpty) {
+            Timber.tag(TAG).d("initStateValue(...): %s = '%s'", field.key(), value)
+            setStateValue(field, property, value)
+        }
+    }
+
+    fun setStateValue(field: Focusable, property: StateFlow<InputWrapper>, value: String) {
+        Timber.tag(TAG).d("setStateValue(...): %s = '%s'", field.key(), value)
+        state[field.key()] = property.value.copy(value = value, isEmpty = false)
+    }
+
+    fun setStateValue(
+        field: Focusable,
+        property: StateFlow<InputWrapper>,
+        @StringRes errorId: Int?
+    ) {
+        Timber.tag(TAG)
+            .d("setStateValue(...): Validate (debounce) %s - ERR[%s]", field.key(), errorId)
+        state[field.key()] = property.value.copy(errorId = errorId, isEmpty = false)
+    }
+
+    fun setStateValidValue(field: Focusable, property: StateFlow<InputWrapper>, value: String) {
+        Timber.tag(TAG).d("setStateValidValue(...): %s = '%s'", field.key(), value)
+        state[field.key()] = property.value.copy(value = value, errorId = null, isEmpty = false)
+    }
+
     fun onTextFieldEntered(inputEvent: Inputable) {
         Timber.tag(TAG).d("onTextFieldEntered: %s", inputEvent.javaClass.name)
         inputEvents.trySend(inputEvent)
@@ -57,7 +86,7 @@ abstract class SingleViewModel<T : Any, S : UiState<T>, A : UiAction, E : UiSing
 
     fun onTextFieldFocusChanged(focusedField: Focusable, isFocused: Boolean) {
         Timber.tag(TAG)
-            .d("onTextFieldFocusChanged: %s - %s", focusedField.javaClass.name, isFocused)
+            .d("onTextFieldFocusChanged: %s - %s", focusedField.key(), isFocused)
         focusedTextField.key = if (isFocused) focusedField.key() else null
     }
 
@@ -73,6 +102,10 @@ abstract class SingleViewModel<T : Any, S : UiState<T>, A : UiAction, E : UiSing
                 null -> {
                     clearFocusAndHideKeyboard()
                     onSuccess()
+                    stateInputFields().forEach {
+                        Timber.tag(TAG).d("onContinueClick(onSuccess): remove state '%s'", it)
+                        state.remove<InputWrapper>(it)
+                    }
                     //_events.send(ScreenEvent.ShowToast(com.oborodulin.home.common.R.string.success))
                 }
                 else -> displayInputErrors(inputErrors)
@@ -83,6 +116,8 @@ abstract class SingleViewModel<T : Any, S : UiState<T>, A : UiAction, E : UiSing
     abstract fun getInputErrorsOrNull(): List<InputError>?
 
     abstract fun displayInputErrors(inputErrors: List<InputError>)
+
+    abstract fun stateInputFields(): List<String>
 
     private suspend fun clearFocusAndHideKeyboard() {
         Timber.tag(TAG).d("clearFocusAndHideKeyboard() called")
