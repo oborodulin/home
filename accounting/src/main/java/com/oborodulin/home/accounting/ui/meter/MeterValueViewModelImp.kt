@@ -2,6 +2,8 @@ package com.oborodulin.home.accounting.ui.meter
 
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
+import com.oborodulin.home.accounting.ui.payer.single.PayerFields
+import com.oborodulin.home.accounting.ui.payer.single.PayerInputValidator
 import com.oborodulin.home.common.ui.components.*
 import com.oborodulin.home.common.ui.components.field.*
 import com.oborodulin.home.common.ui.components.field.util.*
@@ -104,13 +106,12 @@ class MeterValueViewModelImp @Inject constructor(
                 "initFieldStatesByUiModel(MeterValueModel) called: meterValueModel = %s",
                 meterValueModel
             )
-        state[MeterValueFields.METER_VALUE_ID.name] =
-            meterValueId.value.copy(value = meterValueModel.id.toString())
-        state[MeterValueFields.METERS_ID.name] =
-            meterValueId.value.copy(value = meterValueModel.metersId.toString())
+        meterValueModel.id?.let {
+            initStateValue(MeterValueFields.METER_VALUE_ID, meterValueId, it.toString())
+        }
+        initStateValue(MeterValueFields.METERS_ID, metersId, meterValueModel.metersId.toString())
         meterValueModel.currentValue?.let {
-            state[MeterValueFields.METER_CURR_VALUE.name] =
-                currentValue.value.copy(value = it.toString())
+            initStateValue(MeterValueFields.METER_CURR_VALUE, currentValue, it.toString())
         }
         return null
     }
@@ -122,34 +123,29 @@ class MeterValueViewModelImp @Inject constructor(
                 when (event) {
                     is MeterValueInputEvent.CurrentValue -> {
                         when (MeterValueInputValidator.CurrentValue.errorIdOrNull(event.input)) {
-                            null -> {
-                                state[MeterValueFields.METER_CURR_VALUE.name] =
-                                    currentValue.value.copy(value = event.input, errorId = null)
-                            }
-                            else -> {
-                                state[MeterValueFields.METER_CURR_VALUE.name] =
-                                    currentValue.value.copy(value = event.input)
-                            }
+                            null -> setStateValidValue(
+                                MeterValueFields.METER_CURR_VALUE,
+                                currentValue,
+                                event.input
+                            )
+                            else -> setStateValue(
+                                MeterValueFields.METER_CURR_VALUE,
+                                currentValue,
+                                event.input
+                            )
                         }
-                        //Timber.tag(TAG)
-                        //    .d("Validate: %s".format(state[MeterValueFields.METER_CURR_VALUE.name]))
                     }
                 }
             }
             .debounce(350)
             .collect { event ->
                 when (event) {
-                    is MeterValueInputEvent.CurrentValue -> {
-                        val errorId =
+                    is MeterValueInputEvent.CurrentValue ->
+                        setStateValue(
+                            MeterValueFields.METER_CURR_VALUE,
+                            currentValue,
                             MeterValueInputValidator.CurrentValue.errorIdOrNull(event.input)
-                        state[MeterValueFields.METER_CURR_VALUE.name] =
-                            currentValue.value.copy(errorId = errorId)
-                        Timber.tag(TAG).d(
-                            "Validate (debounce): %s - %s",
-                            MeterValueFields.METER_CURR_VALUE.name,
-                            errorId
                         )
-                    }
                 }
             }
     }

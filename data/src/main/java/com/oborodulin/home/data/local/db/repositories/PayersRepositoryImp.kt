@@ -2,6 +2,7 @@ package com.oborodulin.home.data.local.db.repositories
 
 import com.oborodulin.home.domain.model.Payer
 import com.oborodulin.home.domain.repositories.PayersRepository
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import java.util.*
 import javax.inject.Inject
@@ -21,6 +22,11 @@ class PayersRepositoryImp @Inject constructor(
     override fun delete(payer: Payer) = flow {
         payerDataSource.deletePayer(payer)
         this.emit(payer)
+    }
+
+    override fun deleteById(payerId: UUID) = flow {
+        payerDataSource.deletePayerById(payerId)
+        this.emit(payerId)
     }
 
     override suspend fun deleteAll() = payerDataSource.deletePayers()

@@ -113,7 +113,6 @@ class PayerViewModelImp @Inject constructor(
 
     private val errorHandler = CoroutineExceptionHandler { _, exception ->
         Timber.tag(TAG).e(exception)
-        //_uiState.value = _uiState.value.copy(error = exception.message, isLoading = false)
     }
 
     override fun initState(): UiState<PayerModel> = UiState.Loading
@@ -179,7 +178,7 @@ class PayerViewModelImp @Inject constructor(
         Timber.tag(TAG)
             .d("initFieldStatesByUiModel(PayerModel) called: payerModel = %s", payerModel)
         payerModel.id?.let {
-            initStateValue(PayerFields.PAYER_ID, payerId, payerModel.id.toString())
+            initStateValue(PayerFields.PAYER_ID, payerId, it.toString())
         }
         initStateValue(PayerFields.ERC_CODE, ercCode, payerModel.ercCode)
         initStateValue(PayerFields.FULL_NAME, fullName, payerModel.fullName)
@@ -205,25 +204,22 @@ class PayerViewModelImp @Inject constructor(
         inputEvents.receiveAsFlow()
             .onEach { event ->
                 when (event) {
-                    is PayerInputEvent.ErcCode -> {
+                    is PayerInputEvent.ErcCode ->
                         when (PayerInputValidator.ErcCode.errorIdOrNull(event.input)) {
                             null -> setStateValidValue(PayerFields.ERC_CODE, ercCode, event.input)
                             else -> setStateValue(PayerFields.ERC_CODE, ercCode, event.input)
                         }
-                    }
-                    is PayerInputEvent.FullName -> {
+                    is PayerInputEvent.FullName ->
                         when (PayerInputValidator.FullName.errorIdOrNull(event.input)) {
                             null -> setStateValidValue(PayerFields.FULL_NAME, fullName, event.input)
                             else -> setStateValue(PayerFields.FULL_NAME, fullName, event.input)
                         }
-                    }
-                    is PayerInputEvent.Address -> {
+                    is PayerInputEvent.Address ->
                         when (PayerInputValidator.Address.errorIdOrNull(event.input)) {
                             null -> setStateValidValue(PayerFields.ADDRESS, address, event.input)
                             else -> setStateValue(PayerFields.ADDRESS, address, event.input)
                         }
-                    }
-                    is PayerInputEvent.TotalArea -> {
+                    is PayerInputEvent.TotalArea ->
                         when (PayerInputValidator.TotalArea.errorIdOrNull(event.input)) {
                             null -> setStateValidValue(
                                 PayerFields.TOTAL_AREA,
@@ -232,8 +228,7 @@ class PayerViewModelImp @Inject constructor(
                             )
                             else -> setStateValue(PayerFields.TOTAL_AREA, totalArea, event.input)
                         }
-                    }
-                    is PayerInputEvent.LivingSpace -> {
+                    is PayerInputEvent.LivingSpace ->
                         when (PayerInputValidator.LivingSpace.errorIdOrNull(event.input)) {
                             null -> setStateValidValue(
                                 PayerFields.LIVING_SPACE,
@@ -246,8 +241,7 @@ class PayerViewModelImp @Inject constructor(
                                 event.input
                             )
                         }
-                    }
-                    is PayerInputEvent.HeatedVolume -> {
+                    is PayerInputEvent.HeatedVolume ->
                         when (PayerInputValidator.HeatedVolume.errorIdOrNull(event.input)) {
                             null -> setStateValidValue(
                                 PayerFields.HEATED_VOLUME,
@@ -260,8 +254,7 @@ class PayerViewModelImp @Inject constructor(
                                 event.input
                             )
                         }
-                    }
-                    is PayerInputEvent.PaymentDay -> {
+                    is PayerInputEvent.PaymentDay ->
                         when (PayerInputValidator.PaymentDay.errorIdOrNull(event.input)) {
                             null -> setStateValidValue(
                                 PayerFields.PAYMENT_DAY,
@@ -270,8 +263,7 @@ class PayerViewModelImp @Inject constructor(
                             )
                             else -> setStateValue(PayerFields.PAYMENT_DAY, paymentDay, event.input)
                         }
-                    }
-                    is PayerInputEvent.PersonsNum -> {
+                    is PayerInputEvent.PersonsNum ->
                         when (PayerInputValidator.PersonsNum.errorIdOrNull(event.input)) {
                             null -> setStateValidValue(
                                 PayerFields.PERSONS_NUM,
@@ -280,7 +272,6 @@ class PayerViewModelImp @Inject constructor(
                             )
                             else -> setStateValue(PayerFields.PERSONS_NUM, personsNum, event.input)
                         }
-                    }
                 }
             }
             .debounce(350)

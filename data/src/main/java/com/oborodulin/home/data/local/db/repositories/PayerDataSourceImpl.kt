@@ -45,6 +45,10 @@ class PayerDataSourceImpl @Inject constructor(
         payerDao.delete(payerEntityMapper.toPayerEntity(payer))
     }
 
+    override suspend fun deletePayerById(payerId: UUID) = withContext(dispatcher) {
+        payerDao.deleteById(payerId)
+    }
+
     override suspend fun deletePayers(payers: List<Payer>) = withContext(dispatcher) {
         payerDao.delete(payers.map { payer ->
             payerEntityMapper.toPayerEntity(payer)

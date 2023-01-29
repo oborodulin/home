@@ -27,6 +27,9 @@
     <string name="payer_properties_label">Дополнительные параметры</string>
     <string name="persons_num_hint">Кол-во прописанных человек</string>
 
+    <!--ДИАЛОГИ -->
+    <string name="dlg_confirm_del_payer">Удалить плательщика %1$s?</string>
+
     <!--СООБЩЕНИЯ ОБ ОШИБКАХ -->
     <!--формы плательщика-->
     <string name="erc_code_empty_error">Укажите, пожалуйста, код ЕРЦ!</string>

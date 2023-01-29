@@ -58,6 +58,9 @@ interface PayerDao {
     @Delete
     suspend fun delete(payers: List<PayerEntity>)
 
+    @Query("DELETE FROM payers WHERE payerId = :payerId")
+    suspend fun deleteById(payerId: UUID)
+
     @Query("DELETE FROM payers")
     suspend fun deleteAll()
 }

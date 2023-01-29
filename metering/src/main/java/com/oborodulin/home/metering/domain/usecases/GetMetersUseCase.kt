@@ -15,11 +15,13 @@ class GetMetersUseCase(
     override fun process(request: Request): Flow<Response> =
         metersRepository.getMeters(request.payerId).map { list ->
             list.map { meter ->
-                metersRepository.getMeterValues(meter.id).collect {
-                    meter.meterValues = it
-                }
-                metersRepository.getMeterVerifications(meter.id).collect {
-                    meter.meterVerifications = it
+                meter.id?.let { meterId ->
+                    metersRepository.getMeterValues(meterId).collect {
+                        meter.meterValues = it
+                    }
+                    metersRepository.getMeterVerifications(meterId).collect {
+                        meter.meterVerifications = it
+                    }
                 }
                 meter
             }

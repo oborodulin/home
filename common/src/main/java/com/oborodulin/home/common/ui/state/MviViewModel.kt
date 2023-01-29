@@ -10,7 +10,6 @@ import kotlinx.coroutines.launch
 import timber.log.Timber
 
 private const val TAG = "Common.MviViewModel"
-const val FOCUSED_FIELD_KEY = "focusedTextField"
 
 abstract class MviViewModel<T : Any, S : UiState<T>, A : UiAction, E : UiSingleEvent> :
     ViewModel() {
@@ -21,9 +20,12 @@ abstract class MviViewModel<T : Any, S : UiState<T>, A : UiAction, E : UiSingleE
     private val _actionsJobFlow: MutableSharedFlow<Job?> = MutableSharedFlow()
     val actionsJobFlow: SharedFlow<Job?> = _actionsJobFlow
 
-
     private val _singleEventFlow = Channel<E>()
     val singleEventFlow = _singleEventFlow.receiveAsFlow()
+
+    // Initial value is false so the dialog is hidden
+    private val _showDialog = MutableStateFlow(false)
+    val showDialog: StateFlow<Boolean> = _showDialog.asStateFlow()
 
     private val errorHandler = CoroutineExceptionHandler { _, exception ->
         Timber.tag(TAG).e(exception)
@@ -75,5 +77,19 @@ abstract class MviViewModel<T : Any, S : UiState<T>, A : UiAction, E : UiSingleE
             _singleEventFlow.send(event)
         }
         return job
+    }
+
+    fun onOpenDialogClicked() {
+        _showDialog.value = true
+    }
+
+    fun onDialogConfirm(onConfirm: () -> Unit) {
+        _showDialog.value = false
+        onConfirm()
+    }
+
+    fun onDialogDismiss(onDismiss: () -> Unit = {}) {
+        _showDialog.value = false
+        onDismiss()
     }
 }

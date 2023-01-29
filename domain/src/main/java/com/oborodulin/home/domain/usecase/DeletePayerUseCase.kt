@@ -5,6 +5,7 @@ import com.oborodulin.home.domain.model.Payer
 import com.oborodulin.home.domain.repositories.PayersRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
+import java.util.*
 
 class DeletePayerUseCase(
     configuration: Configuration,
@@ -12,12 +13,12 @@ class DeletePayerUseCase(
 ) : UseCase<DeletePayerUseCase.Request, DeletePayerUseCase.Response>(configuration) {
 
     override fun process(request: Request): Flow<Response> {
-        return payersRepository.delete(request.payer)
+        return payersRepository.deleteById(request.payerId)
             .map {
                 Response
             }
     }
 
-    data class Request(val payer: Payer) : UseCase.Request
+    data class Request(val payerId: UUID) : UseCase.Request
     object Response : UseCase.Response
 }

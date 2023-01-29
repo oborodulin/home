@@ -9,5 +9,6 @@ interface PayersRepository {
     fun get(payerId: UUID): Flow<Payer>
     fun save(payer: Payer): Flow<Payer>
     fun delete(payer: Payer): Flow<Payer>
+    fun deleteById(payerId: UUID): Flow<UUID>
     suspend fun deleteAll()
 }

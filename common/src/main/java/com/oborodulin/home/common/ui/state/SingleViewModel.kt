@@ -11,6 +11,7 @@ import kotlinx.coroutines.flow.receiveAsFlow
 import timber.log.Timber
 
 private const val TAG = "Common.SingleViewModel"
+private const val FOCUSED_FIELD_KEY = "focusedTextField"
 
 abstract class SingleViewModel<T : Any, S : UiState<T>, A : UiAction, E : UiSingleEvent>(
     private val state: SavedStateHandle,
@@ -50,7 +51,7 @@ abstract class SingleViewModel<T : Any, S : UiState<T>, A : UiAction, E : UiSing
 
     fun initStateValue(field: Focusable, property: StateFlow<InputWrapper>, value: String) {
         Timber.tag(TAG).d(
-            "initStateValue(...): exists state %s = '%s'", field.key(),
+            "initStateValue(...): exist state %s = '%s'", field.key(),
             state[field.key()]
         )
         if (property.value.isEmpty) {

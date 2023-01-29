@@ -6,17 +6,15 @@ import com.oborodulin.home.accounting.ui.model.PayerListItemModel
 import com.oborodulin.home.accounting.ui.model.converters.PayersListConverter
 import com.oborodulin.home.common.ui.state.MviViewModel
 import com.oborodulin.home.common.ui.state.UiState
+import com.oborodulin.home.domain.usecase.DeletePayerUseCase
 import com.oborodulin.home.domain.usecase.GetPayersUseCase
 import com.oborodulin.home.domain.usecase.PayerUseCases
 import com.oborodulin.home.presentation.navigation.NavRoutes
 import com.oborodulin.home.presentation.navigation.PayerInput
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.Job
+import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.Channel
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.receiveAsFlow
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.flow.*
 import timber.log.Timber
 import java.math.BigDecimal
 import java.util.*
@@ -31,9 +29,13 @@ class PayersListViewModelImp @Inject constructor(
 ) : PayersListViewModel,
     MviViewModel<List<PayerListItemModel>, UiState<List<PayerListItemModel>>, PayersListUiAction, PayersListUiSingleEvent>() {
 
+    private val errorHandler = CoroutineExceptionHandler { _, exception ->
+        Timber.tag(TAG).e(exception)
+    }
+
     override fun initState() = UiState.Loading
 
-    override suspend fun handleAction(action: PayersListUiAction): Job? {
+    override suspend fun handleAction(action: PayersListUiAction): Job {
         Timber.tag(TAG)
             .d("handleAction(PayersListUiAction) called: %s", action.javaClass.name)
         val job = when (action) {
@@ -50,7 +52,7 @@ class PayersListViewModelImp @Inject constructor(
                 )
             }
             is PayersListUiAction.DeletePayer -> {
-                null
+                deletePayer(action.payerId)
             }
             /*is PostListUiAction.UserClick -> {
                 updateInteraction(action.interaction)
@@ -68,13 +70,23 @@ class PayersListViewModelImp @Inject constructor(
 
     private fun loadPayers(): Job {
         Timber.tag(TAG).d("loadPayers() called")
-        val job = viewModelScope.launch {
+        val job = viewModelScope.launch(errorHandler) {
             payerUseCases.getPayersUseCase.execute(GetPayersUseCase.Request).map {
                 converter.convert(it)
             }
                 .collect {
                     submitState(it)
                 }
+        }
+        return job
+    }
+
+    private fun deletePayer(payerId: UUID): Job {
+        Timber.tag(TAG).d("deletePayer() called: payerId = %s", payerId.toString())
+        val job = viewModelScope.launch(errorHandler) {
+            payerUseCases.deletePayerUseCase.execute(
+                DeletePayerUseCase.Request(payerId)
+            ).collect {}
         }
         return job
     }
@@ -115,10 +127,10 @@ class PayersListViewModelImp @Inject constructor(
             object : PayersListViewModel {
                 override val uiStateFlow = MutableStateFlow(UiState.Success(previewList(ctx)))
                 override val singleEventFlow = Channel<PayersListUiSingleEvent>().receiveAsFlow()
+                override val actionsJobFlow: SharedFlow<Job?> = MutableSharedFlow()
 
-                override fun submitAction(action: PayersListUiAction): Job? {
-                    return null
-                }
+                override fun viewModelScope(): CoroutineScope = CoroutineScope(Dispatchers.Main)
+                override fun submitAction(action: PayersListUiAction): Job? = null
             }
 
         fun previewList(ctx: Context) = listOf(

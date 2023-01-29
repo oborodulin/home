@@ -11,18 +11,21 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Card
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.oborodulin.home.common.R
+import com.oborodulin.home.common.ui.components.dialog.AlertDialogComponent
 import com.oborodulin.home.common.ui.model.ListItemModel
 import com.oborodulin.home.common.ui.theme.Typography
 import timber.log.Timber
@@ -40,9 +43,10 @@ fun ListItemComponent(
     item: ListItemModel,
     selected: Boolean = false,
     background: Color = Color.Transparent,
+    dialogText: String = "",
     onClick: (ListItemModel) -> Unit = EMPTY,
     onEdit: (ListItemModel) -> Unit = EMPTY,
-    onDelete: (ListItemModel) -> Unit = EMPTY
+    onDelete: (ListItemModel) -> Unit = EMPTY,
 ) {
     Timber.tag(TAG)
         .d("ListItemComponent(...) called: {\"listItem\": {\"icon\": $icon, \"itemId\": \"${item.itemId}\", \"title\": \"${item.title}\", \"desc\": \"${item.descr}\"}}")
@@ -122,10 +126,18 @@ fun ListItemComponent(
                         }
                         Spacer(Modifier.height(24.dp))
                         if (onDelete !== EMPTY) {
+                            val showDialogState = remember { mutableStateOf(false) }
+                            AlertDialogComponent(
+                                isShow = showDialogState.value,
+                                title = { Text(stringResource(R.string.dlg_confirm_title)) },
+                                text = { Text(text = dialogText) },
+                                onDismiss = { showDialogState.value = false },
+                                onConfirm = { onDelete(item) }
+                            )
                             Image(
                                 modifier = Modifier
                                     .clip(RoundedCornerShape(8.dp))
-                                    .clickable { onDelete(item) },
+                                    .clickable { showDialogState.value = true },
                                 painter = painterResource(R.drawable.outline_delete_black_24),
                                 contentDescription = ""
                             )
@@ -136,6 +148,7 @@ fun ListItemComponent(
         }
     }
 }
+
 
 @Preview(name = "Night Mode", showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
 @Preview(name = "Day Mode", showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_NO)

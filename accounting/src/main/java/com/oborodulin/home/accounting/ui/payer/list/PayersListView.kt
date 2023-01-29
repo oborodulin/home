@@ -23,6 +23,7 @@ import com.oborodulin.home.accounting.ui.model.PayerListItemModel
 import com.oborodulin.home.common.ui.components.items.ListItemComponent
 import com.oborodulin.home.common.ui.state.CommonScreen
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.launch
 import timber.log.Timber
 
 private const val TAG = "Accounting.ui.PayersListView"
@@ -45,6 +46,16 @@ fun PayersListView(
                 onClick = { payer -> accountingViewModel.submitAction(AccountingUiAction.Load(payer.id)) },
                 onEdit = { payer -> viewModel.submitAction(PayersListUiAction.EditPayer(payer.id)) }
             ) { payer ->
+                viewModel.viewModelScope().launch {
+                    viewModel.actionsJobFlow.collect { job ->
+                        Timber.tag(TAG).d(
+                            "PayersListView(...): Start actionsJobFlow.collect [job = %s]",
+                            job?.toString()
+                        )
+                        job?.join()
+                        accountingViewModel.submitAction(AccountingUiAction.Init)
+                    }
+                }
                 viewModel.submitAction(PayersListUiAction.DeletePayer(payer.id))
             }
         }
@@ -88,6 +99,7 @@ fun PayersList(
                         item = payer,
                         selected = (payer.isFavorite and (selectedIndex == -1)) or (selectedIndex == index),
                         background = (if (selectedIndex == index) Color.LightGray else Color.Transparent),
+                        dialogText = stringResource(R.string.dlg_confirm_del_payer, payer.fullName),
                         onClick = {
                             selectedIndex = if (selectedIndex != index) index else -1
                             onClick(payer)

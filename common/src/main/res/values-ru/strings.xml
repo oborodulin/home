@@ -7,8 +7,12 @@
     <string name="card_number_too_short_error">Номер карты слишком короткий!</string>
 
     <!--ОБЩИЕ МЕТКИ UI -->
+    <!--кнопки -->
     <string name="btn_save_lbl">Сохранить</string>
     <string name="btn_cancel_lbl">Отменить</string>
+    <string name="btn_ok_lbl">ОК</string>
+    <!--диалог -->
+    <string name="dlg_confirm_title">Подтверждение</string>
 
     <!--ЕДИНИЦЫ ИЗМЕРЕНИЯ -->
     <string name="m2_unit">м2</string>
