@@ -11,6 +11,7 @@ interface PayerDataSource {
     suspend fun savePayer(payer: Payer)
     suspend fun deletePayer(payer: Payer)
     suspend fun deletePayerById(payerId: UUID)
+    suspend fun favoritePayerById(payerId: UUID)
     suspend fun deletePayers(payers: List<Payer>)
     suspend fun deletePayers()
 }

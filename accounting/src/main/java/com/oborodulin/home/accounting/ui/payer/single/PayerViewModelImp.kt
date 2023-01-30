@@ -29,7 +29,7 @@ class PayerViewModelImp @Inject constructor(
     private val state: SavedStateHandle,
     private val payerUseCases: PayerUseCases,
     private val converter: PayerConverter
-) : PayerViewModel, SingleViewModel<PayerModel, UiState<PayerModel>, PayerUiAction, UiSingleEvent>(
+) : PayerViewModel, SingleViewModel<PayerModel, UiState<PayerModel>, PayerUiAction, UiSingleEvent, PayerFields>(
     state,
     PayerFields.ERC_CODE
 ) {
@@ -396,7 +396,7 @@ class PayerViewModelImp @Inject constructor(
 
                 override fun viewModelScope(): CoroutineScope = CoroutineScope(Dispatchers.Main)
                 override fun onTextFieldEntered(inputEvent: Inputable) {}
-                override fun onTextFieldFocusChanged(focusedField: Focusable, isFocused: Boolean) {}
+                override fun onTextFieldFocusChanged(focusedField: PayerFields, isFocused: Boolean) {}
                 override fun moveFocusImeAction() {}
                 override fun onContinueClick(onSuccess: () -> Unit) {}
             }

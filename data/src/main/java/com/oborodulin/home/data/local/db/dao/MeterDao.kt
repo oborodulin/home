@@ -55,7 +55,7 @@ interface MeterDao {
 
     @Query(
         "SELECT pmv.* FROM prev_meters_values_view pmv " +
-                "WHERE pmv.isFavorite = 'true' AND pmv.meterLocaleCode = :locale AND pmv.serviceLocaleCode = :locale " +
+                "WHERE pmv.isFavorite = 1 AND pmv.meterLocaleCode = :locale AND pmv.serviceLocaleCode = :locale " +
                 "ORDER BY pmv.pos"
     )
     fun findPrevMetersValuesByPayerIsFavorite(

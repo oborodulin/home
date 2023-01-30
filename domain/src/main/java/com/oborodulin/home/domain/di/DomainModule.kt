@@ -22,6 +22,7 @@ object DomainModule {
             getPayerUseCase = GetPayerUseCase(configuration, repository),
             getPayersUseCase = GetPayersUseCase(configuration, repository),
             savePayerUseCase = SavePayerUseCase(configuration, repository),
-            deletePayerUseCase = DeletePayerUseCase(configuration, repository)
+            deletePayerUseCase = DeletePayerUseCase(configuration, repository),
+            favoritePayerUseCase = FavoritePayerUseCase(configuration, repository)
         )
 }

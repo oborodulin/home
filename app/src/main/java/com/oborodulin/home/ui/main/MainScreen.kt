@@ -60,7 +60,7 @@ fun MainScreen() {
     }
     HomeNavigationHost(appState = appState, nestedScrollConnection = nestedScrollConnection,
         bottomBar = {
-            if (appState.shouldShowBottomNavBar) {
+            if (true) {//appState.shouldShowBottomNavBar
                 BottomNavigationComponent(
                     modifier = Modifier
                         .height(bottomBarHeight)

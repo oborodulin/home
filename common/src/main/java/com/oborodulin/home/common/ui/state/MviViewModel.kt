@@ -2,11 +2,9 @@ package com.oborodulin.home.common.ui.state
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import kotlinx.coroutines.CoroutineExceptionHandler
-import kotlinx.coroutines.Job
+import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.*
-import kotlinx.coroutines.launch
 import timber.log.Timber
 
 private const val TAG = "Common.MviViewModel"
@@ -51,6 +49,26 @@ abstract class MviViewModel<T : Any, S : UiState<T>, A : UiAction, E : UiSingleE
     abstract fun initFieldStatesByUiModel(uiModel: Any): Job?
 
     fun viewModelScope() = viewModelScope
+
+    fun handleActionJob(action: () -> Unit, afterAction: () -> Unit) {
+        /*
+        viewModelScope.launch(Dispatchers.Main) {
+
+            _actionsJobFlow.collect { actionJob ->
+                actionJob?.let { job ->
+                    Timber.tag(TAG).d(
+                        "handleActionJob(...): Start actionsJobFlow.collect [job = %s]",
+                        job.toString()
+                    )
+                    if (!job.isCompleted) job.join()
+                }
+                afterAction()
+            }
+        }
+         */
+        action()
+        afterAction()
+    }
 
     fun submitAction(action: A): Job {
         Timber.tag(TAG).d("submitAction(action): emit action = %s", action.javaClass.name)

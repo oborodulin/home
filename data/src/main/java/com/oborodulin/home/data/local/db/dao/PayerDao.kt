@@ -63,4 +63,17 @@ interface PayerDao {
 
     @Query("DELETE FROM payers")
     suspend fun deleteAll()
+
+    // API:
+    @Query("UPDATE payers SET isFavorite = 1 WHERE payerId = :payerId AND isFavorite = 0")
+    suspend fun setFavoriteById(payerId: UUID)
+
+    @Query("UPDATE payers SET isFavorite = 0 WHERE payerId <> :payerId AND isFavorite = 1")
+    suspend fun clearFavoritesById(payerId: UUID)
+
+    @Transaction
+    suspend fun favoriteById(payerId: UUID) {
+        clearFavoritesById(payerId)
+        setFavoriteById(payerId)
+    }
 }

@@ -59,6 +59,9 @@ class PayerDataSourceImpl @Inject constructor(
         payerDao.deleteAll()
     }
 
+    override suspend fun favoritePayerById(payerId: UUID) = withContext(dispatcher) {
+        payerDao.favoriteById(payerId)
+    }
 
 /*    override fun getRefreshKey(state: PagingState<Int, NetworkMovie>): Int? = state.anchorPosition
 

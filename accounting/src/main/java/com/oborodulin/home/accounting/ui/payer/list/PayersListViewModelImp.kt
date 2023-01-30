@@ -7,6 +7,7 @@ import com.oborodulin.home.accounting.ui.model.converters.PayersListConverter
 import com.oborodulin.home.common.ui.state.MviViewModel
 import com.oborodulin.home.common.ui.state.UiState
 import com.oborodulin.home.domain.usecase.DeletePayerUseCase
+import com.oborodulin.home.domain.usecase.FavoritePayerUseCase
 import com.oborodulin.home.domain.usecase.GetPayersUseCase
 import com.oborodulin.home.domain.usecase.PayerUseCases
 import com.oborodulin.home.presentation.navigation.NavRoutes
@@ -54,6 +55,9 @@ class PayersListViewModelImp @Inject constructor(
             is PayersListUiAction.DeletePayer -> {
                 deletePayer(action.payerId)
             }
+            is PayersListUiAction.FavoritePayer -> {
+                favoritePayer(action.payerId)
+            }
             /*is PostListUiAction.UserClick -> {
                 updateInteraction(action.interaction)
                 submitSingleEvent(
@@ -86,6 +90,16 @@ class PayersListViewModelImp @Inject constructor(
         val job = viewModelScope.launch(errorHandler) {
             payerUseCases.deletePayerUseCase.execute(
                 DeletePayerUseCase.Request(payerId)
+            ).collect {}
+        }
+        return job
+    }
+
+    private fun favoritePayer(payerId: UUID): Job {
+        Timber.tag(TAG).d("favoritePayer() called: payerId = %s", payerId.toString())
+        val job = viewModelScope.launch(errorHandler) {
+            payerUseCases.favoritePayerUseCase.execute(
+                FavoritePayerUseCase.Request(payerId)
             ).collect {}
         }
         return job
@@ -129,7 +143,8 @@ class PayersListViewModelImp @Inject constructor(
                 override val singleEventFlow = Channel<PayersListUiSingleEvent>().receiveAsFlow()
                 override val actionsJobFlow: SharedFlow<Job?> = MutableSharedFlow()
 
-                override fun viewModelScope(): CoroutineScope = CoroutineScope(Dispatchers.Main)
+                //fun viewModelScope(): CoroutineScope = CoroutineScope(Dispatchers.Main)
+                override fun handleActionJob(action: () -> Unit, afterAction: () -> Unit) {}
                 override fun submitAction(action: PayersListUiAction): Job? = null
             }
 

@@ -1,6 +1,5 @@
 package com.oborodulin.home.accounting.ui.payer.single
 
-import com.oborodulin.home.common.ui.components.field.util.Focusable
 import com.oborodulin.home.common.ui.components.field.util.InputWrapper
 import com.oborodulin.home.common.ui.components.field.util.Inputable
 import com.oborodulin.home.common.ui.components.field.util.ScreenEvent
@@ -27,7 +26,7 @@ interface PayerViewModel {
 
     fun viewModelScope(): CoroutineScope
     fun onTextFieldEntered(inputEvent: Inputable)
-    fun onTextFieldFocusChanged(focusedField: Focusable, isFocused: Boolean)
+    fun onTextFieldFocusChanged(focusedField: PayerFields, isFocused: Boolean)
     fun moveFocusImeAction()
     fun onContinueClick(onSuccess: () -> Unit)
 }

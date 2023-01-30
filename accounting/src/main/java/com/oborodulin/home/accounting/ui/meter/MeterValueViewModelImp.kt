@@ -2,8 +2,6 @@ package com.oborodulin.home.accounting.ui.meter
 
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
-import com.oborodulin.home.accounting.ui.payer.single.PayerFields
-import com.oborodulin.home.accounting.ui.payer.single.PayerInputValidator
 import com.oborodulin.home.common.ui.components.*
 import com.oborodulin.home.common.ui.components.field.*
 import com.oborodulin.home.common.ui.components.field.util.*
@@ -34,25 +32,22 @@ class MeterValueViewModelImp @Inject constructor(
     private val meterUseCases: MeterUseCases,
     private val converter: MeterValueConverter,
 ) : MeterValueViewModel,
-    SingleViewModel<MeterValueModel, UiState<MeterValueModel>, MeterValueUiAction, UiSingleEvent>(
+    SingleViewModel<MeterValueModel, UiState<MeterValueModel>, MeterValueUiAction, UiSingleEvent, MeterValueFields>(
         state
     ) {
     private val meterValueId: StateFlow<InputWrapper> by lazy {
         state.getStateFlow(
-            MeterValueFields.METER_VALUE_ID.name,
-            InputWrapper()
+            stateKey(MeterValueFields.METER_VALUE_ID), InputWrapper()
         )
     }
     private val metersId: StateFlow<InputWrapper> by lazy {
         state.getStateFlow(
-            MeterValueFields.METERS_ID.name,
-            InputWrapper()
+            stateKey(MeterValueFields.METERS_ID), InputWrapper()
         )
     }
     override val currentValue: StateFlow<InputWrapper> by lazy {
         state.getStateFlow(
-            MeterValueFields.METER_CURR_VALUE.name,
-            InputWrapper()
+            stateKey(MeterValueFields.METER_CURR_VALUE), InputWrapper()
         )
     }
 
@@ -62,7 +57,6 @@ class MeterValueViewModelImp @Inject constructor(
 
     private val errorHandler = CoroutineExceptionHandler { _, exception ->
         Timber.tag(TAG).e(exception)
-        //_uiState.value = _uiState.value.copy(error = exception.message, isLoading = false)
     }
 
     override fun initState() = UiState.Loading
@@ -109,7 +103,9 @@ class MeterValueViewModelImp @Inject constructor(
         meterValueModel.id?.let {
             initStateValue(MeterValueFields.METER_VALUE_ID, meterValueId, it.toString())
         }
-        initStateValue(MeterValueFields.METERS_ID, metersId, meterValueModel.metersId.toString())
+        initStateValue(
+            MeterValueFields.METERS_ID, metersId, meterValueModel.metersId.toString()
+        )
         meterValueModel.currentValue?.let {
             initStateValue(MeterValueFields.METER_CURR_VALUE, currentValue, it.toString())
         }
@@ -124,14 +120,10 @@ class MeterValueViewModelImp @Inject constructor(
                     is MeterValueInputEvent.CurrentValue -> {
                         when (MeterValueInputValidator.CurrentValue.errorIdOrNull(event.input)) {
                             null -> setStateValidValue(
-                                MeterValueFields.METER_CURR_VALUE,
-                                currentValue,
-                                event.input
+                                MeterValueFields.METER_CURR_VALUE, currentValue, event.input
                             )
                             else -> setStateValue(
-                                MeterValueFields.METER_CURR_VALUE,
-                                currentValue,
-                                event.input
+                                MeterValueFields.METER_CURR_VALUE, currentValue, event.input
                             )
                         }
                     }
@@ -142,8 +134,7 @@ class MeterValueViewModelImp @Inject constructor(
                 when (event) {
                     is MeterValueInputEvent.CurrentValue ->
                         setStateValue(
-                            MeterValueFields.METER_CURR_VALUE,
-                            currentValue,
+                            MeterValueFields.METER_CURR_VALUE, currentValue,
                             MeterValueInputValidator.CurrentValue.errorIdOrNull(event.input)
                         )
                 }
@@ -180,7 +171,12 @@ class MeterValueViewModelImp @Inject constructor(
 
                 override fun initFieldStatesByUiModel(uiModel: Any): Job? = null
                 override fun onTextFieldEntered(inputEvent: Inputable) {}
-                override fun onTextFieldFocusChanged(focusedField: Focusable, isFocused: Boolean) {}
+                override fun onTextFieldFocusChanged(
+                    focusedField: MeterValueFields,
+                    isFocused: Boolean
+                ) {
+                }
+
                 override fun onContinueClick(onSuccess: () -> Unit) {}
                 override fun submitAction(action: MeterValueUiAction): Job? = null
             }

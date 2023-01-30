@@ -30,6 +30,8 @@ class Mapper {
                     "java.math.BigDecimal?" -> contentValues.put(it.name,(it.getter.call(instance) as? BigDecimal)?.multiply(BigDecimal.valueOf(CONV_COEFF_BIGDECIMAL))?.toLong())
                     "java.util.Date" -> contentValues.put(it.name, (it.getter.call(instance) as Date).time)
                     "java.util.Date?" -> contentValues.put(it.name, (it.getter.call(instance) as? Date)?.time)
+                    "kotlin.Boolean?" -> contentValues.put(it.name, (it.getter.call(instance) as? Boolean)?.let{ b -> if (b) 1 else 0 })
+                    "kotlin.Boolean" -> contentValues.put(it.name, (it.getter.call(instance) as Boolean).let{ b -> if (b) 1 else 0 })
                     else -> contentValues.put(it.name, it.getter.call(instance)?.toString())
                 }
             }

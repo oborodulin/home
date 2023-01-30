@@ -13,6 +13,6 @@ interface PayersListViewModel {
     val singleEventFlow: Flow<PayersListUiSingleEvent>
     val actionsJobFlow: SharedFlow<Job?>
 
-    fun viewModelScope(): CoroutineScope
     fun submitAction(action: PayersListUiAction): Job?
+    fun handleActionJob(action: () -> Unit, afterAction: () -> Unit)
 }

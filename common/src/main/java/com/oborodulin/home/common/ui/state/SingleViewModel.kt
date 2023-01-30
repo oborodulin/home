@@ -9,14 +9,18 @@ import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.receiveAsFlow
 import timber.log.Timber
+import java.util.*
 
 private const val TAG = "Common.SingleViewModel"
 private const val FOCUSED_FIELD_KEY = "focusedTextField"
 
-abstract class SingleViewModel<T : Any, S : UiState<T>, A : UiAction, E : UiSingleEvent>(
+abstract class SingleViewModel<T : Any, S : UiState<T>, A : UiAction, E : UiSingleEvent, F : Focusable>(
     private val state: SavedStateHandle,
     private val initFocusedTextField: Focusable? = null,
 ) : MviViewModel<T, S, A, E>() {
+
+    val uniqKey = UUID.randomUUID().toString()
+
     private var focusedTextField = FocusedTextField(
         textField = initFocusedTextField,
         key = state[FOCUSED_FIELD_KEY] ?: initFocusedTextField?.key()
@@ -49,35 +53,34 @@ abstract class SingleViewModel<T : Any, S : UiState<T>, A : UiAction, E : UiSing
 
     abstract suspend fun observeInputEvents()
 
-    fun initStateValue(field: Focusable, property: StateFlow<InputWrapper>, value: String) {
-        Timber.tag(TAG).d(
-            "initStateValue(...): exist state %s = '%s'", field.key(),
-            state[field.key()]
-        )
+    fun stateKey(field: F) = field.key() + "/" + this.uniqKey
+
+    fun initStateValue(field: F, property: StateFlow<InputWrapper>, value: String) {
+        val key = stateKey(field)
+        Timber.tag(TAG).d("initStateValue(...): exist state %s = '%s'", key, state[key])
         if (property.value.isEmpty) {
-            Timber.tag(TAG).d("initStateValue(...): %s = '%s'", field.key(), value)
+            Timber.tag(TAG).d("initStateValue(...): %s = '%s'", key, value)
             setStateValue(field, property, value)
         }
     }
 
-    fun setStateValue(field: Focusable, property: StateFlow<InputWrapper>, value: String) {
-        Timber.tag(TAG).d("setStateValue(...): %s = '%s'", field.key(), value)
-        state[field.key()] = property.value.copy(value = value, isEmpty = false)
+    fun setStateValue(field: F, property: StateFlow<InputWrapper>, value: String) {
+        val key = stateKey(field)
+        Timber.tag(TAG).d("setStateValue(...): %s = '%s'", key, value)
+        state[key] = property.value.copy(value = value, isEmpty = false)
     }
 
-    fun setStateValue(
-        field: Focusable,
-        property: StateFlow<InputWrapper>,
-        @StringRes errorId: Int?
-    ) {
+    fun setStateValue(field: F, property: StateFlow<InputWrapper>, @StringRes errorId: Int?) {
+        val key = stateKey(field)
         Timber.tag(TAG)
-            .d("setStateValue(...): Validate (debounce) %s - ERR[%s]", field.key(), errorId)
-        state[field.key()] = property.value.copy(errorId = errorId, isEmpty = false)
+            .d("setStateValue(...): Validate (debounce) %s - ERR[%s]", key, errorId)
+        state[key] = property.value.copy(errorId = errorId, isEmpty = false)
     }
 
-    fun setStateValidValue(field: Focusable, property: StateFlow<InputWrapper>, value: String) {
-        Timber.tag(TAG).d("setStateValidValue(...): %s = '%s'", field.key(), value)
-        state[field.key()] = property.value.copy(value = value, errorId = null, isEmpty = false)
+    fun setStateValidValue(field: F, property: StateFlow<InputWrapper>, value: String) {
+        val key = stateKey(field)
+        Timber.tag(TAG).d("setStateValidValue(...): %s = '%s'", key, value)
+        state[key] = property.value.copy(value = value, errorId = null, isEmpty = false)
     }
 
     fun onTextFieldEntered(inputEvent: Inputable) {
@@ -85,7 +88,7 @@ abstract class SingleViewModel<T : Any, S : UiState<T>, A : UiAction, E : UiSing
         inputEvents.trySend(inputEvent)
     }
 
-    fun onTextFieldFocusChanged(focusedField: Focusable, isFocused: Boolean) {
+    fun onTextFieldFocusChanged(focusedField: F, isFocused: Boolean) {
         Timber.tag(TAG)
             .d("onTextFieldFocusChanged: %s - %s", focusedField.key(), isFocused)
         focusedTextField.key = if (isFocused) focusedField.key() else null

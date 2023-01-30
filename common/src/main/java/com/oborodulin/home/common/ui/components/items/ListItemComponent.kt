@@ -1,6 +1,7 @@
 package com.oborodulin.home.common.ui.components.items
 
 import android.content.res.Configuration
+import androidx.annotation.DrawableRes
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -39,17 +40,25 @@ private val EMPTY: (ListItemModel) -> Unit = {}
 
 @Composable
 fun ListItemComponent(
-    icon: Int?,
+    @DrawableRes icon: Int?,
     item: ListItemModel,
     selected: Boolean = false,
+    deleteDialogText: String = "",
     background: Color = Color.Transparent,
-    dialogText: String = "",
+    onFavorite: (ListItemModel) -> Unit = EMPTY,
     onClick: (ListItemModel) -> Unit = EMPTY,
     onEdit: (ListItemModel) -> Unit = EMPTY,
     onDelete: (ListItemModel) -> Unit = EMPTY,
 ) {
     Timber.tag(TAG)
-        .d("ListItemComponent(...) called: {\"listItem\": {\"icon\": $icon, \"itemId\": \"${item.itemId}\", \"title\": \"${item.title}\", \"desc\": \"${item.descr}\"}}")
+        .d(
+            "ListItemComponent(...) called: {\"listItem\": {\"icon\": %s, \"itemId\": \"%s\", \"title\": \"%s\", \"desc\": \"%s\", \"isFavorite\": \"%s\"}}",
+            icon,
+            item.itemId,
+            item.title,
+            item.descr,
+            item.isFavoriteMark
+        )
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -91,10 +100,32 @@ fun ListItemComponent(
                     .weight(2.5f)
                 //.padding(horizontal = 8.dp)
             ) {
-                Text(
-                    text = item.title,
-                    style = Typography.body1.copy(fontWeight = FontWeight.Bold)
-                )
+                Row {
+                    if (onFavorite !== EMPTY) {
+                        //val isFavorite = remember { mutableStateOf(item.isFavoriteMark) }
+                        Image(
+                            modifier = Modifier
+                                .clip(RoundedCornerShape(8.dp))
+                                .padding(4.dp)
+                                .clickable {
+//                                    if (!isFavorite.value) {
+                                    if (!item.isFavoriteMark) {
+                                        onFavorite(item)
+                                        //isFavorite.value = true
+                                    }
+                                },
+                            painter = when (item.isFavoriteMark) {//isFavorite.value
+                                true -> painterResource(R.drawable.outline_favorite_black_20)
+                                false -> painterResource(R.drawable.outline_favorite_border_black_20)
+                            },
+                            contentDescription = ""
+                        )
+                    }
+                    Text(
+                        text = item.title,
+                        style = Typography.body1.copy(fontWeight = FontWeight.Bold)
+                    )
+                }
                 item.descr?.let {
                     Text(
                         modifier = Modifier.padding(vertical = 4.dp),
@@ -130,7 +161,7 @@ fun ListItemComponent(
                             AlertDialogComponent(
                                 isShow = showDialogState.value,
                                 title = { Text(stringResource(R.string.dlg_confirm_title)) },
-                                text = { Text(text = dialogText) },
+                                text = { Text(text = deleteDialogText) },
                                 onDismiss = { showDialogState.value = false },
                                 onConfirm = { onDelete(item) }
                             )
@@ -162,6 +193,9 @@ fun PreviewListItemComponent() {
             title = context.resources.getString(R.string.preview_blank_title),
             descr = context.resources.getString(R.string.preview_blank_descr),
         ),
-        onClick = { println() }, onEdit = { println() }, onDelete = { println() }
+        onFavorite = { println() },
+        onClick = { println() },
+        onEdit = { println() },
+        onDelete = { println() }
     )
 }

@@ -31,6 +31,10 @@ class PayersRepositoryImp @Inject constructor(
 
     override suspend fun deleteAll() = payerDataSource.deletePayers()
 
+    override fun favoriteById(payerId: UUID) = flow {
+        payerDataSource.favoritePayerById(payerId)
+        this.emit(payerId)
+    }
     /*
         fun nowPlaying(): Flow<PagingData<NetworkMovie>> {
             val config = PagingConfig(
