@@ -28,8 +28,10 @@ import androidx.lifecycle.flowWithLifecycle
 import com.oborodulin.home.metering.ui.model.MeterValueModel
 import com.oborodulin.home.common.ui.components.field.util.InputFocusRequester
 import com.oborodulin.home.common.ui.components.field.TextFieldComponent
+import com.oborodulin.home.common.ui.components.field.util.InputWrapper
 import com.oborodulin.home.common.ui.components.field.util.inputProcess
 import timber.log.Timber
+import java.util.*
 
 private const val TAG = "Accounting.ui.MeterValueView"
 
@@ -40,14 +42,18 @@ fun MeterValueView(
 ) {
     Timber.tag(TAG).d("MeterValueView(...) called: meterValueInput = %s", meterValueModel)
     viewModel.initFieldStatesByUiModel(meterValueModel)
-    MeterValue(viewModel) {
+    MeterValue(meterValueModel, viewModel) {
         viewModel.submitAction(MeterValueUiAction.Save)
     }
 }
 
 @OptIn(ExperimentalComposeUiApi::class, ExperimentalLifecycleComposeApi::class)
 @Composable
-fun MeterValue(viewModel: MeterValueViewModel, onSubmit: () -> Unit) {
+fun MeterValue(
+    meterValueModel: MeterValueModel,
+    viewModel: MeterValueViewModel,
+    onSubmit: () -> Unit
+) {
     Timber.tag(TAG).d("MeterValue(...) called")
     val lifecycleOwner = LocalLifecycleOwner.current
 
@@ -65,11 +71,13 @@ fun MeterValue(viewModel: MeterValueViewModel, onSubmit: () -> Unit) {
     val currentValue by viewModel.currentValue.collectAsStateWithLifecycle()
     val areInputsValid by viewModel.areInputsValid.collectAsStateWithLifecycle()
 
+    Timber.tag(TAG).d("focusRequesters for current Meter Value")
     val focusRequesters: List<InputFocusRequester> = listOf(
         InputFocusRequester(
             MeterValueFields.METER_CURR_VALUE.name,
             remember { FocusRequester() })
     )
+    Timber.tag(TAG).d("MeterValue: LaunchedEffect() - before")
     LaunchedEffect(Unit) {
         Timber.tag(TAG).d("MeterValue: LaunchedEffect()")
         events.collect { event ->
@@ -78,6 +86,10 @@ fun MeterValue(viewModel: MeterValueViewModel, onSubmit: () -> Unit) {
         }
     }
 
+    Timber.tag(TAG).d(
+        "MeterValue: currentValue.inputs = %s",
+        currentValue.inputs[meterValueModel.metersId.toString()]
+    )
     Column(
         modifier = Modifier
             .fillMaxHeight()
@@ -100,9 +112,13 @@ fun MeterValue(viewModel: MeterValueViewModel, onSubmit: () -> Unit) {
                     imeAction = ImeAction.Next
                 )
             },
-            inputWrapper = currentValue,
+            inputWrapper = currentValue.inputs.getValue(meterValueModel.metersId.toString()),
             //  visualTransformation = ::creditCardFilter,
-            onValueChange = { viewModel.onTextFieldEntered(MeterValueInputEvent.CurrentValue(it)) },
+            onValueChange = {
+                viewModel.onTextFieldEntered(
+                    MeterValueInputEvent.CurrentValue(meterValueModel.metersId.toString(), it)
+                )
+            },
             onImeKeyAction = { if (areInputsValid) viewModel.onContinueClick { onSubmit() } }
         )
     }
@@ -112,5 +128,8 @@ fun MeterValue(viewModel: MeterValueViewModel, onSubmit: () -> Unit) {
 @Preview(name = "Day Mode", showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_NO)
 @Composable
 fun PreviewMeterValue() {
-    MeterValue(viewModel = MeterValueViewModelImp.previewModel, onSubmit = {})
+    MeterValue(
+        meterValueModel = MeterValueModel(metersId = UUID.randomUUID()),
+        viewModel = MeterValueViewModelImp.previewModel,
+        onSubmit = {})
 }

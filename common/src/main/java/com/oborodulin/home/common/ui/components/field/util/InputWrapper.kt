@@ -9,5 +9,6 @@ data class InputWrapper(
     val value: String = "",
     @StringRes val errorId: Int? = null,
     val errorMsg: String? = null,
-    val isEmpty: Boolean = true
+    val isEmpty: Boolean = true,
+    val isSaved: Boolean = false,
 ) : Parcelable

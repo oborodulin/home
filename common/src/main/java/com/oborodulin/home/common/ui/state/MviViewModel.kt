@@ -51,9 +51,7 @@ abstract class MviViewModel<T : Any, S : UiState<T>, A : UiAction, E : UiSingleE
     fun viewModelScope() = viewModelScope
 
     fun handleActionJob(action: () -> Unit, afterAction: () -> Unit) {
-        /*
         viewModelScope.launch(Dispatchers.Main) {
-
             _actionsJobFlow.collect { actionJob ->
                 actionJob?.let { job ->
                     Timber.tag(TAG).d(
@@ -65,7 +63,6 @@ abstract class MviViewModel<T : Any, S : UiState<T>, A : UiAction, E : UiSingleE
                 afterAction()
             }
         }
-         */
         action()
         afterAction()
     }

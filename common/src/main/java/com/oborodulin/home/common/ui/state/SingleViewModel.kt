@@ -53,34 +53,79 @@ abstract class SingleViewModel<T : Any, S : UiState<T>, A : UiAction, E : UiSing
 
     abstract suspend fun observeInputEvents()
 
-    fun stateKey(field: F) = field.key() + "/" + this.uniqKey
 
     fun initStateValue(field: F, property: StateFlow<InputWrapper>, value: String) {
-        val key = stateKey(field)
-        Timber.tag(TAG).d("initStateValue(...): exist state %s = '%s'", key, state[key])
+        Timber.tag(TAG)
+            .d("initStateValue(...): exist state %s = '%s'", field.key(), state[field.key()])
         if (property.value.isEmpty) {
-            Timber.tag(TAG).d("initStateValue(...): %s = '%s'", key, value)
+            Timber.tag(TAG).d("initStateValue(...): %s = '%s'", field.key(), value)
             setStateValue(field, property, value)
         }
     }
 
-    fun setStateValue(field: F, property: StateFlow<InputWrapper>, value: String) {
-        val key = stateKey(field)
-        Timber.tag(TAG).d("setStateValue(...): %s = '%s'", key, value)
-        state[key] = property.value.copy(value = value, isEmpty = false)
+    fun setStateValue(
+        field: F, property: StateFlow<InputWrapper>, value: String, isValid: Boolean = false
+    ) {
+        Timber.tag(TAG)
+            .d("setStateValue(...): %s = '%s' [valid = %s]", field.key(), value, isValid)
+        if (isValid) {
+            state[field.key()] = property.value.copy(value = value, errorId = null, isEmpty = false)
+        } else {
+            state[field.key()] = property.value.copy(value = value, isEmpty = false)
+        }
     }
 
     fun setStateValue(field: F, property: StateFlow<InputWrapper>, @StringRes errorId: Int?) {
-        val key = stateKey(field)
         Timber.tag(TAG)
-            .d("setStateValue(...): Validate (debounce) %s - ERR[%s]", key, errorId)
-        state[key] = property.value.copy(errorId = errorId, isEmpty = false)
+            .d("setStateValue(...): Validate (debounce) %s - ERR[%s]", field.key(), errorId)
+        state[field.key()] = property.value.copy(errorId = errorId, isEmpty = false)
     }
 
-    fun setStateValidValue(field: F, property: StateFlow<InputWrapper>, value: String) {
-        val key = stateKey(field)
-        Timber.tag(TAG).d("setStateValidValue(...): %s = '%s'", key, value)
-        state[key] = property.value.copy(value = value, errorId = null, isEmpty = false)
+    fun initStateValue(
+        field: F, properties: StateFlow<InputsWrapper>, value: String, key: String
+    ) {
+        Timber.tag(TAG)
+            .d("initStateValue(...): exist state %s = '%s'", field.key(), state[field.key()])
+        if (properties.value.inputs[key] == null || properties.value.inputs[key]?.isEmpty == true) {
+            properties.value.inputs[key] = InputWrapper(value = value, isEmpty = false)
+            Timber.tag(TAG)
+                .d(
+                    "initStateValue(...): add init value %s = '%s'",
+                    field.key(),
+                    properties.value.inputs[key]
+                )
+            Timber.tag(TAG)
+                .d("initStateValue(...): copy %s = '%s'", field.key(), properties.value.inputs)
+            state[field.key()] =
+                properties.value.copy(inputs = properties.value.inputs.toMutableMap())
+        }
+    }
+
+    fun setStateValue(
+        field: F, properties: StateFlow<InputsWrapper>, value: String, key: String,
+        isValid: Boolean = false
+    ) {
+        Timber.tag(TAG)
+            .d("setStateValue(...): %s = '%s' [valid = %s]", field.key(), value, isValid)
+        if (isValid) {
+            properties.value.inputs[key] = InputWrapper(
+                value = value, errorId = null, isEmpty = false, isSaved = false
+            )
+        } else {
+            properties.value.inputs[key] = InputWrapper(
+                value = value, isEmpty = false, isSaved = false
+            )
+        }
+        state[field.key()] = properties.value.copy(inputs = properties.value.inputs.toMutableMap())
+    }
+
+    fun setStateValue(
+        field: F, properties: StateFlow<InputsWrapper>, key: String, @StringRes errorId: Int?
+    ) {
+        Timber.tag(TAG)
+            .d("setStateValue(...): Validate (debounce) %s - ERR[%s]", field.key(), errorId)
+        properties.value.inputs[key] = InputWrapper(errorId = errorId, isEmpty = false)
+        state[field.key()] = properties.value.copy(inputs = properties.value.inputs.toMutableMap())
     }
 
     fun onTextFieldEntered(inputEvent: Inputable) {

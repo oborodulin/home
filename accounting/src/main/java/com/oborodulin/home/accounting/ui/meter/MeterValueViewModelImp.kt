@@ -35,24 +35,18 @@ class MeterValueViewModelImp @Inject constructor(
     SingleViewModel<MeterValueModel, UiState<MeterValueModel>, MeterValueUiAction, UiSingleEvent, MeterValueFields>(
         state
     ) {
-    private val meterValueId: StateFlow<InputWrapper> by lazy {
-        state.getStateFlow(
-            stateKey(MeterValueFields.METER_VALUE_ID), InputWrapper()
-        )
+    private val meterValueId: StateFlow<InputsWrapper> by lazy {
+        state.getStateFlow(MeterValueFields.METER_VALUE_ID.name, InputsWrapper())
     }
-    private val metersId: StateFlow<InputWrapper> by lazy {
-        state.getStateFlow(
-            stateKey(MeterValueFields.METERS_ID), InputWrapper()
-        )
+    private val metersId: StateFlow<InputsWrapper> by lazy {
+        state.getStateFlow(MeterValueFields.METERS_ID.name, InputsWrapper())
     }
-    override val currentValue: StateFlow<InputWrapper> by lazy {
-        state.getStateFlow(
-            stateKey(MeterValueFields.METER_CURR_VALUE), InputWrapper()
-        )
+    override val currentValue: StateFlow<InputsWrapper> by lazy {
+        state.getStateFlow(MeterValueFields.METER_CURR_VALUE.name, InputsWrapper())
     }
 
     override val areInputsValid = combine(currentValue) { currentValue ->
-        currentValue[0].errorId == null
+        currentValue[0].inputs.filter { it.value.errorId == null }.size == currentValue[0].inputs.size
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), false)
 
     private val errorHandler = CoroutineExceptionHandler { _, exception ->
@@ -75,17 +69,21 @@ class MeterValueViewModelImp @Inject constructor(
     private fun saveMeterValue(): Job {
         Timber.tag(TAG).d("saveMeterValue() called")
         val job = viewModelScope.launch(errorHandler) {
-            meterUseCases.saveMeterValueUseCase.execute(
-                SaveMeterValueUseCase.Request(
-                    converter.toMeterValue(
-                        MeterValueModel(
-                            id = UUID.fromString(meterValueId.value.value),
-                            metersId = UUID.fromString(metersId.value.value),
-                            currentValue = currentValue.value.value.toBigDecimal(),
+            // unsaved values
+            currentValue.value.inputs.filter { entry -> !entry.value.isSaved }
+                .forEach { (key, curVal) ->
+                    meterUseCases.saveMeterValueUseCase.execute(
+                        SaveMeterValueUseCase.Request(
+                            converter.toMeterValue(
+                                MeterValueModel(
+                                    id = UUID.fromString(meterValueId.value.inputs[key]?.value),
+                                    metersId = UUID.fromString(key),
+                                    currentValue = curVal.value.toBigDecimalOrNull(),
+                                )
+                            )
                         )
-                    )
-                )
-            ).collect {}
+                    ).collect {}
+                }
         }
         return job
     }
@@ -101,14 +99,20 @@ class MeterValueViewModelImp @Inject constructor(
                 meterValueModel
             )
         meterValueModel.id?.let {
-            initStateValue(MeterValueFields.METER_VALUE_ID, meterValueId, it.toString())
+            initStateValue(
+                field = MeterValueFields.METER_VALUE_ID, properties = meterValueId,
+                value = it.toString(), key = meterValueModel.metersId.toString()
+            )
         }
         initStateValue(
-            MeterValueFields.METERS_ID, metersId, meterValueModel.metersId.toString()
+            field = MeterValueFields.METERS_ID, properties = metersId,
+            value = meterValueModel.metersId.toString(), key = meterValueModel.metersId.toString()
         )
-        meterValueModel.currentValue?.let {
-            initStateValue(MeterValueFields.METER_CURR_VALUE, currentValue, it.toString())
-        }
+        initStateValue(
+            field = MeterValueFields.METER_CURR_VALUE, properties = currentValue,
+            value = meterValueModel.currentValue?.toString() ?: "",
+            key = meterValueModel.metersId.toString()
+        )
         return null
     }
 
@@ -119,11 +123,18 @@ class MeterValueViewModelImp @Inject constructor(
                 when (event) {
                     is MeterValueInputEvent.CurrentValue -> {
                         when (MeterValueInputValidator.CurrentValue.errorIdOrNull(event.input)) {
-                            null -> setStateValidValue(
-                                MeterValueFields.METER_CURR_VALUE, currentValue, event.input
+                            null -> setStateValue(
+                                field = MeterValueFields.METER_CURR_VALUE,
+                                properties = currentValue,
+                                value = event.input,
+                                key = event.key,
+                                isValid = true
                             )
                             else -> setStateValue(
-                                MeterValueFields.METER_CURR_VALUE, currentValue, event.input
+                                field = MeterValueFields.METER_CURR_VALUE,
+                                properties = currentValue,
+                                value = event.input,
+                                key = event.key
                             )
                         }
                     }
@@ -134,8 +145,9 @@ class MeterValueViewModelImp @Inject constructor(
                 when (event) {
                     is MeterValueInputEvent.CurrentValue ->
                         setStateValue(
-                            MeterValueFields.METER_CURR_VALUE, currentValue,
-                            MeterValueInputValidator.CurrentValue.errorIdOrNull(event.input)
+                            field = MeterValueFields.METER_CURR_VALUE, properties = currentValue,
+                            key = event.key,
+                            errorId = MeterValueInputValidator.CurrentValue.errorIdOrNull(event.input)
                         )
                 }
             }
@@ -144,8 +156,16 @@ class MeterValueViewModelImp @Inject constructor(
     override fun getInputErrorsOrNull(): List<InputError>? {
         Timber.tag(TAG).d("getInputErrorsOrNull() called")
         val inputErrors: MutableList<InputError> = mutableListOf()
-        MeterValueInputValidator.CurrentValue.errorIdOrNull(currentValue.value.value)?.let {
-            inputErrors.add(InputError(MeterValueFields.METER_CURR_VALUE.name, it))
+        currentValue.value.inputs.forEach { entry ->
+            MeterValueInputValidator.CurrentValue.errorIdOrNull(entry.value.value)?.let { errorId ->
+                inputErrors.add(
+                    InputError(
+                        fieldName = MeterValueFields.METER_CURR_VALUE.name,
+                        key = entry.key,
+                        errorId = errorId
+                    )
+                )
+            }
         }
         return if (inputErrors.isEmpty()) null else inputErrors
     }
@@ -155,7 +175,8 @@ class MeterValueViewModelImp @Inject constructor(
             .d("displayInputErrors() called: inputErrors.count = %d", inputErrors.size)
         for (error in inputErrors) {
             state[error.fieldName] = when (error.fieldName) {
-                MeterValueFields.METER_CURR_VALUE.name -> currentValue.value.copy(errorId = error.errorId)
+                MeterValueFields.METER_CURR_VALUE.name ->
+                    currentValue.value.inputs[error.key]?.copy(errorId = error.errorId)
                 else -> null
             }
         }
@@ -166,14 +187,13 @@ class MeterValueViewModelImp @Inject constructor(
             object : MeterValueViewModel {
                 override val events = Channel<ScreenEvent>().receiveAsFlow()
 
-                override val currentValue = MutableStateFlow(InputWrapper())
+                override val currentValue = MutableStateFlow(InputsWrapper())
                 override val areInputsValid = MutableStateFlow(true)
 
                 override fun initFieldStatesByUiModel(uiModel: Any): Job? = null
                 override fun onTextFieldEntered(inputEvent: Inputable) {}
                 override fun onTextFieldFocusChanged(
-                    focusedField: MeterValueFields,
-                    isFocused: Boolean
+                    focusedField: MeterValueFields, isFocused: Boolean
                 ) {
                 }
 
