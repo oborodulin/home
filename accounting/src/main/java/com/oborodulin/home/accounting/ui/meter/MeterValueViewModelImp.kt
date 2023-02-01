@@ -2,6 +2,7 @@ package com.oborodulin.home.accounting.ui.meter
 
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
+import com.oborodulin.home.common.domain.entities.Result
 import com.oborodulin.home.common.ui.components.*
 import com.oborodulin.home.common.ui.components.field.*
 import com.oborodulin.home.common.ui.components.field.util.*
@@ -13,7 +14,6 @@ import com.oborodulin.home.metering.domain.usecases.SaveMeterValueUseCase
 import com.oborodulin.home.metering.ui.model.MeterValueModel
 import com.oborodulin.home.metering.ui.model.converters.MeterValueConverter
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.channels.Channel
@@ -49,10 +49,6 @@ class MeterValueViewModelImp @Inject constructor(
         currentValue[0].inputs.filter { it.value.errorId == null }.size == currentValue[0].inputs.size
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), false)
 
-    private val errorHandler = CoroutineExceptionHandler { _, exception ->
-        Timber.tag(TAG).e(exception)
-    }
-
     override fun initState() = UiState.Loading
 
     override suspend fun handleAction(action: MeterValueUiAction): Job {
@@ -70,19 +66,35 @@ class MeterValueViewModelImp @Inject constructor(
         Timber.tag(TAG).d("saveMeterValue() called")
         val job = viewModelScope.launch(errorHandler) {
             // unsaved values
-            currentValue.value.inputs.filter { entry -> !entry.value.isSaved }
+            currentValue.value.inputs.filter { entry -> !entry.value.isSaved && entry.value.value.isNotEmpty() }
                 .forEach { (key, curVal) ->
+                    Timber.tag(TAG).d("saveMeterValue(): %s - %s", key, curVal)
                     meterUseCases.saveMeterValueUseCase.execute(
                         SaveMeterValueUseCase.Request(
                             converter.toMeterValue(
                                 MeterValueModel(
-                                    id = UUID.fromString(meterValueId.value.inputs[key]?.value),
+                                    id = UUID.fromString(meterValueId.value.inputs.getValue(key).value),
                                     metersId = UUID.fromString(key),
-                                    currentValue = curVal.value.toBigDecimalOrNull(),
+                                    currentValue = curVal.value.toBigDecimal(),
                                 )
                             )
                         )
-                    ).collect {}
+                    ).collect {
+                        when (it) {
+                            is Result.Success -> {
+                                setStateValue(
+                                    field = MeterValueFields.METER_CURR_VALUE,
+                                    properties = currentValue,
+                                    value = it.data.meterValue.meterValue?.toString() ?: "",
+                                    key = it.data.meterValue.metersId.toString(),
+                                    isSaved = true
+                                )
+                            }
+                            is Result.Error -> {
+                                Timber.tag(TAG).e(it.exception)
+                            }
+                        }
+                    }
                 }
         }
         return job
@@ -153,6 +165,18 @@ class MeterValueViewModelImp @Inject constructor(
             }
     }
 
+    override fun onTextFieldFocusChanged(
+        focusedField: MeterValueFields, isFocused: Boolean,
+        onFocusIn: () -> Unit, onFocusOut: () -> Unit
+    ) {
+        Timber.tag(TAG).d("onTextFieldFocusChanged() called")
+        if (isFocused) {
+            onFocusIn()
+        } else {
+            onFocusOut()
+        }
+    }
+
     override fun getInputErrorsOrNull(): List<InputError>? {
         Timber.tag(TAG).d("getInputErrorsOrNull() called")
         val inputErrors: MutableList<InputError> = mutableListOf()
@@ -193,7 +217,8 @@ class MeterValueViewModelImp @Inject constructor(
                 override fun initFieldStatesByUiModel(uiModel: Any): Job? = null
                 override fun onTextFieldEntered(inputEvent: Inputable) {}
                 override fun onTextFieldFocusChanged(
-                    focusedField: MeterValueFields, isFocused: Boolean
+                    focusedField: MeterValueFields, isFocused: Boolean,
+                    onFocusIn: () -> Unit, onFocusOut: () -> Unit
                 ) {
                 }
 

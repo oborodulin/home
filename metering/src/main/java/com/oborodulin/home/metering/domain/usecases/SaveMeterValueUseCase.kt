@@ -16,10 +16,10 @@ class SaveMeterValueUseCase(
     override fun process(request: Request): Flow<Response> {
         return metersRepository.save(request.meterValue)
             .map {
-                Response
+                Response(it)
             }
     }
 
     data class Request(val meterValue: MeterValue) : UseCase.Request
-    object Response : UseCase.Response
+    data class Response(val meterValue: MeterValue) : UseCase.Response
 }

@@ -45,9 +45,6 @@ class AccountingViewModelImp @Inject constructor(
         val uiState: State<PayersListUiState>
             get() = _uiState
     */
-    private val errorHandler = CoroutineExceptionHandler { _, exception ->
-        Timber.tag(TAG).e(exception)
-    }
 
     override fun initState(): UiState<AccountingModel> = UiState.Loading
 

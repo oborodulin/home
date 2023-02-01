@@ -136,6 +136,7 @@ fun Payer(appState: AppState, viewModel: PayerViewModel, onSubmit: () -> Unit) {
         Timber.tag(TAG).d("Payer(...): LaunchedEffect()")
         events.collect { event ->
             Timber.tag(TAG).d("Collect input events flow: %s", event.javaClass.name)
+            //inputProcess(context, focusManager, keyboardController, event, focusRequesters)
             when (event) {
                 is ScreenEvent.ShowToast -> context.toast(event.messageId)
                 is ScreenEvent.UpdateKeyboard -> {

@@ -13,9 +13,10 @@ import com.oborodulin.home.domain.usecase.PayerUseCases
 import com.oborodulin.home.presentation.navigation.NavRoutes
 import com.oborodulin.home.presentation.navigation.PayerInput
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.*
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.launch
 import timber.log.Timber
 import java.math.BigDecimal
 import java.util.*
@@ -29,10 +30,6 @@ class PayersListViewModelImp @Inject constructor(
     private val converter: PayersListConverter
 ) : PayersListViewModel,
     MviViewModel<List<PayerListItemModel>, UiState<List<PayerListItemModel>>, PayersListUiAction, PayersListUiSingleEvent>() {
-
-    private val errorHandler = CoroutineExceptionHandler { _, exception ->
-        Timber.tag(TAG).e(exception)
-    }
 
     override fun initState() = UiState.Loading
 

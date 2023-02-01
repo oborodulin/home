@@ -103,13 +103,15 @@ fun MeterValue(
                 .onFocusChanged { focusState ->
                     viewModel.onTextFieldFocusChanged(
                         focusedField = MeterValueFields.METER_CURR_VALUE,
-                        isFocused = focusState.isFocused
+                        isFocused = focusState.isFocused,
+                        onFocusIn = {Timber.tag(TAG).d("MeterValue: onFocusIn")},
+                        onFocusOut = {Timber.tag(TAG).d("MeterValue: onFocusOut")}
                     )
                 },
             keyboardOptions = remember {
                 KeyboardOptions(
                     keyboardType = KeyboardType.Number,
-                    imeAction = ImeAction.Next
+                    imeAction = ImeAction.Done
                 )
             },
             inputWrapper = currentValue.inputs.getValue(meterValueModel.metersId.toString()),

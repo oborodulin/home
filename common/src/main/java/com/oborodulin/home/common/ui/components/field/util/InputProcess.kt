@@ -7,7 +7,7 @@ import androidx.compose.ui.platform.SoftwareKeyboardController
 import com.oborodulin.home.common.util.toast
 import timber.log.Timber
 
-private const val TAG = "Common.ui.ValidateScreen"
+private const val TAG = "Common.ui.inputProcess"
 
 @OptIn(ExperimentalComposeUiApi::class)
 fun inputProcess(
@@ -17,7 +17,7 @@ fun inputProcess(
     event: ScreenEvent,
     focusRequesters: List<InputFocusRequester>
 ) {
-    Timber.tag(TAG).d("ValidateScreen(...) called")
+    Timber.tag(TAG).d("inputProcess(...) called")
     when (event) {
         is ScreenEvent.ShowToast -> context.toast(event.messageId)
         is ScreenEvent.UpdateKeyboard -> {

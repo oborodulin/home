@@ -112,10 +112,6 @@ class PayerViewModelImp @Inject constructor(
             false
         )
 
-    private val errorHandler = CoroutineExceptionHandler { _, exception ->
-        Timber.tag(TAG).e(exception)
-    }
-
     override fun initState(): UiState<PayerModel> = UiState.Loading
 
     override suspend fun handleAction(action: PayerUiAction): Job {
@@ -212,7 +208,8 @@ class PayerViewModelImp @Inject constructor(
                         }
                     is PayerInputEvent.FullName ->
                         when (PayerInputValidator.FullName.errorIdOrNull(event.input)) {
-                            null -> setStateValue(PayerFields.FULL_NAME, fullName, event.input,
+                            null -> setStateValue(
+                                PayerFields.FULL_NAME, fullName, event.input,
                                 true
                             )
                             else -> setStateValue(PayerFields.FULL_NAME, fullName, event.input)
@@ -345,6 +342,7 @@ class PayerViewModelImp @Inject constructor(
             .d("displayInputErrors() called: inputErrors.count = %d", inputErrors.size)
         for (error in inputErrors) {
             state[error.fieldName] = when (error.fieldName) {
+                //PayerFields.ERC_CODE.name -> ercCode.update{ it.copy(errorId = error.errorId) }
                 PayerFields.ERC_CODE.name -> ercCode.value.copy(errorId = error.errorId)
                 PayerFields.FULL_NAME.name -> fullName.value.copy(errorId = error.errorId)
                 PayerFields.ADDRESS.name -> address.value.copy(errorId = error.errorId)
@@ -378,11 +376,8 @@ class PayerViewModelImp @Inject constructor(
                 override fun viewModelScope(): CoroutineScope = CoroutineScope(Dispatchers.Main)
                 override fun onTextFieldEntered(inputEvent: Inputable) {}
                 override fun onTextFieldFocusChanged(
-                    focusedField: PayerFields,
-                    isFocused: Boolean
-                ) {
-                }
-
+                    focusedField: PayerFields, isFocused: Boolean
+                ) { }
                 override fun moveFocusImeAction() {}
                 override fun onContinueClick(onSuccess: () -> Unit) {}
             }

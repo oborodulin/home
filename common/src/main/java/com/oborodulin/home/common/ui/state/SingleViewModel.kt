@@ -4,12 +4,14 @@ import androidx.annotation.StringRes
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
 import com.oborodulin.home.common.ui.components.field.util.*
-import kotlinx.coroutines.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.receiveAsFlow
+import kotlinx.coroutines.launch
 import timber.log.Timber
-import java.util.*
 
 private const val TAG = "Common.SingleViewModel"
 private const val FOCUSED_FIELD_KEY = "focusedTextField"
@@ -18,8 +20,6 @@ abstract class SingleViewModel<T : Any, S : UiState<T>, A : UiAction, E : UiSing
     private val state: SavedStateHandle,
     private val initFocusedTextField: Focusable? = null,
 ) : MviViewModel<T, S, A, E>() {
-
-    val uniqKey = UUID.randomUUID().toString()
 
     private var focusedTextField = FocusedTextField(
         textField = initFocusedTextField,
@@ -33,10 +33,6 @@ abstract class SingleViewModel<T : Any, S : UiState<T>, A : UiAction, E : UiSing
     private val _events = Channel<ScreenEvent>()
     val events = _events.receiveAsFlow()
     val inputEvents = Channel<Inputable>(Channel.CONFLATED)
-
-    private val errorHandler = CoroutineExceptionHandler { _, exception ->
-        Timber.tag(TAG).e(exception)
-    }
 
     init {
         Timber.tag(TAG).d("init: Start observe input events")
@@ -103,17 +99,20 @@ abstract class SingleViewModel<T : Any, S : UiState<T>, A : UiAction, E : UiSing
 
     fun setStateValue(
         field: F, properties: StateFlow<InputsWrapper>, value: String, key: String,
-        isValid: Boolean = false
+        isValid: Boolean = false, isSaved: Boolean = false
     ) {
         Timber.tag(TAG)
-            .d("setStateValue(...): %s = '%s' [valid = %s]", field.key(), value, isValid)
+            .d(
+                "setStateValue(...): %s = '%s' [valid = %s; isSaved = %s]", field.key(),
+                value, isValid, isSaved
+            )
         if (isValid) {
             properties.value.inputs[key] = InputWrapper(
-                value = value, errorId = null, isEmpty = false, isSaved = false
+                value = value, errorId = null, isEmpty = false, isSaved = isSaved
             )
         } else {
             properties.value.inputs[key] = InputWrapper(
-                value = value, isEmpty = false, isSaved = false
+                value = value, isEmpty = false, isSaved = isSaved
             )
         }
         state[field.key()] = properties.value.copy(inputs = properties.value.inputs.toMutableMap())
@@ -124,7 +123,9 @@ abstract class SingleViewModel<T : Any, S : UiState<T>, A : UiAction, E : UiSing
     ) {
         Timber.tag(TAG)
             .d("setStateValue(...): Validate (debounce) %s - ERR[%s]", field.key(), errorId)
-        properties.value.inputs[key] = InputWrapper(errorId = errorId, isEmpty = false)
+        val property = properties.value.inputs.getValue(key)
+        properties.value.inputs[key] =
+            InputWrapper(value = property.value, errorId = errorId, isEmpty = false)
         state[field.key()] = properties.value.copy(inputs = properties.value.inputs.toMutableMap())
     }
 
@@ -136,7 +137,13 @@ abstract class SingleViewModel<T : Any, S : UiState<T>, A : UiAction, E : UiSing
     fun onTextFieldFocusChanged(focusedField: F, isFocused: Boolean) {
         Timber.tag(TAG)
             .d("onTextFieldFocusChanged: %s - %s", focusedField.key(), isFocused)
-        focusedTextField.key = if (isFocused) focusedField.key() else null
+        if (isFocused) {
+            focusedTextField.key = focusedField.key()
+            //onFocusIn?.invoke()
+        } else {
+            focusedTextField.key = null
+            //onFocusOut?.invoke()
+        }
     }
 
     fun moveFocusImeAction() {
