@@ -13,6 +13,9 @@ import com.oborodulin.home.metering.domain.usecases.GetPrevServiceMeterValuesUse
 import com.oborodulin.home.metering.domain.usecases.MeterUseCases
 import com.oborodulin.home.metering.domain.usecases.SaveMeterValueUseCase
 import com.oborodulin.home.metering.ui.model.converters.MeterValueConverter
+import com.oborodulin.home.metering.ui.model.converters.PrevServiceMeterValuesListConverter
+import com.oborodulin.home.metering.ui.model.mappers.PrevMetersValuesViewToMeterValueListItemModelListMapper
+import com.oborodulin.home.metering.ui.model.mappers.PrevMetersValuesViewToMeterValueModelMapper
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -23,15 +26,32 @@ import javax.inject.Singleton
 @Module
 @InstallIn(SingletonComponent::class)
 object MeteringModule {
-
+    // MAPPERS:
     @Singleton
     @Provides
     fun provideMeterMapper(): MeterMapper = MeterMapper()
 
     @Singleton
     @Provides
+    fun providePrevMetersValuesViewToMeterValueModelMapper(): PrevMetersValuesViewToMeterValueModelMapper =
+        PrevMetersValuesViewToMeterValueModelMapper()
+
+    @Singleton
+    @Provides
+    fun providePrevMetersValuesViewToMeterValueListItemModelListMapper(mapper: PrevMetersValuesViewToMeterValueModelMapper): PrevMetersValuesViewToMeterValueListItemModelListMapper =
+        PrevMetersValuesViewToMeterValueListItemModelListMapper(mapper = mapper)
+
+    // CONVERTERS:
+    @Singleton
+    @Provides
     fun provideMeterValueConverter(): MeterValueConverter = MeterValueConverter()
 
+    @Singleton
+    @Provides
+    fun providePrevServiceMeterValuesListConverter(mapper: PrevMetersValuesViewToMeterValueModelMapper): PrevServiceMeterValuesListConverter =
+        PrevServiceMeterValuesListConverter(mapper = mapper)
+
+    // DATA SOURCES:
     @Singleton
     @Provides
     fun provideMeteringDataSource(
@@ -41,11 +61,13 @@ object MeteringModule {
     ): MeteringDataSource =
         MeteringDataSourceImpl(meterDao, dispatcher, meterMapper)
 
+    // REPOSITORIES:
     @Singleton
     @Provides
     fun provideMetersRepository(meteringDataSource: MeteringDataSource): MetersRepository =
         MetersRepositoryImp(meteringDataSource)
 
+    // USE CASES:
     @Singleton
     @Provides
     fun provideMeterUseCases(configuration: UseCase.Configuration, repository: MetersRepository):

@@ -3,13 +3,14 @@ package com.oborodulin.home.accounting.di
 import com.oborodulin.home.accounting.domain.usecases.*
 import com.oborodulin.home.accounting.ui.model.converters.PayerConverter
 import com.oborodulin.home.accounting.ui.model.converters.PayersListConverter
-import com.oborodulin.home.accounting.ui.model.converters.PrevServiceMeterValuesConverter
+import com.oborodulin.home.metering.ui.model.converters.PrevServiceMeterValuesListConverter
 import com.oborodulin.home.accounting.ui.model.mappers.*
 import com.oborodulin.home.common.domain.usecases.UseCase
 import com.oborodulin.home.domain.repositories.PayersRepository
 import com.oborodulin.home.domain.usecase.*
 import com.oborodulin.home.metering.domain.repositories.MetersRepository
 import com.oborodulin.home.metering.domain.usecases.GetPrevServiceMeterValuesUseCase
+import com.oborodulin.home.metering.ui.model.mappers.PrevMetersValuesViewToMeterValueModelMapper
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -56,8 +57,8 @@ object AccountingModule {
 
     @Singleton
     @Provides
-    fun providePrevServiceMeterValuesConverter(mapper: PrevMetersValuesViewToMeterValueModelMapper): PrevServiceMeterValuesConverter =
-        PrevServiceMeterValuesConverter(mapper = mapper)
+    fun providePrevServiceMeterValuesConverter(mapper: PrevMetersValuesViewToMeterValueModelMapper): PrevServiceMeterValuesListConverter =
+        PrevServiceMeterValuesListConverter(mapper = mapper)
 
     // USE CASES:
     @Singleton

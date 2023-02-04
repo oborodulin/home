@@ -1,4 +1,4 @@
-package com.oborodulin.home.accounting.ui.meter
+package com.oborodulin.home.metering.ui.value
 
 import com.oborodulin.home.common.ui.components.field.util.Validatable
 

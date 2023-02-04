@@ -1,6 +1,7 @@
 plugins {
     id 'com.android.library'
     id 'org.jetbrains.kotlin.android'
+    id 'kotlin-parcelize'
     id 'dagger.hilt.android.plugin'
     id 'org.jetbrains.kotlin.kapt'
 }
@@ -19,7 +20,10 @@ android {
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         consumerProguardFiles "consumer-rules.pro"
     }
-
+    buildFeatures {
+        // Enables Jetpack Compose for this module
+        compose true
+    }
     buildTypes {
         release {
             minifyEnabled false
@@ -95,6 +99,7 @@ dependencies {
     implementation deps.activity.compose
     implementation deps.lifecycle.runtimeKtx
     implementation deps.lifecycle.viewmodelCompose
+    implementation deps.lifecycle.runtimeCompose
     implementation deps.google.gson
     implementation deps.navigation.compose
     //debugImplementation deps.compose.uiTooling

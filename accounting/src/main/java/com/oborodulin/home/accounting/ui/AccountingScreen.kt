@@ -14,34 +14,26 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
-import com.oborodulin.home.accounting.R
-import com.oborodulin.home.accounting.ui.meter.MeterValuesListView
-import com.oborodulin.home.accounting.ui.meter.MeterValuesListViewModel
-import com.oborodulin.home.accounting.ui.meter.MeterValuesListViewModelImp
+import com.oborodulin.home.metering.ui.value.MeterValuesListView
+import com.oborodulin.home.metering.ui.value.MeterValuesListViewModel
+import com.oborodulin.home.metering.ui.value.MeterValuesListViewModelImp
 import com.oborodulin.home.accounting.ui.model.AccountingModel
 import com.oborodulin.home.accounting.ui.payer.list.PayersListView
 import com.oborodulin.home.accounting.ui.payer.list.PayersListViewModel
 import com.oborodulin.home.accounting.ui.payer.list.PayersListViewModelImp
 import com.oborodulin.home.common.ui.state.CommonScreen
 import com.oborodulin.home.common.ui.theme.HomeComposableTheme
-import com.oborodulin.home.common.ui.theme.Typography
 import com.oborodulin.home.common.util.toast
-import com.oborodulin.home.data.util.ServiceType
-import com.oborodulin.home.metering.ui.model.MeterValueModel
 import com.oborodulin.home.presentation.AppState
 import com.oborodulin.home.presentation.components.ScaffoldComponent
 import com.oborodulin.home.presentation.navigation.NavRoutes
 import kotlinx.coroutines.flow.collectLatest
 import timber.log.Timber
-import java.text.DecimalFormat
-import java.time.format.DateTimeFormatter
 
 /**
  * Created by tfakioglu on 12.December.2021
@@ -195,138 +187,6 @@ private fun AccountingView(
     }
 }
 
-@Composable
-fun PrevServiceMeterValues(
-    meterValues: List<MeterValueModel>,
-    viewModel: MeterValuesListViewModel
-) {
-    Timber.tag(TAG).d("PrevServiceMeterValues(...) called")
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .clip(RoundedCornerShape(16.dp))
-            .background(MaterialTheme.colors.background, shape = RoundedCornerShape(16.dp))
-            .verticalScroll(rememberScrollState())
-            .padding(vertical = 8.dp)
-    ) {
-        for (meterValue in meterValues) {
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(IntrinsicSize.Min)
-                    .padding(horizontal = 8.dp, vertical = 4.dp),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.Start
-            ) {
-                Column(modifier = Modifier.width(95.dp)) {
-                    Column(
-                        modifier = Modifier.fillMaxSize(),
-                        verticalArrangement = Arrangement.Top
-                    ) {
-                        Spacer(modifier = Modifier.height(8.dp))
-                        ServiceIcon(meterValue.type)
-                        Spacer(modifier = Modifier.height(4.dp))
-                        Text(
-                            text = meterValue.name,
-                            style = Typography.body1.copy(fontWeight = FontWeight.Bold)
-                        )
-                    }
-                }
-                Column(
-                    modifier = Modifier
-                        .fillMaxHeight()
-                        .width(85.dp),
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.Bottom
-                ) {
-                    meterValue.prevLastDate?.let {
-                        Text(
-                            text = it.format(DateTimeFormatter.ISO_LOCAL_DATE)
-                            //DateFormat.getDateInstance(DateFormat.SHORT, Locale.GERMAN).format(it)
-                        )
-                    }
-                    Divider(thickness = 1.dp)
-                    Spacer(modifier = Modifier.height(8.dp))
-                    meterValue.prevValue?.let {
-                        Text(
-                            text = DecimalFormat(meterValue.valueFormat).format(it),
-                            style = Typography.body1.copy(fontWeight = FontWeight.Bold)
-                        )
-                    }
-                }
-                Column(
-                    modifier = Modifier
-                        .fillMaxHeight()
-                        .width(45.dp),
-                    verticalArrangement = Arrangement.Bottom
-                ) {
-                    meterValue.measureUnit?.let { Text(text = it) }
-                }
-                MeterValuesListView(meterValueModel = meterValue, viewModel = viewModel)
-                Column(
-                    modifier = Modifier.fillMaxSize(),
-                    verticalArrangement = Arrangement.Top
-                ) {
-                    Spacer(modifier = Modifier.height(8.dp))
-                    Image(
-                        modifier = Modifier
-                            .clip(RoundedCornerShape(8.dp))
-                            .padding(4.dp)
-                        //.clickable { onEdit(item) }
-                        ,
-                        painter = painterResource(R.drawable.outline_photo_camera_black_24),
-                        contentDescription = ""
-                    )
-                    Spacer(modifier = Modifier.height(4.dp))
-                    Image(
-                        modifier = Modifier
-                            .clip(RoundedCornerShape(8.dp))
-                            .padding(4.dp)
-                        //.clickable { onDelete(item) }
-                        ,
-                        painter = painterResource(com.oborodulin.home.common.R.drawable.outline_delete_black_24),
-                        contentDescription = ""
-                    )
-                }
-            }
-        }
-    }
-}
-
-@Composable
-fun ServiceIcon(serviceType: ServiceType?) =
-    when (serviceType) {
-        ServiceType.ELECRICITY -> Image(
-            modifier = Modifier
-                .clip(RoundedCornerShape(8.dp))
-                .padding(4.dp),
-            painter = painterResource(com.oborodulin.home.presentation.R.drawable.outline_electric_bolt_black_36),
-            contentDescription = ""
-        )
-        ServiceType.COLD_WATER -> Image(
-            modifier = Modifier
-                .clip(RoundedCornerShape(8.dp))
-                .padding(4.dp),
-            painter = painterResource(com.oborodulin.home.presentation.R.drawable.outline_water_drop_black_36),
-            contentDescription = ""
-        )
-        ServiceType.HOT_WATER -> Image(
-            modifier = Modifier
-                .clip(RoundedCornerShape(8.dp))
-                .padding(4.dp),
-            painter = painterResource(com.oborodulin.home.presentation.R.drawable.outline_opacity_black_36),
-            contentDescription = ""
-        )
-        ServiceType.HEATING -> Image(
-            modifier = Modifier
-                .clip(RoundedCornerShape(8.dp))
-                .padding(4.dp),
-            painter = painterResource(com.oborodulin.home.presentation.R.drawable.ic_radiator_36),
-            contentDescription = ""
-        )
-        else -> {}
-    }
-
 @Preview(name = "Night Mode", showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
 @Preview(name = "Day Mode", showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_NO)
 @Composable
@@ -338,16 +198,6 @@ fun PreviewAccountingView() {
         accountingViewModel = AccountingViewModelImp.previewModel(LocalContext.current),
         payersListViewModel = PayersListViewModelImp.previewModel(LocalContext.current),
         meterValuesListViewModel = MeterValuesListViewModelImp.previewModel
-    )
-}
-
-@Preview(name = "Night Mode", showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
-@Preview(name = "Day Mode", showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_NO)
-@Composable
-fun PreviewPrevServiceMeterValues() {
-    PrevServiceMeterValues(
-        meterValues = AccountingViewModelImp.previewMeterValueModel(LocalContext.current),
-        viewModel = MeterValuesListViewModelImp.previewModel
     )
 }
 

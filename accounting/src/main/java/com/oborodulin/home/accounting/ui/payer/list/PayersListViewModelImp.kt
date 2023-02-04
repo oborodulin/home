@@ -27,7 +27,7 @@ private const val TAG = "Accounting.ui.PayersListViewModel"
 @HiltViewModel
 class PayersListViewModelImp @Inject constructor(
     private val payerUseCases: PayerUseCases,
-    private val converter: PayersListConverter
+    private val payersListConverter: PayersListConverter
 ) : PayersListViewModel,
     MviViewModel<List<PayerListItemModel>, UiState<List<PayerListItemModel>>, PayersListUiAction, PayersListUiSingleEvent>() {
 
@@ -73,7 +73,7 @@ class PayersListViewModelImp @Inject constructor(
         Timber.tag(TAG).d("loadPayers() called")
         val job = viewModelScope.launch(errorHandler) {
             payerUseCases.getPayersUseCase.execute(GetPayersUseCase.Request).map {
-                converter.convert(it)
+                payersListConverter.convert(it)
             }
                 .collect {
                     submitState(it)
@@ -104,35 +104,6 @@ class PayersListViewModelImp @Inject constructor(
 
     override fun initFieldStatesByUiModel(uiModel: Any): Job? = null
 
-    /*    private fun getPayers() {
-            viewModelScope.launch(errorHandler) {
-                payerUseCases.getPayersUseCase().collect {
-                    _uiState.value = _uiState.value.copy(
-                        payers = it,
-                        isLoading = false
-                    )
-                }
-            }
-        }
-    fun onEvent(event: PayersListEvent) {
-        when (event) {
-            is PayersListEvent.DeletePayer ->
-                viewModelScope.launch { payerUseCases.deletePayerUseCase(event.payer) }
-        is PayersListEvent.ShowCompletedPayers -> viewModelScope.launch {
-            userPreferenceUseCases.updateShowCompleted(event.show)
-        }
-        is PayersListEvent.ChangeSortByDeadline -> viewModelScope.launch {
-            userPreferenceUseCases.enableSortByDeadline(event.enable)
-        }
-        is PayersListEvent.ChangeSortByPriority -> viewModelScope.launch {
-            userPreferenceUseCases.enableSortByPriority(event.enable)
-        }
-
-
-        }
-     }
-
-     */
     companion object {
         fun previewModel(ctx: Context) =
             object : PayersListViewModel {

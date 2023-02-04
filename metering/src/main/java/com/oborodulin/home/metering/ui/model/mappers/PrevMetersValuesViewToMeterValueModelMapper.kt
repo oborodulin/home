@@ -1,12 +1,12 @@
-package com.oborodulin.home.accounting.ui.model.mappers
+package com.oborodulin.home.metering.ui.model.mappers
 
 import com.oborodulin.home.common.ui.state.Mapper
 import com.oborodulin.home.data.local.db.views.PrevMetersValuesView
-import com.oborodulin.home.metering.ui.model.MeterValueModel
+import com.oborodulin.home.metering.ui.model.MeterValueListItemModel
 
-class PrevMetersValuesViewToMeterValueModelMapper : Mapper<PrevMetersValuesView, MeterValueModel> {
+class PrevMetersValuesViewToMeterValueModelMapper : Mapper<PrevMetersValuesView, MeterValueListItemModel> {
     override fun map(input: PrevMetersValuesView) =
-        MeterValueModel(
+        MeterValueListItemModel(
             id = input.meterValueId,
             type = input.type,
             name = input.name,

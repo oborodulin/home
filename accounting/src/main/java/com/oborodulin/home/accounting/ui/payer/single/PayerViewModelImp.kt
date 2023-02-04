@@ -29,7 +29,7 @@ private const val TAG = "Accounting.ui.PayerViewModel"
 class PayerViewModelImp @Inject constructor(
     private val state: SavedStateHandle,
     private val payerUseCases: PayerUseCases,
-    private val converter: PayerConverter,
+    private val payerConverter: PayerConverter,
     private val payerModelToPayerMapper: PayerModelToPayerMapper
 ) : PayerViewModel,
     SingleViewModel<PayerModel, UiState<PayerModel>, PayerUiAction, UiSingleEvent, PayerFields, InputWrapper>(
@@ -137,7 +137,7 @@ class PayerViewModelImp @Inject constructor(
         val job = viewModelScope.launch(errorHandler) {
             payerUseCases.getPayerUseCase.execute(GetPayerUseCase.Request(payerId))
                 .map {
-                    converter.convert(it)
+                    payerConverter.convert(it)
                 }
                 .collect {
                     submitState(it)
