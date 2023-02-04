@@ -7,7 +7,7 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.StateFlow
 
-interface MeterValueViewModel {
+interface MeterValuesListViewModel {
     val events: Flow<ScreenEvent>
     val currentValue: StateFlow<InputsWrapper>
     val areInputsValid: StateFlow<Boolean>
@@ -18,7 +18,7 @@ interface MeterValueViewModel {
         focusedField: MeterValueFields, isFocused: Boolean,
         onFocusIn: () -> Unit, onFocusOut: () -> Unit
     )
-
+    fun clearInputFieldsStates()
     fun onContinueClick(onSuccess: () -> Unit)
-    fun submitAction(action: MeterValueUiAction): Job?
+    fun submitAction(action: MeterValuesListUiAction): Job?
 }

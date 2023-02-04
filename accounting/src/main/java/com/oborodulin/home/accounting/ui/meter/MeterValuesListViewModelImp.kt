@@ -20,6 +20,7 @@ import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import timber.log.Timber
+import java.text.DecimalFormat
 import java.util.*
 import javax.inject.Inject
 
@@ -27,12 +28,12 @@ private const val TAG = "Accounting.ui.MeterValueViewModel"
 
 @OptIn(FlowPreview::class)
 @HiltViewModel
-class MeterValueViewModelImp @Inject constructor(
+class MeterValuesListViewModelImp @Inject constructor(
     private val state: SavedStateHandle,
     private val meterUseCases: MeterUseCases,
     private val converter: MeterValueConverter,
-) : MeterValueViewModel,
-    SingleViewModel<MeterValueModel, UiState<MeterValueModel>, MeterValueUiAction, UiSingleEvent, MeterValueFields>(
+) : MeterValuesListViewModel,
+    SingleViewModel<List<MeterValueModel>, UiState<List<MeterValueModel>>, MeterValuesListUiAction, UiSingleEvent, MeterValueFields, InputsWrapper>(
         state
     ) {
     private val meterValueId: StateFlow<InputsWrapper> by lazy {
@@ -51,11 +52,11 @@ class MeterValueViewModelImp @Inject constructor(
 
     override fun initState() = UiState.Loading
 
-    override suspend fun handleAction(action: MeterValueUiAction): Job {
+    override suspend fun handleAction(action: MeterValuesListUiAction): Job {
         Timber.tag(TAG)
             .d("handleAction(MeterValueUiAction) called: %s", action.javaClass.name)
         val job = when (action) {
-            is MeterValueUiAction.Save -> {
+            is MeterValuesListUiAction.Save -> {
                 saveMeterValue()
             }
         }
@@ -122,7 +123,9 @@ class MeterValueViewModelImp @Inject constructor(
         )
         initStateValue(
             field = MeterValueFields.METER_CURR_VALUE, properties = currentValue,
-            value = meterValueModel.currentValue?.toString() ?: "",
+            value = meterValueModel.currentValue?.let {
+                DecimalFormat(meterValueModel.valueFormat).format(it)
+            } ?: "",
             key = meterValueModel.metersId.toString()
         )
         return null
@@ -163,6 +166,13 @@ class MeterValueViewModelImp @Inject constructor(
                         )
                 }
             }
+    }
+
+    override fun clearInputFieldsStates() {
+        super.clearInputFieldsStates()
+        stateInputFields().forEach {
+            Timber.tag(TAG).d("clearInputFieldsStates(): state[%s] = %s", it, state[it])
+        }
     }
 
     override fun onTextFieldFocusChanged(
@@ -208,7 +218,7 @@ class MeterValueViewModelImp @Inject constructor(
 
     companion object {
         val previewModel =
-            object : MeterValueViewModel {
+            object : MeterValuesListViewModel {
                 override val events = Channel<ScreenEvent>().receiveAsFlow()
 
                 override val currentValue = MutableStateFlow(InputsWrapper())
@@ -221,9 +231,9 @@ class MeterValueViewModelImp @Inject constructor(
                     onFocusIn: () -> Unit, onFocusOut: () -> Unit
                 ) {
                 }
-
+                override fun clearInputFieldsStates(){}
                 override fun onContinueClick(onSuccess: () -> Unit) {}
-                override fun submitAction(action: MeterValueUiAction): Job? = null
+                override fun submitAction(action: MeterValuesListUiAction): Job? = null
             }
     }
 }

@@ -1,6 +1,7 @@
 package com.oborodulin.home.accounting.ui.payer.list
 
 import android.content.res.Configuration
+import androidx.compose.foundation.focusable
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
@@ -31,7 +32,8 @@ private const val TAG = "Accounting.ui.PayersListView"
 fun PayersListView(
     viewModel: PayersListViewModel,
     accountingViewModel: AccountingViewModel,
-    navController: NavController
+    navController: NavController,
+    onListItemClick: () -> Unit
 ) {
     Timber.tag(TAG).d("PayersListView(...) called")
     LaunchedEffect(Unit) {
@@ -55,7 +57,10 @@ fun PayersListView(
                         }
                     )
                 },
-                onClick = { payer -> accountingViewModel.submitAction(AccountingUiAction.Load(payer.id)) },
+                onClick = { payer ->
+                    onListItemClick()
+                    accountingViewModel.submitAction(AccountingUiAction.Load(payer.id))
+                },
                 onEdit = { payer -> viewModel.submitAction(PayersListUiAction.EditPayer(payer.id)) }
             ) { payer ->
                 viewModel.handleActionJob(action = {
@@ -98,6 +103,7 @@ fun PayersList(
             modifier = Modifier
                 .selectableGroup() // Optional, for accessibility purpose
                 .padding(8.dp)
+                .focusable(enabled = true)
         ) {
             items(payers.size) { index ->
                 payers[index].let { payer ->

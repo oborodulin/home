@@ -4,6 +4,7 @@ import com.oborodulin.home.accounting.domain.usecases.*
 import com.oborodulin.home.accounting.ui.model.converters.PayerConverter
 import com.oborodulin.home.accounting.ui.model.converters.PayersListConverter
 import com.oborodulin.home.accounting.ui.model.converters.PrevServiceMeterValuesConverter
+import com.oborodulin.home.accounting.ui.model.mappers.*
 import com.oborodulin.home.common.domain.usecases.UseCase
 import com.oborodulin.home.domain.repositories.PayersRepository
 import com.oborodulin.home.domain.usecase.*
@@ -18,20 +19,47 @@ import javax.inject.Singleton
 @Module
 @InstallIn(SingletonComponent::class)
 object AccountingModule {
+    // MAPPERS:
+    @Singleton
+    @Provides
+    fun providePayerToPayerModelMapper(): PayerToPayerModelMapper = PayerToPayerModelMapper()
 
     @Singleton
     @Provides
-    fun providePayersListConverter(): PayersListConverter = PayersListConverter()
+    fun providePayerModelToPayerMapper(): PayerModelToPayerMapper= PayerModelToPayerMapper()
 
     @Singleton
     @Provides
-    fun providePayerConverter(): PayerConverter = PayerConverter()
+    fun providePayerToPayerListItemModelMapper(): PayerToPayerListItemModelMapper =
+        PayerToPayerListItemModelMapper()
 
     @Singleton
     @Provides
-    fun providePrevServiceMeterValuesConverter(): PrevServiceMeterValuesConverter =
-        PrevServiceMeterValuesConverter()
+    fun providePayerListToPayerListItemModelMapper(mapper: PayerToPayerListItemModelMapper): PayerListToPayerListItemModelMapper =
+        PayerListToPayerListItemModelMapper(mapper = mapper)
 
+    @Singleton
+    @Provides
+    fun providePrevMetersValuesViewToMeterValueModelMapper(): PrevMetersValuesViewToMeterValueModelMapper =
+        PrevMetersValuesViewToMeterValueModelMapper()
+
+    // CONVERTERS:
+    @Singleton
+    @Provides
+    fun providePayersListConverter(mapper: PayerListToPayerListItemModelMapper): PayersListConverter =
+        PayersListConverter(mapper = mapper)
+
+    @Singleton
+    @Provides
+    fun providePayerConverter(mapper: PayerToPayerModelMapper): PayerConverter =
+        PayerConverter(mapper = mapper)
+
+    @Singleton
+    @Provides
+    fun providePrevServiceMeterValuesConverter(mapper: PrevMetersValuesViewToMeterValueModelMapper): PrevServiceMeterValuesConverter =
+        PrevServiceMeterValuesConverter(mapper = mapper)
+
+    // USE CASES:
     @Singleton
     @Provides
     fun provideAccountingUseCases(

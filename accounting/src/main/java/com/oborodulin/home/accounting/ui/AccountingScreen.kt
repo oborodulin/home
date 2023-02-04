@@ -8,9 +8,7 @@ import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Settings
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -24,9 +22,9 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.oborodulin.home.accounting.R
-import com.oborodulin.home.accounting.ui.meter.MeterValueView
-import com.oborodulin.home.accounting.ui.meter.MeterValueViewModel
-import com.oborodulin.home.accounting.ui.meter.MeterValueViewModelImp
+import com.oborodulin.home.accounting.ui.meter.MeterValuesListView
+import com.oborodulin.home.accounting.ui.meter.MeterValuesListViewModel
+import com.oborodulin.home.accounting.ui.meter.MeterValuesListViewModelImp
 import com.oborodulin.home.accounting.ui.model.AccountingModel
 import com.oborodulin.home.accounting.ui.payer.list.PayersListView
 import com.oborodulin.home.accounting.ui.payer.list.PayersListViewModel
@@ -36,6 +34,7 @@ import com.oborodulin.home.common.ui.theme.HomeComposableTheme
 import com.oborodulin.home.common.ui.theme.Typography
 import com.oborodulin.home.common.util.toast
 import com.oborodulin.home.data.util.ServiceType
+import com.oborodulin.home.metering.ui.model.MeterValueModel
 import com.oborodulin.home.presentation.AppState
 import com.oborodulin.home.presentation.components.ScaffoldComponent
 import com.oborodulin.home.presentation.navigation.NavRoutes
@@ -53,7 +52,7 @@ private const val TAG = "Accounting.ui.AccountingScreen"
 fun AccountingScreen(
     viewModel: AccountingViewModelImp = hiltViewModel(),
     payersListViewModel: PayersListViewModelImp = hiltViewModel(),
-    meterValueViewModel: MeterValueViewModelImp = hiltViewModel(),
+    meterValuesListViewModel: MeterValuesListViewModelImp = hiltViewModel(),
     appState: AppState,
     nestedScrollConnection: NestedScrollConnection,
     bottomBar: @Composable () -> Unit
@@ -109,7 +108,7 @@ fun AccountingScreen(
                         navController = appState.commonNavController,
                         accountingViewModel = viewModel,
                         payersListViewModel = payersListViewModel,
-                        meterValueViewModel = meterValueViewModel
+                        meterValuesListViewModel = meterValuesListViewModel
                     )
                 }
             }
@@ -134,7 +133,7 @@ private fun AccountingView(
     navController: NavHostController,
     accountingViewModel: AccountingViewModel,
     payersListViewModel: PayersListViewModel,
-    meterValueViewModel: MeterValueViewModel
+    meterValuesListViewModel: MeterValuesListViewModel
 ) {
     Timber.tag(TAG).d("AccountingView(...) called")
     Column(
@@ -154,33 +153,34 @@ private fun AccountingView(
                 .clip(RoundedCornerShape(16.dp))
                 //.background(MaterialTheme.colors.background, shape = RoundedCornerShape(20.dp))
                 .weight(5f)
-                .border(
-                    2.dp,
-                    MaterialTheme.colors.primary,
-                    shape = RoundedCornerShape(16.dp)
-                )
+                .border(2.dp, MaterialTheme.colors.primary, shape = RoundedCornerShape(16.dp))
         ) {
             PayersListView(
                 viewModel = payersListViewModel,
                 accountingViewModel = accountingViewModel,
                 navController = navController
-            )
+            ){
+                meterValuesListViewModel.clearInputFieldsStates()
+            }
         }
         Box(
             modifier = Modifier
                 .padding(vertical = 4.dp)
                 .clip(RoundedCornerShape(16.dp))
                 .weight(4f)
-                .border(
-                    2.dp,
-                    MaterialTheme.colors.primary,
-                    shape = RoundedCornerShape(16.dp)
-                )
+                .border(2.dp, MaterialTheme.colors.primary, shape = RoundedCornerShape(16.dp))
         ) {
-            PrevServiceMeterValues(
-                accountingModel = accountingModel,
-                viewModel = meterValueViewModel
+            val meterValues by remember { accountingViewModel.uiMeterValuesState }
+            MeterValuesListView(
+                viewModel = meterValuesListViewModel,
+                navController = navController
             )
+/*            PrevServiceMeterValues(
+                meterValues = meterValues,
+                viewModel = meterValuesListViewModel
+            )
+
+ */
         }
         Box(
             modifier = Modifier
@@ -188,23 +188,17 @@ private fun AccountingView(
                 .padding(vertical = 4.dp)
                 .clip(RoundedCornerShape(16.dp))
                 .weight(1f)
-                .border(
-                    2.dp,
-                    MaterialTheme.colors.primary,
-                    shape = RoundedCornerShape(16.dp)
-                )
+                .border(2.dp, MaterialTheme.colors.primary, shape = RoundedCornerShape(16.dp))
         ) {
             Text(text = "Итого:")
         }
     }
 }
-//val state = viewModel.accountingUiState.value
-//    val payersList = viewModel.payersList.collectAsLazyPagingItems()
 
 @Composable
 fun PrevServiceMeterValues(
-    accountingModel: AccountingModel,
-    viewModel: MeterValueViewModel
+    meterValues: List<MeterValueModel>,
+    viewModel: MeterValuesListViewModel
 ) {
     Timber.tag(TAG).d("PrevServiceMeterValues(...) called")
     Column(
@@ -215,7 +209,7 @@ fun PrevServiceMeterValues(
             .verticalScroll(rememberScrollState())
             .padding(vertical = 8.dp)
     ) {
-        for (meterValue in accountingModel.serviceMeterVals) {
+        for (meterValue in meterValues) {
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -268,7 +262,7 @@ fun PrevServiceMeterValues(
                 ) {
                     meterValue.measureUnit?.let { Text(text = it) }
                 }
-                MeterValueView(meterValueModel = meterValue, viewModel = viewModel)
+                MeterValuesListView(meterValueModel = meterValue, viewModel = viewModel)
                 Column(
                     modifier = Modifier.fillMaxSize(),
                     verticalArrangement = Arrangement.Top
@@ -343,7 +337,7 @@ fun PreviewAccountingView() {
         navController = rememberNavController(),
         accountingViewModel = AccountingViewModelImp.previewModel(LocalContext.current),
         payersListViewModel = PayersListViewModelImp.previewModel(LocalContext.current),
-        meterValueViewModel = MeterValueViewModelImp.previewModel
+        meterValuesListViewModel = MeterValuesListViewModelImp.previewModel
     )
 }
 
@@ -352,8 +346,8 @@ fun PreviewAccountingView() {
 @Composable
 fun PreviewPrevServiceMeterValues() {
     PrevServiceMeterValues(
-        accountingModel = AccountingViewModelImp.previewAccountingModel(LocalContext.current),
-        viewModel = MeterValueViewModelImp.previewModel
+        meterValues = AccountingViewModelImp.previewMeterValueModel(LocalContext.current),
+        viewModel = MeterValuesListViewModelImp.previewModel
     )
 }
 

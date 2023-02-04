@@ -34,12 +34,13 @@ import androidx.lifecycle.compose.ExperimentalLifecycleComposeApi
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.flowWithLifecycle
 import com.oborodulin.home.accounting.R
+import com.oborodulin.home.accounting.ui.meter.MeterValueFields
 import com.oborodulin.home.common.ui.components.field.ExposedDropdownMenuBoxComponent
 import com.oborodulin.home.common.ui.components.field.TextFieldComponent
-import com.oborodulin.home.common.ui.components.field.util.ScreenEvent
+import com.oborodulin.home.common.ui.components.field.util.InputFocusRequester
+import com.oborodulin.home.common.ui.components.field.util.inputProcess
 import com.oborodulin.home.common.ui.state.CommonScreen
 import com.oborodulin.home.common.ui.theme.HomeComposableTheme
-import com.oborodulin.home.common.util.toast
 import com.oborodulin.home.presentation.AppState
 import com.oborodulin.home.presentation.components.ScaffoldComponent
 import com.oborodulin.home.presentation.navigation.PayerInput
@@ -123,41 +124,16 @@ fun Payer(appState: AppState, viewModel: PayerViewModel, onSubmit: () -> Unit) {
     val areInputsValid by viewModel.areInputsValid.collectAsStateWithLifecycle()
 
     Timber.tag(TAG).d("Init Focus Requesters for all payer fields")
-    val ercCodeFocusRequester = remember { FocusRequester() }
-    val fullNameFocusRequester = remember { FocusRequester() }
-    val addressFocusRequester = remember { FocusRequester() }
-    val totalAreaFocusRequester = remember { FocusRequester() }
-    val livingSpaceFocusRequester = remember { FocusRequester() }
-    val heatedVolumeFocusRequester = remember { FocusRequester() }
-    val paymentDayFocusRequester = remember { FocusRequester() }
-    val personsNumFocusRequester = remember { FocusRequester() }
+    val focusRequesters: MutableMap<String, InputFocusRequester> = HashMap()
+    enumValues<PayerFields>().forEach {
+        focusRequesters[it.name] = InputFocusRequester(it, remember { FocusRequester() })
+    }
 
     LaunchedEffect(Unit) {
         Timber.tag(TAG).d("Payer(...): LaunchedEffect()")
         events.collect { event ->
             Timber.tag(TAG).d("Collect input events flow: %s", event.javaClass.name)
-            //inputProcess(context, focusManager, keyboardController, event, focusRequesters)
-            when (event) {
-                is ScreenEvent.ShowToast -> context.toast(event.messageId)
-                is ScreenEvent.UpdateKeyboard -> {
-                    if (event.show) keyboardController?.show() else keyboardController?.hide()
-                }
-                is ScreenEvent.ClearFocus -> focusManager.clearFocus()
-                is ScreenEvent.RequestFocus -> {
-                    when (event.textFieldKey) {
-                        PayerFields.ERC_CODE -> ercCodeFocusRequester.requestFocus()
-                        PayerFields.FULL_NAME -> fullNameFocusRequester.requestFocus()
-                        PayerFields.ADDRESS -> addressFocusRequester.requestFocus()
-                        PayerFields.TOTAL_AREA -> totalAreaFocusRequester.requestFocus()
-                        PayerFields.LIVING_SPACE -> livingSpaceFocusRequester.requestFocus()
-                        PayerFields.HEATED_VOLUME -> heatedVolumeFocusRequester.requestFocus()
-                        PayerFields.PAYMENT_DAY -> paymentDayFocusRequester.requestFocus()
-                        PayerFields.PERSONS_NUM -> personsNumFocusRequester.requestFocus()
-                        else -> {}
-                    }
-                }
-                is ScreenEvent.MoveFocus -> focusManager.moveFocus(event.direction)
-            }
+            inputProcess(context, focusManager, keyboardController, event, focusRequesters)
         }
     }
 
@@ -167,18 +143,14 @@ fun Payer(appState: AppState, viewModel: PayerViewModel, onSubmit: () -> Unit) {
             .padding(4.dp)
             .height(IntrinsicSize.Min)
             .clip(RoundedCornerShape(16.dp))
-            .border(
-                2.dp,
-                MaterialTheme.colors.primary,
-                shape = RoundedCornerShape(16.dp)
-            )
+            .border(2.dp, MaterialTheme.colors.primary, shape = RoundedCornerShape(16.dp))
             .verticalScroll(rememberScrollState()),
         verticalArrangement = Arrangement.Top,
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         TextFieldComponent(
             modifier = Modifier
-                .focusRequester(ercCodeFocusRequester)
+                .focusRequester(focusRequesters[PayerFields.ERC_CODE.name]!!.focusRequester)
                 .onFocusChanged { focusState ->
                     viewModel.onTextFieldFocusChanged(
                         focusedField = PayerFields.ERC_CODE,
@@ -204,7 +176,7 @@ fun Payer(appState: AppState, viewModel: PayerViewModel, onSubmit: () -> Unit) {
         )
         TextFieldComponent(
             modifier = Modifier
-                .focusRequester(fullNameFocusRequester)
+                .focusRequester(focusRequesters[PayerFields.FULL_NAME.name]!!.focusRequester)
                 .onFocusChanged { focusState ->
                     viewModel.onTextFieldFocusChanged(
                         focusedField = PayerFields.FULL_NAME,
@@ -232,7 +204,7 @@ fun Payer(appState: AppState, viewModel: PayerViewModel, onSubmit: () -> Unit) {
         TextFieldComponent(
             modifier = Modifier
                 .height(90.dp)
-                .focusRequester(addressFocusRequester)
+                .focusRequester(focusRequesters[PayerFields.ADDRESS.name]!!.focusRequester)
                 .onFocusChanged { focusState ->
                     viewModel.onTextFieldFocusChanged(
                         focusedField = PayerFields.ADDRESS,
@@ -260,7 +232,7 @@ fun Payer(appState: AppState, viewModel: PayerViewModel, onSubmit: () -> Unit) {
         )
         TextFieldComponent(
             modifier = Modifier
-                .focusRequester(totalAreaFocusRequester)
+                .focusRequester(focusRequesters[PayerFields.TOTAL_AREA.name]!!.focusRequester)
                 .onFocusChanged { focusState ->
                     viewModel.onTextFieldFocusChanged(
                         focusedField = PayerFields.TOTAL_AREA,
@@ -286,7 +258,7 @@ fun Payer(appState: AppState, viewModel: PayerViewModel, onSubmit: () -> Unit) {
         )
         TextFieldComponent(
             modifier = Modifier
-                .focusRequester(livingSpaceFocusRequester)
+                .focusRequester(focusRequesters[PayerFields.LIVING_SPACE.name]!!.focusRequester)
                 .onFocusChanged { focusState ->
                     viewModel.onTextFieldFocusChanged(
                         focusedField = PayerFields.LIVING_SPACE,
@@ -312,7 +284,7 @@ fun Payer(appState: AppState, viewModel: PayerViewModel, onSubmit: () -> Unit) {
         )
         TextFieldComponent(
             modifier = Modifier
-                .focusRequester(heatedVolumeFocusRequester)
+                .focusRequester(focusRequesters[PayerFields.HEATED_VOLUME.name]!!.focusRequester)
                 .onFocusChanged { focusState ->
                     viewModel.onTextFieldFocusChanged(
                         focusedField = PayerFields.HEATED_VOLUME,
@@ -338,7 +310,7 @@ fun Payer(appState: AppState, viewModel: PayerViewModel, onSubmit: () -> Unit) {
         )
         ExposedDropdownMenuBoxComponent(
             modifier = Modifier
-                .focusRequester(paymentDayFocusRequester)
+                .focusRequester(focusRequesters[PayerFields.PAYMENT_DAY.name]!!.focusRequester)
                 .onFocusChanged { focusState ->
                     viewModel.onTextFieldFocusChanged(
                         focusedField = PayerFields.PAYMENT_DAY,
@@ -366,7 +338,7 @@ fun Payer(appState: AppState, viewModel: PayerViewModel, onSubmit: () -> Unit) {
         )
         TextFieldComponent(
             modifier = Modifier
-                .focusRequester(personsNumFocusRequester)
+                .focusRequester(focusRequesters[PayerFields.PERSONS_NUM.name]!!.focusRequester)
                 .onFocusChanged { focusState ->
                     viewModel.onTextFieldFocusChanged(
                         focusedField = PayerFields.PERSONS_NUM,

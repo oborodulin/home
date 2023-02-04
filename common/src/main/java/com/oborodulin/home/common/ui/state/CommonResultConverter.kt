@@ -16,6 +16,4 @@ abstract class CommonResultConverter<T : Any, R : Any> {
     }
 
     abstract fun convertSuccess(data: T): R
-
-    //fun convertBack(data: R): T {}
 }

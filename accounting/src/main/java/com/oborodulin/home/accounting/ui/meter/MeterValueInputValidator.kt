@@ -1,6 +1,5 @@
 package com.oborodulin.home.accounting.ui.meter
 
-import com.oborodulin.home.common.R
 import com.oborodulin.home.common.ui.components.field.util.Validatable
 
 private const val TAG = "Accounting.ui.MeterValueInputValidator"
@@ -8,11 +7,9 @@ private const val TAG = "Accounting.ui.MeterValueInputValidator"
 sealed class MeterValueInputValidator : Validatable {
     object CurrentValue : MeterValueInputValidator() {
         override fun errorIdOrNull(input: String): Int? =
-        when
-        {
-            input.length < 2 -> R.string.name_too_short_error
-            //etc..
-            else -> null
-        }
+            when {
+                input.isNotEmpty() -> if (input.toBigDecimalOrNull() == null) com.oborodulin.home.common.R.string.number_negative_error else null
+                else -> null
+            }
     }
 }

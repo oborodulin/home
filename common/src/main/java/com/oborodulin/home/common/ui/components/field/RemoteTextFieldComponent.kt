@@ -9,10 +9,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.*
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.setValue
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -24,18 +21,20 @@ import androidx.compose.ui.unit.dp
 import com.oborodulin.home.common.R
 import com.oborodulin.home.common.ui.components.field.util.InputWrapper
 import com.oborodulin.home.common.ui.components.field.util.OnImeKeyAction
+import com.oborodulin.home.common.ui.components.field.util.OnTextFieldValueChange
 import com.oborodulin.home.common.ui.components.field.util.OnValueChange
 import com.oborodulin.home.common.ui.theme.HomeComposableTheme
 import timber.log.Timber
 
-private const val TAG = "Common.ui.TextFieldComponent"
+private const val TAG = "Common.ui.RemoteTextFieldComponent"
 
 @Composable
-fun TextFieldComponent(
+fun RemoteTextFieldComponent(
     modifier: Modifier,
     enabled: Boolean = true,
     readOnly: Boolean = false,
     inputWrapper: InputWrapper,
+    fieldValue: TextFieldValue,
     @StringRes labelResId: Int? = null,
     leadingIcon: @Composable (() -> Unit)? = null,
     trailingIcon: @Composable (() -> Unit)? = null,
@@ -46,19 +45,11 @@ fun TextFieldComponent(
     visualTransformation: VisualTransformation = remember {
         VisualTransformation.None
     },
-    onValueChange: OnValueChange,
+    onValueChange: OnTextFieldValueChange,
     onImeKeyAction: OnImeKeyAction,
     colors: TextFieldColors = TextFieldDefaults.outlinedTextFieldColors()
 ) {
-    Timber.tag(TAG).d("TextFieldComponent(...) called")
-    var locFieldValue by remember {
-        mutableStateOf(TextFieldValue(inputWrapper.value, TextRange(inputWrapper.value.length)))
-    }
-    Timber.tag(TAG).d(
-        "TextFieldComponent(...): fieldValue = %s; inputWrapper = %s",
-        locFieldValue,
-        inputWrapper
-    )
+    Timber.tag(TAG).d("RemoteTextFieldComponent(...) called: fieldValue = %s", fieldValue)
     Column {
         OutlinedTextField(
             modifier = modifier
@@ -66,10 +57,9 @@ fun TextFieldComponent(
                 .padding(vertical = 4.dp, horizontal = 8.dp),//.weight(1f),
             enabled = enabled,
             readOnly = readOnly,
-            value = locFieldValue,
+            value = fieldValue,
             onValueChange = {
-                locFieldValue = it
-                onValueChange(it.text)
+                onValueChange(it)
             },
             label = { labelResId?.let { Text(stringResource(it)) } },
             leadingIcon = leadingIcon,
@@ -99,15 +89,19 @@ fun TextFieldComponent(
 @Preview(name = "Night Mode", showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
 @Preview(name = "Day Mode", showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_NO)
 @Composable
-fun PreviewTextFieldComponent() {
+fun PreviewRemoteTextFieldComponent() {
     HomeComposableTheme {
         Surface {
-            TextFieldComponent(modifier = Modifier
+            RemoteTextFieldComponent(modifier = Modifier
                 .fillMaxWidth()
                 .height(60.dp),
                 inputWrapper = InputWrapper(
                     value = stringResource(R.string.preview_blank_text_field_val),
                     errorId = R.string.preview_blank_text_field_err
+                ),
+                fieldValue = TextFieldValue(
+                    text = stringResource(R.string.preview_blank_text_field_val),
+                    selection = TextRange(stringResource(R.string.preview_blank_text_field_val).length)
                 ),
                 labelResId = R.string.preview_blank_text_field_lbl,
                 onValueChange = {},

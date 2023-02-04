@@ -4,6 +4,7 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
 import com.oborodulin.home.accounting.ui.model.PayerModel
 import com.oborodulin.home.accounting.ui.model.converters.PayerConverter
+import com.oborodulin.home.accounting.ui.model.mappers.PayerModelToPayerMapper
 import com.oborodulin.home.common.ui.components.*
 import com.oborodulin.home.common.ui.components.field.*
 import com.oborodulin.home.common.ui.components.field.util.*
@@ -28,9 +29,10 @@ private const val TAG = "Accounting.ui.PayerViewModel"
 class PayerViewModelImp @Inject constructor(
     private val state: SavedStateHandle,
     private val payerUseCases: PayerUseCases,
-    private val converter: PayerConverter
+    private val converter: PayerConverter,
+    private val payerModelToPayerMapper: PayerModelToPayerMapper
 ) : PayerViewModel,
-    SingleViewModel<PayerModel, UiState<PayerModel>, PayerUiAction, UiSingleEvent, PayerFields>(
+    SingleViewModel<PayerModel, UiState<PayerModel>, PayerUiAction, UiSingleEvent, PayerFields, InputWrapper>(
         state,
         PayerFields.ERC_CODE
     ) {
@@ -161,7 +163,7 @@ class PayerViewModelImp @Inject constructor(
         Timber.tag(TAG).d("savePayer() called: UI model %s", payerModel)
         val job = viewModelScope.launch(errorHandler) {
             payerUseCases.savePayerUseCase.execute(
-                SavePayerUseCase.Request(converter.toPayer(payerModel))
+                SavePayerUseCase.Request(payerModelToPayerMapper.map(payerModel))
             ).collect {}
         }
         return job
@@ -377,7 +379,9 @@ class PayerViewModelImp @Inject constructor(
                 override fun onTextFieldEntered(inputEvent: Inputable) {}
                 override fun onTextFieldFocusChanged(
                     focusedField: PayerFields, isFocused: Boolean
-                ) { }
+                ) {
+                }
+
                 override fun moveFocusImeAction() {}
                 override fun onContinueClick(onSuccess: () -> Unit) {}
             }

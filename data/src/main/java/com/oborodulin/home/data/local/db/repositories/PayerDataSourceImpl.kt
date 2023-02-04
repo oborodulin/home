@@ -1,9 +1,10 @@
 package com.oborodulin.home.data.local.db.repositories
 
-//import com.oborodulin.home.domain.model.NetworkMovie
 import com.oborodulin.home.common.di.IoDispatcher
 import com.oborodulin.home.data.local.db.dao.PayerDao
-import com.oborodulin.home.data.local.db.mappers.PayerEntityMapper
+import com.oborodulin.home.data.local.db.mappers.PayerEntityListToPayerListMapper
+import com.oborodulin.home.data.local.db.mappers.PayerEntityToPayerMapper
+import com.oborodulin.home.data.local.db.mappers.PayerToPayerEntityMapper
 import com.oborodulin.home.domain.model.Payer
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.map
@@ -12,37 +13,32 @@ import java.util.*
 import javax.inject.Inject
 
 /**
- * Created by tfakioglu on 12.December.2021
+ * Created by o.borodulin on 08.August.2022
  */
 @OptIn(kotlinx.coroutines.ExperimentalCoroutinesApi::class)
 class PayerDataSourceImpl @Inject constructor(
     private val payerDao: PayerDao,
     @IoDispatcher private val dispatcher: CoroutineDispatcher,
-    private val payerEntityMapper: PayerEntityMapper
-/*private val nowPlayingUseCase: NowPlayingUseCase*/
-) : PayerDataSource
-//    :    PagingSource<Int, NetworkMovie>()
-{
+    private val payerEntityListToPayerListMapper: PayerEntityListToPayerListMapper,
+    private val payerEntityToPayerMapper: PayerEntityToPayerMapper,
+    private val payerToPayerEntityMapper: PayerToPayerEntityMapper
+) : PayerDataSource {
     override fun getPayers() = payerDao.findAllDistinctUntilChanged()
-        .map { list ->
-            list.map {
-                payerEntityMapper.toPayer(it)
-            }
-        }
+        .map(payerEntityListToPayerListMapper::map)
 
     override fun getPayer(payerId: UUID) =
-        payerDao.findByIdDistinctUntilChanged(payerId).map { payerEntityMapper.toPayer(it) }
+        payerDao.findByIdDistinctUntilChanged(payerId).map(payerEntityToPayerMapper::map)
 
     override suspend fun savePayer(payer: Payer) = withContext(dispatcher) {
         if (payer.id == null) {
-            payerDao.insert(payerEntityMapper.toPayerEntity(payer))
+            payerDao.insert(payerToPayerEntityMapper.map(payer))
         } else {
-            payerDao.update(payerEntityMapper.toPayerEntity(payer))
+            payerDao.update(payerToPayerEntityMapper.map(payer))
         }
     }
 
     override suspend fun deletePayer(payer: Payer) = withContext(dispatcher) {
-        payerDao.delete(payerEntityMapper.toPayerEntity(payer))
+        payerDao.delete(payerToPayerEntityMapper.map(payer))
     }
 
     override suspend fun deletePayerById(payerId: UUID) = withContext(dispatcher) {
@@ -50,9 +46,7 @@ class PayerDataSourceImpl @Inject constructor(
     }
 
     override suspend fun deletePayers(payers: List<Payer>) = withContext(dispatcher) {
-        payerDao.delete(payers.map { payer ->
-            payerEntityMapper.toPayerEntity(payer)
-        })
+        payerDao.delete(payers.map { payerToPayerEntityMapper.map(it) })
     }
 
     override suspend fun deletePayers() = withContext(dispatcher) {
@@ -62,31 +56,4 @@ class PayerDataSourceImpl @Inject constructor(
     override suspend fun favoritePayerById(payerId: UUID) = withContext(dispatcher) {
         payerDao.favoriteById(payerId)
     }
-
-/*    override fun getRefreshKey(state: PagingState<Int, NetworkMovie>): Int? = state.anchorPosition
-
-    override suspend fun load(params: LoadParams<Int>): LoadResult<Int, NetworkMovie> {
-        try {
-            val nextPage = params.key ?: 1
-            val movieResponse = nowPlayingUseCase(nextPage)
-
-            if (movieResponse.body()?.results.isNullOrEmpty()){
-                return LoadResult.Error(throw Exception("Something went wrong"))
-            }
-
-            val list = movieResponse.body()?.results ?: emptyList()
-
-            return LoadResult.Page(
-                data = list,
-                prevKey =
-                if (nextPage == 1) null
-                else nextPage - 1,
-                nextKey = nextPage.plus(1)
-            )
-        } catch (t: Throwable) {
-            return LoadResult.Error(t)
-        }
-    }
-
- */
 }

@@ -1,6 +1,8 @@
 package com.oborodulin.home.accounting.ui
 
 import android.content.Context
+import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.viewModelScope
 import com.oborodulin.home.accounting.domain.usecases.AccountingUseCases
 import com.oborodulin.home.accounting.ui.model.AccountingModel
@@ -14,7 +16,6 @@ import com.oborodulin.home.data.util.ServiceType
 import com.oborodulin.home.metering.domain.usecases.GetPrevServiceMeterValuesUseCase
 import com.oborodulin.home.metering.ui.model.MeterValueModel
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -35,16 +36,10 @@ class AccountingViewModelImp @Inject constructor(
     private val converter: PrevServiceMeterValuesConverter
 ) : AccountingViewModel,
     MviViewModel<AccountingModel, UiState<AccountingModel>, AccountingUiAction, AccountingUiSingleEvent>() {
-    /*
-        private val _uiState = mutableStateOf(
-             PayersListUiState(
-                payers = listOf(),
-                isLoading = true
-            )
-        )
-        val uiState: State<PayersListUiState>
-            get() = _uiState
-    */
+
+    private val _uiMeterValuesState: MutableState<List<MeterValueModel>> = mutableStateOf(listOf())
+    override val uiMeterValuesState: MutableState<List<MeterValueModel>>
+        get() = _uiMeterValuesState
 
     override fun initState(): UiState<AccountingModel> = UiState.Loading
 
@@ -84,7 +79,16 @@ class AccountingViewModelImp @Inject constructor(
         return job
     }
 
-    override fun initFieldStatesByUiModel(uiModel: Any): Job? = null
+    override fun initFieldStatesByUiModel(uiModel: Any): Job? {
+        val accountingModel = uiModel as AccountingModel
+        Timber.tag(TAG)
+            .d(
+                "initFieldStatesByUiModel(AccountingModel) called: accountingModel = %s",
+                accountingModel
+            )
+        _uiMeterValuesState.value = accountingModel.serviceMeterVals.toList()
+        return null
+    }
 
     /*    private fun getPayers() {
             viewModelScope.launch(errorHandler) {
@@ -119,40 +123,48 @@ class AccountingViewModelImp @Inject constructor(
         fun previewModel(ctx: Context) =
             object : AccountingViewModel {
                 override val uiStateFlow =
-                    MutableStateFlow(UiState.Success(previewAccountingModel(ctx)))
+                    MutableStateFlow(
+                        UiState.Success(
+                            AccountingModel(
+                                serviceMeterVals = previewMeterValueModel(ctx)
+                            )
+                        )
+                    )
                 override val singleEventFlow = Channel<AccountingUiSingleEvent>().receiveAsFlow()
+                override val uiMeterValuesState = mutableStateOf<List<MeterValueModel>>(listOf())
 
                 override fun submitAction(action: AccountingUiAction): Job? {
                     return null
                 }
             }
 
-        fun previewAccountingModel(ctx: Context) =
-            AccountingModel(
-                serviceMeterVals = listOf(
-                    MeterValueModel(
-                        id = UUID.randomUUID(),
-                        metersId = UUID.randomUUID(),
-                        type = ServiceType.ELECRICITY,
-                        name = ctx.resources.getString(R.string.service_electricity),
-                        measureUnit = ctx.resources.getString(com.oborodulin.home.common.R.string.kWh_unit),
-                        prevLastDate = Utils.toOffsetDateTime("2022-08-01T14:29:10.212"),
-                        prevValue = BigDecimal.valueOf(9628),
-                        valueFormat = "#0",
-                        valueDate = OffsetDateTime.now()
-                    ),
-                    MeterValueModel(
-                        id = UUID.randomUUID(),
-                        metersId = UUID.randomUUID(),
-                        type = ServiceType.COLD_WATER,
-                        name = ctx.resources.getString(R.string.service_cold_water),
-                        measureUnit = ctx.resources.getString(com.oborodulin.home.common.R.string.m3_unit),
-                        prevLastDate = Utils.toOffsetDateTime("2022-08-01T14:29:10.212"),
-                        prevValue = BigDecimal.valueOf(1553),
-                        valueFormat = "#0.000",
-                        valueDate = OffsetDateTime.now()
-                    )
+        fun previewMeterValueModel(ctx: Context) =
+//            AccountingModel(
+//                serviceMeterVals =
+            listOf(
+                MeterValueModel(
+                    id = UUID.randomUUID(),
+                    metersId = UUID.randomUUID(),
+                    type = ServiceType.ELECRICITY,
+                    name = ctx.resources.getString(R.string.service_electricity),
+                    measureUnit = ctx.resources.getString(com.oborodulin.home.common.R.string.kWh_unit),
+                    prevLastDate = Utils.toOffsetDateTime("2022-08-01T14:29:10.212"),
+                    prevValue = BigDecimal.valueOf(9628),
+                    valueFormat = "#0",
+                    valueDate = OffsetDateTime.now()
+                ),
+                MeterValueModel(
+                    id = UUID.randomUUID(),
+                    metersId = UUID.randomUUID(),
+                    type = ServiceType.COLD_WATER,
+                    name = ctx.resources.getString(R.string.service_cold_water),
+                    measureUnit = ctx.resources.getString(com.oborodulin.home.common.R.string.m3_unit),
+                    prevLastDate = Utils.toOffsetDateTime("2022-08-01T14:29:10.212"),
+                    prevValue = BigDecimal.valueOf(1553),
+                    valueFormat = "#0.000",
+                    valueDate = OffsetDateTime.now()
                 )
             )
+        //           )
     }
 }

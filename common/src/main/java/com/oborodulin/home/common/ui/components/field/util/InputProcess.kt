@@ -15,7 +15,7 @@ fun inputProcess(
     focusManager: FocusManager,
     keyboardController: SoftwareKeyboardController?,
     event: ScreenEvent,
-    focusRequesters: List<InputFocusRequester>
+    focusRequesters: Map<String, InputFocusRequester>
 ) {
     Timber.tag(TAG).d("inputProcess(...) called")
     when (event) {
@@ -24,10 +24,7 @@ fun inputProcess(
             if (event.show) keyboardController?.show() else keyboardController?.hide()
         }
         is ScreenEvent.ClearFocus -> focusManager.clearFocus()
-        is ScreenEvent.RequestFocus ->
-            for (requester in focusRequesters)
-                if (event.textFieldKey.key() == requester.fieldKey)
-                    requester.focusRequester.requestFocus()
+        is ScreenEvent.RequestFocus -> focusRequesters[event.textField.key()]?.focusRequester?.requestFocus()
         is ScreenEvent.MoveFocus -> focusManager.moveFocus(event.direction)
     }
 }

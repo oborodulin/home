@@ -16,7 +16,7 @@ import timber.log.Timber
 private const val TAG = "Common.SingleViewModel"
 private const val FOCUSED_FIELD_KEY = "focusedTextField"
 
-abstract class SingleViewModel<T : Any, S : UiState<T>, A : UiAction, E : UiSingleEvent, F : Focusable>(
+abstract class SingleViewModel<T : Any, S : UiState<T>, A : UiAction, E : UiSingleEvent, F : Focusable, W : InputWrapped>(
     private val state: SavedStateHandle,
     private val initFocusedTextField: Focusable? = null,
 ) : MviViewModel<T, S, A, E>() {
@@ -137,13 +137,7 @@ abstract class SingleViewModel<T : Any, S : UiState<T>, A : UiAction, E : UiSing
     fun onTextFieldFocusChanged(focusedField: F, isFocused: Boolean) {
         Timber.tag(TAG)
             .d("onTextFieldFocusChanged: %s - %s", focusedField.key(), isFocused)
-        if (isFocused) {
-            focusedTextField.key = focusedField.key()
-            //onFocusIn?.invoke()
-        } else {
-            focusedTextField.key = null
-            //onFocusOut?.invoke()
-        }
+        focusedTextField.key = if (isFocused) focusedField.key() else null
     }
 
     fun moveFocusImeAction() {
@@ -158,10 +152,7 @@ abstract class SingleViewModel<T : Any, S : UiState<T>, A : UiAction, E : UiSing
                 null -> {
                     clearFocusAndHideKeyboard()
                     onSuccess()
-                    stateInputFields().forEach {
-                        Timber.tag(TAG).d("onContinueClick(onSuccess): remove state '%s'", it)
-                        state.remove<InputWrapper>(it)
-                    }
+                    clearInputFieldsStates()
                     //_events.send(ScreenEvent.ShowToast(com.oborodulin.home.common.R.string.success))
                 }
                 else -> displayInputErrors(inputErrors)
@@ -174,6 +165,13 @@ abstract class SingleViewModel<T : Any, S : UiState<T>, A : UiAction, E : UiSing
     abstract fun displayInputErrors(inputErrors: List<InputError>)
 
     abstract fun stateInputFields(): List<String>
+
+    open fun clearInputFieldsStates() {
+        stateInputFields().forEach {
+            Timber.tag(TAG).d("clearInputFieldsStates(): remove state '%s'", it)
+            state.remove<W>(it)
+        }
+    }
 
     private suspend fun clearFocusAndHideKeyboard() {
         Timber.tag(TAG).d("clearFocusAndHideKeyboard() called")
