@@ -16,8 +16,8 @@ import com.oborodulin.home.metering.domain.usecases.GetPrevServiceMeterValuesUse
 import com.oborodulin.home.metering.domain.usecases.MeterUseCases
 import com.oborodulin.home.metering.domain.usecases.SaveMeterValueUseCase
 import com.oborodulin.home.metering.ui.model.MeterValueListItemModel
-import com.oborodulin.home.metering.ui.model.converters.MeterValueConverter
 import com.oborodulin.home.metering.ui.model.converters.PrevServiceMeterValuesListConverter
+import com.oborodulin.home.metering.ui.model.mappers.MeterValueListItemModelToMeterValueMapper
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.Job
@@ -39,7 +39,7 @@ class MeterValuesListViewModelImp @Inject constructor(
     private val state: SavedStateHandle,
     private val meterUseCases: MeterUseCases,
     private val prevServiceMeterValuesListConverter: PrevServiceMeterValuesListConverter,
-    private val meterValueConverter: MeterValueConverter,
+    private val meterValueListItemModelToMeterValueMapper: MeterValueListItemModelToMeterValueMapper
 ) : MeterValuesListViewModel,
     SingleViewModel<List<MeterValueListItemModel>, UiState<List<MeterValueListItemModel>>, MeterValuesListUiAction, MeterValuesListUiSingleEvent, MeterValueFields, InputsWrapper>(
         state
@@ -104,7 +104,7 @@ class MeterValuesListViewModelImp @Inject constructor(
                     Timber.tag(TAG).d("saveMeterValue(): %s - %s", key, curVal)
                     meterUseCases.saveMeterValueUseCase.execute(
                         SaveMeterValueUseCase.Request(
-                            meterValueConverter.toMeterValue(
+                            meterValueListItemModelToMeterValueMapper.map(
                                 MeterValueListItemModel(
                                     id = UUID.fromString(meterValueId.value.inputs.getValue(key).value),
                                     metersId = UUID.fromString(key),
@@ -137,31 +137,35 @@ class MeterValuesListViewModelImp @Inject constructor(
 
     override fun initFieldStatesByUiModel(uiModel: Any): Job? {
         super.initFieldStatesByUiModel(uiModel)
-        val meterValueListItemModel = uiModel as MeterValueListItemModel
-        Timber.tag(TAG)
-            .d(
-                "initFieldStatesByUiModel(MeterValueModel) called: meterValueModel = %s",
-                meterValueListItemModel
-            )
-        meterValueListItemModel.id?.let {
+        val meterValues = uiModel as List<*>
+
+        for (meterValue in meterValues) {
+            val value = meterValue as MeterValueListItemModel
+            Timber.tag(TAG)
+                .d(
+                    "initFieldStatesByUiModel(List<MeterValueListItemModel>) called for %s",
+                    meterValue
+                )
+            value.id?.let {
+                initStateValue(
+                    field = MeterValueFields.METER_VALUE_ID, properties = meterValueId,
+                    value = it.toString(), key = value.metersId.toString()
+                )
+            }
             initStateValue(
-                field = MeterValueFields.METER_VALUE_ID, properties = meterValueId,
-                value = it.toString(), key = meterValueListItemModel.metersId.toString()
+                field = MeterValueFields.METERS_ID,
+                properties = metersId,
+                value = value.metersId.toString(),
+                key = value.metersId.toString()
+            )
+            initStateValue(
+                field = MeterValueFields.METER_CURR_VALUE, properties = currentValue,
+                value = value.currentValue?.let {
+                    DecimalFormat(value.valueFormat).format(it)
+                } ?: "",
+                key = value.metersId.toString()
             )
         }
-        initStateValue(
-            field = MeterValueFields.METERS_ID,
-            properties = metersId,
-            value = meterValueListItemModel.metersId.toString(),
-            key = meterValueListItemModel.metersId.toString()
-        )
-        initStateValue(
-            field = MeterValueFields.METER_CURR_VALUE, properties = currentValue,
-            value = meterValueListItemModel.currentValue?.let {
-                DecimalFormat(meterValueListItemModel.valueFormat).format(it)
-            } ?: "",
-            key = meterValueListItemModel.metersId.toString()
-        )
         return null
     }
 

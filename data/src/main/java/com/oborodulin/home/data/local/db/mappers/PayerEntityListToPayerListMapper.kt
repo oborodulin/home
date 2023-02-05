@@ -1,6 +1,6 @@
 package com.oborodulin.home.data.local.db.mappers
 
-import com.oborodulin.home.common.ui.state.ListMapperImp
+import com.oborodulin.home.common.mapping.ListMapperImp
 import com.oborodulin.home.data.local.db.entities.PayerEntity
 import com.oborodulin.home.domain.model.Payer
 

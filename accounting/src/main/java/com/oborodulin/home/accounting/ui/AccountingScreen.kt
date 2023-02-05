@@ -149,7 +149,7 @@ private fun AccountingView(
         ) {
             PayersListView(
                 viewModel = payersListViewModel,
-                accountingViewModel = accountingViewModel,
+                meterValuesListViewModel = meterValuesListViewModel,
                 navController = navController
             ){
                 meterValuesListViewModel.clearInputFieldsStates()
@@ -162,7 +162,7 @@ private fun AccountingView(
                 .weight(4f)
                 .border(2.dp, MaterialTheme.colors.primary, shape = RoundedCornerShape(16.dp))
         ) {
-            val meterValues by remember { accountingViewModel.uiMeterValuesState }
+            //val meterValues by remember { accountingViewModel.uiMeterValuesState }
             MeterValuesListView(
                 viewModel = meterValuesListViewModel,
                 navController = navController
@@ -197,7 +197,7 @@ fun PreviewAccountingView() {
         navController = rememberNavController(),
         accountingViewModel = AccountingViewModelImp.previewModel(LocalContext.current),
         payersListViewModel = PayersListViewModelImp.previewModel(LocalContext.current),
-        meterValuesListViewModel = MeterValuesListViewModelImp.previewModel
+        meterValuesListViewModel = MeterValuesListViewModelImp.previewModel(LocalContext.current)
     )
 }
 

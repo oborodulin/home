@@ -1,7 +1,7 @@
 package com.oborodulin.home.accounting.ui.model.mappers
 
 import com.oborodulin.home.accounting.ui.model.PayerModel
-import com.oborodulin.home.common.ui.state.Mapper
+import com.oborodulin.home.common.mapping.Mapper
 import com.oborodulin.home.domain.model.Payer
 
 class PayerToPayerModelMapper : Mapper<Payer, PayerModel> {

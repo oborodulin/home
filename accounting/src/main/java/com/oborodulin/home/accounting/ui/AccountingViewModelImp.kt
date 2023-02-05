@@ -34,8 +34,8 @@ class AccountingViewModelImp @Inject constructor(
 */
     override fun initState(): UiState<AccountingModel> = UiState.Loading
 
-    override suspend fun handleAction(action: AccountingUiAction): Job? = null
-    /*{
+    override suspend fun handleAction(action: AccountingUiAction): Job
+    {
         Timber.tag(TAG)
             .d(
                 "handleAction(AccountingUiAction) called: %s [HomeDatabase.isImportExecute = %s]",
@@ -50,12 +50,12 @@ class AccountingViewModelImp @Inject constructor(
                 HomeDatabase.isImportDone
             )
         val job = when (action) {
-            is AccountingUiAction.Init -> loadPrevServiceMeterValues()
-            is AccountingUiAction.Load -> loadPrevServiceMeterValues(action.payerId)
+            is AccountingUiAction.Init -> submitState(UiState.Success(data = AccountingModel()))
+            //is AccountingUiAction.Load -> loadPrevServiceMeterValues(action.payerId)
         }
         return job
     }
-*/
+
     override fun initFieldStatesByUiModel(uiModel: Any): Job? = null
 
     /*    private fun getPayers() {

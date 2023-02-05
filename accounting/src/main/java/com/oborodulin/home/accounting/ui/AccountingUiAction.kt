@@ -5,6 +5,6 @@ import java.util.*
 
 sealed class AccountingUiAction : UiAction {
     object Init : AccountingUiAction()
-    data class Load(val payerId: UUID) : AccountingUiAction()
+    //data class Load(val payerId: UUID) : AccountingUiAction()
 }
 

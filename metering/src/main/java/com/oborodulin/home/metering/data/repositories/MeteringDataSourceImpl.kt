@@ -2,7 +2,7 @@ package com.oborodulin.home.metering.data.repositories
 
 import com.oborodulin.home.common.di.IoDispatcher
 import com.oborodulin.home.data.local.db.dao.MeterDao
-import com.oborodulin.home.metering.data.mappers.MeterMapper
+import com.oborodulin.home.metering.data.mappers.*
 import com.oborodulin.home.metering.domain.model.Meter
 import com.oborodulin.home.metering.domain.model.MeterValue
 import kotlinx.coroutines.CoroutineDispatcher
@@ -17,41 +17,29 @@ import javax.inject.Inject
 class MeteringDataSourceImpl @Inject constructor(
     private val meterDao: MeterDao,
     @IoDispatcher private val dispatcher: CoroutineDispatcher,
-    private val meterMapper: MeterMapper
+    private val metersViewToMeterListMapper: MetersViewToMeterListMapper,
+    private val metersViewToMeterMapper: MetersViewToMeterMapper,
+    private val meterValueEntityListToMeterValueListMapper: MeterValueEntityListToMeterValueListMapper,
+    private val meterVerificationEntityListToMeterVerificationListMapper: MeterVerificationEntityListToMeterVerificationListMapper,
+    private val meterValueToMeterValueEntityMapper: MeterValueToMeterValueEntityMapper,
+    private val meterToMeterEntityMapper: MeterToMeterEntityMapper,
+    private val meterToMeterTlEntityMapper: MeterToMeterTlEntityMapper
 ) : MeteringDataSource {
     override fun getMeters() = meterDao.findAllDistinctUntilChanged()
-        .map { list ->
-            list.map {
-                meterMapper.toMeter(it)
-            }
-        }
+        .map(metersViewToMeterListMapper::map)
 
     override fun getMeters(payerId: UUID) = meterDao.findByPayerId(payerId)
-        .map { list ->
-            list.map {
-                meterMapper.toMeter(it)
-            }
-        }
+        .map(metersViewToMeterListMapper::map)
 
     override fun getMeter(id: UUID) = meterDao.findByIdDistinctUntilChanged(id)
-        .map {
-            meterMapper.toMeter(it)
-        }
+        .map(metersViewToMeterMapper::map)
 
     override fun getMeterValues(meterId: UUID) = meterDao.findValuesByMeterId(meterId)
-        .map { list ->
-            list.map {
-                meterMapper.toMeterValue(it)
-            }
-        }
+        .map(meterValueEntityListToMeterValueListMapper::map)
 
     override fun getMeterVerifications(meterId: UUID) =
         meterDao.findVerificationsByMeterId(meterId)
-            .map { list ->
-                list.map {
-                    meterMapper.toMeterVerification(it)
-                }
-            }
+            .map(meterVerificationEntityListToMeterVerificationListMapper::map)
 
     override fun getPrevServiceMeterValues(payerId: UUID?) =
         when (payerId) {
@@ -60,24 +48,19 @@ class MeteringDataSourceImpl @Inject constructor(
         }
 
     override suspend fun saveMeter(meter: Meter) = withContext(dispatcher) {
-        meterDao.insert(
-            meterMapper.toMeterEntity(meter),
-            meterMapper.toMeterTlEntity(meter)
-        )
+        meterDao.insert(meterToMeterEntityMapper.map(meter), meterToMeterTlEntityMapper.map(meter))
     }
 
     override suspend fun saveMeterValue(meterValue: MeterValue) = withContext(dispatcher) {
-        meterDao.insert(meterMapper.toMeterValueEntity(meterValue))
+        meterDao.insert(meterValueToMeterValueEntityMapper.map(meterValue))
     }
 
     override suspend fun deleteMeter(meter: Meter) = withContext(dispatcher) {
-        meterDao.delete(meterMapper.toMeterEntity(meter))
+        meterDao.delete(meterToMeterEntityMapper.map(meter))
     }
 
     override suspend fun deleteMeters(meters: List<Meter>) = withContext(dispatcher) {
-        meterDao.delete(meters.map { meter ->
-            meterMapper.toMeterEntity(meter)
-        })
+        meterDao.delete(meters.map(meterToMeterEntityMapper::map))
     }
 
     override suspend fun deleteMeters() = withContext(dispatcher) {

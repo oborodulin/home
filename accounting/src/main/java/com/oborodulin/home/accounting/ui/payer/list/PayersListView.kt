@@ -18,11 +18,11 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.oborodulin.home.accounting.R
-import com.oborodulin.home.accounting.ui.AccountingUiAction
-import com.oborodulin.home.accounting.ui.AccountingViewModel
 import com.oborodulin.home.accounting.ui.model.PayerListItemModel
 import com.oborodulin.home.common.ui.components.items.ListItemComponent
 import com.oborodulin.home.common.ui.state.CommonScreen
+import com.oborodulin.home.metering.ui.value.MeterValuesListUiAction
+import com.oborodulin.home.metering.ui.value.MeterValuesListViewModel
 import kotlinx.coroutines.flow.collectLatest
 import timber.log.Timber
 
@@ -31,7 +31,7 @@ private const val TAG = "Accounting.ui.PayersListView"
 @Composable
 fun PayersListView(
     viewModel: PayersListViewModel,
-    accountingViewModel: AccountingViewModel,
+    meterValuesListViewModel: MeterValuesListViewModel,
     navController: NavController,
     onListItemClick: () -> Unit
 ) {
@@ -51,15 +51,15 @@ fun PayersListView(
                         )
                     },
                         afterAction = {
-                            accountingViewModel.submitAction(
-                                AccountingUiAction.Load(payer.id)
+                            meterValuesListViewModel.submitAction(
+                                MeterValuesListUiAction.Load(payer.id)
                             )
                         }
                     )
                 },
                 onClick = { payer ->
                     onListItemClick()
-                    accountingViewModel.submitAction(AccountingUiAction.Load(payer.id))
+                    meterValuesListViewModel.submitAction(MeterValuesListUiAction.Load(payer.id))
                 },
                 onEdit = { payer -> viewModel.submitAction(PayersListUiAction.EditPayer(payer.id)) }
             ) { payer ->
@@ -67,7 +67,7 @@ fun PayersListView(
                     viewModel.submitAction(PayersListUiAction.DeletePayer(payer.id))
                 },
                     afterAction = {
-                        accountingViewModel.submitAction(AccountingUiAction.Init)
+                        meterValuesListViewModel.submitAction(MeterValuesListUiAction.Init)
                     }
                 )
             }
