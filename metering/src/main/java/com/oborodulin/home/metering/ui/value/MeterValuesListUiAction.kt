@@ -6,6 +6,6 @@ import java.util.*
 sealed class MeterValuesListUiAction : UiAction {
     object Init : MeterValuesListUiAction()
     data class Load(val payerId: UUID) : MeterValuesListUiAction()
-    data class Delete(val meterValueId: UUID) : MeterValuesListUiAction()
+    data class Delete(val meterId: UUID) : MeterValuesListUiAction()
     object Save : MeterValuesListUiAction()
 }

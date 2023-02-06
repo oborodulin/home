@@ -17,5 +17,6 @@ interface MetersRepository {
     fun save(meter: Meter): Flow<Meter>
     fun save(meterValue: MeterValue): Flow<MeterValue>
     fun delete(meter: Meter): Flow<Meter>
+    fun deleteCurrentValue(meterId: UUID): Flow<UUID>
     suspend fun deleteAll()
 }

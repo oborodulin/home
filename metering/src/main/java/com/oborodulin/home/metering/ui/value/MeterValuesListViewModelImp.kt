@@ -12,6 +12,7 @@ import com.oborodulin.home.common.ui.state.UiState
 import com.oborodulin.home.common.util.Utils
 import com.oborodulin.home.data.R
 import com.oborodulin.home.data.util.ServiceType
+import com.oborodulin.home.metering.domain.usecases.DeleteMeterValueUseCase
 import com.oborodulin.home.metering.domain.usecases.GetPrevServiceMeterValuesUseCase
 import com.oborodulin.home.metering.domain.usecases.MeterUseCases
 import com.oborodulin.home.metering.domain.usecases.SaveMeterValueUseCase
@@ -71,7 +72,7 @@ class MeterValuesListViewModelImp @Inject constructor(
                 loadMeterValues(action.payerId)
             }
             is MeterValuesListUiAction.Delete -> {
-                saveMeterValue()
+                deleteMeterValue(action.meterId)
             }
             is MeterValuesListUiAction.Save -> {
                 saveMeterValue()
@@ -91,6 +92,16 @@ class MeterValuesListViewModelImp @Inject constructor(
             }.collect {
                 submitState(it)
             }
+        }
+        return job
+    }
+
+    private fun deleteMeterValue(meterId: UUID): Job {
+        Timber.tag(TAG).d("deletePayer() called: meterId = %s", meterId.toString())
+        val job = viewModelScope.launch(errorHandler) {
+            meterUseCases.deleteMeterValueUseCase.execute(
+                DeleteMeterValueUseCase.Request(meterId)
+            ).collect {}
         }
         return job
     }
@@ -137,33 +148,32 @@ class MeterValuesListViewModelImp @Inject constructor(
 
     override fun initFieldStatesByUiModel(uiModel: Any): Job? {
         super.initFieldStatesByUiModel(uiModel)
-        val meterValues = uiModel as List<*>
 
-        for (meterValue in meterValues) {
-            val value = meterValue as MeterValueListItemModel
+        for (meterValue in uiModel as List<*>) {
+            meterValue as MeterValueListItemModel
             Timber.tag(TAG)
                 .d(
                     "initFieldStatesByUiModel(List<MeterValueListItemModel>) called for %s",
                     meterValue
                 )
-            value.id?.let {
+            meterValue.id?.let {
                 initStateValue(
                     field = MeterValueFields.METER_VALUE_ID, properties = meterValueId,
-                    value = it.toString(), key = value.metersId.toString()
+                    value = it.toString(), key = meterValue.metersId.toString()
                 )
             }
             initStateValue(
                 field = MeterValueFields.METERS_ID,
                 properties = metersId,
-                value = value.metersId.toString(),
-                key = value.metersId.toString()
+                value = meterValue.metersId.toString(),
+                key = meterValue.metersId.toString()
             )
             initStateValue(
                 field = MeterValueFields.METER_CURR_VALUE, properties = currentValue,
-                value = value.currentValue?.let {
-                    DecimalFormat(value.valueFormat).format(it)
+                value = meterValue.currentValue?.let {
+                    DecimalFormat(meterValue.valueFormat).format(it)
                 } ?: "",
-                key = value.metersId.toString()
+                key = meterValue.metersId.toString()
             )
         }
         return null

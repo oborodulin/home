@@ -122,4 +122,7 @@ interface MeterDao {
 
     @Query("DELETE FROM meters")
     suspend fun deleteAll()
+
+    @Query("DELETE FROM meter_values WHERE metersId = :meterId")
+    suspend fun deleteCurrentValue(meterId: UUID)
 }

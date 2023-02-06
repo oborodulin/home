@@ -8,10 +8,7 @@ import com.oborodulin.home.metering.data.repositories.MeteringDataSource
 import com.oborodulin.home.metering.data.repositories.MeteringDataSourceImpl
 import com.oborodulin.home.metering.data.repositories.MetersRepositoryImp
 import com.oborodulin.home.metering.domain.repositories.MetersRepository
-import com.oborodulin.home.metering.domain.usecases.GetMetersUseCase
-import com.oborodulin.home.metering.domain.usecases.GetPrevServiceMeterValuesUseCase
-import com.oborodulin.home.metering.domain.usecases.MeterUseCases
-import com.oborodulin.home.metering.domain.usecases.SaveMeterValueUseCase
+import com.oborodulin.home.metering.domain.usecases.*
 import com.oborodulin.home.metering.ui.model.converters.PrevServiceMeterValuesListConverter
 import com.oborodulin.home.metering.ui.model.mappers.MeterValueListItemModelToMeterValueMapper
 import com.oborodulin.home.metering.ui.model.mappers.MeterValueToMeterValueListItemModelMapper
@@ -98,11 +95,6 @@ object MeteringModule {
         PrevMetersValuesViewToMeterValueListItemModelListMapper(mapper = mapper)
 
     // CONVERTERS:
-/*    @Singleton
-    @Provides
-    fun provideMeterValueConverter(mapper: MeterValueToMeterValueListItemModelMapper): MeterValueConverter =
-        MeterValueConverter(mapper = mapper)
-*/
     @Singleton
     @Provides
     fun providePrevServiceMeterValuesListConverter(mapper: PrevMetersValuesViewToMeterValueModelMapper): PrevServiceMeterValuesListConverter =
@@ -151,6 +143,7 @@ object MeteringModule {
                 configuration,
                 repository
             ),
+            deleteMeterValueUseCase = DeleteMeterValueUseCase(configuration, repository),
             saveMeterValueUseCase = SaveMeterValueUseCase(configuration, repository)
         )
 }

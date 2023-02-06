@@ -2,14 +2,15 @@ package com.oborodulin.home.metering.ui.value
 
 import android.content.res.Configuration
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
+import androidx.compose.foundation.focusable
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.selection.selectableGroup
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.Card
 import androidx.compose.material.Divider
-import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -41,6 +42,7 @@ import com.oborodulin.home.common.ui.state.CommonScreen
 import com.oborodulin.home.common.ui.theme.Typography
 import com.oborodulin.home.data.util.ServiceType
 import com.oborodulin.home.metering.ui.model.MeterValueListItemModel
+import com.oborodulin.home.presentation.R
 import com.oborodulin.home.presentation.navigation.PayerInput
 import kotlinx.coroutines.flow.collectLatest
 import timber.log.Timber
@@ -97,99 +99,124 @@ fun MeterValuesList(
     viewModel: MeterValuesListViewModel
 ) {
     Timber.tag(TAG).d("MeterValuesList(...) called")
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .clip(RoundedCornerShape(16.dp))
-            .background(MaterialTheme.colors.background, shape = RoundedCornerShape(16.dp))
-            .verticalScroll(rememberScrollState())
-            .padding(vertical = 8.dp)
-    ) {
-        for (meterValue in metersValues) {
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(IntrinsicSize.Min)
-                    .padding(horizontal = 8.dp, vertical = 4.dp),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.Start
-            ) {
-                Column(modifier = Modifier.width(95.dp)) {
-                    Column(
-                        modifier = Modifier.fillMaxSize(),
-                        verticalArrangement = Arrangement.Top
-                    ) {
-                        Spacer(modifier = Modifier.height(8.dp))
-                        ServiceIcon(meterValue.type)
-                        Spacer(modifier = Modifier.height(4.dp))
-                        Text(
-                            text = meterValue.name,
-                            style = Typography.body1.copy(fontWeight = FontWeight.Bold)
-                        )
-                    }
-                }
-                Column(
-                    modifier = Modifier
-                        .fillMaxHeight()
-                        .width(85.dp),
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.Bottom
-                ) {
-                    meterValue.prevLastDate?.let {
-                        Text(
-                            text = it.format(DateTimeFormatter.ISO_LOCAL_DATE)
-                            //DateFormat.getDateInstance(DateFormat.SHORT, Locale.GERMAN).format(it)
-                        )
-                    }
-                    Divider(thickness = 1.dp)
-                    Spacer(modifier = Modifier.height(8.dp))
-                    meterValue.prevValue?.let {
-                        Text(
-                            text = DecimalFormat(meterValue.valueFormat).format(it),
-                            style = Typography.body1.copy(fontWeight = FontWeight.Bold)
-                        )
-                    }
-                }
-                Column(
-                    modifier = Modifier
-                        .fillMaxHeight()
-                        .width(45.dp),
-                    verticalArrangement = Arrangement.Bottom
-                ) {
-                    meterValue.measureUnit?.let { Text(text = it) }
-                }
-                MeterValue(meterValueListItemModel = meterValue, viewModel = viewModel) {
-                    viewModel.submitAction(MeterValuesListUiAction.Save)
-                }
-                Column(
-                    modifier = Modifier.fillMaxSize(),
-                    verticalArrangement = Arrangement.Top
-                ) {
-                    Spacer(modifier = Modifier.height(8.dp))
-                    Image(
+    if (metersValues.isNotEmpty()) {
+        LazyColumn(
+            state = rememberLazyListState(),
+            modifier = Modifier
+                .selectableGroup()
+                .padding(vertical = 2.dp)
+//                .padding(horizontal = 8.dp, vertical = 4.dp),
+                .focusable(enabled = true)
+        ) {
+            items(metersValues.size) { index ->
+                metersValues[index].let { meterValue ->
+                    Card(
                         modifier = Modifier
+                            .fillMaxWidth()
+                            .height(96.dp)
                             .clip(RoundedCornerShape(8.dp))
-                            .padding(4.dp)
-                        //.clickable { onEdit(item) }
-                        ,
-                        painter = painterResource(com.oborodulin.home.presentation.R.drawable.outline_photo_camera_black_24),
-                        contentDescription = ""
+                            //.background(background)
+//                        .height(IntrinsicSize.Min)
+                            .padding(horizontal = 4.dp, vertical = 4.dp),
+                        elevation = 10.dp
                     )
-                    Spacer(modifier = Modifier.height(4.dp))
-                    Image(
-                        modifier = Modifier
-                            .clip(RoundedCornerShape(8.dp))
-                            .padding(4.dp)
-                        //.clickable { onDelete(item) }
-                        ,
-                        painter = painterResource(com.oborodulin.home.common.R.drawable.outline_delete_black_24),
-                        contentDescription = ""
-                    )
+                    {
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(IntrinsicSize.Min)
+                                .padding(vertical = 2.dp),
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.Start
+                        ) {
+                            Column(
+                                modifier = Modifier
+                                    .weight(0.2f)
+                            ) {
+                                Column(
+                                    modifier = Modifier.fillMaxSize(),
+                                    verticalArrangement = Arrangement.Top
+                                ) {
+                                    Spacer(modifier = Modifier.height(8.dp))
+                                    ServiceIcon(meterValue.type)
+                                    Spacer(modifier = Modifier.height(4.dp))
+                                    Text(
+                                        text = meterValue.name,
+                                        style = Typography.body1.copy(fontWeight = FontWeight.Bold)
+                                    )
+                                }
+                            }
+                            Column(
+                                modifier = Modifier
+                                    .fillMaxHeight()
+                                    .weight(0.2f),
+                                horizontalAlignment = Alignment.CenterHorizontally,
+                                verticalArrangement = Arrangement.Bottom
+                            ) {
+                                meterValue.prevLastDate?.let {
+                                    Text(
+                                        text = it.format(DateTimeFormatter.ISO_LOCAL_DATE)
+                                        //DateFormat.getDateInstance(DateFormat.SHORT, Locale.GERMAN).format(it)
+                                    )
+                                }
+                                Divider(thickness = 1.dp)
+                                Spacer(modifier = Modifier.height(8.dp))
+                                meterValue.prevValue?.let {
+                                    Text(
+                                        text = DecimalFormat(meterValue.valueFormat).format(it),
+                                        style = Typography.body1.copy(fontWeight = FontWeight.Bold)
+                                    )
+                                }
+                            }
+                            Column(
+                                modifier = Modifier.weight(0.1f),
+                                verticalArrangement = Arrangement.Bottom
+                            ) {
+                                meterValue.measureUnit?.let { Text(text = it) }
+                            }
+                            Column(
+                                modifier = Modifier.weight(0.3f),
+                                verticalArrangement = Arrangement.Center,
+                                horizontalAlignment = Alignment.CenterHorizontally
+                            ) {
+                                MeterValue(
+                                    meterValueListItemModel = meterValue,
+                                    viewModel = viewModel
+                                ) {
+                                    viewModel.submitAction(MeterValuesListUiAction.Save)
+                                }
+                            }
+                            Column(
+                                modifier = Modifier.weight(0.1f),
+                                verticalArrangement = Arrangement.Top
+                            ) {
+                                Spacer(modifier = Modifier.height(8.dp))
+                                Image(
+                                    modifier = Modifier
+                                        .clip(RoundedCornerShape(8.dp))
+                                        .padding(4.dp)
+                                    //.clickable { onEdit(item) }
+                                    ,
+                                    painter = painterResource(R.drawable.outline_photo_camera_black_24),
+                                    contentDescription = ""
+                                )
+                                Spacer(modifier = Modifier.height(4.dp))
+                                Image(
+                                    modifier = Modifier
+                                        .clip(RoundedCornerShape(8.dp))
+                                        .padding(4.dp)
+                                    //.clickable { onDelete(item) }
+                                    ,
+                                    painter = painterResource(com.oborodulin.home.common.R.drawable.outline_delete_black_24),
+                                    contentDescription = ""
+                                )
+                            }
+                        }
+                    }
                 }
             }
         }
     }
-
 }
 
 @OptIn(ExperimentalComposeUiApi::class, ExperimentalLifecycleComposeApi::class)
@@ -234,72 +261,70 @@ fun MeterValue(
         "MeterValue: currentValue.inputs = %s",
         currentValue.inputs[meterValueListItemModel.metersId.toString()]
     )
-    Column(
-        modifier = Modifier
-            .fillMaxHeight()
-            .width(120.dp),
-        verticalArrangement = Arrangement.Center,
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        /*
-        var fieldValue = TextFieldValue(
-            currentValue.inputs.getValue(meterValueListItemModel.metersId.toString()).value,
-            TextRange(currentValue.inputs.getValue(meterValueListItemModel.metersId.toString()).value.length)
-        )
+    Timber.tag(TAG).d(
+        "MeterValue: currentValue.inputs[%s] = %s",
+        meterValueListItemModel.metersId,
+        currentValue.inputs.getValue(meterValueListItemModel.metersId.toString()),
+    )
+    /*
+    var fieldValue = TextFieldValue(
+        currentValue.inputs.getValue(meterValueListItemModel.metersId.toString()).value,
+        TextRange(currentValue.inputs.getValue(meterValueListItemModel.metersId.toString()).value.length)
+    )
 
-         */
+     */
 /*
         val inputWrapper by remember { mutableStateOf(currentValue.inputs.getValue(meterValueModel.metersId.toString())) }
         var fieldValue by remember {
             mutableStateOf(TextFieldValue(inputWrapper.value, TextRange(inputWrapper.value.length)))
         }
  */
-        TextFieldComponent(
-            modifier = Modifier
-                .focusRequester(focusRequesters[MeterValueFields.METER_CURR_VALUE.name]!!.focusRequester)
-                .onFocusChanged { focusState ->
-                    viewModel.onTextFieldFocusChanged(
-                        focusedField = MeterValueFields.METER_CURR_VALUE,
-                        isFocused = focusState.isFocused,
-                        onFocusIn = {
-                            Timber
-                                .tag(TAG)
-                                .d("MeterValue: onFocusIn")
-                        },
-                        onFocusOut = {
-                            Timber
-                                .tag(TAG)
-                                .d("MeterValue: onFocusOut")
-                        }
-                    )
-                },
-            keyboardOptions = remember {
-                KeyboardOptions(
-                    keyboardType = KeyboardType.Number,
-                    imeAction = ImeAction.Done
+    TextFieldComponent(
+        modifier = Modifier
+            .focusRequester(focusRequesters[MeterValueFields.METER_CURR_VALUE.name]!!.focusRequester)
+            .onFocusChanged { focusState ->
+                viewModel.onTextFieldFocusChanged(
+                    focusedField = MeterValueFields.METER_CURR_VALUE,
+                    isFocused = focusState.isFocused,
+                    onFocusIn = {
+                        Timber
+                            .tag(TAG)
+                            .d("MeterValue: onFocusIn")
+                    },
+                    onFocusOut = {
+                        Timber
+                            .tag(TAG)
+                            .d("MeterValue: onFocusOut")
+                    }
                 )
             },
-            inputWrapper = currentValue.inputs.getValue(meterValueListItemModel.metersId.toString()),
-            //fieldValue = fieldValue,
-            //  visualTransformation = ::creditCardFilter,
-            onValueChange = {
-                //fieldValue = it
+        keyboardOptions = remember {
+            KeyboardOptions(
+                keyboardType = KeyboardType.Number,
+                imeAction = ImeAction.Done
+            )
+        },
+        inputWrapper = currentValue.inputs.getValue(meterValueListItemModel.metersId.toString()),
+        //fieldValue = fieldValue,
+        //  visualTransformation = ::creditCardFilter,
+        onValueChange = {
+            //fieldValue = it
 /*                val inputWrapper = currentValue.inputs.getValue(meterValueListItemModel.metersId.toString())
                 currentValue.inputs[meterValueListItemModel.metersId.toString()] =
                     InputWrapper(value = it.text, errorId = inputWrapper.errorId, isEmpty = false)
                 currentValue.copy(inputs = currentValue.inputs.toMutableMap())
 
  */
-                viewModel.onTextFieldEntered(
-                    MeterValueInputEvent.CurrentValue(
-                        meterValueListItemModel.metersId.toString(),
-                        it
-                    )
+            Timber.tag(TAG).d("MeterValue: onValueChange - %s", it)
+            viewModel.onTextFieldEntered(
+                MeterValueInputEvent.CurrentValue(
+                    meterValueListItemModel.metersId.toString(),
+                    it
                 )
-            },
-            onImeKeyAction = { if (areInputsValid) viewModel.onContinueClick { onSubmit() } }
-        )
-    }
+            )
+        },
+        onImeKeyAction = { if (areInputsValid) viewModel.onContinueClick { onSubmit() } }
+    )
 }
 
 @Composable
@@ -309,28 +334,28 @@ fun ServiceIcon(serviceType: ServiceType?) =
             modifier = Modifier
                 .clip(RoundedCornerShape(8.dp))
                 .padding(4.dp),
-            painter = painterResource(com.oborodulin.home.presentation.R.drawable.outline_electric_bolt_black_36),
+            painter = painterResource(R.drawable.outline_electric_bolt_black_36),
             contentDescription = ""
         )
         ServiceType.COLD_WATER -> Image(
             modifier = Modifier
                 .clip(RoundedCornerShape(8.dp))
                 .padding(4.dp),
-            painter = painterResource(com.oborodulin.home.presentation.R.drawable.outline_water_drop_black_36),
+            painter = painterResource(R.drawable.outline_water_drop_black_36),
             contentDescription = ""
         )
         ServiceType.HOT_WATER -> Image(
             modifier = Modifier
                 .clip(RoundedCornerShape(8.dp))
                 .padding(4.dp),
-            painter = painterResource(com.oborodulin.home.presentation.R.drawable.outline_opacity_black_36),
+            painter = painterResource(R.drawable.outline_opacity_black_36),
             contentDescription = ""
         )
         ServiceType.HEATING -> Image(
             modifier = Modifier
                 .clip(RoundedCornerShape(8.dp))
                 .padding(4.dp),
-            painter = painterResource(com.oborodulin.home.presentation.R.drawable.ic_radiator_36),
+            painter = painterResource(R.drawable.ic_radiator_36),
             contentDescription = ""
         )
         else -> {}

@@ -19,4 +19,5 @@ interface MeteringDataSource {
     suspend fun deleteMeter(meter: Meter)
     suspend fun deleteMeters(meters: List<Meter>)
     suspend fun deleteMeters()
+    suspend fun deleteMeterCurrentValue(meterId: UUID)
 }

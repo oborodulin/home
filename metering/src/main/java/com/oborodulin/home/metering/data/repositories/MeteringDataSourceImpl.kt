@@ -67,6 +67,9 @@ class MeteringDataSourceImpl @Inject constructor(
         meterDao.deleteAll()
     }
 
+    override suspend fun deleteMeterCurrentValue(meterId: UUID) = withContext(dispatcher) {
+        meterDao.deleteCurrentValue(meterId)
+    }
 
 /*    override fun getRefreshKey(state: PagingState<Int, NetworkMovie>): Int? = state.anchorPosition
 

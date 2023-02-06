@@ -38,12 +38,7 @@ object AccountingModule {
     @Provides
     fun providePayerListToPayerListItemModelMapper(mapper: PayerToPayerListItemModelMapper): PayerListToPayerListItemModelMapper =
         PayerListToPayerListItemModelMapper(mapper = mapper)
-/*
-    @Singleton
-    @Provides
-    fun providePrevMetersValuesViewToMeterValueModelMapper(): PrevMetersValuesViewToMeterValueModelMapper =
-        PrevMetersValuesViewToMeterValueModelMapper()
-*/
+
     // CONVERTERS:
     @Singleton
     @Provides
@@ -54,12 +49,7 @@ object AccountingModule {
     @Provides
     fun providePayerConverter(mapper: PayerToPayerModelMapper): PayerConverter =
         PayerConverter(mapper = mapper)
-/*
-    @Singleton
-    @Provides
-    fun providePrevServiceMeterValuesConverter(mapper: PrevMetersValuesViewToMeterValueModelMapper): PrevServiceMeterValuesListConverter =
-        PrevServiceMeterValuesListConverter(mapper = mapper)
-*/
+
     // USE CASES:
     @Singleton
     @Provides

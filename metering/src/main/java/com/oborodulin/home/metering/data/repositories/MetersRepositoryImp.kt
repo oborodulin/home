@@ -43,6 +43,10 @@ class MetersRepositoryImp @Inject constructor(
 
     override suspend fun deleteAll() = meteringDataSource.deleteMeters()
 
+    override fun deleteCurrentValue(meterId: UUID): Flow<UUID> = flow {
+        meteringDataSource.deleteMeterCurrentValue(meterId)
+        this.emit(meterId)
+    }
     /*
         fun nowPlaying(): Flow<PagingData<NetworkMovie>> {
             val config = PagingConfig(
