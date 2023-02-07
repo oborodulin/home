@@ -4,11 +4,11 @@
     <item
         android:id="@+id/menu_delete_item"
         android:icon="@drawable/outline_delete_black_24"
-        android:title="@string/delete"
+        android:title="@string/payer_delete"
         app:showAsAction="always" />
     <item
         android:id="@+id/menu_select_all_items"
         android:icon="@drawable/outline_select_all_black_24"
-        android:title="@string/select_all"
+        android:title="@string/payer_select_all"
         app:showAsAction="always" />
 </menu>

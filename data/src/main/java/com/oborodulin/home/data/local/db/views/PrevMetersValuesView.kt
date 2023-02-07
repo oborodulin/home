@@ -2,6 +2,7 @@ package com.oborodulin.home.data.local.db.views
 
 import androidx.room.DatabaseView
 import com.oborodulin.home.common.util.Constants.CONV_COEFF_BIGDECIMAL
+import com.oborodulin.home.data.util.Constants
 import com.oborodulin.home.data.util.Constants.DEF_PAYMENT_DAY
 import com.oborodulin.home.data.util.ServiceType
 import java.math.BigDecimal
@@ -26,16 +27,8 @@ import java.util.*
             "FROM meters_view AS mv JOIN services_view AS sv ON sv.serviceId = mv.servicesId  " +
             "JOIN meter_values AS mvl ON mvl.metersId = mv.meterId  " +
             "JOIN payers AS p ON p.payerId = mv.payersId  " +
-            "JOIN  " +
-            "(SELECT v.metersId, MAX(datetime(v.valueDate)) maxValueDate  " +
-            "FROM meter_values v JOIN meters m ON m.meterId = v.metersId  " +
-            "JOIN payers_services AS ps ON ps.payerServiceId = m.payersServicesId  " +
-            "JOIN payers AS p ON p.payerId = ps.payersId  " +
-            "WHERE datetime(v.valueDate) <= CASE WHEN datetime('now') > datetime('now', 'start of month', '+' || (IFNULL(p.paymentDay, ${DEF_PAYMENT_DAY}) - 1) || ' days')  " +
-            "THEN datetime('now', 'start of month', '+' || (IFNULL(p.paymentDay, ${DEF_PAYMENT_DAY}) - 1) || ' days')  " +
-            "ELSE datetime('now', '-1 months', 'start of month', '+' || (IFNULL(p.paymentDay, ${DEF_PAYMENT_DAY}) - 1) || ' days') END  " +
-            "GROUP BY v.metersId) mp  " +
-            "ON mp.metersId = mvl.metersId AND mp.maxValueDate = datetime(mvl.valueDate)"
+            "JOIN (" + Constants.SQL_PREV_METERS_VALUES_SUBQUERY +
+            ") mp ON mp.metersId = mvl.metersId AND mp.maxValueDate = datetime(mvl.valueDate)"
 )
 class PrevMetersValuesView(
     var meterValueId: UUID,

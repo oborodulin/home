@@ -17,6 +17,10 @@ interface MeterValuesListViewModel {
     val areInputsValid: StateFlow<Boolean>
 
     fun initFieldStatesByUiModel(uiModel: Any): Job?
+    fun setStateValue(
+        field: MeterValueFields, properties: StateFlow<InputsWrapper>, value: String, key: String,
+        isValid: Boolean, isSaved: Boolean
+    )
     fun onTextFieldEntered(inputEvent: Inputable)
     fun onTextFieldFocusChanged(
         focusedField: MeterValueFields, isFocused: Boolean,

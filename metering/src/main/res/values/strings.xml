@@ -1,0 +1,25 @@
+<resources>
+    <!--МЕНЮ счётчиков -->
+    <string name="meter_add">Добавить счётчик</string>
+    <string name="meter_delete">Удалить счётчик</string>
+    <string name="meter_select_all">Выбрать все счётчики</string>
+
+    <!--МЕНЮ: -->
+    <!--счётчика -->
+    <string name="new_meter_menu_item">Новый счётчик</string>
+
+    <!--СПИСОК: -->
+    <!--счётчиков -->
+    <string name="meter_list_empty_text">Счётчиков пока нет. Добавте, пожалуйста, хотя бы один</string>
+
+    <!--ФОРМА: -->
+
+    <!--ДИАЛОГИ -->
+    <string name="dlg_confirm_del_meter">Удалить счётчик %1$s?</string>
+    <string name="dlg_confirm_del_meter_value">Удалить последнее показание?</string>
+
+    <!--СООБЩЕНИЯ ОБ ОШИБКАХ -->
+    <!--формы счётчиков-->
+    <!--формы показаний счётчиков-->
+    <string name="meter_value_less_than_previous_error">Показания должны быть больше предыдущих!</string>
+</resources>

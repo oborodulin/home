@@ -45,6 +45,10 @@ class MeterValuesListViewModelImp @Inject constructor(
     SingleViewModel<List<MeterValueListItemModel>, UiState<List<MeterValueListItemModel>>, MeterValuesListUiAction, MeterValuesListUiSingleEvent, MeterValueFields, InputsWrapper>(
         state
     ) {
+    private val payerId: StateFlow<String> by lazy {
+        state.getStateFlow("MeterValueFields.METER_VALUE_ID.name", "")
+    }
+
     private val meterValueId: StateFlow<InputsWrapper> by lazy {
         state.getStateFlow(MeterValueFields.METER_VALUE_ID.name, InputsWrapper())
     }
@@ -277,6 +281,10 @@ class MeterValuesListViewModelImp @Inject constructor(
                 override val areInputsValid = MutableStateFlow(true)
 
                 override fun initFieldStatesByUiModel(uiModel: Any): Job? = null
+                override fun setStateValue(
+                    field: MeterValueFields, properties: StateFlow<InputsWrapper>, value: String, key: String,
+                    isValid: Boolean, isSaved: Boolean
+                ){}
                 override fun onTextFieldEntered(inputEvent: Inputable) {}
                 override fun onTextFieldFocusChanged(
                     focusedField: MeterValueFields, isFocused: Boolean,

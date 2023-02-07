@@ -55,6 +55,13 @@ fun TextFieldComponent(
         mutableStateOf(TextFieldValue(inputWrapper.value, TextRange(inputWrapper.value.length)))
     }
     Timber.tag(TAG).d(
+        "TextFieldComponent(...): fieldValue.text = %s; inputWrapper.value = %s",
+        locFieldValue.text,
+        inputWrapper.value
+    )
+    if (locFieldValue.text != inputWrapper.value) locFieldValue =
+        TextFieldValue(inputWrapper.value, TextRange(inputWrapper.value.length))
+    Timber.tag(TAG).d(
         "TextFieldComponent(...): fieldValue = %s; inputWrapper = %s",
         locFieldValue,
         inputWrapper

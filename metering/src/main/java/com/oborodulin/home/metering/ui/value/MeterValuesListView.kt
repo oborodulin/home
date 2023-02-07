@@ -2,7 +2,7 @@ package com.oborodulin.home.metering.ui.value
 
 import android.content.res.Configuration
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.focusable
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
@@ -25,24 +25,31 @@ import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.ExperimentalLifecycleComposeApi
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.flowWithLifecycle
 import androidx.navigation.NavController
+import com.oborodulin.home.common.ui.components.dialog.AlertDialogComponent
 import com.oborodulin.home.common.ui.components.field.TextFieldComponent
 import com.oborodulin.home.common.ui.components.field.util.InputFocusRequester
 import com.oborodulin.home.common.ui.components.field.util.inputProcess
 import com.oborodulin.home.common.ui.state.CommonScreen
 import com.oborodulin.home.common.ui.theme.Typography
+import com.oborodulin.home.common.util.Utils
 import com.oborodulin.home.data.util.ServiceType
+import com.oborodulin.home.metering.R
 import com.oborodulin.home.metering.ui.model.MeterValueListItemModel
-import com.oborodulin.home.presentation.R
 import com.oborodulin.home.presentation.navigation.PayerInput
 import kotlinx.coroutines.flow.collectLatest
 import timber.log.Timber
@@ -57,15 +64,8 @@ fun MeterValuesListView(
     viewModel: MeterValuesListViewModel,
     navController: NavController,
     payerInput: PayerInput? = null
-//    meterValueModel: MeterValueModel
 ) {
     Timber.tag(TAG).d("MeterValuesListView(...) called: payerInput = %s", payerInput)
-    /*
-    viewModel.initFieldStatesByUiModel(meterValueModel)
-    MeterValue(meterValueModel, viewModel) {
-        viewModel.submitAction(MeterValuesListUiAction.Save)
-    }
-     */
     LaunchedEffect(payerInput) {
         Timber.tag(TAG).d("MeterValuesListView: LaunchedEffect() BEFORE collect ui state flow")
         when (payerInput) {
@@ -76,7 +76,7 @@ fun MeterValuesListView(
     viewModel.uiStateFlow.collectAsState().value.let { state ->
         Timber.tag(TAG).d("Collect ui state flow: %s", state)
         CommonScreen(state = state) {
-            MeterValuesList(it, viewModel)
+            MeterValuesList(it, viewModel, payerInput)
         }
     }
     LaunchedEffect(Unit) {
@@ -96,7 +96,8 @@ fun MeterValuesListView(
 @Composable
 fun MeterValuesList(
     metersValues: List<MeterValueListItemModel>,
-    viewModel: MeterValuesListViewModel
+    viewModel: MeterValuesListViewModel,
+    payerInput: PayerInput?
 ) {
     Timber.tag(TAG).d("MeterValuesList(...) called")
     if (metersValues.isNotEmpty()) {
@@ -104,54 +105,52 @@ fun MeterValuesList(
             state = rememberLazyListState(),
             modifier = Modifier
                 .selectableGroup()
-                .padding(vertical = 2.dp)
-//                .padding(horizontal = 8.dp, vertical = 4.dp),
-                .focusable(enabled = true)
+                .padding(4.dp)
         ) {
             items(metersValues.size) { index ->
                 metersValues[index].let { meterValue ->
                     Card(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .height(96.dp)
+                            .height(100.dp)
                             .clip(RoundedCornerShape(8.dp))
-                            //.background(background)
-//                        .height(IntrinsicSize.Min)
-                            .padding(horizontal = 4.dp, vertical = 4.dp),
+                            .padding(4.dp),
                         elevation = 10.dp
                     )
                     {
                         Row(
                             modifier = Modifier
-                                .fillMaxWidth()
-                                .height(IntrinsicSize.Min)
-                                .padding(vertical = 2.dp),
+                                .fillMaxSize()
+                                .padding(horizontal = 4.dp, vertical = 2.dp),
                             verticalAlignment = Alignment.CenterVertically,
                             horizontalArrangement = Arrangement.Start
                         ) {
                             Column(
                                 modifier = Modifier
-                                    .weight(0.2f)
+                                    .weight(0.25f)
                             ) {
                                 Column(
                                     modifier = Modifier.fillMaxSize(),
                                     verticalArrangement = Arrangement.Top
                                 ) {
-                                    Spacer(modifier = Modifier.height(8.dp))
                                     ServiceIcon(meterValue.type)
                                     Spacer(modifier = Modifier.height(4.dp))
                                     Text(
                                         text = meterValue.name,
-                                        style = Typography.body1.copy(fontWeight = FontWeight.Bold)
+                                        style = Typography.body1.copy(
+                                            fontWeight = FontWeight.Bold,
+                                            fontSize = 18.sp
+                                        ),
+                                        maxLines = 2
                                     )
                                 }
                             }
                             Column(
                                 modifier = Modifier
                                     .fillMaxHeight()
-                                    .weight(0.2f),
+                                    .weight(0.25f),
                                 horizontalAlignment = Alignment.CenterHorizontally,
-                                verticalArrangement = Arrangement.Bottom
+                                verticalArrangement = Arrangement.Center
                             ) {
                                 meterValue.prevLastDate?.let {
                                     Text(
@@ -163,16 +162,25 @@ fun MeterValuesList(
                                 Spacer(modifier = Modifier.height(8.dp))
                                 meterValue.prevValue?.let {
                                     Text(
-                                        text = DecimalFormat(meterValue.valueFormat).format(it),
-                                        style = Typography.body1.copy(fontWeight = FontWeight.Bold)
+                                        text = AnnotatedString(
+                                            text = DecimalFormat(meterValue.valueFormat).format(it),
+                                            spanStyle = SpanStyle(fontWeight = FontWeight.Bold)
+                                        ).plus(
+                                            AnnotatedString(
+                                                when (meterValue.measureUnit) {
+                                                    null -> ""
+                                                    else -> " "
+                                                }
+                                            )
+                                        ).plus(
+                                            Utils.scriptText(
+                                                meterValue.measureUnit, listOf("2", "3")
+                                            )
+                                        ),
+                                        maxLines = 2,
+                                        textAlign = TextAlign.Center
                                     )
                                 }
-                            }
-                            Column(
-                                modifier = Modifier.weight(0.1f),
-                                verticalArrangement = Arrangement.Bottom
-                            ) {
-                                meterValue.measureUnit?.let { Text(text = it) }
                             }
                             Column(
                                 modifier = Modifier.weight(0.3f),
@@ -197,16 +205,38 @@ fun MeterValuesList(
                                         .padding(4.dp)
                                     //.clickable { onEdit(item) }
                                     ,
-                                    painter = painterResource(R.drawable.outline_photo_camera_black_24),
+                                    painter = painterResource(com.oborodulin.home.presentation.R.drawable.outline_photo_camera_black_24),
                                     contentDescription = ""
                                 )
                                 Spacer(modifier = Modifier.height(4.dp))
+                                val showDialogState = remember { mutableStateOf(false) }
+                                AlertDialogComponent(
+                                    isShow = showDialogState.value,
+                                    title = { Text(stringResource(com.oborodulin.home.common.R.string.dlg_confirm_title)) },
+                                    text = { Text(text = stringResource(R.string.dlg_confirm_del_meter_value)) },
+                                    onDismiss = { showDialogState.value = false },
+                                    onConfirm = {
+                                        showDialogState.value = false
+                                        viewModel.submitAction(
+                                            MeterValuesListUiAction.Delete(meterValue.metersId)
+                                        )
+                                        when (payerInput) {
+                                            null -> viewModel.submitAction(MeterValuesListUiAction.Init)
+                                            else -> viewModel.submitAction(
+                                                MeterValuesListUiAction.Load(payerInput.payerId)
+                                            )
+                                        }
+                                    }
+                                )
                                 Image(
                                     modifier = Modifier
                                         .clip(RoundedCornerShape(8.dp))
                                         .padding(4.dp)
-                                    //.clickable { onDelete(item) }
-                                    ,
+                                        .clickable {
+                                            if (meterValue.currentValue != null) {
+                                                showDialogState.value = true
+                                            }
+                                        },
                                     painter = painterResource(com.oborodulin.home.common.R.drawable.outline_delete_black_24),
                                     contentDescription = ""
                                 )
@@ -266,19 +296,39 @@ fun MeterValue(
         meterValueListItemModel.metersId,
         currentValue.inputs.getValue(meterValueListItemModel.metersId.toString()),
     )
-    /*
-    var fieldValue = TextFieldValue(
-        currentValue.inputs.getValue(meterValueListItemModel.metersId.toString()).value,
-        TextRange(currentValue.inputs.getValue(meterValueListItemModel.metersId.toString()).value.length)
+    var inputWrapper by remember {
+        mutableStateOf(
+            currentValue.inputs.getValue(
+                meterValueListItemModel.metersId.toString()
+            )
+        )
+    }
+    Timber.tag(TAG).d(
+        "MeterValue: BEFORE Update remember inputWrapper = %s, currentValue.inputs[%s] = %s",
+        inputWrapper,
+        meterValueListItemModel.metersId.toString(),
+        currentValue.inputs.getValue(
+            meterValueListItemModel.metersId.toString()
+        )
     )
 
-     */
-/*
-        val inputWrapper by remember { mutableStateOf(currentValue.inputs.getValue(meterValueModel.metersId.toString())) }
-        var fieldValue by remember {
-            mutableStateOf(TextFieldValue(inputWrapper.value, TextRange(inputWrapper.value.length)))
-        }
- */
+    if (inputWrapper.value != currentValue.inputs.getValue(
+            meterValueListItemModel.metersId.toString()
+        ).value
+    )
+        inputWrapper = inputWrapper.copy(
+            value = currentValue.inputs.getValue(
+                meterValueListItemModel.metersId.toString()
+            ).value
+        )
+    Timber.tag(TAG).d(
+        "MeterValue: AFTER Update remember inputWrapper = %s, currentValue.inputs[%s] = %s",
+        inputWrapper,
+        meterValueListItemModel.metersId.toString(),
+        currentValue.inputs.getValue(
+            meterValueListItemModel.metersId.toString()
+        )
+    )
     TextFieldComponent(
         modifier = Modifier
             .focusRequester(focusRequesters[MeterValueFields.METER_CURR_VALUE.name]!!.focusRequester)
@@ -304,17 +354,26 @@ fun MeterValue(
                 imeAction = ImeAction.Done
             )
         },
-        inputWrapper = currentValue.inputs.getValue(meterValueListItemModel.metersId.toString()),
-        //fieldValue = fieldValue,
+        inputWrapper = inputWrapper,
         //  visualTransformation = ::creditCardFilter,
         onValueChange = {
-            //fieldValue = it
-/*                val inputWrapper = currentValue.inputs.getValue(meterValueListItemModel.metersId.toString())
-                currentValue.inputs[meterValueListItemModel.metersId.toString()] =
-                    InputWrapper(value = it.text, errorId = inputWrapper.errorId, isEmpty = false)
-                currentValue.copy(inputs = currentValue.inputs.toMutableMap())
-
- */
+            Timber.tag(TAG).d(
+                "MeterValue: onValueChange BEFORE Update - inputWrapper.value = %s, it = %s",
+                inputWrapper.value,
+                it
+            )
+            inputWrapper = inputWrapper.copy(value = it)
+            viewModel.setStateValue(
+                field = MeterValueFields.METER_CURR_VALUE,
+                properties = viewModel.currentValue,
+                value = it, key = meterValueListItemModel.metersId.toString(),
+                isValid = true, isSaved = false
+            )
+            Timber.tag(TAG).d(
+                "MeterValue: onValueChange AFTER Update - inputWrapper.value = %s, it = %s",
+                inputWrapper.value,
+                it
+            )
             Timber.tag(TAG).d("MeterValue: onValueChange - %s", it)
             viewModel.onTextFieldEntered(
                 MeterValueInputEvent.CurrentValue(
@@ -332,30 +391,26 @@ fun ServiceIcon(serviceType: ServiceType?) =
     when (serviceType) {
         ServiceType.ELECRICITY -> Image(
             modifier = Modifier
-                .clip(RoundedCornerShape(8.dp))
-                .padding(4.dp),
-            painter = painterResource(R.drawable.outline_electric_bolt_black_36),
+                .clip(RoundedCornerShape(8.dp)),
+            painter = painterResource(com.oborodulin.home.presentation.R.drawable.outline_electric_bolt_black_36),
             contentDescription = ""
         )
         ServiceType.COLD_WATER -> Image(
             modifier = Modifier
-                .clip(RoundedCornerShape(8.dp))
-                .padding(4.dp),
-            painter = painterResource(R.drawable.outline_water_drop_black_36),
+                .clip(RoundedCornerShape(8.dp)),
+            painter = painterResource(com.oborodulin.home.presentation.R.drawable.outline_water_drop_black_36),
             contentDescription = ""
         )
         ServiceType.HOT_WATER -> Image(
             modifier = Modifier
-                .clip(RoundedCornerShape(8.dp))
-                .padding(4.dp),
-            painter = painterResource(R.drawable.outline_opacity_black_36),
+                .clip(RoundedCornerShape(8.dp)),
+            painter = painterResource(com.oborodulin.home.presentation.R.drawable.outline_opacity_black_36),
             contentDescription = ""
         )
         ServiceType.HEATING -> Image(
             modifier = Modifier
-                .clip(RoundedCornerShape(8.dp))
-                .padding(4.dp),
-            painter = painterResource(R.drawable.ic_radiator_36),
+                .clip(RoundedCornerShape(8.dp)),
+            painter = painterResource(com.oborodulin.home.presentation.R.drawable.ic_radiator_36),
             contentDescription = ""
         )
         else -> {}
@@ -367,7 +422,8 @@ fun ServiceIcon(serviceType: ServiceType?) =
 fun PreviewMeterValuesList() {
     MeterValuesList(
         metersValues = MeterValuesListViewModelImp.previewMeterValueModel(LocalContext.current),
-        viewModel = MeterValuesListViewModelImp.previewModel(LocalContext.current)
+        viewModel = MeterValuesListViewModelImp.previewModel(LocalContext.current),
+        payerInput = null
     )
 }
 

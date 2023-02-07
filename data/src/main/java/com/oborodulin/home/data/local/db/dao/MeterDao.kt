@@ -4,6 +4,7 @@ import androidx.room.*
 import com.oborodulin.home.data.local.db.entities.*
 import com.oborodulin.home.data.local.db.views.PrevMetersValuesView
 import com.oborodulin.home.data.local.db.views.MetersView
+import com.oborodulin.home.data.util.Constants
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.distinctUntilChanged
@@ -123,6 +124,12 @@ interface MeterDao {
     @Query("DELETE FROM meters")
     suspend fun deleteAll()
 
-    @Query("DELETE FROM meter_values WHERE metersId = :meterId")
+    @Query(
+        "DELETE FROM meter_values WHERE metersId = :meterId AND datetime(valueDate) = " +
+                "(SELECT MAX(datetime(v.valueDate)) FROM meter_values v " +
+                "WHERE v.metersId = :meterId " +
+                "AND datetime(v.valueDate) > (SELECT maxValueDate FROM (" + Constants.SQL_PREV_METERS_VALUES_SUBQUERY +
+                ") mp WHERE mp.metersId = :meterId))"
+    )
     suspend fun deleteCurrentValue(meterId: UUID)
 }
