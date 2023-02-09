@@ -2,9 +2,8 @@ package com.oborodulin.home.data.local.db.dao
 
 import androidx.room.*
 import com.oborodulin.home.data.local.db.entities.*
-import com.oborodulin.home.data.local.db.views.PrevMetersValuesView
+import com.oborodulin.home.data.local.db.views.MeterValuePrevPeriodsView
 import com.oborodulin.home.data.local.db.views.MetersView
-import com.oborodulin.home.data.util.Constants
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.distinctUntilChanged
@@ -46,22 +45,22 @@ interface MeterDao {
         findByPayerId(serviceId).distinctUntilChanged()
 
     @Query(
-        "SELECT pmv.* FROM prev_meters_values_view pmv " +
+        "SELECT pmv.* FROM meter_value_prev_periods_view pmv " +
                 "WHERE pmv.payerId = :payerId AND pmv.meterLocaleCode = :locale AND pmv.serviceLocaleCode = :locale " +
                 "ORDER BY pmv.pos"
     )
     fun findPrevMetersValuesByPayerId(
         payerId: UUID, locale: String? = Locale.getDefault().language
-    ): Flow<List<PrevMetersValuesView>>
+    ): Flow<List<MeterValuePrevPeriodsView>>
 
     @Query(
-        "SELECT pmv.* FROM prev_meters_values_view pmv " +
+        "SELECT pmv.* FROM meter_value_prev_periods_view pmv " +
                 "WHERE pmv.isFavorite = 1 AND pmv.meterLocaleCode = :locale AND pmv.serviceLocaleCode = :locale " +
                 "ORDER BY pmv.pos"
     )
     fun findPrevMetersValuesByPayerIsFavorite(
         locale: String? = Locale.getDefault().language
-    ): Flow<List<PrevMetersValuesView>>
+    ): Flow<List<MeterValuePrevPeriodsView>>
 
     @ExperimentalCoroutinesApi
     fun findPrevMetersValuesByPayerIdDistinctUntilChanged(payerId: UUID) =
@@ -124,12 +123,14 @@ interface MeterDao {
     @Query("DELETE FROM meters")
     suspend fun deleteAll()
 
-    @Query(
-        "DELETE FROM meter_values WHERE metersId = :meterId AND datetime(valueDate) = " +
-                "(SELECT MAX(datetime(v.valueDate)) FROM meter_values v " +
-                "WHERE v.metersId = :meterId " +
-                "AND datetime(v.valueDate) > (SELECT maxValueDate FROM (" + Constants.SQL_PREV_METERS_VALUES_SUBQUERY +
-                ") mp WHERE mp.metersId = :meterId))"
+    @Query("""
+        DELETE FROM meter_values WHERE metersId = :meterId AND datetime(valueDate) = 
+                (SELECT MAX(datetime(v.valueDate)) FROM meter_values v 
+                WHERE v.metersId = :meterId 
+                AND datetime(v.valueDate) > (SELECT mpd.maxValueDate 
+                                               FROM meter_value_max_prev_dates_view mpd 
+                                           WHERE mpd.metersId = :meterId))
+"""
     )
     suspend fun deleteCurrentValue(meterId: UUID)
 }

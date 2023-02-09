@@ -44,12 +44,15 @@ import com.oborodulin.home.common.ui.components.dialog.AlertDialogComponent
 import com.oborodulin.home.common.ui.components.field.TextFieldComponent
 import com.oborodulin.home.common.ui.components.field.util.InputFocusRequester
 import com.oborodulin.home.common.ui.components.field.util.inputProcess
+import com.oborodulin.home.common.ui.model.ListItemModel
 import com.oborodulin.home.common.ui.state.CommonScreen
+import com.oborodulin.home.common.ui.state.MviViewModel
+import com.oborodulin.home.common.ui.state.SharedViewModel
 import com.oborodulin.home.common.ui.theme.Typography
 import com.oborodulin.home.common.util.Utils
 import com.oborodulin.home.data.util.ServiceType
 import com.oborodulin.home.metering.R
-import com.oborodulin.home.metering.ui.model.MeterValueListItemModel
+import com.oborodulin.home.metering.ui.model.MeterValueListItem
 import com.oborodulin.home.presentation.navigation.PayerInput
 import kotlinx.coroutines.flow.collectLatest
 import timber.log.Timber
@@ -59,6 +62,7 @@ import java.util.*
 
 private const val TAG = "Metering.ui.MeterValueView"
 
+@OptIn(ExperimentalLifecycleComposeApi::class)
 @Composable
 fun MeterValuesListView(
     viewModel: MeterValuesListViewModel,
@@ -66,17 +70,25 @@ fun MeterValuesListView(
     payerInput: PayerInput? = null
 ) {
     Timber.tag(TAG).d("MeterValuesListView(...) called: payerInput = %s", payerInput)
-    LaunchedEffect(payerInput) {
+
+    val currentPayer by viewModel.primaryObjectData.collectAsStateWithLifecycle()
+    Timber.tag(TAG).d("MeterValuesListView: currentPayer = %s", currentPayer)
+    val payerId = payerInput?.payerId
+        ?: if (currentPayer[MviViewModel.IDX_OBJECT_ID].isNotEmpty()) UUID.fromString(currentPayer[MviViewModel.IDX_OBJECT_ID]) else null
+
+    Timber.tag(TAG).d("MeterValuesListView: payerId = %s", payerId)
+
+    LaunchedEffect(payerId) {
         Timber.tag(TAG).d("MeterValuesListView: LaunchedEffect() BEFORE collect ui state flow")
-        when (payerInput) {
+        when (payerId) {
             null -> viewModel.submitAction(MeterValuesListUiAction.Init)
-            else -> viewModel.submitAction(MeterValuesListUiAction.Load(payerInput.payerId))
+            else -> viewModel.submitAction(MeterValuesListUiAction.Load(payerId))
         }
     }
     viewModel.uiStateFlow.collectAsState().value.let { state ->
         Timber.tag(TAG).d("Collect ui state flow: %s", state)
         CommonScreen(state = state) {
-            MeterValuesList(it, viewModel, payerInput)
+            MeterValuesList(it, viewModel, payerId)
         }
     }
     LaunchedEffect(Unit) {
@@ -95,9 +107,9 @@ fun MeterValuesListView(
 
 @Composable
 fun MeterValuesList(
-    metersValues: List<MeterValueListItemModel>,
+    metersValues: List<MeterValueListItem>,
     viewModel: MeterValuesListViewModel,
-    payerInput: PayerInput?
+    payerId: UUID?
 ) {
     Timber.tag(TAG).d("MeterValuesList(...) called")
     if (metersValues.isNotEmpty()) {
@@ -127,23 +139,19 @@ fun MeterValuesList(
                         ) {
                             Column(
                                 modifier = Modifier
-                                    .weight(0.25f)
+                                    .weight(0.25f),
+                                verticalArrangement = Arrangement.Center
                             ) {
-                                Column(
-                                    modifier = Modifier.fillMaxSize(),
-                                    verticalArrangement = Arrangement.Top
-                                ) {
-                                    ServiceIcon(meterValue.type)
-                                    Spacer(modifier = Modifier.height(4.dp))
-                                    Text(
-                                        text = meterValue.name,
-                                        style = Typography.body1.copy(
-                                            fontWeight = FontWeight.Bold,
-                                            fontSize = 18.sp
-                                        ),
-                                        maxLines = 2
-                                    )
-                                }
+                                ServiceIcon(meterValue.type)
+                                Spacer(modifier = Modifier.height(4.dp))
+                                Text(
+                                    text = meterValue.name,
+                                    style = Typography.body1.copy(
+                                        fontWeight = FontWeight.Bold,
+                                        fontSize = 18.sp
+                                    ),
+                                    maxLines = 2
+                                )
                             }
                             Column(
                                 modifier = Modifier
@@ -188,7 +196,7 @@ fun MeterValuesList(
                                 horizontalAlignment = Alignment.CenterHorizontally
                             ) {
                                 MeterValue(
-                                    meterValueListItemModel = meterValue,
+                                    meterValueListItem = meterValue,
                                     viewModel = viewModel
                                 ) {
                                     viewModel.submitAction(MeterValuesListUiAction.Save)
@@ -220,10 +228,10 @@ fun MeterValuesList(
                                         viewModel.submitAction(
                                             MeterValuesListUiAction.Delete(meterValue.metersId)
                                         )
-                                        when (payerInput) {
+                                        when (payerId) {
                                             null -> viewModel.submitAction(MeterValuesListUiAction.Init)
                                             else -> viewModel.submitAction(
-                                                MeterValuesListUiAction.Load(payerInput.payerId)
+                                                MeterValuesListUiAction.Load(payerId)
                                             )
                                         }
                                     }
@@ -252,7 +260,7 @@ fun MeterValuesList(
 @OptIn(ExperimentalComposeUiApi::class, ExperimentalLifecycleComposeApi::class)
 @Composable
 fun MeterValue(
-    meterValueListItemModel: MeterValueListItemModel,
+    meterValueListItem: MeterValueListItem,
     viewModel: MeterValuesListViewModel,
     onSubmit: () -> Unit
 ) {
@@ -289,44 +297,44 @@ fun MeterValue(
 
     Timber.tag(TAG).d(
         "MeterValue: currentValue.inputs = %s",
-        currentValue.inputs[meterValueListItemModel.metersId.toString()]
+        currentValue.inputs[meterValueListItem.metersId.toString()]
     )
     Timber.tag(TAG).d(
         "MeterValue: currentValue.inputs[%s] = %s",
-        meterValueListItemModel.metersId,
-        currentValue.inputs.getValue(meterValueListItemModel.metersId.toString()),
+        meterValueListItem.metersId,
+        currentValue.inputs.getValue(meterValueListItem.metersId.toString()),
     )
     var inputWrapper by remember {
         mutableStateOf(
             currentValue.inputs.getValue(
-                meterValueListItemModel.metersId.toString()
+                meterValueListItem.metersId.toString()
             )
         )
     }
     Timber.tag(TAG).d(
         "MeterValue: BEFORE Update remember inputWrapper = %s, currentValue.inputs[%s] = %s",
         inputWrapper,
-        meterValueListItemModel.metersId.toString(),
+        meterValueListItem.metersId.toString(),
         currentValue.inputs.getValue(
-            meterValueListItemModel.metersId.toString()
+            meterValueListItem.metersId.toString()
         )
     )
 
     if (inputWrapper.value != currentValue.inputs.getValue(
-            meterValueListItemModel.metersId.toString()
+            meterValueListItem.metersId.toString()
         ).value
     )
         inputWrapper = inputWrapper.copy(
             value = currentValue.inputs.getValue(
-                meterValueListItemModel.metersId.toString()
+                meterValueListItem.metersId.toString()
             ).value
         )
     Timber.tag(TAG).d(
         "MeterValue: AFTER Update remember inputWrapper = %s, currentValue.inputs[%s] = %s",
         inputWrapper,
-        meterValueListItemModel.metersId.toString(),
+        meterValueListItem.metersId.toString(),
         currentValue.inputs.getValue(
-            meterValueListItemModel.metersId.toString()
+            meterValueListItem.metersId.toString()
         )
     )
     TextFieldComponent(
@@ -366,7 +374,7 @@ fun MeterValue(
             viewModel.setStateValue(
                 field = MeterValueFields.METER_CURR_VALUE,
                 properties = viewModel.currentValue,
-                value = it, key = meterValueListItemModel.metersId.toString(),
+                value = it, key = meterValueListItem.metersId.toString(),
                 isValid = true, isSaved = false
             )
             Timber.tag(TAG).d(
@@ -377,7 +385,7 @@ fun MeterValue(
             Timber.tag(TAG).d("MeterValue: onValueChange - %s", it)
             viewModel.onTextFieldEntered(
                 MeterValueInputEvent.CurrentValue(
-                    meterValueListItemModel.metersId.toString(),
+                    meterValueListItem.metersId.toString(),
                     it
                 )
             )
@@ -423,7 +431,7 @@ fun PreviewMeterValuesList() {
     MeterValuesList(
         metersValues = MeterValuesListViewModelImp.previewMeterValueModel(LocalContext.current),
         viewModel = MeterValuesListViewModelImp.previewModel(LocalContext.current),
-        payerInput = null
+        payerId = null
     )
 }
 
@@ -432,7 +440,7 @@ fun PreviewMeterValuesList() {
 @Composable
 fun PreviewMeterValue() {
     MeterValue(
-        meterValueListItemModel = MeterValueListItemModel(metersId = UUID.randomUUID()),
+        meterValueListItem = MeterValueListItem(metersId = UUID.randomUUID()),
         viewModel = MeterValuesListViewModelImp.previewModel(LocalContext.current),
         onSubmit = {})
 }

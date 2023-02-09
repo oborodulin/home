@@ -16,9 +16,9 @@ import com.oborodulin.home.metering.domain.usecases.DeleteMeterValueUseCase
 import com.oborodulin.home.metering.domain.usecases.GetPrevServiceMeterValuesUseCase
 import com.oborodulin.home.metering.domain.usecases.MeterUseCases
 import com.oborodulin.home.metering.domain.usecases.SaveMeterValueUseCase
-import com.oborodulin.home.metering.ui.model.MeterValueListItemModel
+import com.oborodulin.home.metering.ui.model.MeterValueListItem
 import com.oborodulin.home.metering.ui.model.converters.PrevServiceMeterValuesListConverter
-import com.oborodulin.home.metering.ui.model.mappers.MeterValueListItemModelToMeterValueMapper
+import com.oborodulin.home.metering.ui.model.mappers.MeterValueListItemToMeterValueMapper
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.Job
@@ -40,15 +40,11 @@ class MeterValuesListViewModelImp @Inject constructor(
     private val state: SavedStateHandle,
     private val meterUseCases: MeterUseCases,
     private val prevServiceMeterValuesListConverter: PrevServiceMeterValuesListConverter,
-    private val meterValueListItemModelToMeterValueMapper: MeterValueListItemModelToMeterValueMapper
+    private val meterValueListItemToMeterValueMapper: MeterValueListItemToMeterValueMapper
 ) : MeterValuesListViewModel,
-    SingleViewModel<List<MeterValueListItemModel>, UiState<List<MeterValueListItemModel>>, MeterValuesListUiAction, MeterValuesListUiSingleEvent, MeterValueFields, InputsWrapper>(
-        state
+    SingleViewModel<List<MeterValueListItem>, UiState<List<MeterValueListItem>>, MeterValuesListUiAction, MeterValuesListUiSingleEvent, MeterValueFields, InputsWrapper>(
+        state = state
     ) {
-    private val payerId: StateFlow<String> by lazy {
-        state.getStateFlow("MeterValueFields.METER_VALUE_ID.name", "")
-    }
-
     private val meterValueId: StateFlow<InputsWrapper> by lazy {
         state.getStateFlow(MeterValueFields.METER_VALUE_ID.name, InputsWrapper())
     }
@@ -119,8 +115,8 @@ class MeterValuesListViewModelImp @Inject constructor(
                     Timber.tag(TAG).d("saveMeterValue(): %s - %s", key, curVal)
                     meterUseCases.saveMeterValueUseCase.execute(
                         SaveMeterValueUseCase.Request(
-                            meterValueListItemModelToMeterValueMapper.map(
-                                MeterValueListItemModel(
+                            meterValueListItemToMeterValueMapper.map(
+                                MeterValueListItem(
                                     id = UUID.fromString(meterValueId.value.inputs.getValue(key).value),
                                     metersId = UUID.fromString(key),
                                     currentValue = curVal.value.toBigDecimal(),
@@ -154,7 +150,7 @@ class MeterValuesListViewModelImp @Inject constructor(
         super.initFieldStatesByUiModel(uiModel)
 
         for (meterValue in uiModel as List<*>) {
-            meterValue as MeterValueListItemModel
+            meterValue as MeterValueListItem
             Timber.tag(TAG)
                 .d(
                     "initFieldStatesByUiModel(List<MeterValueListItemModel>) called for %s",
@@ -271,6 +267,8 @@ class MeterValuesListViewModelImp @Inject constructor(
     companion object {
         fun previewModel(ctx: Context) =
             object : MeterValuesListViewModel {
+                override var primaryObjectData: StateFlow<ArrayList<String>> =
+                    MutableStateFlow(arrayListOf())
                 override val uiStateFlow =
                     MutableStateFlow(UiState.Success(previewMeterValueModel(ctx)))
                 override val singleEventFlow =
@@ -295,11 +293,12 @@ class MeterValuesListViewModelImp @Inject constructor(
                 override fun clearInputFieldsStates() {}
                 override fun onContinueClick(onSuccess: () -> Unit) {}
                 override fun submitAction(action: MeterValuesListUiAction): Job? = null
+                override fun setPrimaryObjectData(value: ArrayList<String>){}
             }
 
         fun previewMeterValueModel(ctx: Context) =
             listOf(
-                MeterValueListItemModel(
+                MeterValueListItem(
                     id = UUID.randomUUID(),
                     metersId = UUID.randomUUID(),
                     type = ServiceType.ELECRICITY,
@@ -310,7 +309,7 @@ class MeterValuesListViewModelImp @Inject constructor(
                     valueFormat = "#0",
                     valueDate = OffsetDateTime.now()
                 ),
-                MeterValueListItemModel(
+                MeterValueListItem(
                     id = UUID.randomUUID(),
                     metersId = UUID.randomUUID(),
                     type = ServiceType.COLD_WATER,

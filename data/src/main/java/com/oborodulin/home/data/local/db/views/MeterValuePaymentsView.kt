@@ -5,7 +5,7 @@ import java.math.BigDecimal
 import java.util.*
 
 @DatabaseView(
-    viewName = PaymentMetersValuesView.VIEW_NAME,
+    viewName = MeterValuePaymentsView.VIEW_NAME,
     value = "SELECT lmv.payerId, lmv.payerServiceId, lmv.metersId, pmv.meterValue AS startMeterValue, lmv.meterValue AS endMeterValue, " +
             "(CASE " +
             "WHEN instr((SELECT measureUnit FROM meters_tl WHERE metersId = lmv.metersId LIMIT 1), '/') = 0 THEN 0 ELSE 1 " +
@@ -14,12 +14,12 @@ import java.util.*
             "THEN (lmv.meterValue - pmv.meterValue) " +
             "ELSE lmv.meterValue END) AS diffMeterValue, " +
             "lmv.paymentYear, lmv.paymentMonth " +
-            "FROM last_meters_values_view lmv JOIN last_meters_values_view pmv " +
+            "FROM meter_value_payment_periods_view lmv JOIN meter_value_payment_periods_view pmv " +
             "ON pmv.metersId = lmv.metersId " +
             "AND pmv.paymentYear = (CASE WHEN (lmv.paymentMonth - 1) = 0 THEN lmv.paymentYear - 1 ELSE lmv.paymentYear END) " +
             "AND pmv.paymentMonth = (CASE WHEN (lmv.paymentMonth - 1) = 0 THEN 12 ELSE lmv.paymentMonth - 1 END)"
 )
-class PaymentMetersValuesView(
+class MeterValuePaymentsView(
     val payerId: UUID,
     val payerServiceId: UUID,
     val metersId: UUID,
@@ -31,6 +31,6 @@ class PaymentMetersValuesView(
     val paymentMonth: Int
 ) {
     companion object {
-        const val VIEW_NAME = "payment_meters_values_view"
+        const val VIEW_NAME = "meter_value_payments_view"
     }
 }

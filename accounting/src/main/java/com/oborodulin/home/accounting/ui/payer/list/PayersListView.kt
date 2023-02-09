@@ -18,9 +18,10 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.oborodulin.home.accounting.R
-import com.oborodulin.home.accounting.ui.model.PayerListItemModel
+import com.oborodulin.home.accounting.ui.model.PayerListItem
 import com.oborodulin.home.common.ui.components.items.ListItemComponent
 import com.oborodulin.home.common.ui.state.CommonScreen
+import com.oborodulin.home.common.ui.state.SharedViewModel
 import com.oborodulin.home.metering.ui.value.MeterValuesListUiAction
 import com.oborodulin.home.metering.ui.value.MeterValuesListViewModel
 import kotlinx.coroutines.flow.collectLatest
@@ -32,8 +33,7 @@ private const val TAG = "Accounting.ui.PayersListView"
 fun PayersListView(
     viewModel: PayersListViewModel,
     meterValuesListViewModel: MeterValuesListViewModel,
-    navController: NavController,
-    onListItemClick: () -> Unit
+    navController: NavController
 ) {
     Timber.tag(TAG).d("PayersListView(...) called")
     LaunchedEffect(Unit) {
@@ -58,8 +58,12 @@ fun PayersListView(
                     )
                 },
                 onClick = { payer ->
-                    onListItemClick()
-                    meterValuesListViewModel.submitAction(MeterValuesListUiAction.Load(payer.id))
+                    viewModel.setPrimaryObjectData(arrayListOf(payer.id.toString(), payer.fullName))
+                    with(meterValuesListViewModel) {
+                        clearInputFieldsStates()
+                        setPrimaryObjectData(arrayListOf(payer.id.toString()))
+                        submitAction(MeterValuesListUiAction.Load(payer.id))
+                    }
                 },
                 onEdit = { payer -> viewModel.submitAction(PayersListUiAction.EditPayer(payer.id)) }
             ) { payer ->
@@ -88,11 +92,11 @@ fun PayersListView(
 
 @Composable
 fun PayersList(
-    payers: List<PayerListItemModel>,
-    onFavorite: (PayerListItemModel) -> Unit,
-    onClick: (PayerListItemModel) -> Unit,
-    onEdit: (PayerListItemModel) -> Unit,
-    onDelete: (PayerListItemModel) -> Unit
+    payers: List<PayerListItem>,
+    onFavorite: (PayerListItem) -> Unit,
+    onClick: (PayerListItem) -> Unit,
+    onEdit: (PayerListItem) -> Unit,
+    onDelete: (PayerListItem) -> Unit
 ) {
     Timber.tag(TAG).d("PayersList(...) called")
     val selectedIndex = remember { mutableStateOf(-1) } // by

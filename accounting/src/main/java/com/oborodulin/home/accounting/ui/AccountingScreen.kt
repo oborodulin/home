@@ -151,9 +151,7 @@ private fun AccountingView(
                 viewModel = payersListViewModel,
                 meterValuesListViewModel = meterValuesListViewModel,
                 navController = navController
-            ){
-                meterValuesListViewModel.clearInputFieldsStates()
-            }
+            )
         }
         Box(
             modifier = Modifier
@@ -162,17 +160,10 @@ private fun AccountingView(
                 .weight(4f)
                 .border(2.dp, MaterialTheme.colors.primary, shape = RoundedCornerShape(16.dp))
         ) {
-            //val meterValues by remember { accountingViewModel.uiMeterValuesState }
             MeterValuesListView(
                 viewModel = meterValuesListViewModel,
                 navController = navController
             )
-/*            PrevServiceMeterValues(
-                meterValues = meterValues,
-                viewModel = meterValuesListViewModel
-            )
-
- */
         }
         Box(
             modifier = Modifier
@@ -192,7 +183,6 @@ private fun AccountingView(
 @Composable
 fun PreviewAccountingView() {
     AccountingView(
-        //UiState.Success(AccountingViewModelImp.previewAccountingModel(LocalContext.current)),
         accountingModel = AccountingModel(),
         navController = rememberNavController(),
         accountingViewModel = AccountingViewModelImp.previewModel(LocalContext.current),

@@ -4,7 +4,7 @@ import com.oborodulin.home.common.ui.model.ListItemModel
 import java.math.BigDecimal
 import java.util.*
 
-data class MeterListItemModel(
+data class MeterListItem(
     var id: UUID,
     var fullName: String = "",
     var address: String = "",

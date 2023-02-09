@@ -163,7 +163,10 @@ fun ListItemComponent(
                                 title = { Text(stringResource(R.string.dlg_confirm_title)) },
                                 text = { Text(text = deleteDialogText) },
                                 onDismiss = { showDialogState.value = false },
-                                onConfirm = { onDelete(item) }
+                                onConfirm = {
+                                    showDialogState.value = false
+                                    onDelete(item)
+                                }
                             )
                             Image(
                                 modifier = Modifier

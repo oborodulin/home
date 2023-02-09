@@ -7,7 +7,7 @@ import java.time.OffsetDateTime
 import java.util.*
 
 @DatabaseView(
-    viewName = PayersTotalDebtsView.VIEW_NAME,
+    viewName = PayerTotalDebtsView.VIEW_NAME,
     value = "SELECT mvl.meterValueId, mv.payersId AS payerId, mv.servicesId AS serviceId, " +
             "sv.type, sv.name, sv.pos, mv.meterId, IFNULL(mv.measureUnit, sv.measureUnit) AS measureUnit, " +
             "mvl.valueDate AS prevLastDate, mvl.meterValue AS prevValue, p.isFavorite, " +
@@ -26,7 +26,7 @@ import java.util.*
             "GROUP BY v.metersId) mp " +
             "ON mp.metersId = mvl.metersId AND mp.maxValueDate = mvl.valueDate "*/
 )
-class PayersTotalDebtsView(
+class PayerTotalDebtsView(
     var meterValueId: UUID,
     var payerId: UUID,
     var serviceId: UUID,
@@ -42,6 +42,6 @@ class PayersTotalDebtsView(
     val servicelocaleCode: String
 ) {
     companion object {
-        const val VIEW_NAME = "payers_total_debts_view"
+        const val VIEW_NAME = "payer_total_debts_view"
     }
 }

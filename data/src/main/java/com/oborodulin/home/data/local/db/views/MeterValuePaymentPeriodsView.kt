@@ -7,7 +7,7 @@ import com.oborodulin.home.data.util.Constants
 import java.util.*
 
 @DatabaseView(
-    viewName = LastMetersValuesView.VIEW_NAME,
+    viewName = MeterValuePaymentPeriodsView.VIEW_NAME,
     value = "SELECT mv.*, lv.payerId, lv.payerServiceId, lv.paymentYear, lv.paymentMonth FROM meter_values mv " +
             "JOIN " +
             "(SELECT p.payerId, ps.payerServiceId, m.meterId, MAX(datetime(v.valueDate)) maxValueDate, " +
@@ -34,7 +34,7 @@ import java.util.*
             "END) lv " +
             "ON mv.metersId = lv.meterId AND datetime(mv.valueDate) = lv.maxValueDate"
 )
-class LastMetersValuesView(
+class MeterValuePaymentPeriodsView(
     @Embedded
     var data: MeterValueEntity,
     var payerId: UUID,
@@ -42,6 +42,6 @@ class LastMetersValuesView(
     var paymentMonth: Int
 ) {
     companion object {
-        const val VIEW_NAME = "last_meters_values_view"
+        const val VIEW_NAME = "meter_value_payment_periods_view"
     }
 }

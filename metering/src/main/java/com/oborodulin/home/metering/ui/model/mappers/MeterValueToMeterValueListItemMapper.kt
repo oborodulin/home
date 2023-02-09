@@ -2,11 +2,11 @@ package com.oborodulin.home.metering.ui.model.mappers
 
 import com.oborodulin.home.common.mapping.Mapper
 import com.oborodulin.home.metering.domain.model.MeterValue
-import com.oborodulin.home.metering.ui.model.MeterValueListItemModel
+import com.oborodulin.home.metering.ui.model.MeterValueListItem
 
-class MeterValueToMeterValueListItemModelMapper : Mapper<MeterValue, MeterValueListItemModel> {
+class MeterValueToMeterValueListItemMapper : Mapper<MeterValue, MeterValueListItem> {
     override fun map(input: MeterValue) =
-        MeterValueListItemModel(
+        MeterValueListItem(
             id = input.id,
             metersId = input.metersId,
             valueDate = input.valueDate,

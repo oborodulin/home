@@ -1,15 +1,21 @@
 package com.oborodulin.home.common.ui.state
 
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import kotlinx.coroutines.*
+import kotlinx.coroutines.CoroutineExceptionHandler
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.launch
 import timber.log.Timber
 
 private const val TAG = "Common.MviViewModel"
 
-abstract class MviViewModel<T : Any, S : UiState<T>, A : UiAction, E : UiSingleEvent> :
+abstract class MviViewModel<T : Any, S : UiState<T>, A : UiAction, E : UiSingleEvent>(
+    private val state: SavedStateHandle
+) :
     ViewModel() {
     private val _uiStateFlow: MutableStateFlow<S> by lazy { MutableStateFlow(initState()) }
     val uiStateFlow: StateFlow<S> = _uiStateFlow
@@ -20,6 +26,13 @@ abstract class MviViewModel<T : Any, S : UiState<T>, A : UiAction, E : UiSingleE
 
     private val _singleEventFlow = Channel<E>()
     val singleEventFlow = _singleEventFlow.receiveAsFlow()
+
+    val primaryObjectData: StateFlow<ArrayList<String>> by lazy {
+        state.getStateFlow(
+            STATE_PRIMARY_OBJECT_KEY,
+            arrayListOf("", "")
+        )
+    }
 
     // Initial value is false so the dialog is hidden
     private val _showDialog = MutableStateFlow(false)
@@ -94,6 +107,11 @@ abstract class MviViewModel<T : Any, S : UiState<T>, A : UiAction, E : UiSingleE
         return job
     }
 
+    fun setPrimaryObjectData(value: ArrayList<String>) {
+        Timber.tag(TAG).d("setPrimaryObjectData: value = %s", value)
+        state[STATE_PRIMARY_OBJECT_KEY] = value
+    }
+
     fun onOpenDialogClicked() {
         _showDialog.value = true
     }
@@ -106,5 +124,11 @@ abstract class MviViewModel<T : Any, S : UiState<T>, A : UiAction, E : UiSingleE
     fun onDialogDismiss(onDismiss: () -> Unit = {}) {
         _showDialog.value = false
         onDismiss()
+    }
+
+    companion object {
+        const val STATE_PRIMARY_OBJECT_KEY = "primaryObjectKey"
+        const val IDX_OBJECT_ID = 0
+        const val IDX_OBJECT_NAME = 1
     }
 }

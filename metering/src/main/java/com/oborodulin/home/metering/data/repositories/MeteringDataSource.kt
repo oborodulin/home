@@ -1,6 +1,6 @@
 package com.oborodulin.home.metering.data.repositories
 
-import com.oborodulin.home.data.local.db.views.PrevMetersValuesView
+import com.oborodulin.home.data.local.db.views.MeterValuePrevPeriodsView
 import com.oborodulin.home.metering.domain.model.Meter
 import com.oborodulin.home.metering.domain.model.MeterValue
 import com.oborodulin.home.metering.domain.model.MeterVerification
@@ -11,7 +11,7 @@ interface MeteringDataSource {
     fun getMeters(): Flow<List<Meter>>
     fun getMeters(payerId: UUID): Flow<List<Meter>>
     fun getMeter(id: UUID): Flow<Meter>
-    fun getPrevServiceMeterValues(payerId: UUID?): Flow<List<PrevMetersValuesView>>
+    fun getPrevServiceMeterValues(payerId: UUID?): Flow<List<MeterValuePrevPeriodsView>>
     fun getMeterValues(meterId: UUID): Flow<List<MeterValue>>
     fun getMeterVerifications(meterId: UUID): Flow<List<MeterVerification>>
     suspend fun saveMeter(meter: Meter)

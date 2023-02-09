@@ -1,8 +1,9 @@
 package com.oborodulin.home.accounting.ui.payer.list
 
 import android.content.Context
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
-import com.oborodulin.home.accounting.ui.model.PayerListItemModel
+import com.oborodulin.home.accounting.ui.model.PayerListItem
 import com.oborodulin.home.accounting.ui.model.converters.PayersListConverter
 import com.oborodulin.home.common.ui.state.MviViewModel
 import com.oborodulin.home.common.ui.state.UiState
@@ -26,10 +27,13 @@ private const val TAG = "Accounting.ui.PayersListViewModel"
 
 @HiltViewModel
 class PayersListViewModelImp @Inject constructor(
+    private val state: SavedStateHandle,
     private val payerUseCases: PayerUseCases,
     private val payersListConverter: PayersListConverter
 ) : PayersListViewModel,
-    MviViewModel<List<PayerListItemModel>, UiState<List<PayerListItemModel>>, PayersListUiAction, PayersListUiSingleEvent>() {
+    MviViewModel<List<PayerListItem>, UiState<List<PayerListItem>>, PayersListUiAction, PayersListUiSingleEvent>(
+        state = state
+    ) {
 
     override fun initState() = UiState.Loading
 
@@ -107,6 +111,8 @@ class PayersListViewModelImp @Inject constructor(
     companion object {
         fun previewModel(ctx: Context) =
             object : PayersListViewModel {
+                override var primaryObjectData: StateFlow<ArrayList<String>> =
+                    MutableStateFlow(arrayListOf())
                 override val uiStateFlow = MutableStateFlow(UiState.Success(previewList(ctx)))
                 override val singleEventFlow = Channel<PayersListUiSingleEvent>().receiveAsFlow()
                 override val actionsJobFlow: SharedFlow<Job?> = MutableSharedFlow()
@@ -114,10 +120,11 @@ class PayersListViewModelImp @Inject constructor(
                 //fun viewModelScope(): CoroutineScope = CoroutineScope(Dispatchers.Main)
                 override fun handleActionJob(action: () -> Unit, afterAction: () -> Unit) {}
                 override fun submitAction(action: PayersListUiAction): Job? = null
+                override fun setPrimaryObjectData(value: ArrayList<String>){}
             }
 
         fun previewList(ctx: Context) = listOf(
-            PayerListItemModel(
+            PayerListItem(
                 id = UUID.randomUUID(),
                 fullName = ctx.resources.getString(com.oborodulin.home.data.R.string.def_payer1_full_name),
                 address = ctx.resources.getString(com.oborodulin.home.data.R.string.def_payer1_address),
@@ -127,7 +134,7 @@ class PayersListViewModelImp @Inject constructor(
                 personsNum = 2,
                 isFavorite = true,
             ),
-            PayerListItemModel(
+            PayerListItem(
                 id = UUID.randomUUID(),
                 fullName = ctx.resources.getString(com.oborodulin.home.data.R.string.def_payer2_full_name),
                 address = ctx.resources.getString(com.oborodulin.home.data.R.string.def_payer2_address),

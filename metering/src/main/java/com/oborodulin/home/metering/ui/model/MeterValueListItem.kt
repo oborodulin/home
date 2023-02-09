@@ -5,7 +5,7 @@ import java.math.BigDecimal
 import java.time.OffsetDateTime
 import java.util.*
 
-data class MeterValueListItemModel(
+data class MeterValueListItem(
     var id: UUID? = null,
     var metersId: UUID,
     var type: ServiceType? = null,

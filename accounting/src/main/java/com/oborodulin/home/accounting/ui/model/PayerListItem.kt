@@ -5,7 +5,7 @@ import com.oborodulin.home.data.util.Constants.DEF_PAYMENT_DAY
 import java.math.BigDecimal
 import java.util.*
 
-data class PayerListItemModel(
+data class PayerListItem(
     var id: UUID,
     var fullName: String = "",
     var address: String = "",

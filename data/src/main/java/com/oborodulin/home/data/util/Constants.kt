@@ -8,6 +8,7 @@ object Constants {
 
     const val DEF_PAYMENT_DAY = 20
 
+/*
     const val SQL_PREV_METERS_VALUES_SUBQUERY = """
 SELECT v.metersId, MAX(datetime(v.valueDate)) maxValueDate 
     FROM meter_values v JOIN meters m ON m.meterId = v.metersId
@@ -18,8 +19,9 @@ SELECT v.metersId, MAX(datetime(v.valueDate)) maxValueDate
             ELSE datetime('now', '-1 months', 'start of month', '+' || (IFNULL(p.paymentDay, ${DEF_PAYMENT_DAY}) - 1) || ' days') END
 GROUP BY v.metersId
 """
+//.trimIndent()
+//.replace("\n\\s+".toRegex(), "")
 
-/*
     const val TMDB_BASE_URL = "https://api.themoviedb.org/3/"
 
     private const val IMAGE_BASE_URL = "https://image.tmdb.org/t/p/"

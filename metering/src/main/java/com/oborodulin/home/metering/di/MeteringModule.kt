@@ -10,9 +10,9 @@ import com.oborodulin.home.metering.data.repositories.MetersRepositoryImp
 import com.oborodulin.home.metering.domain.repositories.MetersRepository
 import com.oborodulin.home.metering.domain.usecases.*
 import com.oborodulin.home.metering.ui.model.converters.PrevServiceMeterValuesListConverter
-import com.oborodulin.home.metering.ui.model.mappers.MeterValueListItemModelToMeterValueMapper
-import com.oborodulin.home.metering.ui.model.mappers.MeterValueToMeterValueListItemModelMapper
-import com.oborodulin.home.metering.ui.model.mappers.PrevMetersValuesViewToMeterValueListItemModelListMapper
+import com.oborodulin.home.metering.ui.model.mappers.MeterValueListItemToMeterValueMapper
+import com.oborodulin.home.metering.ui.model.mappers.MeterValueToMeterValueListItemMapper
+import com.oborodulin.home.metering.ui.model.mappers.PrevMetersValuesViewToMeterValueListItemListMapper
 import com.oborodulin.home.metering.ui.model.mappers.PrevMetersValuesViewToMeterValueModelMapper
 import dagger.Module
 import dagger.Provides
@@ -76,13 +76,13 @@ object MeteringModule {
 
     @Singleton
     @Provides
-    fun provideMeterValueToMeterValueListItemModelMapper(): MeterValueToMeterValueListItemModelMapper =
-        MeterValueToMeterValueListItemModelMapper()
+    fun provideMeterValueToMeterValueListItemMapper(): MeterValueToMeterValueListItemMapper =
+        MeterValueToMeterValueListItemMapper()
 
     @Singleton
     @Provides
-    fun provideMeterValueListItemModelToMeterValueMapper(): MeterValueListItemModelToMeterValueMapper =
-        MeterValueListItemModelToMeterValueMapper()
+    fun provideMeterValueListItemToMeterValueMapper(): MeterValueListItemToMeterValueMapper =
+        MeterValueListItemToMeterValueMapper()
 
     @Singleton
     @Provides
@@ -91,8 +91,8 @@ object MeteringModule {
 
     @Singleton
     @Provides
-    fun providePrevMetersValuesViewToMeterValueListItemModelListMapper(mapper: PrevMetersValuesViewToMeterValueModelMapper): PrevMetersValuesViewToMeterValueListItemModelListMapper =
-        PrevMetersValuesViewToMeterValueListItemModelListMapper(mapper = mapper)
+    fun providePrevMetersValuesViewToMeterValueListItemListMapper(mapper: PrevMetersValuesViewToMeterValueModelMapper): PrevMetersValuesViewToMeterValueListItemListMapper =
+        PrevMetersValuesViewToMeterValueListItemListMapper(mapper = mapper)
 
     // CONVERTERS:
     @Singleton
