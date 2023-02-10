@@ -113,6 +113,12 @@ interface MeterDao {
         update(textContent)
     }
 
+    @Update
+    suspend fun update(vararg meterValues: MeterValueEntity)
+
+    @Update
+    suspend fun update(vararg meterVerifications: MeterVerificationEntity)
+
     // DELETES:
     @Delete
     suspend fun delete(vararg meter: MeterEntity)
@@ -123,7 +129,8 @@ interface MeterDao {
     @Query("DELETE FROM meters")
     suspend fun deleteAll()
 
-    @Query("""
+    @Query(
+        """
         DELETE FROM meter_values WHERE metersId = :meterId AND datetime(valueDate) = 
                 (SELECT MAX(datetime(v.valueDate)) FROM meter_values v 
                 WHERE v.metersId = :meterId 

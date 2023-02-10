@@ -110,6 +110,8 @@ class MeterValuesListViewModelImp @Inject constructor(
         Timber.tag(TAG).d("saveMeterValue() called")
         val job = viewModelScope.launch(errorHandler) {
             // unsaved values
+            Timber.tag(TAG)
+                .d("saveMeterValue(): currentValue.value.inputs = %s", currentValue.value.inputs)
             currentValue.value.inputs.filter { entry -> !entry.value.isSaved && entry.value.value.isNotEmpty() }
                 .forEach { (key, curVal) ->
                     Timber.tag(TAG).d("saveMeterValue(): %s - %s", key, curVal)
@@ -117,9 +119,9 @@ class MeterValuesListViewModelImp @Inject constructor(
                         SaveMeterValueUseCase.Request(
                             meterValueListItemToMeterValueMapper.map(
                                 MeterValueListItem(
-                                    id = UUID.fromString(meterValueId.value.inputs.getValue(key).value),
+                                    //id = UUID.fromString(meterValueId.value.inputs.getValue(key).value),
                                     metersId = UUID.fromString(key),
-                                    currentValue = curVal.value.toBigDecimal(),
+                                    currentValue = curVal.value.replace(',', '.').toBigDecimal(),
                                 )
                             )
                         )
@@ -131,6 +133,7 @@ class MeterValuesListViewModelImp @Inject constructor(
                                     properties = currentValue,
                                     value = it.data.meterValue.meterValue?.toString() ?: "",
                                     key = it.data.meterValue.metersId.toString(),
+                                    isValid = true,
                                     isSaved = true
                                 )
                             }
@@ -153,7 +156,7 @@ class MeterValuesListViewModelImp @Inject constructor(
             meterValue as MeterValueListItem
             Timber.tag(TAG)
                 .d(
-                    "initFieldStatesByUiModel(List<MeterValueListItemModel>) called for %s",
+                    "initFieldStatesByUiModel(List<MeterValueListItem>) called for %s",
                     meterValue
                 )
             meterValue.id?.let {
@@ -239,7 +242,17 @@ class MeterValuesListViewModelImp @Inject constructor(
         Timber.tag(TAG).d("getInputErrorsOrNull() called")
         val inputErrors: MutableList<InputError> = mutableListOf()
         currentValue.value.inputs.forEach { entry ->
+            Timber.tag(TAG).d(
+                "getInputErrorsOrNull: currentValue.value.inputs[%s] = %s",
+                entry.key,
+                entry.value.value
+            )
             MeterValueInputValidator.CurrentValue.errorIdOrNull(entry.value.value)?.let { errorId ->
+                Timber.tag(TAG).d(
+                    "getInputErrorsOrNull: inputs = %s; errorId = %d",
+                    entry.value.value,
+                    errorId
+                )
                 inputErrors.add(
                     InputError(
                         fieldName = MeterValueFields.METER_CURR_VALUE.name,
@@ -258,7 +271,11 @@ class MeterValuesListViewModelImp @Inject constructor(
         for (error in inputErrors) {
             state[error.fieldName] = when (error.fieldName) {
                 MeterValueFields.METER_CURR_VALUE.name ->
-                    currentValue.value.inputs[error.key]?.copy(errorId = error.errorId)
+                    setStateValue(
+                        field = MeterValueFields.METER_CURR_VALUE, properties = currentValue,
+                        key = error.key!!,
+                        errorId = error.errorId
+                    )
                 else -> null
             }
         }
@@ -280,9 +297,15 @@ class MeterValuesListViewModelImp @Inject constructor(
 
                 override fun initFieldStatesByUiModel(uiModel: Any): Job? = null
                 override fun setStateValue(
-                    field: MeterValueFields, properties: StateFlow<InputsWrapper>, value: String, key: String,
-                    isValid: Boolean, isSaved: Boolean
-                ){}
+                    field: MeterValueFields,
+                    properties: StateFlow<InputsWrapper>,
+                    value: String,
+                    key: String,
+                    isValid: Boolean,
+                    isSaved: Boolean
+                ) {
+                }
+
                 override fun onTextFieldEntered(inputEvent: Inputable) {}
                 override fun onTextFieldFocusChanged(
                     focusedField: MeterValueFields, isFocused: Boolean,
@@ -293,7 +316,7 @@ class MeterValuesListViewModelImp @Inject constructor(
                 override fun clearInputFieldsStates() {}
                 override fun onContinueClick(onSuccess: () -> Unit) {}
                 override fun submitAction(action: MeterValuesListUiAction): Job? = null
-                override fun setPrimaryObjectData(value: ArrayList<String>){}
+                override fun setPrimaryObjectData(value: ArrayList<String>) {}
             }
 
         fun previewMeterValueModel(ctx: Context) =

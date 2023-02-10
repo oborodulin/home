@@ -27,11 +27,6 @@ class AccountingViewModelImp @Inject constructor(
     MviViewModel<AccountingModel, UiState<AccountingModel>, AccountingUiAction, AccountingUiSingleEvent>(
         state = state
     ) {
-    /*
-        private val _uiMeterValuesState: MutableState<List<MeterValueListItemModel>> = mutableStateOf(listOf())
-        override val uiMeterValuesState: MutableState<List<MeterValueListItemModel>>
-            get() = _uiMeterValuesState
-    */
     override fun initState(): UiState<AccountingModel> = UiState.Loading
 
     override suspend fun handleAction(action: AccountingUiAction): Job {
@@ -98,7 +93,7 @@ class AccountingViewModelImp @Inject constructor(
                         )
                     )
                 override val singleEventFlow = Channel<AccountingUiSingleEvent>().receiveAsFlow()
-//                override val uiMeterValuesState = mutableStateOf<List<MeterValueListItemModel>>(listOf())
+//                override val uiMeterValuesState = mutableStateOf<List<MeterValueListItem>>(listOf())
 
                 override fun submitAction(action: AccountingUiAction): Job? {
                     return null

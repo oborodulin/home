@@ -44,12 +44,11 @@ import com.oborodulin.home.common.ui.components.dialog.AlertDialogComponent
 import com.oborodulin.home.common.ui.components.field.TextFieldComponent
 import com.oborodulin.home.common.ui.components.field.util.InputFocusRequester
 import com.oborodulin.home.common.ui.components.field.util.inputProcess
-import com.oborodulin.home.common.ui.model.ListItemModel
 import com.oborodulin.home.common.ui.state.CommonScreen
 import com.oborodulin.home.common.ui.state.MviViewModel
-import com.oborodulin.home.common.ui.state.SharedViewModel
 import com.oborodulin.home.common.ui.theme.Typography
 import com.oborodulin.home.common.util.Utils
+import com.oborodulin.home.common.util.toast
 import com.oborodulin.home.data.util.ServiceType
 import com.oborodulin.home.metering.R
 import com.oborodulin.home.metering.ui.model.MeterValueListItem
@@ -58,6 +57,7 @@ import kotlinx.coroutines.flow.collectLatest
 import timber.log.Timber
 import java.text.DecimalFormat
 import java.time.format.DateTimeFormatter
+import java.time.format.FormatStyle
 import java.util.*
 
 private const val TAG = "Metering.ui.MeterValueView"
@@ -72,12 +72,10 @@ fun MeterValuesListView(
     Timber.tag(TAG).d("MeterValuesListView(...) called: payerInput = %s", payerInput)
 
     val currentPayer by viewModel.primaryObjectData.collectAsStateWithLifecycle()
-    Timber.tag(TAG).d("MeterValuesListView: currentPayer = %s", currentPayer)
     val payerId = payerInput?.payerId
         ?: if (currentPayer[MviViewModel.IDX_OBJECT_ID].isNotEmpty()) UUID.fromString(currentPayer[MviViewModel.IDX_OBJECT_ID]) else null
 
-    Timber.tag(TAG).d("MeterValuesListView: payerId = %s", payerId)
-
+    Timber.tag(TAG).d("MeterValuesListView: currentPayer = %s, payerId = %s", currentPayer, payerId)
     LaunchedEffect(payerId) {
         Timber.tag(TAG).d("MeterValuesListView: LaunchedEffect() BEFORE collect ui state flow")
         when (payerId) {
@@ -113,6 +111,7 @@ fun MeterValuesList(
 ) {
     Timber.tag(TAG).d("MeterValuesList(...) called")
     if (metersValues.isNotEmpty()) {
+        val context = LocalContext.current
         LazyColumn(
             state = rememberLazyListState(),
             modifier = Modifier
@@ -139,30 +138,31 @@ fun MeterValuesList(
                         ) {
                             Column(
                                 modifier = Modifier
-                                    .weight(0.25f),
+                                    .weight(0.22f),
                                 verticalArrangement = Arrangement.Center
                             ) {
                                 ServiceIcon(meterValue.type)
                                 Spacer(modifier = Modifier.height(4.dp))
                                 Text(
                                     text = meterValue.name,
-                                    style = Typography.body1.copy(
-                                        fontWeight = FontWeight.Bold,
-                                        fontSize = 18.sp
-                                    ),
+                                    style = Typography.body1.copy(fontWeight = FontWeight.Bold),
                                     maxLines = 2
                                 )
                             }
                             Column(
                                 modifier = Modifier
                                     .fillMaxHeight()
-                                    .weight(0.25f),
+                                    .weight(0.28f),
                                 horizontalAlignment = Alignment.CenterHorizontally,
                                 verticalArrangement = Arrangement.Center
                             ) {
                                 meterValue.prevLastDate?.let {
                                     Text(
-                                        text = it.format(DateTimeFormatter.ISO_LOCAL_DATE)
+                                        text = it.format(
+                                            DateTimeFormatter.ofLocalizedDate(
+                                                FormatStyle.SHORT
+                                            ).withLocale(Locale.getDefault())
+                                        ) //ISO_LOCAL_DATE
                                         //DateFormat.getDateInstance(DateFormat.SHORT, Locale.GERMAN).format(it)
                                     )
                                 }
@@ -172,7 +172,10 @@ fun MeterValuesList(
                                     Text(
                                         text = AnnotatedString(
                                             text = DecimalFormat(meterValue.valueFormat).format(it),
-                                            spanStyle = SpanStyle(fontWeight = FontWeight.Bold)
+                                            spanStyle = SpanStyle(
+                                                fontWeight = FontWeight.Bold,
+                                                fontSize = 20.sp
+                                            )
                                         ).plus(
                                             AnnotatedString(
                                                 when (meterValue.measureUnit) {
@@ -198,9 +201,7 @@ fun MeterValuesList(
                                 MeterValue(
                                     meterValueListItem = meterValue,
                                     viewModel = viewModel
-                                ) {
-                                    viewModel.submitAction(MeterValuesListUiAction.Save)
-                                }
+                                )
                             }
                             Column(
                                 modifier = Modifier.weight(0.1f),
@@ -211,8 +212,7 @@ fun MeterValuesList(
                                     modifier = Modifier
                                         .clip(RoundedCornerShape(8.dp))
                                         .padding(4.dp)
-                                    //.clickable { onEdit(item) }
-                                    ,
+                                        .clickable { context.toast("Photo button clicked...") },
                                     painter = painterResource(com.oborodulin.home.presentation.R.drawable.outline_photo_camera_black_24),
                                     contentDescription = ""
                                 )
@@ -228,6 +228,7 @@ fun MeterValuesList(
                                         viewModel.submitAction(
                                             MeterValuesListUiAction.Delete(meterValue.metersId)
                                         )
+                                        viewModel.clearInputFieldsStates()
                                         when (payerId) {
                                             null -> viewModel.submitAction(MeterValuesListUiAction.Init)
                                             else -> viewModel.submitAction(
@@ -261,8 +262,7 @@ fun MeterValuesList(
 @Composable
 fun MeterValue(
     meterValueListItem: MeterValueListItem,
-    viewModel: MeterValuesListViewModel,
-    onSubmit: () -> Unit
+    viewModel: MeterValuesListViewModel
 ) {
     Timber.tag(TAG).d("MeterValue(...) called")
     val lifecycleOwner = LocalLifecycleOwner.current
@@ -358,7 +358,7 @@ fun MeterValue(
             },
         keyboardOptions = remember {
             KeyboardOptions(
-                keyboardType = KeyboardType.Number,
+                keyboardType = KeyboardType.Decimal,
                 imeAction = ImeAction.Done
             )
         },
@@ -370,7 +370,7 @@ fun MeterValue(
                 inputWrapper.value,
                 it
             )
-            inputWrapper = inputWrapper.copy(value = it)
+            inputWrapper = inputWrapper.copy(value = it, isSaved = false)
             viewModel.setStateValue(
                 field = MeterValueFields.METER_CURR_VALUE,
                 properties = viewModel.currentValue,
@@ -390,7 +390,11 @@ fun MeterValue(
                 )
             )
         },
-        onImeKeyAction = { if (areInputsValid) viewModel.onContinueClick { onSubmit() } }
+        onImeKeyAction = {
+            if (areInputsValid) viewModel.onContinueClick {
+                viewModel.submitAction(MeterValuesListUiAction.Save)
+            }
+        }
     )
 }
 
@@ -441,6 +445,6 @@ fun PreviewMeterValuesList() {
 fun PreviewMeterValue() {
     MeterValue(
         meterValueListItem = MeterValueListItem(metersId = UUID.randomUUID()),
-        viewModel = MeterValuesListViewModelImp.previewModel(LocalContext.current),
-        onSubmit = {})
+        viewModel = MeterValuesListViewModelImp.previewModel(LocalContext.current)
+    )
 }

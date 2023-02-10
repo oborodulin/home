@@ -51,19 +51,19 @@ fun TextFieldComponent(
     colors: TextFieldColors = TextFieldDefaults.outlinedTextFieldColors()
 ) {
     Timber.tag(TAG).d("TextFieldComponent(...) called")
-    var locFieldValue by remember {
+    var fieldValue by remember {
         mutableStateOf(TextFieldValue(inputWrapper.value, TextRange(inputWrapper.value.length)))
     }
     Timber.tag(TAG).d(
         "TextFieldComponent(...): fieldValue.text = %s; inputWrapper.value = %s",
-        locFieldValue.text,
+        fieldValue.text,
         inputWrapper.value
     )
-    if (locFieldValue.text != inputWrapper.value) locFieldValue =
+    if (fieldValue.text != inputWrapper.value) fieldValue =
         TextFieldValue(inputWrapper.value, TextRange(inputWrapper.value.length))
     Timber.tag(TAG).d(
         "TextFieldComponent(...): fieldValue = %s; inputWrapper = %s",
-        locFieldValue,
+        fieldValue,
         inputWrapper
     )
     Column {
@@ -73,9 +73,9 @@ fun TextFieldComponent(
                 .padding(vertical = 4.dp, horizontal = 8.dp),//.weight(1f),
             enabled = enabled,
             readOnly = readOnly,
-            value = locFieldValue,
+            value = fieldValue,
             onValueChange = {
-                locFieldValue = it
+                fieldValue = it
                 onValueChange(it.text)
             },
             label = { labelResId?.let { Text(stringResource(it)) } },

@@ -82,7 +82,12 @@ abstract class SingleViewModel<T : Any, S : UiState<T>, A : UiAction, E : UiSing
     ) {
         Timber.tag(TAG)
             .d("initStateValue(...): exist state %s = '%s'", field.key(), state[field.key()])
-        if (properties.value.inputs[key] == null || properties.value.inputs[key]?.isEmpty == true) {
+        Timber.tag(TAG)
+            .d(
+                "initStateValue(...): properties.value.inputs[%s] = '%s'",
+                key, properties.value.inputs[key]
+            )
+        if (state.get<T>(field.key()) == null || properties.value.inputs[key] == null || properties.value.inputs[key]?.isEmpty == true) {
             properties.value.inputs[key] = InputWrapper(value = value, isEmpty = false)
             Timber.tag(TAG)
                 .d(
@@ -112,7 +117,7 @@ abstract class SingleViewModel<T : Any, S : UiState<T>, A : UiAction, E : UiSing
             )
         } else {
             properties.value.inputs[key] = InputWrapper(
-                value = value, isEmpty = false, isSaved = isSaved
+                value = value, isEmpty = false, isSaved = true
             )
         }
         state[field.key()] = properties.value.copy(inputs = properties.value.inputs.toMutableMap())
@@ -125,7 +130,12 @@ abstract class SingleViewModel<T : Any, S : UiState<T>, A : UiAction, E : UiSing
             .d("setStateValue(...): Validate (debounce) %s - ERR[%s]", field.key(), errorId)
         val property = properties.value.inputs.getValue(key)
         properties.value.inputs[key] =
-            InputWrapper(value = property.value, errorId = errorId, isEmpty = false)
+            InputWrapper(
+                value = property.value,
+                errorId = errorId,
+                isEmpty = false,
+                isSaved = errorId != null
+            )
         state[field.key()] = properties.value.copy(inputs = properties.value.inputs.toMutableMap())
     }
 

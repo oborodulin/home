@@ -9,7 +9,7 @@ import kotlinx.coroutines.flow.StateFlow
 interface AccountingViewModel {
     val uiStateFlow: StateFlow<UiState<AccountingModel>>
     val singleEventFlow : Flow<AccountingUiSingleEvent>
-//    val uiMeterValuesState: MutableState<List<MeterValueListItemModel>>
+//    val uiMeterValuesState: MutableState<List<MeterValueListItem>>
 
     fun submitAction(action: AccountingUiAction): Job?
 }

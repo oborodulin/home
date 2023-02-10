@@ -52,7 +52,11 @@ class MeteringDataSourceImpl @Inject constructor(
     }
 
     override suspend fun saveMeterValue(meterValue: MeterValue) = withContext(dispatcher) {
-        meterDao.insert(meterValueToMeterValueEntityMapper.map(meterValue))
+        if (meterValue.id == null) {
+            meterDao.insert(meterValueToMeterValueEntityMapper.map(meterValue))
+        } else {
+            meterDao.update(meterValueToMeterValueEntityMapper.map(meterValue))
+        }
     }
 
     override suspend fun deleteMeter(meter: Meter) = withContext(dispatcher) {

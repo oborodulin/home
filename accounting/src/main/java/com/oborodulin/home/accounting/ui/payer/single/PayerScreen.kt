@@ -25,6 +25,7 @@ import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -191,6 +192,7 @@ fun Payer(appState: AppState, viewModel: PayerViewModel, onSubmit: () -> Unit) {
             },
             keyboardOptions = remember {
                 KeyboardOptions(
+                    capitalization = KeyboardCapitalization.Words,
                     keyboardType = KeyboardType.Text,
                     imeAction = ImeAction.Next
                 )
@@ -220,6 +222,7 @@ fun Payer(appState: AppState, viewModel: PayerViewModel, onSubmit: () -> Unit) {
             maxLines = 2,
             keyboardOptions = remember {
                 KeyboardOptions(
+                    capitalization = KeyboardCapitalization.Sentences,
                     keyboardType = KeyboardType.Text,
                     imeAction = ImeAction.Next
                 )
@@ -247,7 +250,7 @@ fun Payer(appState: AppState, viewModel: PayerViewModel, onSubmit: () -> Unit) {
             },
             keyboardOptions = remember {
                 KeyboardOptions(
-                    keyboardType = KeyboardType.Number,
+                    keyboardType = KeyboardType.Decimal,
                     imeAction = ImeAction.Next
                 )
             },
@@ -273,7 +276,7 @@ fun Payer(appState: AppState, viewModel: PayerViewModel, onSubmit: () -> Unit) {
             },
             keyboardOptions = remember {
                 KeyboardOptions(
-                    keyboardType = KeyboardType.Number,
+                    keyboardType = KeyboardType.Decimal,
                     imeAction = ImeAction.Next
                 )
             },
@@ -299,7 +302,7 @@ fun Payer(appState: AppState, viewModel: PayerViewModel, onSubmit: () -> Unit) {
             },
             keyboardOptions = remember {
                 KeyboardOptions(
-                    keyboardType = KeyboardType.Number,
+                    keyboardType = KeyboardType.Decimal,
                     imeAction = ImeAction.Next
                 )
             },
@@ -325,7 +328,7 @@ fun Payer(appState: AppState, viewModel: PayerViewModel, onSubmit: () -> Unit) {
             },
             keyboardOptions = remember {
                 KeyboardOptions(
-                    keyboardType = KeyboardType.Number,
+                    keyboardType = KeyboardType.Decimal,
                     imeAction = ImeAction.Next
                 )
             },

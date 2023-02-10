@@ -10,5 +10,5 @@ data class InputWrapper(
     @StringRes val errorId: Int? = null,
     val errorMsg: String? = null,
     val isEmpty: Boolean = true,
-    val isSaved: Boolean = false,
+    val isSaved: Boolean = true,
 ) : InputWrapped, Parcelable
