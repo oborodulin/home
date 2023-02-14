@@ -30,7 +30,7 @@ fun <T : Any> CommonScreen(
             Error(modifier, state.errorMessage)
         }
         is UiState.Success -> {
-            Timber.tag(TAG).d("onSuccess(...) called: %s", state.data)
+            Timber.tag(TAG).d("CommonScreen: onSuccess(...) called: %s", state.data)
             onSuccess(state.data)
         }
     }

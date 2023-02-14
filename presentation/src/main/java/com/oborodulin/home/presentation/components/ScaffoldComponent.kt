@@ -1,14 +1,10 @@
 package com.oborodulin.home.presentation.components
 
 import androidx.annotation.StringRes
-import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.RowScope
-import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Menu
-import androidx.compose.material.icons.filled.Settings
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
@@ -16,10 +12,9 @@ import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import com.oborodulin.home.common.ui.theme.Typography
 import com.oborodulin.home.common.util.toast
 import com.oborodulin.home.presentation.AppState
-import com.oborodulin.home.presentation.R
-import com.oborodulin.home.presentation.navigation.NavRoutes
 import timber.log.Timber
 
 private const val TAG = "Presentation.ScaffoldComponent"
@@ -41,7 +36,6 @@ fun ScaffoldComponent(
     Timber.tag(TAG).d("ScaffoldComponent() called")
     val context = LocalContext.current
     var actionBarTitle by remember { mutableStateOf(appState.appName) }
-    var actionBarSubtitle by remember { mutableStateOf("") }
 
 /*    LaunchedEffect(appState.navBarNavController) {
         appState.navBarNavController.currentBackStackEntryFlow.collect { backStackEntry ->
@@ -53,14 +47,9 @@ fun ScaffoldComponent(
     }
 
  */
-    val modifier = when (nestedScrollConnection) {
-        null -> Modifier.fillMaxSize()
-        else -> Modifier
-            .fillMaxSize()
-            .nestedScroll(nestedScrollConnection)
-    }
+    val modifier = Modifier.fillMaxSize()
     Scaffold(
-        modifier = modifier,
+        modifier = nestedScrollConnection?.let { modifier.nestedScroll(it) } ?: modifier,
         scaffoldState = scaffoldState,
         topBar = {
             when (topBar) {
@@ -68,12 +57,20 @@ fun ScaffoldComponent(
                     TopAppBar(
                         elevation = 4.dp,
                         title = {
-                            Text(
-                                when (topBarTitleId) {
-                                    null -> appState.appName
-                                    else -> appState.appName + " - " + stringResource(topBarTitleId)
+                            Column(
+                                verticalArrangement = Arrangement.Center
+                            ) {
+                                Text(topBarTitleId?.let {
+                                    appState.appName + " - " + stringResource(topBarTitleId)
+                                } ?: appState.appName
+                                )
+                                if (appState.actionBarSubtitle.value.isNotEmpty()) {
+                                    Text(
+                                        text = appState.actionBarSubtitle.value,
+                                        style = Typography.subtitle1
+                                    )
                                 }
-                            )
+                            }
                         },
                         navigationIcon = {
                             when (topBarNavigationIcon) {

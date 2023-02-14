@@ -89,10 +89,11 @@ abstract class MviViewModel<T : Any, S : UiState<T>, A : UiAction, E : UiSingleE
     }
 
     fun submitState(state: S): Job {
-        Timber.tag(TAG).d("submitState: change ui state = %s", state.javaClass.name)
+        Timber.tag(TAG).d("submitState(S): change ui state = %s", state.javaClass.name)
         val job = viewModelScope.launch(errorHandler) {
             _uiStateFlow.value = state
             if (state is UiState.Success<*>) {
+                Timber.tag(TAG).d("submitState: state.data = %s", state.data)
                 initFieldStatesByUiModel(state.data)
             }
         }

@@ -7,6 +7,7 @@ import java.util.*
 
 data class MeterValueListItem(
     var id: UUID? = null,
+    var payerId: UUID? = null,
     var metersId: UUID,
     var type: ServiceType? = null,
     val name: String = "",

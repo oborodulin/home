@@ -6,7 +6,10 @@ import com.oborodulin.home.data.local.db.entities.ServiceTlEntity
 
 @DatabaseView(
     viewName = ServicesView.VIEW_NAME,
-    value = "SELECT s.*, stl.* FROM services AS s JOIN services_tl AS stl ON stl.servicesId = s.serviceId"
+    value = """
+SELECT s.*, stl.* FROM services AS s JOIN services_tl AS stl ON stl.servicesId = s.serviceId
+ORDER BY s.pos
+"""
 )
 class ServicesView(
     @Embedded

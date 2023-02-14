@@ -24,6 +24,7 @@ import com.oborodulin.home.common.ui.state.CommonScreen
 import com.oborodulin.home.common.ui.state.SharedViewModel
 import com.oborodulin.home.metering.ui.value.MeterValuesListUiAction
 import com.oborodulin.home.metering.ui.value.MeterValuesListViewModel
+import com.oborodulin.home.presentation.AppState
 import kotlinx.coroutines.flow.collectLatest
 import timber.log.Timber
 
@@ -31,6 +32,7 @@ private const val TAG = "Accounting.ui.PayersListView"
 
 @Composable
 fun PayersListView(
+    appState: AppState,
     viewModel: PayersListViewModel,
     meterValuesListViewModel: MeterValuesListViewModel,
     navController: NavController
@@ -59,6 +61,7 @@ fun PayersListView(
                 },
                 onClick = { payer ->
                     viewModel.setPrimaryObjectData(arrayListOf(payer.id.toString(), payer.fullName))
+                    appState.actionBarSubtitle.value = payer.address
                     with(meterValuesListViewModel) {
                         clearInputFieldsStates()
                         setPrimaryObjectData(arrayListOf(payer.id.toString()))
@@ -99,7 +102,7 @@ fun PayersList(
     onDelete: (PayerListItem) -> Unit
 ) {
     Timber.tag(TAG).d("PayersList(...) called")
-    val selectedIndex = remember { mutableStateOf(-1) } // by
+    var selectedIndex by remember { mutableStateOf(-1) } // by
     if (payers.isNotEmpty()) {
         val listState = rememberLazyListState()
         LazyColumn(
@@ -114,15 +117,16 @@ fun PayersList(
                     ListItemComponent(
                         icon = null,
                         item = payer,
-                        selected = (payer.isFavorite and (selectedIndex.value == -1)) or (selectedIndex.value == index),
-                        background = (if (selectedIndex.value == index) Color.LightGray else Color.Transparent),
+                        selected = (payer.isFavorite and (selectedIndex == -1)) or (selectedIndex == index),
+                        background = (if (selectedIndex == index) Color.LightGray else Color.Transparent),
                         deleteDialogText = stringResource(
                             R.string.dlg_confirm_del_payer,
                             payer.fullName
                         ),
                         onFavorite = { onFavorite(payer) },
                         onClick = {
-                            selectedIndex.value = if (selectedIndex.value != index) index else -1
+                            //selectedIndex = if (selectedIndex != index) index else -1
+                            if (selectedIndex != index) selectedIndex = index
                             onClick(payer)
                         },
                         onEdit = { onEdit(payer) }

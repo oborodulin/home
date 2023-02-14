@@ -72,21 +72,34 @@ fun MeterValuesListView(
     Timber.tag(TAG).d("MeterValuesListView(...) called: payerInput = %s", payerInput)
 
     val currentPayer by viewModel.primaryObjectData.collectAsStateWithLifecycle()
-    val payerId = payerInput?.payerId
-        ?: if (currentPayer[MviViewModel.IDX_OBJECT_ID].isNotEmpty()) UUID.fromString(currentPayer[MviViewModel.IDX_OBJECT_ID]) else null
+    var payerId by remember { mutableStateOf(payerInput?.payerId) }
+
+    payerId = payerId ?: if (currentPayer[MviViewModel.IDX_OBJECT_ID].isNotEmpty()) UUID.fromString(
+        currentPayer[MviViewModel.IDX_OBJECT_ID]
+    ) else null
 
     Timber.tag(TAG).d("MeterValuesListView: currentPayer = %s, payerId = %s", currentPayer, payerId)
     LaunchedEffect(payerId) {
         Timber.tag(TAG).d("MeterValuesListView: LaunchedEffect() BEFORE collect ui state flow")
         when (payerId) {
-            null -> viewModel.submitAction(MeterValuesListUiAction.Init)
-            else -> viewModel.submitAction(MeterValuesListUiAction.Load(payerId))
+            null -> {
+                Timber.tag(TAG).d("LaunchedEffect: MeterValuesListUiAction.Init")
+                viewModel.submitAction(MeterValuesListUiAction.Init)
+            }
+            else -> {
+                Timber.tag(TAG).d("LaunchedEffect: MeterValuesListUiAction.Load(%s)", payerId)
+                viewModel.submitAction(MeterValuesListUiAction.Load(payerId!!))
+            }
         }
     }
     viewModel.uiStateFlow.collectAsState().value.let { state ->
         Timber.tag(TAG).d("Collect ui state flow: %s", state)
-        CommonScreen(state = state) {
-            MeterValuesList(it, viewModel, payerId)
+        CommonScreen(state = state) { list ->
+            MeterValuesList(
+                list.filter { it.payerId == (payerId ?: it.payerId) },
+                viewModel,
+                payerId
+            )
         }
     }
     LaunchedEffect(Unit) {
@@ -217,18 +230,19 @@ fun MeterValuesList(
                                     contentDescription = ""
                                 )
                                 Spacer(modifier = Modifier.height(4.dp))
-                                val showDialogState = remember { mutableStateOf(false) }
+                                var showDialogState by remember { mutableStateOf(false) }
                                 AlertDialogComponent(
-                                    isShow = showDialogState.value,
+                                    isShow = showDialogState,
                                     title = { Text(stringResource(com.oborodulin.home.common.R.string.dlg_confirm_title)) },
                                     text = { Text(text = stringResource(R.string.dlg_confirm_del_meter_value)) },
-                                    onDismiss = { showDialogState.value = false },
+                                    onDismiss = { showDialogState = false },
                                     onConfirm = {
-                                        showDialogState.value = false
+                                        showDialogState = false
                                         viewModel.submitAction(
                                             MeterValuesListUiAction.Delete(meterValue.metersId)
                                         )
                                         viewModel.clearInputFieldsStates()
+                                        Timber.tag(TAG).d("MeterValuesList: payerId = %s", payerId)
                                         when (payerId) {
                                             null -> viewModel.submitAction(MeterValuesListUiAction.Init)
                                             else -> viewModel.submitAction(
@@ -243,7 +257,7 @@ fun MeterValuesList(
                                         .padding(4.dp)
                                         .clickable {
                                             if (meterValue.currentValue != null) {
-                                                showDialogState.value = true
+                                                showDialogState = true
                                             }
                                         },
                                     painter = painterResource(com.oborodulin.home.common.R.drawable.outline_delete_black_24),
@@ -391,6 +405,7 @@ fun MeterValue(
             )
         },
         onImeKeyAction = {
+            Timber.tag(TAG).d("MeterValue: onImeKeyAction")
             if (areInputsValid) viewModel.onContinueClick {
                 viewModel.submitAction(MeterValuesListUiAction.Save)
             }

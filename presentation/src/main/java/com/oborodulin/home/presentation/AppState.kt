@@ -3,10 +3,7 @@ package com.oborodulin.home.presentation
 import android.content.res.Resources
 import androidx.compose.material.ScaffoldState
 import androidx.compose.material.rememberScaffoldState
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.Stable
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.*
 import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
@@ -28,7 +25,8 @@ fun rememberAppState(
     navBarNavController: NavHostController = rememberNavController(),
     resources: Resources = LocalContext.current.resources,
     coroutineScope: CoroutineScope = rememberCoroutineScope(),
-    appName: String = ""
+    appName: String = "",
+    actionBarSubtitle: MutableState<String> = remember { mutableStateOf("") }
 ) =
     remember(
         accountingScaffoldState,
@@ -36,14 +34,16 @@ fun rememberAppState(
         commonNavController,
         navBarNavController,
         resources,
-        coroutineScope
+        coroutineScope,
+        actionBarSubtitle
     ) {
         AppState(
             accountingScaffoldState,
             payerScaffoldState,
             commonNavController,
             navBarNavController,
-            appName
+            appName,
+            actionBarSubtitle
         )
     }
 
@@ -56,8 +56,13 @@ class AppState(
     val payerScaffoldState: ScaffoldState,
     val commonNavController: NavHostController,
     val navBarNavController: NavHostController,
-    val appName: String
+    val appName: String,
+    val actionBarSubtitle: MutableState<String>
 ) {
+    // ----------------------------------------------------------
+    // Источник состояния TopAppBar
+    // ----------------------------------------------------------
+
     // ----------------------------------------------------------
     // Источник состояния BottomBar
     // ----------------------------------------------------------

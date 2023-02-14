@@ -162,7 +162,7 @@ abstract class SingleViewModel<T : Any, S : UiState<T>, A : UiAction, E : UiSing
                 null -> {
                     clearFocusAndHideKeyboard()
                     onSuccess()
-                    clearInputFieldsStates()
+                    //clearInputFieldsStates()
                     //_events.send(ScreenEvent.ShowToast(com.oborodulin.home.common.R.string.success))
                 }
                 else -> displayInputErrors(inputErrors)

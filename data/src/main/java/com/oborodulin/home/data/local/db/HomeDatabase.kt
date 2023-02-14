@@ -55,11 +55,13 @@ private val MIGRATION_4_5 = object : Migration(4, 5) {
 @Database(
     entities = [PayerEntity::class, ServiceEntity::class, ServiceTlEntity::class,
         PayerServiceCrossRefEntity::class,
-        RateEntity::class, RatePromotionEntity::class,
+        RateEntity::class, ServicePromotionEntity::class,
         MeterEntity::class, MeterTlEntity::class, MeterValueEntity::class, MeterVerificationEntity::class,
-        ReceiptEntity::class],
+        PayerServiceMeterCrossRefEntity::class,
+        ReceiptEntity::class, ReceiptLineEntity::class],
     views = [MetersView::class, ServicesView::class, MeterValueMaxPrevDatesView::class,
-            MeterValuePrevPeriodsView::class, MeterValuePaymentPeriodsView::class, MeterValuePaymentsView::class],
+        MeterValuePrevPeriodsView::class, MeterValuePaymentPeriodsView::class, MeterValuePaymentsView::class,
+        RateServiceLastDatesView::class, RateServiceWithPrivilegesView::class, RatePayerServicesView::class],
     version = 5
 )
 @TypeConverters(HomeTypeConverters::class)
@@ -333,7 +335,7 @@ abstract class HomeDatabase : RoomDatabase() {
                 // Meters:
                 // Electricity
                 val electricityPayer1Meter =
-                    MeterEntity.populateElectricityMeter(context, electricityPayer1ServiceId)
+                    MeterEntity.populateElectricityMeter(context, payer1Entity.payerId)
                 insertDefMeter(
                     db, electricityPayer1Meter,
                     MeterTlEntity.populateElectricityMeterTl(
@@ -362,7 +364,7 @@ abstract class HomeDatabase : RoomDatabase() {
                 )
                 // Cold water
                 val coldWaterPayer1Meter =
-                    MeterEntity.populateColdWaterMeter(context, coldWaterPayer1ServiceId)
+                    MeterEntity.populateColdWaterMeter(context, payer1Entity.payerId)
                 insertDefMeter(
                     db, coldWaterPayer1Meter,
                     MeterTlEntity.populateColdWaterMeterTl(context, coldWaterPayer1Meter.meterId)
@@ -388,14 +390,14 @@ abstract class HomeDatabase : RoomDatabase() {
                 )
                 // Hot water
                 val hotWaterPayer1Meter =
-                    MeterEntity.populateHotWaterMeter(context, hotWaterPayer1ServiceId)
+                    MeterEntity.populateHotWaterMeter(context, payer1Entity.payerId)
                 insertDefMeter(
                     db, hotWaterPayer1Meter,
                     MeterTlEntity.populateHotWaterMeterTl(context, hotWaterPayer1Meter.meterId)
                 )
                 // Heating
                 val heatingPayer1Meter =
-                    MeterEntity.populateHeatingMeter(context, heatingPayer1ServiceId)
+                    MeterEntity.populateHeatingMeter(context, payer1Entity.payerId)
                 insertDefMeter(
                     db, heatingPayer1Meter,
                     MeterTlEntity.populateHeatingMeterTl(
@@ -448,18 +450,21 @@ abstract class HomeDatabase : RoomDatabase() {
                 // phone
                 // ugso
 
-                // Rate promotions:
-                val doorphoneRatePromotion =
-                    RatePromotionEntity.populatePrevRatePromotion(doorphoneRateId)
+                // Service promotions:
+                val doorphoneServicePromotion =
+                    ServicePromotionEntity.populatePrevRatePromotion(
+                        serviceId = doorphoneService.serviceId,
+                        payerServiceId = doorphonePayer1ServiceId
+                    )
                 db.insert(
-                    RatePromotionEntity.TABLE_NAME,
+                    ServicePromotionEntity.TABLE_NAME,
                     SQLiteDatabase.CONFLICT_REPLACE,
-                    Mapper.toContentValues(doorphoneRatePromotion)
+                    Mapper.toContentValues(doorphoneServicePromotion)
                 )
                 Timber.tag(TAG)
                     .i(
-                        "Default rate promotion imported: {%s}", jsonLogger?.toJson(
-                            doorphoneRatePromotion
+                        "Default service promotion imported: {%s}", jsonLogger?.toJson(
+                            doorphoneServicePromotion
                         )
                     )
 
@@ -513,7 +518,7 @@ abstract class HomeDatabase : RoomDatabase() {
                 // Meters:
                 // Electricity
                 val electricityPayer2Meter =
-                    MeterEntity.populateElectricityMeter(context, electricityPayer2ServiceId)
+                    MeterEntity.populateElectricityMeter(context, payer2Entity.payerId)
                 insertDefMeter(
                     db, electricityPayer2Meter,
                     MeterTlEntity.populateElectricityMeterTl(
@@ -542,7 +547,7 @@ abstract class HomeDatabase : RoomDatabase() {
                 )
                 // Cold water
                 val coldWaterPayer2Meter =
-                    MeterEntity.populateColdWaterMeter(context, coldWaterPayer2ServiceId)
+                    MeterEntity.populateColdWaterMeter(context, payer2Entity.payerId)
                 insertDefMeter(
                     db, coldWaterPayer2Meter,
                     MeterTlEntity.populateColdWaterMeterTl(context, coldWaterPayer2Meter.meterId)
@@ -568,7 +573,7 @@ abstract class HomeDatabase : RoomDatabase() {
                 )
                 // Hot water
                 val hotWaterPayer2Meter =
-                    MeterEntity.populateHotWaterMeter(context, hotWaterPayer2ServiceId)
+                    MeterEntity.populateHotWaterMeter(context, payer2Entity.payerId)
                 insertDefMeter(
                     db, hotWaterPayer2Meter,
                     MeterTlEntity.populateHotWaterMeterTl(context, hotWaterPayer2Meter.meterId)

@@ -1,14 +1,20 @@
 package com.oborodulin.home.accounting.ui
 
 import android.content.res.Configuration
-import androidx.compose.foundation.*
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.*
+import androidx.compose.material.Icon
+import androidx.compose.material.IconButton
+import androidx.compose.material.MaterialTheme
+import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Settings
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -19,9 +25,6 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
-import com.oborodulin.home.metering.ui.value.MeterValuesListView
-import com.oborodulin.home.metering.ui.value.MeterValuesListViewModel
-import com.oborodulin.home.metering.ui.value.MeterValuesListViewModelImp
 import com.oborodulin.home.accounting.ui.model.AccountingModel
 import com.oborodulin.home.accounting.ui.payer.list.PayersListView
 import com.oborodulin.home.accounting.ui.payer.list.PayersListViewModel
@@ -29,9 +32,13 @@ import com.oborodulin.home.accounting.ui.payer.list.PayersListViewModelImp
 import com.oborodulin.home.common.ui.state.CommonScreen
 import com.oborodulin.home.common.ui.theme.HomeComposableTheme
 import com.oborodulin.home.common.util.toast
+import com.oborodulin.home.metering.ui.value.MeterValuesListView
+import com.oborodulin.home.metering.ui.value.MeterValuesListViewModel
+import com.oborodulin.home.metering.ui.value.MeterValuesListViewModelImp
 import com.oborodulin.home.presentation.AppState
 import com.oborodulin.home.presentation.components.ScaffoldComponent
 import com.oborodulin.home.presentation.navigation.NavRoutes
+import com.oborodulin.home.presentation.rememberAppState
 import kotlinx.coroutines.flow.collectLatest
 import timber.log.Timber
 
@@ -96,6 +103,7 @@ fun AccountingScreen(
             ) {
                 CommonScreen(paddingValues = it, state = state) { accountingModel ->
                     AccountingView(
+                        appState = appState,
                         accountingModel = accountingModel,
                         navController = appState.commonNavController,
                         accountingViewModel = viewModel,
@@ -121,6 +129,7 @@ fun AccountingScreen(
 
 @Composable
 private fun AccountingView(
+    appState: AppState,
     accountingModel: AccountingModel,
     navController: NavHostController,
     accountingViewModel: AccountingViewModel,
@@ -148,6 +157,7 @@ private fun AccountingView(
                 .border(2.dp, MaterialTheme.colors.primary, shape = RoundedCornerShape(16.dp))
         ) {
             PayersListView(
+                appState = appState,
                 viewModel = payersListViewModel,
                 meterValuesListViewModel = meterValuesListViewModel,
                 navController = navController
@@ -183,6 +193,7 @@ private fun AccountingView(
 @Composable
 fun PreviewAccountingView() {
     AccountingView(
+        appState = rememberAppState(),
         accountingModel = AccountingModel(),
         navController = rememberNavController(),
         accountingViewModel = AccountingViewModelImp.previewModel(LocalContext.current),
