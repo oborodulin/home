@@ -12,6 +12,6 @@ class MeterToMeterEntityMapper : Mapper<Meter, MeterEntity> {
         maxValue = input.maxValue,
         passportDate = input.passportDate,
         verificationPeriod = input.verificationPeriod,
-        payersServicesId = input.payersServicesId,
+        payersId = input.payersId,
     )
 }

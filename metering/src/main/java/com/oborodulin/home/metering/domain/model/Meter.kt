@@ -6,7 +6,7 @@ import java.time.OffsetDateTime
 import java.util.*
 
 data class Meter(
-    var payersServicesId: UUID,
+    var payersId: UUID,
     var num: String,
     var maxValue: BigDecimal,
     var passportDate: OffsetDateTime?,

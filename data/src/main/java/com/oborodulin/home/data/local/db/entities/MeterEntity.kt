@@ -9,11 +9,11 @@ import java.util.*
 
 @Entity(
     tableName = MeterEntity.TABLE_NAME,
-    indices = [Index(value = ["num", "payersServicesId"], unique = true)],
+    indices = [Index(value = ["num", "payersId"], unique = true)],
     foreignKeys = [ForeignKey(
-        entity = PayerServiceCrossRefEntity::class,
-        parentColumns = arrayOf("payerServiceId"),
-        childColumns = arrayOf("payersServicesId"),
+        entity = PayerEntity::class,
+        parentColumns = arrayOf("payerId"),
+        childColumns = arrayOf("payersId"),
         onDelete = ForeignKey.CASCADE,
         deferred = true
     )]
@@ -25,32 +25,32 @@ data class MeterEntity(
     //@TypeConverters(DateTypeConverter::class)
     val passportDate: OffsetDateTime? = null,
     val verificationPeriod: Int? = null,
-    @ColumnInfo(index = true) var payersServicesId: UUID,
+    @ColumnInfo(index = true) var payersId: UUID,
 ) {
     companion object {
         const val TABLE_NAME = "meters"
 
-        fun populateElectricityMeter(ctx: Context, payersServiceId: UUID) = MeterEntity(
+        fun populateElectricityMeter(ctx: Context, payerId: UUID) = MeterEntity(
             num = ctx.resources.getString(R.string.def_meter_num),
-            payersServicesId = payersServiceId,
+            payersId = payerId,
             maxValue = BigDecimal.valueOf(9999)
         )
 
-        fun populateColdWaterMeter(ctx: Context, payersServiceId: UUID) = MeterEntity(
+        fun populateColdWaterMeter(ctx: Context, payerId: UUID) = MeterEntity(
             num = ctx.resources.getString(R.string.def_meter_num),
-            payersServicesId = payersServiceId,
+            payersId = payerId,
             maxValue = BigDecimal.valueOf(99999.999)
         )
 
-        fun populateHotWaterMeter(ctx: Context, payersServiceId: UUID) = MeterEntity(
+        fun populateHotWaterMeter(ctx: Context, payerId: UUID) = MeterEntity(
             num = ctx.resources.getString(R.string.def_meter_num),
-            payersServicesId = payersServiceId,
+            payersId = payerId,
             maxValue = BigDecimal.valueOf(99999.999)
         )
 
-        fun populateHeatingMeter(ctx: Context, payersServiceId: UUID) = MeterEntity(
+        fun populateHeatingMeter(ctx: Context, payerId: UUID) = MeterEntity(
             num = ctx.resources.getString(R.string.def_meter_num),
-            payersServicesId = payersServiceId,
+            payersId = payerId,
             maxValue = BigDecimal.valueOf(9.99999)
         )
     }
