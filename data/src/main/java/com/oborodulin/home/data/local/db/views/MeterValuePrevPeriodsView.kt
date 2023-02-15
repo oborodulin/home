@@ -12,7 +12,7 @@ import java.util.*
     value = """
 SELECT mvl.meterValueId, mv.payersId AS payerId, mv.servicesId AS serviceId, 
     sv.type, sv.name, sv.pos, mv.meterId, IFNULL(mv.measureUnit, sv.measureUnit) AS measureUnit,
-    IFNULL(mvl.valueDate, datetime('now')) AS prevLastDate, mvl.meterValue AS prevValue, p.isFavorite,
+    mvl.valueDate AS prevLastDate, mvl.meterValue AS prevValue, p.isFavorite,
     (SELECT vl.meterValue FROM meter_values vl
     WHERE vl.metersId = mvl.metersId
         AND datetime(vl.valueDate) = (SELECT MAX(datetime(v.valueDate)) FROM meter_values v
@@ -25,11 +25,11 @@ SELECT mvl.meterValueId, mv.payersId AS payerId, mv.servicesId AS serviceId,
             THEN length(cast(mv.maxValue / ${Constants.CONV_COEFF_BIGDECIMAL}.0 as text)) + 1 
             ELSE instr(cast(mv.maxValue / ${Constants.CONV_COEFF_BIGDECIMAL}.0 as text), '.') END)
     ) AS valueFormat 
-FROM meters_view AS mv JOIN services_view AS sv ON sv.serviceId = mv.servicesId 
+FROM meters_view AS mv JOIN services_view AS sv ON sv.serviceId = mv.servicesId AND sv.type = mv.type
     JOIN meter_values AS mvl ON mvl.metersId = mv.meterId 
     JOIN payers AS p ON p.payerId = mv.payersId 
-    JOIN meter_value_max_prev_dates_view AS mpd ON mpd.metersId = mvl.metersId AND mpd.maxValueDate = datetime(mvl.valueDate)
-""""
+    JOIN meter_value_max_prev_dates_view AS mpd ON mpd.meterId = mvl.metersId AND mpd.maxValueDate = datetime(mvl.valueDate)
+"""
 )
 class MeterValuePrevPeriodsView(
     val meterValueId: UUID,

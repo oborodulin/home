@@ -3,13 +3,14 @@ package com.oborodulin.home.data.local.db.entities
 import android.content.Context
 import androidx.room.*
 import com.oborodulin.home.data.R
+import com.oborodulin.home.data.util.MeterType
 import java.math.BigDecimal
 import java.time.OffsetDateTime
 import java.util.*
 
 @Entity(
     tableName = MeterEntity.TABLE_NAME,
-    indices = [Index(value = ["num", "payersId"], unique = true)],
+    indices = [Index(value = ["payersId", "num", "type"], unique = true)],
     foreignKeys = [ForeignKey(
         entity = PayerEntity::class,
         parentColumns = arrayOf("payerId"),
@@ -19,8 +20,9 @@ import java.util.*
     )]
 )
 data class MeterEntity(
-    @PrimaryKey var meterId: UUID = UUID.randomUUID(),
-    var num: String,
+    @PrimaryKey val meterId: UUID = UUID.randomUUID(),
+    val num: String,
+    val type: MeterType,
     val maxValue: BigDecimal,
     //@TypeConverters(DateTypeConverter::class)
     val passportDate: OffsetDateTime? = null,
@@ -33,24 +35,28 @@ data class MeterEntity(
         fun populateElectricityMeter(ctx: Context, payerId: UUID) = MeterEntity(
             num = ctx.resources.getString(R.string.def_meter_num),
             payersId = payerId,
+            type = MeterType.ELECTRICITY,
             maxValue = BigDecimal.valueOf(9999)
         )
 
         fun populateColdWaterMeter(ctx: Context, payerId: UUID) = MeterEntity(
             num = ctx.resources.getString(R.string.def_meter_num),
             payersId = payerId,
+            type = MeterType.COLD_WATER,
             maxValue = BigDecimal.valueOf(99999.999)
         )
 
         fun populateHotWaterMeter(ctx: Context, payerId: UUID) = MeterEntity(
             num = ctx.resources.getString(R.string.def_meter_num),
             payersId = payerId,
+            type = MeterType.HOT_WATER,
             maxValue = BigDecimal.valueOf(99999.999)
         )
 
         fun populateHeatingMeter(ctx: Context, payerId: UUID) = MeterEntity(
             num = ctx.resources.getString(R.string.def_meter_num),
             payersId = payerId,
+            type = MeterType.HEATING,
             maxValue = BigDecimal.valueOf(9.99999)
         )
     }

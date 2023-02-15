@@ -15,6 +15,12 @@ import java.util.*
         onDelete = ForeignKey.CASCADE,
         deferred = true
     ), ForeignKey(
+        entity = ServiceEntity::class,
+        parentColumns = arrayOf("serviceId"),
+        childColumns = arrayOf("servicesId"),
+        onDelete = ForeignKey.CASCADE,
+        deferred = true
+    ), ForeignKey(
         entity = RateEntity::class,
         parentColumns = arrayOf("rateId"),
         childColumns = arrayOf("ratesId"),
@@ -22,8 +28,8 @@ import java.util.*
         deferred = true
     ), ForeignKey(
         entity = ServicePromotionEntity::class,
-        parentColumns = arrayOf("ratePromotionId"),
-        childColumns = arrayOf("ratePromotionsId"),
+        parentColumns = arrayOf("servicePromotionId"),
+        childColumns = arrayOf("servicePromotionsId"),
         onDelete = ForeignKey.CASCADE,
         deferred = true
     ), ForeignKey(
@@ -38,19 +44,22 @@ class ReceiptLineEntity(
     @PrimaryKey var receiptLineId: UUID = UUID.randomUUID(),
     val isPaid: Boolean = false,
     @ColumnInfo(index = true) val receiptsId: UUID,
+    @ColumnInfo(index = true) val servicesId: UUID,
     @ColumnInfo(index = true) val ratesId: UUID,
-    @ColumnInfo(index = true) val ratePromotionsId: UUID? = null,
+    @ColumnInfo(index = true) val servicePromotionsId: UUID? = null,
     @ColumnInfo(index = true) val meterValuesId: UUID? = null
 ) {
     companion object {
         const val TABLE_NAME = "receipt_lines"
 
         fun populateReceiptLine(
-            receiptId: UUID, rateId: UUID, ratePromotionId: UUID? = null, meterValueId: UUID? = null
+            receiptId: UUID, serviceId: UUID, rateId: UUID, servicePromotionId: UUID? = null,
+            meterValueId: UUID? = null
         ) = ReceiptLineEntity(
             receiptsId = receiptId,
+            servicesId = serviceId,
             ratesId = rateId,
-            ratePromotionsId = ratePromotionId,
+            servicePromotionsId = servicePromotionId,
             meterValuesId = meterValueId,
         )
     }

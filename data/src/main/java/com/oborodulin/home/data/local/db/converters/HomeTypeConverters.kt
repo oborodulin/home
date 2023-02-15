@@ -4,6 +4,7 @@ import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.room.TypeConverter
 import com.oborodulin.home.common.util.Constants.CONV_COEFF_BIGDECIMAL
+import com.oborodulin.home.data.util.MeterType
 import com.oborodulin.home.data.util.ServiceType
 import java.math.BigDecimal
 import java.time.*
@@ -74,4 +75,10 @@ object HomeTypeConverters {
 
     @TypeConverter
     fun fromServiceType(value: ServiceType) = value.name
+
+    @TypeConverter
+    fun toMeterType(value: String) = enumValueOf<MeterType>(value)
+
+    @TypeConverter
+    fun fromMeterType(value: MeterType) = value.name
 }

@@ -7,15 +7,15 @@ import java.util.*
 
 @Entity(tableName = ServiceEntity.TABLE_NAME)
 data class ServiceEntity(
-    @PrimaryKey var serviceId: UUID = UUID.randomUUID(),
+    @PrimaryKey val serviceId: UUID = UUID.randomUUID(),
     var pos: Int? = null,
-    var type: ServiceType,
+    val type: ServiceType,
 ) {
     companion object {
         const val TABLE_NAME = "services"
 
         fun populateRentService() = ServiceEntity(pos = 1, type = ServiceType.RENT)
-        fun populateElectricityService() = ServiceEntity(pos = 2, type = ServiceType.ELECRICITY)
+        fun populateElectricityService() = ServiceEntity(pos = 2, type = ServiceType.ELECTRICITY)
         fun populateGasService() = ServiceEntity(pos = 3, type = ServiceType.GAS)
         fun populateColdWaterService() = ServiceEntity(pos = 4, type = ServiceType.COLD_WATER)
         fun populateWasteService() = ServiceEntity(pos = 5, type = ServiceType.WASTE)

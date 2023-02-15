@@ -19,7 +19,6 @@ import com.oborodulin.home.metering.domain.usecases.SaveMeterValueUseCase
 import com.oborodulin.home.metering.ui.model.MeterValueListItem
 import com.oborodulin.home.metering.ui.model.converters.PrevServiceMeterValuesListConverter
 import com.oborodulin.home.metering.ui.model.mappers.MeterValueListItemToMeterValueMapper
-import com.oborodulin.home.metering.ui.model.mappers.MeterValueToMeterValueListItemMapper
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.Job
@@ -325,7 +324,7 @@ class MeterValuesListViewModelImp @Inject constructor(
                 MeterValueListItem(
                     id = UUID.randomUUID(),
                     metersId = UUID.randomUUID(),
-                    type = ServiceType.ELECRICITY,
+                    type = ServiceType.ELECTRICITY,
                     name = ctx.resources.getString(R.string.service_electricity),
                     measureUnit = ctx.resources.getString(com.oborodulin.home.common.R.string.kWh_unit),
                     prevLastDate = Utils.toOffsetDateTime("2022-08-01T14:29:10.212"),

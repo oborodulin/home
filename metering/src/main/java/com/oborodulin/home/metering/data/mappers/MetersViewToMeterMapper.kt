@@ -10,7 +10,9 @@ class MetersViewToMeterMapper : Mapper<MetersView, Meter> {
         val tl = MeterTl(measureUnit = input.tl.measureUnit, descr = input.tl.descr)
         tl.id = input.tl.meterTlId
         val meter = Meter(
-            payersServicesId = input.ps.payerServiceId,
+            payersId = input.data.payersId,
+            payersServicesId = input.payerServiceId,
+            type = input.data.type,
             num = input.data.num,
             maxValue = input.data.maxValue,
             passportDate = input.data.passportDate,

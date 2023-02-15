@@ -2,7 +2,7 @@ package com.oborodulin.home.data.util
 
 enum class ServiceType {
     RENT,
-    ELECRICITY,
+    ELECTRICITY,
     GAS,
     COLD_WATER,
     WASTE,

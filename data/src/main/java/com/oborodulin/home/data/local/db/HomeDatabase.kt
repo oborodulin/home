@@ -175,7 +175,7 @@ abstract class HomeDatabase : RoomDatabase() {
             Timber.tag(TAG).i("prePopulateDb(...) called")
             db.beginTransaction()
             try {
-                // Default payers
+                // Default payers:
                 // 1
                 val payer1Entity = PayerEntity.populatePayer1(context)
                 db.insert(
@@ -292,7 +292,8 @@ abstract class HomeDatabase : RoomDatabase() {
                 val electricityPayer1ServiceId =
                     insertPayerService(
                         db, payer = payer1Entity,
-                        serviceId = electricityService.serviceId
+                        serviceId = electricityService.serviceId,
+                        isAllocateRate = true
                     )
                 val gasPayer1ServiceId =
                     insertPayerService(db, payer = payer1Entity, serviceId = gasService.serviceId)
@@ -337,7 +338,7 @@ abstract class HomeDatabase : RoomDatabase() {
                 val electricityPayer1Meter =
                     MeterEntity.populateElectricityMeter(context, payer1Entity.payerId)
                 insertDefMeter(
-                    db, electricityPayer1Meter,
+                    db, listOf(electricityPayer1ServiceId), electricityPayer1Meter,
                     MeterTlEntity.populateElectricityMeterTl(
                         context,
                         electricityPayer1Meter.meterId
@@ -366,7 +367,7 @@ abstract class HomeDatabase : RoomDatabase() {
                 val coldWaterPayer1Meter =
                     MeterEntity.populateColdWaterMeter(context, payer1Entity.payerId)
                 insertDefMeter(
-                    db, coldWaterPayer1Meter,
+                    db, listOf(coldWaterPayer1ServiceId), coldWaterPayer1Meter,
                     MeterTlEntity.populateColdWaterMeterTl(context, coldWaterPayer1Meter.meterId)
                 )
                 // values:
@@ -392,14 +393,14 @@ abstract class HomeDatabase : RoomDatabase() {
                 val hotWaterPayer1Meter =
                     MeterEntity.populateHotWaterMeter(context, payer1Entity.payerId)
                 insertDefMeter(
-                    db, hotWaterPayer1Meter,
+                    db, listOf(hotWaterPayer1ServiceId, wastePayer1ServiceId), hotWaterPayer1Meter,
                     MeterTlEntity.populateHotWaterMeterTl(context, hotWaterPayer1Meter.meterId)
                 )
                 // Heating
                 val heatingPayer1Meter =
                     MeterEntity.populateHeatingMeter(context, payer1Entity.payerId)
                 insertDefMeter(
-                    db, heatingPayer1Meter,
+                    db, listOf(heatingPayer1ServiceId), heatingPayer1Meter,
                     MeterTlEntity.populateHeatingMeterTl(
                         context,
                         heatingPayer1Meter.meterId
@@ -475,7 +476,8 @@ abstract class HomeDatabase : RoomDatabase() {
                 val electricityPayer2ServiceId =
                     insertPayerService(
                         db, payer = payer2Entity,
-                        serviceId = electricityService.serviceId
+                        serviceId = electricityService.serviceId,
+                        isPrivilege = true
                     )
                 val gasPayer2ServiceId =
                     insertPayerService(db, payer = payer2Entity, serviceId = gasService.serviceId)
@@ -520,7 +522,7 @@ abstract class HomeDatabase : RoomDatabase() {
                 val electricityPayer2Meter =
                     MeterEntity.populateElectricityMeter(context, payer2Entity.payerId)
                 insertDefMeter(
-                    db, electricityPayer2Meter,
+                    db, listOf(electricityPayer2ServiceId), electricityPayer2Meter,
                     MeterTlEntity.populateElectricityMeterTl(
                         context,
                         electricityPayer2Meter.meterId
@@ -549,7 +551,7 @@ abstract class HomeDatabase : RoomDatabase() {
                 val coldWaterPayer2Meter =
                     MeterEntity.populateColdWaterMeter(context, payer2Entity.payerId)
                 insertDefMeter(
-                    db, coldWaterPayer2Meter,
+                    db, listOf(coldWaterPayer2ServiceId), coldWaterPayer2Meter,
                     MeterTlEntity.populateColdWaterMeterTl(context, coldWaterPayer2Meter.meterId)
                 )
                 // values:
@@ -575,7 +577,7 @@ abstract class HomeDatabase : RoomDatabase() {
                 val hotWaterPayer2Meter =
                     MeterEntity.populateHotWaterMeter(context, payer2Entity.payerId)
                 insertDefMeter(
-                    db, hotWaterPayer2Meter,
+                    db, listOf(hotWaterPayer2ServiceId, wastePayer2ServiceId), hotWaterPayer2Meter,
                     MeterTlEntity.populateHotWaterMeterTl(context, hotWaterPayer2Meter.meterId)
                 )
                 // values:
@@ -670,12 +672,14 @@ abstract class HomeDatabase : RoomDatabase() {
         }
 
         private fun insertPayerService(
-            db: SupportSQLiteDatabase,
-            payer: PayerEntity,
-            serviceId: UUID
+            db: SupportSQLiteDatabase, payer: PayerEntity, serviceId: UUID,
+            isPrivilege: Boolean = false, isAllocateRate: Boolean = false
         ): UUID {
             val payerService =
-                PayerServiceCrossRefEntity(payersId = payer.payerId, servicesId = serviceId)
+                PayerServiceCrossRefEntity(
+                    payersId = payer.payerId, servicesId = serviceId, isPrivilege = isPrivilege,
+                    isAllocateRate = isAllocateRate
+                )
             db.insert(
                 PayerServiceCrossRefEntity.TABLE_NAME,
                 SQLiteDatabase.CONFLICT_REPLACE,
@@ -690,7 +694,7 @@ abstract class HomeDatabase : RoomDatabase() {
         }
 
         private fun insertDefMeter(
-            db: SupportSQLiteDatabase,
+            db: SupportSQLiteDatabase, payerServiceIds: List<UUID>,
             meter: MeterEntity, textContent: MeterTlEntity
         ) {
             db.insert(
@@ -703,11 +707,24 @@ abstract class HomeDatabase : RoomDatabase() {
                 SQLiteDatabase.CONFLICT_REPLACE,
                 Mapper.toContentValues(textContent)
             )
-            Timber.tag(TAG).i(
-                "Default meter imported: {\"meter\": {%s}, \"tl\": {%s}}",
-                jsonLogger?.toJson(meter),
-                jsonLogger?.toJson(textContent)
-            )
+            for (payerServiceId in payerServiceIds) {
+                val payerServiceMeter =
+                    PayerServiceMeterCrossRefEntity(
+                        payersServicesId = payerServiceId,
+                        metersId = meter.meterId
+                    )
+                db.insert(
+                    PayerServiceMeterCrossRefEntity.TABLE_NAME,
+                    SQLiteDatabase.CONFLICT_REPLACE,
+                    Mapper.toContentValues(payerServiceMeter)
+                )
+                Timber.tag(TAG).i(
+                    "Default meter imported: {\"meter\": {%s}, \"tl\": {%s}, \"psm\": {%s}}",
+                    jsonLogger?.toJson(meter),
+                    jsonLogger?.toJson(textContent),
+                    jsonLogger?.toJson(payerServiceMeter)
+                )
+            }
         }
 
         private fun insertDefMeterValue(

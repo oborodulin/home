@@ -416,7 +416,7 @@ fun MeterValue(
 @Composable
 fun ServiceIcon(serviceType: ServiceType?) =
     when (serviceType) {
-        ServiceType.ELECRICITY -> Image(
+        ServiceType.ELECTRICITY -> Image(
             modifier = Modifier
                 .clip(RoundedCornerShape(8.dp)),
             painter = painterResource(com.oborodulin.home.presentation.R.drawable.outline_electric_bolt_black_36),

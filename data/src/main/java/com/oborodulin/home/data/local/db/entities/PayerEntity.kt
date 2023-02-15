@@ -10,16 +10,17 @@ import java.util.*
 
 @Entity(tableName = PayerEntity.TABLE_NAME)
 class PayerEntity(
-    @PrimaryKey var payerId: UUID = UUID.randomUUID(),
-    var ercCode: String = "",
-    var fullName: String = "",
-    var address: String = "",
-    var totalArea: BigDecimal? = null,
-    var livingSpace: BigDecimal? = null,
-    var heatedVolume: BigDecimal? = null,
-    var paymentDay: Int = DEF_PAYMENT_DAY,
-    var personsNum: Int = 1,
-    var isFavorite: Boolean = false,
+    @PrimaryKey val payerId: UUID = UUID.randomUUID(),
+    val ercCode: String = "",
+    val fullName: String = "",
+    val address: String = "",
+    val totalArea: BigDecimal? = null,
+    val livingSpace: BigDecimal? = null,
+    val heatedVolume: BigDecimal? = null,
+    val paymentDay: Int = DEF_PAYMENT_DAY,
+    val personsNum: Int = 1,
+    val isAlignByPaymentDay: Boolean = false,
+    val isFavorite: Boolean = false,
 ) {
     companion object {
         const val TABLE_NAME = "payers"
@@ -45,6 +46,7 @@ class PayerEntity(
                 livingSpace = BigDecimal.valueOf(48.7),
                 heatedVolume = BigDecimal.valueOf(121.75),
                 personsNum = 1,
+                isAlignByPaymentDay = true,
                 isFavorite = true
             )
     }

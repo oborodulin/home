@@ -136,7 +136,7 @@ interface MeterDao {
                 WHERE v.metersId = :meterId 
                 AND datetime(v.valueDate) > (SELECT mpd.maxValueDate 
                                                FROM meter_value_max_prev_dates_view mpd 
-                                           WHERE mpd.metersId = :meterId))
+                                           WHERE mpd.meterId = :meterId))
 """
     )
     suspend fun deleteCurrentValue(meterId: UUID)

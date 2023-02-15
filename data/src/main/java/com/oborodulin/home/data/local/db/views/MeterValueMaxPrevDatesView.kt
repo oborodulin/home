@@ -8,17 +8,23 @@ import java.util.*
 @DatabaseView(
     viewName = MeterValueMaxPrevDatesView.VIEW_NAME,
     value = """
-SELECT v.metersId, MAX(datetime(v.valueDate)) maxValueDate 
-    FROM meter_values v JOIN meters m ON m.meterId = v.metersId
-        JOIN payers AS p ON p.payerId = m.payersId
-    WHERE datetime(v.valueDate) <= CASE WHEN datetime('now') > datetime('now', 'start of month', '+' || (IFNULL(p.paymentDay, ${Constants.DEF_PAYMENT_DAY}) - 1) || ' days')
-            THEN datetime('now', 'start of month', '+' || (IFNULL(p.paymentDay, ${Constants.DEF_PAYMENT_DAY}) - 1) || ' days')
-            ELSE datetime('now', '-1 months', 'start of month', '+' || (IFNULL(p.paymentDay, ${Constants.DEF_PAYMENT_DAY}) - 1) || ' days') END
-GROUP BY v.metersId
+SELECT mv.meterId, MAX(mv.valueDate) AS maxValueDate 
+FROM (SELECT m.meterId, m.payersId, IFNULL(datetime(v.valueDate), datetime('now', 'start of month', '-1 days')) valueDate 
+        FROM meters m LEFT JOIN meter_values v ON v.metersId = m.meterId) mv 
+    JOIN payers p ON p.payerId = mv.payersId
+ WHERE datetime(mv.valueDate) <= 
+    CASE WHEN p.isAlignByPaymentDay = 0 
+        THEN datetime('now', 'start of month', '-1 days')
+        ELSE CASE WHEN datetime('now') > datetime('now', 'start of month', '+' || (IFNULL(p.paymentDay, ${Constants.DEF_PAYMENT_DAY}) - 1) || ' days')
+                THEN datetime('now', 'start of month', '+' || (IFNULL(p.paymentDay, ${Constants.DEF_PAYMENT_DAY}) - 1) || ' days')
+                ELSE datetime('now', '-1 months', 'start of month', '+' || (IFNULL(p.paymentDay, ${Constants.DEF_PAYMENT_DAY}) - 1) || ' days')
+            END
+    END
+GROUP BY mv.meterId
 """
 )
 class MeterValueMaxPrevDatesView(
-    var metersId: UUID,
+    var meterId: UUID,
     var maxValueDate: OffsetDateTime
 ) {
     companion object {

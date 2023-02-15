@@ -12,12 +12,12 @@ SELECT rsd.* FROM rate_service_last_dates_view rsd JOIN
     EXCEPT 
     SELECT servicesId, payersServicesId FROM rate_service_last_dates_view WHERE isPrivileges = 1) rwp
         ON rsd.isPrivileges = 0 AND rsd.servicesId = rwp.servicesId 
-        AND IFNULL(rsd.payersServicesId, '') = IFNULL(rwp.payersServicesId, '')
+            AND IFNULL(rsd.payersServicesId, '') = IFNULL(rwp.payersServicesId, '')
 UNION ALL
 SELECT rsd.* FROM rate_service_last_dates_view rsd JOIN
     (SELECT servicesId, payersServicesId FROM rate_service_last_dates_view WHERE isPrivileges = 1) rp
         ON rsd.isPrivileges = 1 AND rsd.servicesId = rp.servicesId 
-        AND IFNULL(rsd.payersServicesId, '') = IFNULL(rp.payersServicesId, '')
+            AND IFNULL(rsd.payersServicesId, '') = IFNULL(rp.payersServicesId, '')
 """
 )
 class RateServiceWithPrivilegesView(
