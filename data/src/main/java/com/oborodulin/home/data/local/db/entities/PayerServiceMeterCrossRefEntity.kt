@@ -21,7 +21,7 @@ import java.util.*
     )]
 )
 data class PayerServiceMeterCrossRefEntity(
-    @PrimaryKey var payerServiceMeterId: UUID = UUID.randomUUID(),
+    @PrimaryKey val payerServiceMeterId: UUID = UUID.randomUUID(),
     @ColumnInfo(index = true) val payersServicesId: UUID,
     @ColumnInfo(index = true) val metersId: UUID,
 ) {

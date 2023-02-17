@@ -25,7 +25,7 @@ import java.util.*
     )]
 )
 class RateEntity(
-    @PrimaryKey var rateId: UUID = UUID.randomUUID(),
+    @PrimaryKey val rateId: UUID = UUID.randomUUID(),
     //@TypeConverters(DateTypeConverter::class)
     val startDate: OffsetDateTime = OffsetDateTime.now(),
     val fromMeterValue: BigDecimal? = null,
@@ -33,8 +33,8 @@ class RateEntity(
     val rateValue: BigDecimal,
     val isPerPerson: Boolean = false, // считаем по норме на 1 человека, но приоритет для тарифов по счётчику
     val isPrivileges: Boolean = false, // считаем по счётчику, но по льготному тарифу
-    @ColumnInfo(index = true) var servicesId: UUID,
-    @ColumnInfo(index = true) var payersServicesId: UUID? = null,
+    @ColumnInfo(index = true) val servicesId: UUID,
+    @ColumnInfo(index = true) val payersServicesId: UUID? = null,
 ) {
     companion object {
         const val TABLE_NAME = "rates"

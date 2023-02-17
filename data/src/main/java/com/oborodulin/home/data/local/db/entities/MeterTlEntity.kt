@@ -18,7 +18,7 @@ import java.util.*
 data class MeterTlEntity(
     @PrimaryKey var meterTlId: UUID = UUID.randomUUID(),
     val localeCode: String = Locale.getDefault().language,
-    var measureUnit: String,
+    val measureUnit: String,
     val descr: String? = null,
     @ColumnInfo(index = true) var metersId: UUID,
 ) {

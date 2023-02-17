@@ -22,12 +22,12 @@ import java.util.*
 )
 data class PayerServiceCrossRefEntity(
     @PrimaryKey var payerServiceId: UUID = UUID.randomUUID(),
+    val isPrivileges: Boolean = false,
+    val isAllocateRate: Boolean = false,
     //warning: servicesId column references a foreign key but it is not part of an index.
     // This may trigger full table scans whenever parent table is modified so you are highly advised to create an index that covers this column.
     @ColumnInfo(index = true) val payersId: UUID,
-    @ColumnInfo(index = true) val servicesId: UUID,
-    var isPrivilege: Boolean = false,
-    var isAllocateRate: Boolean = false
+    @ColumnInfo(index = true) val servicesId: UUID
 ) {
     companion object {
         const val TABLE_NAME = "payers_services"

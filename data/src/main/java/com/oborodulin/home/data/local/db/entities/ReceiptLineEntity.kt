@@ -41,7 +41,7 @@ import java.util.*
     )]
 )
 class ReceiptLineEntity(
-    @PrimaryKey var receiptLineId: UUID = UUID.randomUUID(),
+    @PrimaryKey val receiptLineId: UUID = UUID.randomUUID(),
     val isPaid: Boolean = false,
     @ColumnInfo(index = true) val receiptsId: UUID,
     @ColumnInfo(index = true) val servicesId: UUID,

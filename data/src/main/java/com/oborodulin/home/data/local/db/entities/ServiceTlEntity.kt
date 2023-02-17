@@ -17,12 +17,12 @@ import java.util.*
     )]
 )
 class ServiceTlEntity(
-    @PrimaryKey var serviceTlId: UUID = UUID.randomUUID(),
+    @PrimaryKey val serviceTlId: UUID = UUID.randomUUID(),
     val localeCode: String = Locale.getDefault().language,
     val name: String = "",
     var measureUnit: String? = null,
     val descr: String? = null,
-    @ColumnInfo(index = true) var servicesId: UUID,
+    @ColumnInfo(index = true) val servicesId: UUID,
 ) {
     companion object {
         const val TABLE_NAME = "services_tl"

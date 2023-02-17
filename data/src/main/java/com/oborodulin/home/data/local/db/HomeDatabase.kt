@@ -61,7 +61,8 @@ private val MIGRATION_4_5 = object : Migration(4, 5) {
         ReceiptEntity::class, ReceiptLineEntity::class],
     views = [MetersView::class, ServicesView::class, MeterValueMaxPrevDatesView::class,
         MeterValuePrevPeriodsView::class, MeterValuePaymentPeriodsView::class, MeterValuePaymentsView::class,
-        RateServiceLastDatesView::class, RateServiceWithPrivilegesView::class, RatePayerServicesView::class],
+        RateServiceLastDatesView::class, RatePayerServicesView::class,
+        PayerServiceDebtsView::class],
     version = 5
 )
 @TypeConverters(HomeTypeConverters::class)
@@ -677,7 +678,7 @@ abstract class HomeDatabase : RoomDatabase() {
         ): UUID {
             val payerService =
                 PayerServiceCrossRefEntity(
-                    payersId = payer.payerId, servicesId = serviceId, isPrivilege = isPrivilege,
+                    payersId = payer.payerId, servicesId = serviceId, isPrivileges = isPrivilege,
                     isAllocateRate = isAllocateRate
                 )
             db.insert(

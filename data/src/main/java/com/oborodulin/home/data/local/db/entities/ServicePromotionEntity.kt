@@ -21,12 +21,12 @@ import java.util.*
     )]
 )
 class ServicePromotionEntity(
-    @PrimaryKey var servicePromotionId: UUID = UUID.randomUUID(),
+    @PrimaryKey val servicePromotionId: UUID = UUID.randomUUID(),
     val paymentMonths: Int = 1, // период оплаты - кол-во месяцев в году
     val isPrevRate: Boolean = false, // считаем по предыдущему тарифу
     val isActive: Boolean = true,
-    @ColumnInfo(index = true) var servicesId: UUID,
-    @ColumnInfo(index = true) var payersServicesId: UUID? = null,
+    @ColumnInfo(index = true) val servicesId: UUID,
+    @ColumnInfo(index = true) val payersServicesId: UUID? = null,
 ) {
     companion object {
         const val TABLE_NAME = "service_promotions"

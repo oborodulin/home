@@ -15,11 +15,11 @@ import java.util.*
     )]
 )
 class ReceiptEntity(
-    @PrimaryKey var receiptId: UUID = UUID.randomUUID(),
-    var receiptMonth: Int,
-    var receiptYear: Int,
-    var isPaid: Boolean = false,
-    @ColumnInfo(index = true) var payersId: UUID,
+    @PrimaryKey val receiptId: UUID = UUID.randomUUID(),
+    val receiptMonth: Int,
+    val receiptYear: Int,
+    val isPaid: Boolean = false,
+    @ColumnInfo(index = true) val payersId: UUID,
 ) {
     companion object {
         const val TABLE_NAME = "receipts"
