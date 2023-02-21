@@ -24,8 +24,8 @@ GROUP BY mv.meterId
 """
 )
 class MeterValueMaxPrevDatesView(
-    var meterId: UUID,
-    var maxValueDate: OffsetDateTime
+    val meterId: UUID,
+    val maxValueDate: OffsetDateTime
 ) {
     companion object {
         const val VIEW_NAME = "meter_value_max_prev_dates_view"

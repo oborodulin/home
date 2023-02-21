@@ -1,16 +1,14 @@
 package com.oborodulin.home.accounting.di
 
 import com.oborodulin.home.accounting.domain.usecases.*
+import com.oborodulin.home.accounting.ui.model.converters.FavoritePayerConverter
 import com.oborodulin.home.accounting.ui.model.converters.PayerConverter
 import com.oborodulin.home.accounting.ui.model.converters.PayersListConverter
-import com.oborodulin.home.metering.ui.model.converters.PrevServiceMeterValuesListConverter
 import com.oborodulin.home.accounting.ui.model.mappers.*
 import com.oborodulin.home.common.domain.usecases.UseCase
 import com.oborodulin.home.domain.repositories.PayersRepository
 import com.oborodulin.home.domain.usecase.*
 import com.oborodulin.home.metering.domain.repositories.MetersRepository
-import com.oborodulin.home.metering.domain.usecases.GetPrevServiceMeterValuesUseCase
-import com.oborodulin.home.metering.ui.model.mappers.PrevMetersValuesViewToMeterValueModelMapper
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -27,7 +25,7 @@ object AccountingModule {
 
     @Singleton
     @Provides
-    fun providePayerModelToPayerMapper(): PayerModelToPayerMapper= PayerModelToPayerMapper()
+    fun providePayerModelToPayerMapper(): PayerModelToPayerMapper = PayerModelToPayerMapper()
 
     @Singleton
     @Provides
@@ -50,6 +48,11 @@ object AccountingModule {
     fun providePayerConverter(mapper: PayerToPayerModelMapper): PayerConverter =
         PayerConverter(mapper = mapper)
 
+    @Singleton
+    @Provides
+    fun provideFavoritePayerConverter(mapper: PayerToPayerModelMapper): FavoritePayerConverter =
+        FavoritePayerConverter(mapper = mapper)
+
     // USE CASES:
     @Singleton
     @Provides
@@ -59,9 +62,9 @@ object AccountingModule {
         metersRepository: MetersRepository
     ): AccountingUseCases =
         AccountingUseCases(
-            getPrevServiceMeterValuesUseCase = GetPrevServiceMeterValuesUseCase(
+            getFavoritePayerUseCase = GetFavoritePayerUseCase(
                 configuration,
-                metersRepository
+                payersRepository
             ),
         )
 }

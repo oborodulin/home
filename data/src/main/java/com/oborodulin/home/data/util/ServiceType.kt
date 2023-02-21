@@ -12,4 +12,5 @@ enum class ServiceType {
     DOORPHONE,
     PHONE,
     USGO,
+    INTERNET,
 }

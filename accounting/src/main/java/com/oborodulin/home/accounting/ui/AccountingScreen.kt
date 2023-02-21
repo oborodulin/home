@@ -25,6 +25,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
+import com.oborodulin.home.accounting.ui.AccountingViewModelImp.Companion.previewPayerModel
 import com.oborodulin.home.accounting.ui.model.AccountingModel
 import com.oborodulin.home.accounting.ui.payer.list.PayersListView
 import com.oborodulin.home.accounting.ui.payer.list.PayersListViewModel
@@ -102,6 +103,7 @@ fun AccountingScreen(
                 bottomBar = bottomBar
             ) {
                 CommonScreen(paddingValues = it, state = state) { accountingModel ->
+                    appState.actionBarSubtitle.value = accountingModel.favoritePayer.address
                     AccountingView(
                         appState = appState,
                         accountingModel = accountingModel,
@@ -194,7 +196,7 @@ private fun AccountingView(
 fun PreviewAccountingView() {
     AccountingView(
         appState = rememberAppState(),
-        accountingModel = AccountingModel(),
+        accountingModel = AccountingModel(previewPayerModel(LocalContext.current)),
         navController = rememberNavController(),
         accountingViewModel = AccountingViewModelImp.previewModel(LocalContext.current),
         payersListViewModel = PayersListViewModelImp.previewModel(LocalContext.current),

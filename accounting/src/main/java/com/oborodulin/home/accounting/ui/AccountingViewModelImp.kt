@@ -2,18 +2,26 @@ package com.oborodulin.home.accounting.ui
 
 import android.content.Context
 import androidx.lifecycle.SavedStateHandle
+import androidx.lifecycle.viewModelScope
 import com.oborodulin.home.accounting.domain.usecases.AccountingUseCases
+import com.oborodulin.home.accounting.domain.usecases.GetFavoritePayerUseCase
 import com.oborodulin.home.accounting.ui.model.AccountingModel
+import com.oborodulin.home.accounting.ui.model.PayerModel
+import com.oborodulin.home.accounting.ui.model.converters.FavoritePayerConverter
 import com.oborodulin.home.common.ui.state.MviViewModel
 import com.oborodulin.home.common.ui.state.UiState
+import com.oborodulin.home.data.R
 import com.oborodulin.home.data.local.db.HomeDatabase
-import com.oborodulin.home.metering.ui.model.converters.PrevServiceMeterValuesListConverter
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.receiveAsFlow
+import kotlinx.coroutines.launch
 import timber.log.Timber
+import java.math.BigDecimal
+import java.util.*
 import javax.inject.Inject
 
 private const val TAG = "Accounting.ui.AccountingViewModel"
@@ -22,7 +30,7 @@ private const val TAG = "Accounting.ui.AccountingViewModel"
 class AccountingViewModelImp @Inject constructor(
     private val state: SavedStateHandle,
     private val accountingUseCases: AccountingUseCases,
-    private val converter: PrevServiceMeterValuesListConverter
+    private val payerConverter: FavoritePayerConverter
 ) : AccountingViewModel,
     MviViewModel<AccountingModel, UiState<AccountingModel>, AccountingUiAction, AccountingUiSingleEvent>(
         state = state
@@ -44,60 +52,51 @@ class AccountingViewModelImp @Inject constructor(
                 HomeDatabase.isImportDone
             )
         val job = when (action) {
-            is AccountingUiAction.Init -> submitState(UiState.Success(data = AccountingModel()))
-            //is AccountingUiAction.Load -> loadPrevServiceMeterValues(action.payerId)
+            is AccountingUiAction.Init -> loadFavoritePayer()
+        }
+        return job
+    }
+
+    private fun loadFavoritePayer(): Job {
+        Timber.tag(TAG).d("loadFavoritePayer() called")
+        val job = viewModelScope.launch(errorHandler) {
+            accountingUseCases.getFavoritePayerUseCase.execute(GetFavoritePayerUseCase.Request)
+                .map {
+                    payerConverter.convert(it)
+                }
+                .collect {
+                    submitState(it)
+                }
         }
         return job
     }
 
     override fun initFieldStatesByUiModel(uiModel: Any): Job? = null
 
-    /*    private fun getPayers() {
-            viewModelScope.launch(errorHandler) {
-                payerUseCases.getPayersUseCase().collect {
-                    _uiState.value = _uiState.value.copy(
-                        payers = it,
-                        isLoading = false
-                    )
-                }
-            }
-        }
-    fun onEvent(event: PayersListEvent) {
-        when (event) {
-            is PayersListEvent.DeletePayer ->
-                viewModelScope.launch { payerUseCases.deletePayerUseCase(event.payer) }
-        is PayersListEvent.ShowCompletedPayers -> viewModelScope.launch {
-            userPreferenceUseCases.updateShowCompleted(event.show)
-        }
-        is PayersListEvent.ChangeSortByDeadline -> viewModelScope.launch {
-            userPreferenceUseCases.enableSortByDeadline(event.enable)
-        }
-        is PayersListEvent.ChangeSortByPriority -> viewModelScope.launch {
-            userPreferenceUseCases.enableSortByPriority(event.enable)
-        }
-
-
-        }
-     }
-
-     */
     companion object {
         fun previewModel(ctx: Context) =
             object : AccountingViewModel {
                 override val uiStateFlow =
                     MutableStateFlow(
-                        UiState.Success(
-                            AccountingModel(
-                                //serviceMeterVals = previewMeterValueModel(ctx)
-                            )
-                        )
+                        UiState.Success(AccountingModel(favoritePayer = previewPayerModel(ctx)))
                     )
                 override val singleEventFlow = Channel<AccountingUiSingleEvent>().receiveAsFlow()
-//                override val uiMeterValuesState = mutableStateOf<List<MeterValueListItem>>(listOf())
 
                 override fun submitAction(action: AccountingUiAction): Job? {
                     return null
                 }
             }
+
+        fun previewPayerModel(ctx: Context) =
+            PayerModel(
+                id = UUID.randomUUID(),
+                fullName = ctx.resources.getString(R.string.def_payer1_full_name),
+                address = ctx.resources.getString(R.string.def_payer1_address),
+                totalArea = BigDecimal.valueOf(61),
+                livingSpace = BigDecimal.valueOf(59),
+                paymentDay = 20,
+                personsNum = 2,
+                isFavorite = true,
+            )
     }
 }

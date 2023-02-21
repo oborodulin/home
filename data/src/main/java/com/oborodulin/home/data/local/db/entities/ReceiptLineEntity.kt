@@ -4,6 +4,7 @@ import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.PrimaryKey
+import java.math.BigDecimal
 import java.util.*
 
 @Entity(
@@ -15,9 +16,9 @@ import java.util.*
         onDelete = ForeignKey.CASCADE,
         deferred = true
     ), ForeignKey(
-        entity = ServiceEntity::class,
-        parentColumns = arrayOf("serviceId"),
-        childColumns = arrayOf("servicesId"),
+        entity = PayerServiceCrossRefEntity::class,
+        parentColumns = arrayOf("payerServiceId"),
+        childColumns = arrayOf("payersServicesId"),
         onDelete = ForeignKey.CASCADE,
         deferred = true
     ), ForeignKey(
@@ -42,9 +43,15 @@ import java.util.*
 )
 class ReceiptLineEntity(
     @PrimaryKey val receiptLineId: UUID = UUID.randomUUID(),
-    val isPaid: Boolean = false,
+    val isServiceActive: Boolean = true,
+    val isPromotionActive: Boolean = true,
+    val isPrivileges: Boolean = false,
+    val isAllocateRate: Boolean = false,
+    val rateValue: BigDecimal,
+    val additionalPayment: BigDecimal? = null,
+    val isLinePaid: Boolean = false,
     @ColumnInfo(index = true) val receiptsId: UUID,
-    @ColumnInfo(index = true) val servicesId: UUID,
+    @ColumnInfo(index = true) val payersServicesId: UUID,
     @ColumnInfo(index = true) val ratesId: UUID,
     @ColumnInfo(index = true) val servicePromotionsId: UUID? = null,
     @ColumnInfo(index = true) val meterValuesId: UUID? = null
@@ -52,13 +59,27 @@ class ReceiptLineEntity(
     companion object {
         const val TABLE_NAME = "receipt_lines"
 
-        fun populateReceiptLine(
-            receiptId: UUID, serviceId: UUID, rateId: UUID, servicePromotionId: UUID? = null,
-            meterValueId: UUID? = null
+        fun populateReceiptLinePaid(
+            receiptId: UUID, payerServiceId: UUID, rateId: UUID, rateValue: BigDecimal,
+            servicePromotionId: UUID? = null, meterValueId: UUID? = null
         ) = ReceiptLineEntity(
             receiptsId = receiptId,
-            servicesId = serviceId,
+            payersServicesId = payerServiceId,
             ratesId = rateId,
+            rateValue = rateValue,
+            servicePromotionsId = servicePromotionId,
+            meterValuesId = meterValueId,
+            isLinePaid = true
+        )
+
+        fun populateReceiptLineNotPaid(
+            receiptId: UUID, payerServiceId: UUID, rateId: UUID, rateValue: BigDecimal,
+            servicePromotionId: UUID? = null, meterValueId: UUID? = null
+        ) = ReceiptLineEntity(
+            receiptsId = receiptId,
+            payersServicesId = payerServiceId,
+            ratesId = rateId,
+            rateValue = rateValue,
             servicePromotionsId = servicePromotionId,
             meterValuesId = meterValueId,
         )

@@ -2,7 +2,6 @@ package com.oborodulin.home.data.local.db.repositories
 
 import com.oborodulin.home.domain.model.Payer
 import com.oborodulin.home.domain.repositories.PayersRepository
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import java.util.*
 import javax.inject.Inject
@@ -13,6 +12,8 @@ class PayersRepositoryImp @Inject constructor(
     override fun getAll() = payerDataSource.getPayers()
 
     override fun get(payerId: UUID) = payerDataSource.getPayer(payerId)
+
+    override fun getFavorite() = payerDataSource.getFavoritePayer()
 
     override fun save(payer: Payer) = flow {
         payerDataSource.savePayer(payer)

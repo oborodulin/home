@@ -13,9 +13,9 @@ ORDER BY s.pos
 )
 class ServicesView(
     @Embedded
-    var data: ServiceEntity,
+    val data: ServiceEntity,
     @Embedded
-    var tl: ServiceTlEntity,
+    val tl: ServiceTlEntity,
 ) {
     companion object {
         const val VIEW_NAME = "services_view"

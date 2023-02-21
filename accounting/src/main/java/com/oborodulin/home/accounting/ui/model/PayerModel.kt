@@ -5,16 +5,14 @@ import java.math.BigDecimal
 import java.util.*
 
 data class PayerModel(
-    var id: UUID? = null,
-    var ercCode: String = "",
-    var fullName: String = "",
-    var address: String = "",
-    var totalArea: BigDecimal? = null,
-    var livingSpace: BigDecimal? = null,
-    var heatedVolume: BigDecimal? = null,
-    var paymentDay: Int = Constants.DEF_PAYMENT_DAY,
-    var personsNum: Int = 1,
-    var isFavorite: Boolean = false,
-//    val isLoading: Boolean,
-//    val error: String? = null
+    val id: UUID? = null,
+    val ercCode: String = "",
+    val fullName: String = "",
+    val address: String = "",
+    val totalArea: BigDecimal? = null,
+    val livingSpace: BigDecimal? = null,
+    val heatedVolume: BigDecimal? = null,
+    val paymentDay: Int = Constants.DEF_PAYMENT_DAY,
+    val personsNum: Int = 1,
+    val isFavorite: Boolean = false
 )

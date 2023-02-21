@@ -6,7 +6,7 @@ import com.oborodulin.home.data.local.db.mappers.PayerEntityListToPayerListMappe
 import com.oborodulin.home.data.local.db.mappers.PayerEntityToPayerMapper
 import com.oborodulin.home.data.local.db.mappers.PayerToPayerEntityMapper
 import com.oborodulin.home.data.local.db.repositories.PayerDataSource
-import com.oborodulin.home.data.local.db.repositories.PayerDataSourceImpl
+import com.oborodulin.home.data.local.db.repositories.PayerDataSourceImp
 import com.oborodulin.home.data.local.db.repositories.PayersRepositoryImp
 import com.oborodulin.home.domain.repositories.PayersRepository
 import com.oborodulin.home.domain.usecase.*
@@ -44,7 +44,7 @@ object DataModule {
         payerEntityToPayerMapper: PayerEntityToPayerMapper,
         payerToPayerEntityMapper: PayerToPayerEntityMapper
     ): PayerDataSource =
-        PayerDataSourceImpl(
+        PayerDataSourceImp(
             payerDao, dispatcher,
             payerEntityListToPayerListMapper,
             payerEntityToPayerMapper,

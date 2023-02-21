@@ -14,7 +14,7 @@ import javax.inject.Inject
 /**
  * Created by tfakioglu on 12.December.2021
  */
-class MeteringDataSourceImpl @Inject constructor(
+class MeteringDataSourceImp @Inject constructor(
     private val meterDao: MeterDao,
     @IoDispatcher private val dispatcher: CoroutineDispatcher,
     private val metersViewToMeterListMapper: MetersViewToMeterListMapper,

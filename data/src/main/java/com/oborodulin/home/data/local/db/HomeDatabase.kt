@@ -59,10 +59,11 @@ private val MIGRATION_4_5 = object : Migration(4, 5) {
         MeterEntity::class, MeterTlEntity::class, MeterValueEntity::class, MeterVerificationEntity::class,
         PayerServiceMeterCrossRefEntity::class,
         ReceiptEntity::class, ReceiptLineEntity::class],
-    views = [MetersView::class, ServicesView::class, MeterValueMaxPrevDatesView::class,
-        MeterValuePrevPeriodsView::class, MeterValuePaymentPeriodsView::class, MeterValuePaymentsView::class,
-        RateServiceLastDatesView::class, RatePayerServicesView::class,
-        PayerServiceDebtsView::class],
+    views = [MetersView::class, ServicesView::class, ReceiptsView::class,
+        MeterValueMaxPrevDatesView::class, MeterValuePrevPeriodsView::class,
+        MeterValuePaymentPeriodsView::class, MeterValuePaymentsView::class,
+        RatePayerServicesView::class,
+        PayerServiceDebtsView::class, PayerServiceTotalDebtsView::class, PayerTotalDebtsView::class],
     version = 5
 )
 @TypeConverters(HomeTypeConverters::class)

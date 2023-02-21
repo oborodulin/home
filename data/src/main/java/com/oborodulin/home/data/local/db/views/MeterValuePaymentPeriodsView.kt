@@ -35,7 +35,7 @@ FROM meter_values mv JOIN
             JOIN payers p ON p.payerId = m.payersId) mvp
         JOIN payers_services_meters AS psm ON psm.metersId = mvp.meterId 
         JOIN payers_services AS ps ON ps.payerServiceId = psm.payersServicesId
-        JOIN services_view sv ON sv.serviceId = ps.servicesId AND sv.type = mvp.type
+        JOIN services_view sv ON sv.serviceId = ps.servicesId
     GROUP BY mvp.payerId, ps.payerServiceId, mvp.meterId, mvp.paymentDate) lv 
         ON mv.metersId = lv.meterId AND datetime(mv.valueDate) = lv.maxValueDate
 """

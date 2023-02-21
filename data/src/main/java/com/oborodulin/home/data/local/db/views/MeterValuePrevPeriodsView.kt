@@ -23,7 +23,7 @@ SELECT mvf.meterValueId, p.payerId, sv.serviceId, sv.type, sv.name, sv.pos,
     mvf.valueFormat
 FROM (SELECT mvl.meterValueId, mv.payersId, mv.servicesId, mv.meterId, mv.type, mv.measureUnit, 
         IFNULL(datetime(mvl.valueDate), datetime('now', 'start of month', '-1 days')) AS prevLastDate, 
-        mvl.meterValue AS prevValue, mv.localeCode AS meterlocaleCode,
+        mvl.meterValue AS prevValue, mv.localeCode AS meterLocaleCode,
         substr('#0.' || '0000000000', 1, 3 + (length(cast(mv.maxValue / ${Constants.CONV_COEFF_BIGDECIMAL}.0 as text)) - 
             CASE WHEN instr(cast(mv.maxValue / ${Constants.CONV_COEFF_BIGDECIMAL}.0 as text), '.') = length(cast(mv.maxValue / ${Constants.CONV_COEFF_BIGDECIMAL}.0 as text)) - 1
                 THEN length(cast(mv.maxValue / ${Constants.CONV_COEFF_BIGDECIMAL}.0 as text)) + 1 

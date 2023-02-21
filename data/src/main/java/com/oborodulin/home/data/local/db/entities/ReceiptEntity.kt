@@ -1,6 +1,7 @@
 package com.oborodulin.home.data.local.db.entities
 
 import androidx.room.*
+import java.math.BigDecimal
 import java.util.*
 
 @Entity(
@@ -18,6 +19,10 @@ class ReceiptEntity(
     @PrimaryKey val receiptId: UUID = UUID.randomUUID(),
     val receiptMonth: Int,
     val receiptYear: Int,
+    val totalArea: BigDecimal? = null,
+    val livingSpace: BigDecimal? = null,
+    val heatedVolume: BigDecimal? = null,
+    val personsNum: Int = 1,
     val isPaid: Boolean = false,
     @ColumnInfo(index = true) val payersId: UUID,
 ) {

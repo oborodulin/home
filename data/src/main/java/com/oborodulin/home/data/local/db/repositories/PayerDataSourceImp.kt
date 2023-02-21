@@ -16,7 +16,7 @@ import javax.inject.Inject
  * Created by o.borodulin on 08.August.2022
  */
 @OptIn(kotlinx.coroutines.ExperimentalCoroutinesApi::class)
-class PayerDataSourceImpl @Inject constructor(
+class PayerDataSourceImp @Inject constructor(
     private val payerDao: PayerDao,
     @IoDispatcher private val dispatcher: CoroutineDispatcher,
     private val payerEntityListToPayerListMapper: PayerEntityListToPayerListMapper,
@@ -28,6 +28,9 @@ class PayerDataSourceImpl @Inject constructor(
 
     override fun getPayer(payerId: UUID) =
         payerDao.findByIdDistinctUntilChanged(payerId).map(payerEntityToPayerMapper::map)
+
+    override fun getFavoritePayer() =
+        payerDao.findFavoriteDistinctUntilChanged().map(payerEntityToPayerMapper::map)
 
     override suspend fun savePayer(payer: Payer) = withContext(dispatcher) {
         if (payer.id == null) {

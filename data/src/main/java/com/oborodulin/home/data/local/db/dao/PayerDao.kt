@@ -25,6 +25,12 @@ interface PayerDao {
     @ExperimentalCoroutinesApi
     fun findByIdDistinctUntilChanged(id: UUID) = findById(id).distinctUntilChanged()
 
+    @Query("SELECT * FROM payers WHERE isFavorite = 1")
+    fun findFavorite(): Flow<PayerEntity>
+
+    @ExperimentalCoroutinesApi
+    fun findFavoriteDistinctUntilChanged() = findFavorite().distinctUntilChanged()
+
     @Transaction
     @Query("SELECT * FROM payers ORDER BY isFavorite DESC")
     fun findPayersWithServices(): List<PayerWithServices>
