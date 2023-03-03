@@ -7,6 +7,28 @@ object Constants {
     const val DATABASE_NAME = "home-database.sqlite"
 
     const val DEF_PAYMENT_DAY = 20
+    const val DB_FRACT_SEC_TIME = "'%Y-%m-%dT%H:%M:%f'"
+    const val TZ_TIME = "STRFTIME('%Y-%m-%dT%H:%M:%S', DATETIME('now', 'localtime')) || PRINTF('%+.2d:%.2d', ROUND((JULIANDAY('now', 'localtime') - JULIANDAY('now')) * 24), ABS(ROUND((JULIANDAY('now', 'localtime') - JULIANDAY('now')) * 24 * 60) % 60))"
+
+    const val SRV_RENT_VAL = "'RENT'"
+    const val SRV_ELECTRICITY_VAL = "'ELECTRICITY'"
+    const val SRV_GAS_VAL = "'GAS'"
+    const val SRV_COLD_WATER_VAL = "'COLD_WATER'"
+    const val SRV_WASTE_VAL = "'WASTE'"
+    const val SRV_HEATING_VAL = "'HEATING'"
+    const val SRV_HOT_WATER_VAL = "'HOT_WATER'"
+    const val SRV_GARBAGE_VAL = "'GARBAGE'"
+    const val SRV_DOORPHONE_VAL = "'DOORPHONE'"
+    const val SRV_PHONE_VAL = "'PHONE'"
+    const val SRV_USGO_VAL = "'USGO'"
+    const val SRV_INTERNET_VAL = "'INTERNET'"
+
+    const val MTR_ELECTRICITY_VAL = "'ELECTRICITY'"
+    const val MTR_GAS_VAL = "'GAS'"
+    const val MTR_COLD_WATER_VAL = "'COLD_WATER'"
+    const val MTR_HEATING_VAL = "'HEATING'"
+    const val MTR_HOT_WATER_VAL = "'HOT_WATER'"
+    const val MTR_NONE_VAL = "'NONE'"
 
 /*
     const val SQL_PREV_METERS_VALUES_SUBQUERY = """

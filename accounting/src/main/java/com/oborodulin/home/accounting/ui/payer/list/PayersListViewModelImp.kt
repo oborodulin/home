@@ -7,10 +7,11 @@ import com.oborodulin.home.accounting.ui.model.PayerListItem
 import com.oborodulin.home.accounting.ui.model.converters.PayersListConverter
 import com.oborodulin.home.common.ui.state.MviViewModel
 import com.oborodulin.home.common.ui.state.UiState
-import com.oborodulin.home.domain.usecase.DeletePayerUseCase
-import com.oborodulin.home.domain.usecase.FavoritePayerUseCase
-import com.oborodulin.home.domain.usecase.GetPayersUseCase
-import com.oborodulin.home.domain.usecase.PayerUseCases
+import com.oborodulin.home.common.util.Utils
+import com.oborodulin.home.domain.usecases.DeletePayerUseCase
+import com.oborodulin.home.domain.usecases.FavoritePayerUseCase
+import com.oborodulin.home.accounting.domain.usecases.GetPayersUseCase
+import com.oborodulin.home.accounting.domain.usecases.PayerUseCases
 import com.oborodulin.home.presentation.navigation.NavRoutes
 import com.oborodulin.home.presentation.navigation.PayerInput
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -120,7 +121,7 @@ class PayersListViewModelImp @Inject constructor(
                 //fun viewModelScope(): CoroutineScope = CoroutineScope(Dispatchers.Main)
                 override fun handleActionJob(action: () -> Unit, afterAction: () -> Unit) {}
                 override fun submitAction(action: PayersListUiAction): Job? = null
-                override fun setPrimaryObjectData(value: ArrayList<String>){}
+                override fun setPrimaryObjectData(value: ArrayList<String>) {}
             }
 
         fun previewList(ctx: Context) = listOf(
@@ -133,6 +134,9 @@ class PayersListViewModelImp @Inject constructor(
                 paymentDay = 20,
                 personsNum = 2,
                 isFavorite = true,
+                fromPaymentDate = Utils.toOffsetDateTime("2022-08-01T14:29:10.212"),
+                toPaymentDate = Utils.toOffsetDateTime("2022-09-01T14:29:10.212"),
+                totalDebt = BigDecimal.valueOf(123456.78)
             ),
             PayerListItem(
                 id = UUID.randomUUID(),
@@ -142,6 +146,9 @@ class PayersListViewModelImp @Inject constructor(
                 livingSpace = BigDecimal.valueOf(76),
                 paymentDay = 20,
                 personsNum = 1,
+                fromPaymentDate = Utils.toOffsetDateTime("2022-08-01T14:29:10.212"),
+                toPaymentDate = Utils.toOffsetDateTime("2022-09-01T14:29:10.212"),
+                totalDebt = BigDecimal.valueOf(876543.21)
             )
         )
     }

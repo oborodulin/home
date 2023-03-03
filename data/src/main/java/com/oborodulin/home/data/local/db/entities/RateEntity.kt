@@ -26,7 +26,6 @@ import java.util.*
 )
 class RateEntity(
     @PrimaryKey val rateId: UUID = UUID.randomUUID(),
-    //@TypeConverters(DateTypeConverter::class)
     val startDate: OffsetDateTime = OffsetDateTime.now(),
     val fromMeterValue: BigDecimal? = null,
     val toMeterValue: BigDecimal? = null,

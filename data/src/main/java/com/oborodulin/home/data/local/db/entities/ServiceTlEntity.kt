@@ -22,7 +22,7 @@ class ServiceTlEntity(
     val name: String = "",
     var measureUnit: String? = null,
     val descr: String? = null,
-    @ColumnInfo(index = true) val servicesId: UUID,
+    @ColumnInfo(index = true) var servicesId: UUID,
 ) {
     companion object {
         const val TABLE_NAME = "services_tl"
@@ -96,6 +96,12 @@ class ServiceTlEntity(
         fun populateUgsoServiceTl(ctx: Context, serviceId: UUID) =
             ServiceTlEntity(
                 name = ctx.resources.getString(R.string.service_ugso),
+                servicesId = serviceId
+            )
+
+        fun populateInternetServiceTl(ctx: Context, serviceId: UUID) =
+            ServiceTlEntity(
+                name = ctx.resources.getString(R.string.service_internet),
                 servicesId = serviceId
             )
     }

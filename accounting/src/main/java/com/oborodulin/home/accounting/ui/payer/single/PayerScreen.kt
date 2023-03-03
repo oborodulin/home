@@ -160,7 +160,7 @@ fun Payer(appState: AppState, viewModel: PayerViewModel, onSubmit: () -> Unit) {
             labelResId = R.string.erc_code_hint,
             leadingIcon = {
                 Icon(
-                    painterResource(com.oborodulin.home.common.R.drawable.outline_123_black_36),
+                    painterResource(com.oborodulin.home.common.R.drawable.ic_123_36),
                     null
                 )
             },
@@ -270,7 +270,7 @@ fun Payer(appState: AppState, viewModel: PayerViewModel, onSubmit: () -> Unit) {
             labelResId = R.string.living_space_hint,
             leadingIcon = {
                 Icon(
-                    painterResource(com.oborodulin.home.presentation.R.drawable.outline_aspect_ratio_black_36),
+                    painterResource(com.oborodulin.home.presentation.R.drawable.ic_aspect_ratio_36),
                     null
                 )
             },

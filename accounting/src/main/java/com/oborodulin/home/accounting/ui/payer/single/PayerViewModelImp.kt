@@ -2,18 +2,18 @@ package com.oborodulin.home.accounting.ui.payer.single
 
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
-import com.oborodulin.home.accounting.ui.model.PayerModel
+import com.oborodulin.home.accounting.ui.model.PayerUi
 import com.oborodulin.home.accounting.ui.model.converters.PayerConverter
-import com.oborodulin.home.accounting.ui.model.mappers.PayerModelToPayerMapper
+import com.oborodulin.home.accounting.ui.model.mappers.PayerUiToPayerMapper
 import com.oborodulin.home.common.ui.components.*
 import com.oborodulin.home.common.ui.components.field.*
 import com.oborodulin.home.common.ui.components.field.util.*
 import com.oborodulin.home.common.ui.state.SingleViewModel
 import com.oborodulin.home.common.ui.state.UiSingleEvent
 import com.oborodulin.home.common.ui.state.UiState
-import com.oborodulin.home.domain.usecase.GetPayerUseCase
-import com.oborodulin.home.domain.usecase.PayerUseCases
-import com.oborodulin.home.domain.usecase.SavePayerUseCase
+import com.oborodulin.home.domain.usecases.GetPayerUseCase
+import com.oborodulin.home.accounting.domain.usecases.PayerUseCases
+import com.oborodulin.home.domain.usecases.SavePayerUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.Channel
@@ -30,9 +30,9 @@ class PayerViewModelImp @Inject constructor(
     private val state: SavedStateHandle,
     private val payerUseCases: PayerUseCases,
     private val payerConverter: PayerConverter,
-    private val payerModelToPayerMapper: PayerModelToPayerMapper
+    private val payerUiToPayerMapper: PayerUiToPayerMapper
 ) : PayerViewModel,
-    SingleViewModel<PayerModel, UiState<PayerModel>, PayerUiAction, UiSingleEvent, PayerFields, InputWrapper>(
+    SingleViewModel<PayerUi, UiState<PayerUi>, PayerUiAction, UiSingleEvent, PayerFields, InputWrapper>(
         state,
         PayerFields.ERC_CODE
     ) {
@@ -114,13 +114,13 @@ class PayerViewModelImp @Inject constructor(
             false
         )
 
-    override fun initState(): UiState<PayerModel> = UiState.Loading
+    override fun initState(): UiState<PayerUi> = UiState.Loading
 
     override suspend fun handleAction(action: PayerUiAction): Job {
         Timber.tag(TAG).d("handleAction(PayerUiAction) called: %s", action.javaClass.name)
         val job = when (action) {
             is PayerUiAction.Create -> {
-                submitState(UiState.Success(PayerModel()))
+                submitState(UiState.Success(PayerUi()))
             }
             is PayerUiAction.Load -> {
                 loadPayer(action.payerId)
@@ -147,7 +147,7 @@ class PayerViewModelImp @Inject constructor(
     }
 
     private fun savePayer(): Job {
-        val payerModel = PayerModel(
+        val payerUi = PayerUi(
             id = if (payerId.value.value.isNotEmpty()) {
                 UUID.fromString(payerId.value.value)
             } else null,
@@ -160,10 +160,10 @@ class PayerViewModelImp @Inject constructor(
             paymentDay = paymentDay.value.value.toInt(),
             personsNum = personsNum.value.value.toInt()
         )
-        Timber.tag(TAG).d("savePayer() called: UI model %s", payerModel)
+        Timber.tag(TAG).d("savePayer() called: UI model %s", payerUi)
         val job = viewModelScope.launch(errorHandler) {
             payerUseCases.savePayerUseCase.execute(
-                SavePayerUseCase.Request(payerModelToPayerMapper.map(payerModel))
+                SavePayerUseCase.Request(payerUiToPayerMapper.map(payerUi))
             ).collect {}
         }
         return job
@@ -173,28 +173,28 @@ class PayerViewModelImp @Inject constructor(
 
     override fun initFieldStatesByUiModel(uiModel: Any): Job? {
         super.initFieldStatesByUiModel(uiModel)
-        val payerModel = uiModel as PayerModel
+        val payerUi = uiModel as PayerUi
         Timber.tag(TAG)
-            .d("initFieldStatesByUiModel(PayerModel) called: payerModel = %s", payerModel)
-        payerModel.id?.let {
+            .d("initFieldStatesByUiModel(PayerModel) called: payerModel = %s", payerUi)
+        payerUi.id?.let {
             initStateValue(PayerFields.PAYER_ID, payerId, it.toString())
         }
-        initStateValue(PayerFields.ERC_CODE, ercCode, payerModel.ercCode)
-        initStateValue(PayerFields.FULL_NAME, fullName, payerModel.fullName)
-        initStateValue(PayerFields.ADDRESS, address, payerModel.address)
-        initStateValue(PayerFields.TOTAL_AREA, totalArea, payerModel.totalArea?.toString() ?: "")
+        initStateValue(PayerFields.ERC_CODE, ercCode, payerUi.ercCode)
+        initStateValue(PayerFields.FULL_NAME, fullName, payerUi.fullName)
+        initStateValue(PayerFields.ADDRESS, address, payerUi.address)
+        initStateValue(PayerFields.TOTAL_AREA, totalArea, payerUi.totalArea?.toString() ?: "")
         initStateValue(
             PayerFields.LIVING_SPACE,
             livingSpace,
-            payerModel.livingSpace?.toString() ?: ""
+            payerUi.livingSpace?.toString() ?: ""
         )
         initStateValue(
             PayerFields.HEATED_VOLUME,
             heatedVolume,
-            payerModel.heatedVolume?.toString() ?: ""
+            payerUi.heatedVolume?.toString() ?: ""
         )
-        initStateValue(PayerFields.PAYMENT_DAY, paymentDay, payerModel.paymentDay.toString())
-        initStateValue(PayerFields.PERSONS_NUM, personsNum, payerModel.personsNum.toString())
+        initStateValue(PayerFields.PAYMENT_DAY, paymentDay, payerUi.paymentDay.toString())
+        initStateValue(PayerFields.PERSONS_NUM, personsNum, payerUi.personsNum.toString())
         return null
     }
 

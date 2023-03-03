@@ -1,0 +1,12 @@
+<resources>
+    <!--СПИСОК: -->
+    <!--услуги плательщиков -->
+    <string name="payer_service_list_empty_text">Услуг плательщиков пока нет. Добавте, пожалуйста, хотя бы одну</string>
+
+    <!--ДИАЛОГИ -->
+    <string name="dlg_confirm_del_payer_service">Удалить услугу плательщика %1$s?</string>
+
+    <!--Значения полей данных по-умолчанию -->
+    <!--Услуга: Интернет-->
+    <string name="def_internet_descr">ООО Донапекс</string>
+</resources>

@@ -26,4 +26,8 @@ object PersistenceModule {
     @Singleton
     @Provides
     fun provideMeterDao(db: HomeDatabase) = db.meterDao()
+
+    @Singleton
+    @Provides
+    fun provideServiceDao(db: HomeDatabase) = db.serviceDao()
 }

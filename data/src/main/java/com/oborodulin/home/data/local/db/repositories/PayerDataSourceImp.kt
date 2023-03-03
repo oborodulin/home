@@ -23,14 +23,14 @@ class PayerDataSourceImp @Inject constructor(
     private val payerEntityToPayerMapper: PayerEntityToPayerMapper,
     private val payerToPayerEntityMapper: PayerToPayerEntityMapper
 ) : PayerDataSource {
-    override fun getPayers() = payerDao.findAllDistinctUntilChanged()
+    override fun getPayers() = payerDao.findDistinctAll()
         .map(payerEntityListToPayerListMapper::map)
 
     override fun getPayer(payerId: UUID) =
-        payerDao.findByIdDistinctUntilChanged(payerId).map(payerEntityToPayerMapper::map)
+        payerDao.findDistinctById(payerId).map(payerEntityToPayerMapper::map)
 
     override fun getFavoritePayer() =
-        payerDao.findFavoriteDistinctUntilChanged().map(payerEntityToPayerMapper::map)
+        payerDao.findDistinctFavorite().map(payerEntityToPayerMapper::map)
 
     override suspend fun savePayer(payer: Payer) = withContext(dispatcher) {
         if (payer.id == null) {

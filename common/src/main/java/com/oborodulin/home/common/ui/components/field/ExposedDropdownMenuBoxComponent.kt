@@ -12,16 +12,14 @@ import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.TextRange
-import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.oborodulin.home.common.R
 import com.oborodulin.home.common.ui.components.field.util.InputWrapper
-import com.oborodulin.home.common.ui.components.field.util.OnImeKeyAction
-import com.oborodulin.home.common.ui.components.field.util.OnValueChange
 import com.oborodulin.home.common.ui.theme.HomeComposableTheme
+import com.oborodulin.home.common.util.OnImeKeyAction
+import com.oborodulin.home.common.util.OnValueChange
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
@@ -44,7 +42,7 @@ fun ExposedDropdownMenuBoxComponent(
     onImeKeyAction: OnImeKeyAction,
     colors: TextFieldColors = TextFieldDefaults.outlinedTextFieldColors()
 ) {
-    val fieldValue = remember { mutableStateOf(inputWrapper.value)}
+    val fieldValue = remember { mutableStateOf(inputWrapper.value) }
     var expanded by remember { mutableStateOf(false) }
     // the box
     ExposedDropdownMenuBox(

@@ -24,7 +24,7 @@ import javax.inject.Singleton
 @Module
 @InstallIn(SingletonComponent::class)
 object MeteringModule {
-    // MAPPERS:
+    // DATA MAPPERS:
     @Singleton
     @Provides
     fun provideMeterToMeterEntityMapper(): MeterToMeterEntityMapper = MeterToMeterEntityMapper()
@@ -41,12 +41,12 @@ object MeteringModule {
 
     @Singleton
     @Provides
-    fun provideMetersViewToMeterMapper(): MetersViewToMeterMapper = MetersViewToMeterMapper()
+    fun provideMetersViewToMeterMapper(): MeterViewToMeterMapper = MeterViewToMeterMapper()
 
     @Singleton
     @Provides
-    fun provideMetersViewToMeterListMapper(mapper: MetersViewToMeterMapper): MetersViewToMeterListMapper =
-        MetersViewToMeterListMapper(mapper = mapper)
+    fun provideMetersViewToMeterListMapper(mapper: MeterViewToMeterMapper): MeterViewToMeterListMapper =
+        MeterViewToMeterListMapper(mapper = mapper)
 
     @Singleton
     @Provides
@@ -73,7 +73,7 @@ object MeteringModule {
     fun provideMeterVerificationEntityListToMeterVerificationListMapper(mapper: MeterVerificationEntityToMeterVerificationMapper): MeterVerificationEntityListToMeterVerificationListMapper =
         MeterVerificationEntityListToMeterVerificationListMapper(mapper = mapper)
 
-
+    // UI MAPPERS:
     @Singleton
     @Provides
     fun provideMeterValueToMeterValueListItemMapper(): MeterValueToMeterValueListItemMapper =
@@ -106,8 +106,8 @@ object MeteringModule {
     fun provideMeteringDataSource(
         meterDao: MeterDao,
         @IoDispatcher dispatcher: CoroutineDispatcher,
-        metersViewToMeterListMapper: MetersViewToMeterListMapper,
-        metersViewToMeterMapper: MetersViewToMeterMapper,
+        meterViewToMeterListMapper: MeterViewToMeterListMapper,
+        meterViewToMeterMapper: MeterViewToMeterMapper,
         meterValueEntityListToMeterValueListMapper: MeterValueEntityListToMeterValueListMapper,
         meterVerificationEntityListToMeterVerificationListMapper: MeterVerificationEntityListToMeterVerificationListMapper,
         meterValueToMeterValueEntityMapper: MeterValueToMeterValueEntityMapper,
@@ -117,8 +117,8 @@ object MeteringModule {
         MeteringDataSourceImp(
             meterDao,
             dispatcher,
-            metersViewToMeterListMapper,
-            metersViewToMeterMapper,
+            meterViewToMeterListMapper,
+            meterViewToMeterMapper,
             meterValueEntityListToMeterValueListMapper,
             meterVerificationEntityListToMeterVerificationListMapper,
             meterValueToMeterValueEntityMapper,

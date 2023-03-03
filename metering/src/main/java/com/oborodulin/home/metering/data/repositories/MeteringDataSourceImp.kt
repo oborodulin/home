@@ -17,22 +17,22 @@ import javax.inject.Inject
 class MeteringDataSourceImp @Inject constructor(
     private val meterDao: MeterDao,
     @IoDispatcher private val dispatcher: CoroutineDispatcher,
-    private val metersViewToMeterListMapper: MetersViewToMeterListMapper,
-    private val metersViewToMeterMapper: MetersViewToMeterMapper,
+    private val meterViewToMeterListMapper: MeterViewToMeterListMapper,
+    private val meterViewToMeterMapper: MeterViewToMeterMapper,
     private val meterValueEntityListToMeterValueListMapper: MeterValueEntityListToMeterValueListMapper,
     private val meterVerificationEntityListToMeterVerificationListMapper: MeterVerificationEntityListToMeterVerificationListMapper,
     private val meterValueToMeterValueEntityMapper: MeterValueToMeterValueEntityMapper,
     private val meterToMeterEntityMapper: MeterToMeterEntityMapper,
     private val meterToMeterTlEntityMapper: MeterToMeterTlEntityMapper
 ) : MeteringDataSource {
-    override fun getMeters() = meterDao.findAllDistinctUntilChanged()
-        .map(metersViewToMeterListMapper::map)
+    override fun getMeters() = meterDao.findDistinctAll()
+        .map(meterViewToMeterListMapper::map)
 
     override fun getMeters(payerId: UUID) = meterDao.findByPayerId(payerId)
-        .map(metersViewToMeterListMapper::map)
+        .map(meterViewToMeterListMapper::map)
 
-    override fun getMeter(id: UUID) = meterDao.findByIdDistinctUntilChanged(id)
-        .map(metersViewToMeterMapper::map)
+    override fun getMeter(id: UUID) = meterDao.findDistinctById(id)
+        .map(meterViewToMeterMapper::map)
 
     override fun getMeterValues(meterId: UUID) = meterDao.findValuesByMeterId(meterId)
         .map(meterValueEntityListToMeterValueListMapper::map)
@@ -44,7 +44,7 @@ class MeteringDataSourceImp @Inject constructor(
     override fun getPrevServiceMeterValues(payerId: UUID?) =
         when (payerId) {
             null -> meterDao.findPrevMetersValuesByPayerIsFavorite()
-            else -> meterDao.findPrevMetersValuesByPayerIdDistinctUntilChanged(payerId)
+            else -> meterDao.findDistinctPrevMetersValuesByPayerId(payerId)
         }
 
     override suspend fun saveMeter(meter: Meter) = withContext(dispatcher) {

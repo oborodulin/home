@@ -78,7 +78,7 @@ class Utils {
             //val defaultZone: ZoneId = ZoneId.systemDefault()
             val zoneId: ZoneId = ZoneId.systemDefault()
             val formatter: DateTimeFormatter =
-                DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSS")
+                DateTimeFormatter.ofPattern(Constants.APP_FRACT_SEC_TIME)
             val dateTime: LocalDateTime = LocalDateTime.parse(s, formatter)
             val offset: ZoneOffset = zoneId.rules.getOffset(dateTime)
             return OffsetDateTime.of(dateTime, offset)

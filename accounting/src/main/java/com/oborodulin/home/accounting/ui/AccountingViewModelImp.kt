@@ -5,8 +5,8 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
 import com.oborodulin.home.accounting.domain.usecases.AccountingUseCases
 import com.oborodulin.home.accounting.domain.usecases.GetFavoritePayerUseCase
-import com.oborodulin.home.accounting.ui.model.AccountingModel
-import com.oborodulin.home.accounting.ui.model.PayerModel
+import com.oborodulin.home.accounting.ui.model.AccountingUi
+import com.oborodulin.home.accounting.ui.model.PayerUi
 import com.oborodulin.home.accounting.ui.model.converters.FavoritePayerConverter
 import com.oborodulin.home.common.ui.state.MviViewModel
 import com.oborodulin.home.common.ui.state.UiState
@@ -32,10 +32,10 @@ class AccountingViewModelImp @Inject constructor(
     private val accountingUseCases: AccountingUseCases,
     private val payerConverter: FavoritePayerConverter
 ) : AccountingViewModel,
-    MviViewModel<AccountingModel, UiState<AccountingModel>, AccountingUiAction, AccountingUiSingleEvent>(
+    MviViewModel<AccountingUi, UiState<AccountingUi>, AccountingUiAction, AccountingUiSingleEvent>(
         state = state
     ) {
-    override fun initState(): UiState<AccountingModel> = UiState.Loading
+    override fun initState(): UiState<AccountingUi> = UiState.Loading
 
     override suspend fun handleAction(action: AccountingUiAction): Job {
         Timber.tag(TAG)
@@ -78,7 +78,7 @@ class AccountingViewModelImp @Inject constructor(
             object : AccountingViewModel {
                 override val uiStateFlow =
                     MutableStateFlow(
-                        UiState.Success(AccountingModel(favoritePayer = previewPayerModel(ctx)))
+                        UiState.Success(AccountingUi(favoritePayer = previewPayerModel(ctx)))
                     )
                 override val singleEventFlow = Channel<AccountingUiSingleEvent>().receiveAsFlow()
 
@@ -88,7 +88,7 @@ class AccountingViewModelImp @Inject constructor(
             }
 
         fun previewPayerModel(ctx: Context) =
-            PayerModel(
+            PayerUi(
                 id = UUID.randomUUID(),
                 fullName = ctx.resources.getString(R.string.def_payer1_full_name),
                 address = ctx.resources.getString(R.string.def_payer1_address),

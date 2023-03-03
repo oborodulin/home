@@ -1,6 +1,9 @@
 plugins {
     id 'com.android.library'
     id 'org.jetbrains.kotlin.android'
+    id 'kotlin-parcelize'
+    id 'dagger.hilt.android.plugin'
+    id 'org.jetbrains.kotlin.kapt'
 }
 
 android {
@@ -13,7 +16,10 @@ android {
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         consumerProguardFiles "consumer-rules.pro"
     }
-
+    buildFeatures {
+        // Enables Jetpack Compose for this module
+        compose true
+    }
     buildTypes {
         release {
             minifyEnabled false
@@ -26,11 +32,56 @@ android {
     }
     kotlinOptions {
         jvmTarget = cfg.jvm.target
+
+        // Enable Coroutines and Flow APIs
+        freeCompilerArgs += "-opt-in=kotlinx.coroutines.ExperimentalCoroutinesApi"
+        freeCompilerArgs += "-opt-in=kotlinx.coroutines.FlowPreview"
+    }
+    composeOptions {
+        kotlinCompilerExtensionVersion versions.composeKotlinExt
     }
     namespace 'com.oborodulin.home.servicing'
 }
 
 dependencies {
+    implementation project(':common')
+    implementation project(':data')
+    implementation project(':domain')
+    implementation project(':presentation')
+
+    // Logging
+    implementation deps.logging.timber
+    implementation deps.logging.logger
+    // Room
+    implementation deps.room.runtime
+    kapt deps.room.compiler
+    implementation deps.room.ktx
+    // Compose
+    implementation deps.compose.ui
+    implementation deps.compose.material
+    implementation deps.compose.iconsCore
+    implementation deps.compose.iconsExtended
+    implementation deps.compose.uiTooling
+    implementation deps.compose.uiPreview
+    // Compose preview
+    debugImplementation deps.androidx.poolingcontainer
+    // Compose Constraint Layout
+    implementation deps.androidx.constraintlayoutCompose
+    // Hilt
+    implementation deps.dagger.hilt
+    kapt deps.dagger.compiler
+    implementation deps.hilt.navigationCompose
+    // Paging
+    implementation deps.paging.compose
+    // Sweet Toast
+    implementation deps.TalhaFaki.composableSweetToast
+    // Lottie
+    implementation deps.lottie.compose
+    // Network
+    implementation deps.retrofit2.retrofit
+    implementation deps.retrofit2.converterGson
+    // Desugaring
+    //coreLibraryDesugaring deps.tools.desugar
 
     implementation deps.androidx.coreKtx
     implementation deps.androidx.appcompat

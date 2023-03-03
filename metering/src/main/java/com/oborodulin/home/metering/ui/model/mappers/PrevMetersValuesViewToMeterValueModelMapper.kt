@@ -1,16 +1,14 @@
 package com.oborodulin.home.metering.ui.model.mappers
 
 import com.oborodulin.home.common.mapping.Mapper
-import com.oborodulin.home.data.local.db.views.MeterValuePrevPeriodsView
+import com.oborodulin.home.data.local.db.views.MeterValuePrevPeriodView
 import com.oborodulin.home.metering.ui.model.MeterValueListItem
-import timber.log.Timber
-import java.text.DecimalFormat
 
 //private const val TAG = "Metering.ui.PrevMetersValuesViewToMeterValueModelMapper"
 
 class PrevMetersValuesViewToMeterValueModelMapper :
-    Mapper<MeterValuePrevPeriodsView, MeterValueListItem> {
-    override fun map(input: MeterValuePrevPeriodsView): MeterValueListItem {
+    Mapper<MeterValuePrevPeriodView, MeterValueListItem> {
+    override fun map(input: MeterValuePrevPeriodView): MeterValueListItem {
 /*        val decimalSeparator = DecimalFormat().decimalFormatSymbols.decimalSeparator
         Timber.tag(TAG).d(
             "map(...) called: input.valueFormat = '%s'; decimalSeparator = '%s'",

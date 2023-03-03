@@ -20,6 +20,7 @@ import kotlinx.coroutines.*
 import timber.log.Timber
 import java.time.OffsetDateTime
 import java.util.*
+import java.util.concurrent.Executors
 
 private const val TAG = "HomeDatabase"
 
@@ -55,15 +56,15 @@ private val MIGRATION_4_5 = object : Migration(4, 5) {
 @Database(
     entities = [PayerEntity::class, ServiceEntity::class, ServiceTlEntity::class,
         PayerServiceCrossRefEntity::class,
-        RateEntity::class, ServicePromotionEntity::class,
+        RateEntity::class, ServiceActivityEntity::class, ServicePromotionEntity::class,
         MeterEntity::class, MeterTlEntity::class, MeterValueEntity::class, MeterVerificationEntity::class,
         PayerServiceMeterCrossRefEntity::class,
         ReceiptEntity::class, ReceiptLineEntity::class],
-    views = [MetersView::class, ServicesView::class, ReceiptsView::class,
-        MeterValueMaxPrevDatesView::class, MeterValuePrevPeriodsView::class,
-        MeterValuePaymentPeriodsView::class, MeterValuePaymentsView::class,
-        RatePayerServicesView::class,
-        PayerServiceDebtsView::class, PayerServiceTotalDebtsView::class, PayerTotalDebtsView::class],
+    views = [MeterView::class, ServiceView::class, ReceiptView::class,
+        MeterValueMaxPrevDateView::class, MeterValuePrevPeriodView::class,
+        MeterValuePaymentPeriodView::class, MeterValuePaymentView::class,
+        PayerServiceView::class, RatePayerServiceView::class,
+        PayerServiceDebtView::class, PayerServiceSubtotalDebtView::class, PayerTotalDebtView::class],
     version = 5
 )
 @TypeConverters(HomeTypeConverters::class)
@@ -130,8 +131,10 @@ abstract class HomeDatabase : RoomDatabase() {
                             MIGRATION_3_4,
                             MIGRATION_4_5
                         )
-                        .addCallback(DatabaseCallback(context, jsonLogger))
+                        //.addCallback(DatabaseCallback(context, jsonLogger))
                         .allowMainThreadQueries()
+                        //https://stackoverflow.com/questions/57027850/testing-android-room-with-livedata-coroutines-and-transactions
+                        .setTransactionExecutor(Executors.newSingleThreadExecutor())
                         .build()
                 INSTANCE = instance
             }
@@ -141,6 +144,12 @@ abstract class HomeDatabase : RoomDatabase() {
         // https://stackoverflow.com/questions/2421189/version-of-sqlite-used-in-android
         fun sqliteVersion() = SQLiteDatabase.create(null).use {
             android.database.DatabaseUtils.stringForQuery(it, "SELECT sqlite_version()", null)
+        }
+
+        @Synchronized
+        fun close() {
+            INSTANCE?.close()
+            INSTANCE = null
         }
     }
 
@@ -179,7 +188,7 @@ abstract class HomeDatabase : RoomDatabase() {
             try {
                 // Default payers:
                 // 1
-                val payer1Entity = PayerEntity.populatePayer1(context)
+                val payer1Entity = PayerEntity.populateTwoPersonsPayer(context)
                 db.insert(
                     PayerEntity.TABLE_NAME,
                     SQLiteDatabase.CONFLICT_REPLACE,
@@ -188,7 +197,7 @@ abstract class HomeDatabase : RoomDatabase() {
                 Timber.tag(TAG)
                     .i("Default 1 PayerEntity imported: {%s}", jsonLogger?.toJson(payer1Entity))
                 // 2
-                val payer2Entity = PayerEntity.populatePayer2(context)
+                val payer2Entity = PayerEntity.populateFavoritePayer(context)
                 db.insert(
                     PayerEntity.TABLE_NAME,
                     SQLiteDatabase.CONFLICT_REPLACE,

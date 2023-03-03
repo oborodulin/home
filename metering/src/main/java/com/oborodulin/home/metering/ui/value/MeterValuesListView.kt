@@ -49,10 +49,10 @@ import com.oborodulin.home.common.ui.state.MviViewModel
 import com.oborodulin.home.common.ui.theme.Typography
 import com.oborodulin.home.common.util.Utils
 import com.oborodulin.home.common.util.toast
-import com.oborodulin.home.data.util.ServiceType
 import com.oborodulin.home.metering.R
 import com.oborodulin.home.metering.ui.model.MeterValueListItem
 import com.oborodulin.home.presentation.navigation.PayerInput
+import com.oborodulin.home.presentation.util.MeterIcon
 import kotlinx.coroutines.flow.collectLatest
 import timber.log.Timber
 import java.text.DecimalFormat
@@ -154,7 +154,7 @@ fun MeterValuesList(
                                     .weight(0.22f),
                                 verticalArrangement = Arrangement.Center
                             ) {
-                                ServiceIcon(meterValue.type)
+                                MeterIcon(meterValue.type)
                                 Spacer(modifier = Modifier.height(4.dp))
                                 Text(
                                     text = meterValue.name,
@@ -412,36 +412,6 @@ fun MeterValue(
         }
     )
 }
-
-@Composable
-fun ServiceIcon(serviceType: ServiceType?) =
-    when (serviceType) {
-        ServiceType.ELECTRICITY -> Image(
-            modifier = Modifier
-                .clip(RoundedCornerShape(8.dp)),
-            painter = painterResource(com.oborodulin.home.presentation.R.drawable.outline_electric_bolt_black_36),
-            contentDescription = ""
-        )
-        ServiceType.COLD_WATER -> Image(
-            modifier = Modifier
-                .clip(RoundedCornerShape(8.dp)),
-            painter = painterResource(com.oborodulin.home.presentation.R.drawable.outline_water_drop_black_36),
-            contentDescription = ""
-        )
-        ServiceType.HOT_WATER -> Image(
-            modifier = Modifier
-                .clip(RoundedCornerShape(8.dp)),
-            painter = painterResource(com.oborodulin.home.presentation.R.drawable.outline_opacity_black_36),
-            contentDescription = ""
-        )
-        ServiceType.HEATING -> Image(
-            modifier = Modifier
-                .clip(RoundedCornerShape(8.dp)),
-            painter = painterResource(com.oborodulin.home.presentation.R.drawable.ic_radiator_36),
-            contentDescription = ""
-        )
-        else -> {}
-    }
 
 @Preview(name = "Night Mode", showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
 @Preview(name = "Day Mode", showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_NO)

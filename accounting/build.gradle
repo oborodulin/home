@@ -46,8 +46,8 @@ android {
         jvmTarget = cfg.jvm.target
 
         // Enable Coroutines and Flow APIs
-        freeCompilerArgs += "-Xopt-in=kotlinx.coroutines.ExperimentalCoroutinesApi"
-        freeCompilerArgs += "-Xopt-in=kotlinx.coroutines.FlowPreview"
+        freeCompilerArgs += "-opt-in=kotlinx.coroutines.ExperimentalCoroutinesApi"
+        freeCompilerArgs += "-opt-in=kotlinx.coroutines.FlowPreview"
     }
     composeOptions {
         kotlinCompilerExtensionVersion versions.composeKotlinExt
@@ -58,9 +58,10 @@ dependencies {
     implementation project(":common")
     implementation project(":data")
     implementation project(":domain")
-    implementation project(':presentation')
+    implementation project(":presentation")
 
-    implementation project(':metering')
+    implementation project(":metering")
+    implementation project(":servicing")
     implementation project(":billing")
 
     // Logging

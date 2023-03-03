@@ -1,14 +1,8 @@
 package com.oborodulin.home.metering.data.mappers
 
-import com.oborodulin.home.data.local.db.entities.MeterEntity
-import com.oborodulin.home.data.local.db.entities.MeterTlEntity
 import com.oborodulin.home.data.local.db.entities.MeterValueEntity
 import com.oborodulin.home.data.local.db.entities.MeterVerificationEntity
-import com.oborodulin.home.data.local.db.views.MetersView
 import com.oborodulin.home.metering.domain.model.Meter
-import com.oborodulin.home.metering.domain.model.MeterTl
-import com.oborodulin.home.metering.domain.model.MeterValue
-import com.oborodulin.home.metering.domain.model.MeterVerification
 import java.util.*
 
 class MeterMapper {

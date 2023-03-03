@@ -33,7 +33,7 @@ data class MeterValueEntity(
             meterValue: BigDecimal? = null
         ) = MeterValueEntity(
             metersId = meterId,
-            valueDate = valueDate,//Utils.toOffsetDateTime("2022-06-19T14:29:10.212"),
+            valueDate = valueDate,
             meterValue = meterValue ?: BigDecimal.valueOf(9532)
         )
 

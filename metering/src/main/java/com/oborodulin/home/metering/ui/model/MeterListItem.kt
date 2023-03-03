@@ -5,12 +5,12 @@ import java.math.BigDecimal
 import java.util.*
 
 data class MeterListItem(
-    var id: UUID,
-    var fullName: String = "",
-    var address: String = "",
-    var totalArea: BigDecimal? = null,
-    var livingSpace: BigDecimal? = null,
-    var paymentDay: Int? = null,
-    var personsNum: Int? = null,
-    var isFavorite: Boolean = false,
+    val id: UUID,
+    val fullName: String = "",
+    val address: String = "",
+    val totalArea: BigDecimal? = null,
+    val livingSpace: BigDecimal? = null,
+    val paymentDay: Int? = null,
+    val personsNum: Int? = null,
+    val isFavorite: Boolean = false,
 ) : ListItemModel(itemId = id, title = fullName, descr = address)

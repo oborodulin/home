@@ -1,0 +1,148 @@
+package com.oborodulin.home.servicing.ui.payerservice.subtotals
+
+import android.content.Context
+import androidx.lifecycle.SavedStateHandle
+import androidx.lifecycle.viewModelScope
+import com.oborodulin.home.common.ui.state.MviViewModel
+import com.oborodulin.home.common.ui.state.UiState
+import com.oborodulin.home.common.util.Utils
+import com.oborodulin.home.data.util.ServiceType
+import com.oborodulin.home.servicing.R
+import com.oborodulin.home.servicing.domain.usecases.GetPayerServiceSubtotalsUseCase
+import com.oborodulin.home.servicing.domain.usecases.PayerServiceUseCases
+import com.oborodulin.home.servicing.ui.model.ServiceSubtotalListItem
+import com.oborodulin.home.servicing.ui.model.converters.ServiceSubtotalListConverter
+import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.launch
+import timber.log.Timber
+import java.math.BigDecimal
+import java.util.*
+import javax.inject.Inject
+
+private const val TAG = "Servicing.ui.PayerServiceSubtotalsListViewModel"
+
+@HiltViewModel
+class PayerServiceSubtotalsListViewModelImp @Inject constructor(
+    private val state: SavedStateHandle,
+    private val payerServiceUseCases: PayerServiceUseCases,
+    private val serviceSubtotalListConverter: ServiceSubtotalListConverter
+) : PayerServiceSubtotalsListViewModel,
+    MviViewModel<List<ServiceSubtotalListItem>, UiState<List<ServiceSubtotalListItem>>, PayerServiceSubtotalsListUiAction, PayerServiceSubtotalsListUiSingleEvent>(
+        state = state
+    ) {
+
+    override fun initState() = UiState.Loading
+
+    override suspend fun handleAction(action: PayerServiceSubtotalsListUiAction): Job {
+        Timber.tag(TAG)
+            .d("handleAction(PayerServiceSubtotalsListUiAction) called: %s", action.javaClass.name)
+        val job = when (action) {
+            is PayerServiceSubtotalsListUiAction.Load -> {
+                loadPayerServiceSubtotals(action.payerId)
+            }
+        }
+        return job
+    }
+
+    private fun loadPayerServiceSubtotals(payerId: UUID): Job {
+        Timber.tag(TAG).d("loadPayerServiceSubtotals() called")
+        val job = viewModelScope.launch(errorHandler) {
+            payerServiceUseCases.getPayerServiceSubtotalsUseCase.execute(
+                GetPayerServiceSubtotalsUseCase.Request(payerId)
+            ).map {
+                serviceSubtotalListConverter.convert(it)
+            }
+                .collect {
+                    submitState(it)
+                }
+        }
+        return job
+    }
+
+    override fun initFieldStatesByUiModel(uiModel: Any): Job? = null
+
+    companion object {
+        fun previewModel(ctx: Context) =
+            object : PayerServiceSubtotalsListViewModel {
+                override var primaryObjectData: StateFlow<ArrayList<String>> =
+                    MutableStateFlow(arrayListOf())
+                override val uiStateFlow = MutableStateFlow(UiState.Success(previewList(ctx)))
+                override val singleEventFlow =
+                    Channel<PayerServiceSubtotalsListUiSingleEvent>().receiveAsFlow()
+                override val actionsJobFlow: SharedFlow<Job?> = MutableSharedFlow()
+
+                //fun viewModelScope(): CoroutineScope = CoroutineScope(Dispatchers.Main)
+                override fun handleActionJob(action: () -> Unit, afterAction: () -> Unit) {}
+                override fun submitAction(action: PayerServiceSubtotalsListUiAction): Job? = null
+                override fun setPrimaryObjectData(value: ArrayList<String>) {}
+            }
+
+        fun previewList(ctx: Context) = listOf(
+            ServiceSubtotalListItem(
+                id = UUID.randomUUID(),
+                name = ctx.resources.getString(com.oborodulin.home.data.R.string.service_rent),
+                type = ServiceType.RENT,
+                isPrivileges = false,
+                isAllocateRate = false,
+                fromPaymentDate = Utils.toOffsetDateTime("2023-01-01T00:00:00.000"),
+                toPaymentDate = Utils.toOffsetDateTime("2023-02-01T00:00:00.000"),
+                rateValue = BigDecimal.valueOf(46.2),
+                serviceDebt = BigDecimal.valueOf(485.1)
+            ),
+            ServiceSubtotalListItem(
+                id = UUID.randomUUID(),
+                name = ctx.resources.getString(com.oborodulin.home.data.R.string.service_electricity),
+                type = ServiceType.ELECTRICITY,
+                measureUnit = ctx.resources.getString(com.oborodulin.home.common.R.string.kWh_unit),
+                serviceDescr = "",
+                isPrivileges = false,
+                isAllocateRate = true,
+                fromPaymentDate = Utils.toOffsetDateTime("2023-01-01T00:00:00.000"),
+                toPaymentDate = Utils.toOffsetDateTime("2023-02-01T00:00:00.000"),
+                rateValue = BigDecimal.valueOf(0.92),
+                diffMeterValue = BigDecimal.valueOf(96),
+                serviceDebt = BigDecimal.valueOf(883.2)
+            ),
+            ServiceSubtotalListItem(
+                id = UUID.randomUUID(),
+                name = ctx.resources.getString(com.oborodulin.home.data.R.string.service_gas),
+                type = ServiceType.GAS,
+                isPrivileges = true,
+                isAllocateRate = false,
+                fromPaymentDate = Utils.toOffsetDateTime("2023-01-01T00:00:00.000"),
+                toPaymentDate = Utils.toOffsetDateTime("2023-02-01T00:00:00.000"),
+                rateValue = BigDecimal.valueOf(18.05),
+                serviceDebt = BigDecimal.valueOf(36.1)
+            ),
+            ServiceSubtotalListItem(
+                id = UUID.randomUUID(),
+                name = ctx.resources.getString(com.oborodulin.home.data.R.string.service_cold_water),
+                type = ServiceType.COLD_WATER,
+                measureUnit = ctx.resources.getString(com.oborodulin.home.common.R.string.m3_unit),
+                isPrivileges = false,
+                isAllocateRate = false,
+                fromPaymentDate = Utils.toOffsetDateTime("2023-01-01T00:00:00.000"),
+                toPaymentDate = Utils.toOffsetDateTime("2023-02-01T00:00:00.000"),
+                rateValue = BigDecimal.valueOf(25.02),
+                diffMeterValue = BigDecimal.valueOf(15),
+                serviceDebt = BigDecimal.valueOf(375.3)
+            ),
+            ServiceSubtotalListItem(
+                id = UUID.randomUUID(),
+                name = ctx.resources.getString(com.oborodulin.home.data.R.string.service_internet),
+                type = ServiceType.INTERNET,
+                serviceDescr = ctx.resources.getString(R.string.def_internet_descr),
+                isPrivileges = false,
+                isAllocateRate = false,
+                fromPaymentDate = Utils.toOffsetDateTime("2023-01-01T00:00:00.000"),
+                toPaymentDate = Utils.toOffsetDateTime("2023-02-01T00:00:00.000"),
+                rateValue = BigDecimal.valueOf(25.02),
+                diffMeterValue = BigDecimal.valueOf(15),
+                serviceDebt = BigDecimal.valueOf(375.3)
+            )
+        )
+    }
+}

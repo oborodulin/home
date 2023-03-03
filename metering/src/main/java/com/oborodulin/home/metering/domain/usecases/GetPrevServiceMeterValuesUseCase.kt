@@ -1,7 +1,7 @@
 package com.oborodulin.home.metering.domain.usecases
 
 import com.oborodulin.home.common.domain.usecases.UseCase
-import com.oborodulin.home.data.local.db.views.MeterValuePrevPeriodsView
+import com.oborodulin.home.data.local.db.views.MeterValuePrevPeriodView
 import com.oborodulin.home.metering.domain.repositories.MetersRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
@@ -19,6 +19,6 @@ class GetPrevServiceMeterValuesUseCase(
         }
 
     data class Request(val payerId: UUID?) : UseCase.Request
-    data class Response(val prevServiceMeterValues: List<MeterValuePrevPeriodsView>) :
+    data class Response(val prevServiceMeterValues: List<MeterValuePrevPeriodView>) :
         UseCase.Response
 }

@@ -9,7 +9,7 @@ import com.oborodulin.home.data.local.db.repositories.PayerDataSource
 import com.oborodulin.home.data.local.db.repositories.PayerDataSourceImp
 import com.oborodulin.home.data.local.db.repositories.PayersRepositoryImp
 import com.oborodulin.home.domain.repositories.PayersRepository
-import com.oborodulin.home.domain.usecase.*
+import com.oborodulin.home.domain.usecases.*
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn

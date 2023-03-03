@@ -7,14 +7,15 @@ import java.time.OffsetDateTime
 import java.util.*
 
 data class Meter(
-    var payersId: UUID,
-    var payersServicesId: UUID,
-    var type: MeterType,
-    var num: String,
-    var maxValue: BigDecimal,
-    var passportDate: OffsetDateTime?,
-    var verificationPeriod: Int?,
-    var tl: MeterTl,
+    val payersId: UUID,
+    val payersServicesId: UUID,
+    val type: MeterType,
+    val num: String,
+    val maxValue: BigDecimal,
+    val passportDate: OffsetDateTime,
+    val initValue: BigDecimal = BigDecimal.ZERO,
+    val verificationPeriod: Int?,
+    val tl: MeterTl,
     var meterValues: List<MeterValue>? = emptyList(),
     var meterVerifications: List<MeterVerification>? = emptyList(),
 ) : DomainModel()

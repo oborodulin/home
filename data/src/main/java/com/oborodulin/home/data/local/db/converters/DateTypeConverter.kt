@@ -1,15 +1,33 @@
 package com.oborodulin.home.data.local.db.converters
 
 import androidx.room.TypeConverter
+import com.oborodulin.home.common.util.Constants
 import java.text.SimpleDateFormat
+import java.time.LocalDateTime
+import java.time.OffsetDateTime
+import java.time.ZoneId
+import java.time.format.DateTimeFormatter
 import java.util.*
 
-class DateTypeConverter {
+object DateTypeConverter {
     private val formatter = SimpleDateFormat("dd.MM.yyyy")
+    private val offsetFormatter = DateTimeFormatter.ofPattern(Constants.APP_FRACT_SEC_TIME)
 
     @TypeConverter
     fun fromDate(date: Date?): Long? = date?.let { formatter.format(it).toLong() }
 
     @TypeConverter
     fun toDate(millisSinceEpoch: Long?): Date? = millisSinceEpoch?.let { Date(it) }
+
+    @TypeConverter
+    @JvmStatic
+    fun toOffsetDateTime(value: String?): OffsetDateTime? = value?.let {
+        LocalDateTime.parse(it)
+            .atZone(ZoneId.systemDefault())
+            .toOffsetDateTime()
+    }
+
+    @TypeConverter
+    @JvmStatic
+    fun fromOffsetDateTime(date: OffsetDateTime?): String? = date?.format(offsetFormatter)
 }

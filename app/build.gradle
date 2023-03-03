@@ -18,6 +18,9 @@ android {
         versionName cfg.app.versionName
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        testInstrumentationRunnerArguments clearPackageData: 'true'
+        testInstrumentationRunnerArguments useTestStorageService: 'true'
+
         javaCompileOptions {
             annotationProcessorOptions {
                 arguments["dagger.hilt.disableModulesHaveInstallInCheck"] = "true"
@@ -29,6 +32,9 @@ android {
         compose true
     }
     buildTypes {
+        debug {
+            testCoverageEnabled true
+        }
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
@@ -43,12 +49,18 @@ android {
         jvmTarget = cfg.jvm.target
 
         // Enable Coroutines and Flow APIs
-        freeCompilerArgs += "-Xopt-in=kotlinx.coroutines.ExperimentalCoroutinesApi"
-        freeCompilerArgs += "-Xopt-in=kotlinx.coroutines.FlowPreview"
+        freeCompilerArgs += "-opt-in=kotlinx.coroutines.ExperimentalCoroutinesApi"
+        freeCompilerArgs += "-opt-in=kotlinx.coroutines.FlowPreview"
     }
     composeOptions {
         kotlinCompilerExtensionVersion versions.composeKotlinExt
     }
+    /*sourceSets {
+        androidTest {
+            java.srcDirs += ["${project(':data').projectDir}/src/androidTest/java"]
+           // assets.srcDirs = ["${project(':data').projectDir}/src/androidTest/assets/"]
+        }
+    }*/
     namespace 'com.oborodulin.home'
 }
 
@@ -59,7 +71,7 @@ dependencies {
     implementation project(':presentation')
 
     api project(path: ':app:core')
-    api project(path: ':app:navigation')
+//    api project(path: ':app:navigation')
 
     implementation project(':accounting')
     implementation project(':metering')

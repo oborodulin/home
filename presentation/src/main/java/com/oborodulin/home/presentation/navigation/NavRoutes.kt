@@ -50,7 +50,7 @@ sealed class NavRoutes constructor(
 
     object Metering : NavRoutes(
         ROUTE_METERING,
-        R.drawable.outline_electric_meter_black_24,
+        R.drawable.ic_electric_meter_24,
         R.string.nav_item_metering
     )
 

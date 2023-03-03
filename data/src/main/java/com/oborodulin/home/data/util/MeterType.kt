@@ -5,5 +5,6 @@ enum class MeterType {
     GAS,
     COLD_WATER,
     HEATING,
-    HOT_WATER
+    HOT_WATER,
+    NONE
 }

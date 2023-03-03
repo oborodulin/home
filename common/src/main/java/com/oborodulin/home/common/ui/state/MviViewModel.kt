@@ -52,6 +52,7 @@ abstract class MviViewModel<T : Any, S : UiState<T>, A : UiAction, E : UiSingleE
                 _actionsJobFlow.emit(job)
                 Timber.tag(TAG).d("actionFlow.collect: emitted job = %s", job)
             }
+            Timber.tag(TAG).d("init ended")
         }
     }
 
@@ -78,6 +79,7 @@ abstract class MviViewModel<T : Any, S : UiState<T>, A : UiAction, E : UiSingleE
         }
         action()
         afterAction()
+        Timber.tag(TAG).d("handleActionJob(...) ended")
     }
 
     fun submitAction(action: A): Job {
@@ -97,14 +99,16 @@ abstract class MviViewModel<T : Any, S : UiState<T>, A : UiAction, E : UiSingleE
                 initFieldStatesByUiModel(state.data)
             }
         }
+        Timber.tag(TAG).d("submitState(S) ended")
         return job
     }
 
     fun submitSingleEvent(event: E): Job {
-        Timber.tag(TAG).d("submitSingleEvent: send single event = %s", event.javaClass.name)
+        Timber.tag(TAG).d("submitSingleEvent(E): send single event = %s", event.javaClass.name)
         val job = viewModelScope.launch(errorHandler) {
             _singleEventFlow.send(event)
         }
+        Timber.tag(TAG).d("submitSingleEvent(E) ended")
         return job
     }
 

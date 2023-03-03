@@ -14,7 +14,7 @@ import androidx.lifecycle.ViewModelProvider
 import com.google.android.material.textfield.TextInputLayout
 import com.oborodulin.home.R
 import com.oborodulin.home.common.util.Validator
-import com.oborodulin.home.domain.model.Service
+//import com.oborodulin.home.servicing.domain.model.Service
 import com.oborodulin.home.model.service.ServiceViewModel
 import java.util.*
 
@@ -22,8 +22,9 @@ private const val TAG = "ServiceFragment"
 private const val ARG_SERVICE_ID = "service_id"
 
 class ServiceFragment : Fragment() {
+    /*
     private var nextDisplayPos: Int = 0
-    private lateinit var service: Service
+    private lateinit var service: com.oborodulin.home.servicing.domain.model.Service
     private lateinit var etDisplayPos: EditText
     private lateinit var etDisplayName: EditText
     private lateinit var etServiceDescr: EditText
@@ -144,4 +145,6 @@ class ServiceFragment : Fragment() {
             }
         }
     }
+
+     */
 }

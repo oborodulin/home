@@ -7,8 +7,9 @@ import com.oborodulin.home.accounting.ui.model.converters.PayersListConverter
 import com.oborodulin.home.accounting.ui.model.mappers.*
 import com.oborodulin.home.common.domain.usecases.UseCase
 import com.oborodulin.home.domain.repositories.PayersRepository
-import com.oborodulin.home.domain.usecase.*
+import com.oborodulin.home.domain.usecases.*
 import com.oborodulin.home.metering.domain.repositories.MetersRepository
+import com.oborodulin.home.servicing.domain.repositories.ServicesRepository
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -21,36 +22,36 @@ object AccountingModule {
     // MAPPERS:
     @Singleton
     @Provides
-    fun providePayerToPayerModelMapper(): PayerToPayerModelMapper = PayerToPayerModelMapper()
+    fun providePayerToPayerModelMapper(): PayerToPayerUiMapper = PayerToPayerUiMapper()
 
     @Singleton
     @Provides
-    fun providePayerModelToPayerMapper(): PayerModelToPayerMapper = PayerModelToPayerMapper()
+    fun providePayerModelToPayerMapper(): PayerUiToPayerMapper = PayerUiToPayerMapper()
 
     @Singleton
     @Provides
-    fun providePayerToPayerListItemModelMapper(): PayerToPayerListItemModelMapper =
-        PayerToPayerListItemModelMapper()
+    fun providePayerToPayerListItemModelMapper(): PayerToPayerListItemMapper =
+        PayerToPayerListItemMapper()
 
     @Singleton
     @Provides
-    fun providePayerListToPayerListItemModelMapper(mapper: PayerToPayerListItemModelMapper): PayerListToPayerListItemModelMapper =
-        PayerListToPayerListItemModelMapper(mapper = mapper)
+    fun providePayerListToPayerListItemModelMapper(mapper: PayerToPayerListItemMapper): PayerListToPayerListItemMapper =
+        PayerListToPayerListItemMapper(mapper = mapper)
 
     // CONVERTERS:
     @Singleton
     @Provides
-    fun providePayersListConverter(mapper: PayerListToPayerListItemModelMapper): PayersListConverter =
+    fun providePayersListConverter(mapper: PayerListToPayerListItemMapper): PayersListConverter =
         PayersListConverter(mapper = mapper)
 
     @Singleton
     @Provides
-    fun providePayerConverter(mapper: PayerToPayerModelMapper): PayerConverter =
+    fun providePayerConverter(mapper: PayerToPayerUiMapper): PayerConverter =
         PayerConverter(mapper = mapper)
 
     @Singleton
     @Provides
-    fun provideFavoritePayerConverter(mapper: PayerToPayerModelMapper): FavoritePayerConverter =
+    fun provideFavoritePayerConverter(mapper: PayerToPayerUiMapper): FavoritePayerConverter =
         FavoritePayerConverter(mapper = mapper)
 
     // USE CASES:
@@ -67,4 +68,21 @@ object AccountingModule {
                 payersRepository
             ),
         )
+
+    @Singleton
+    @Provides
+    fun providePayerUseCases(
+        configuration: UseCase.Configuration, payersRepository: PayersRepository,
+        servicesRepository: ServicesRepository
+    ): PayerUseCases =
+        PayerUseCases(
+            getPayerUseCase = GetPayerUseCase(configuration, payersRepository),
+            getPayersUseCase = GetPayersUseCase(
+                configuration, payersRepository, servicesRepository
+            ),
+            savePayerUseCase = SavePayerUseCase(configuration, payersRepository),
+            deletePayerUseCase = DeletePayerUseCase(configuration, payersRepository),
+            favoritePayerUseCase = FavoritePayerUseCase(configuration, payersRepository)
+        )
+
 }

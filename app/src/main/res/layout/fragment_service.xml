@@ -22,7 +22,7 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:startIconDrawable="@drawable/outline_123_black_24">
+            app:startIconDrawable="@drawable/ic_123_24">
 
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/display_pos_input"

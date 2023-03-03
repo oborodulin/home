@@ -8,38 +8,25 @@ import kotlinx.coroutines.flow.distinctUntilChanged
 import java.util.*
 
 @Dao
-interface RateDao {
+interface RateDao : BaseDao<RateEntity> {
     // READS:
     @Query("SELECT * FROM rates")
     fun findAll(): Flow<List<RateEntity>>
 
     @ExperimentalCoroutinesApi
-    fun findAllDistinctUntilChanged() = findAll().distinctUntilChanged()
+    fun findDistinctAll() = findAll().distinctUntilChanged()
 
     @Query("SELECT * FROM rates WHERE rateId = :id")
     fun findById(id: UUID): Flow<RateEntity>
 
     @ExperimentalCoroutinesApi
-    fun findByIdDistinctUntilChanged(id: UUID) = findById(id).distinctUntilChanged()
+    fun findDistinctById(id: UUID) = findById(id).distinctUntilChanged()
 
     // INSERTS:
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insert(vararg rate: RateEntity)
-
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun addAll(rates: List<RateEntity>)
 
     // UPDATES:
-    @Update
-    suspend fun update(vararg rate: RateEntity)
 
     // DELETES:
-    @Delete
-    suspend fun delete(vararg rate: RateEntity)
-
-    @Delete
-    suspend fun delete(rates: List<RateEntity>)
-
     @Query("DELETE FROM rates")
     fun deleteAll()
 }

@@ -1,47 +1,38 @@
 package com.oborodulin.home.data.local.db.dao
 
 import androidx.room.*
-import com.oborodulin.home.data.local.db.entities.PayerEntity
-import com.oborodulin.home.data.local.db.entities.PayerServiceCrossRefEntity
-import com.oborodulin.home.data.local.db.entities.PayerWithServices
-import com.oborodulin.home.data.local.db.entities.ServiceEntity
+import com.oborodulin.home.data.local.db.entities.*
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.distinctUntilChanged
 import java.util.*
 
 @Dao
-interface PayerDao {
+interface PayerDao : BaseDao<PayerEntity> {
     // READS:
-    @Query("SELECT * FROM payers ORDER BY isFavorite DESC")
+    @Query("SELECT * FROM ${PayerEntity.TABLE_NAME} ORDER BY isFavorite DESC")
     fun findAll(): Flow<List<PayerEntity>>
 
     @ExperimentalCoroutinesApi
-    fun findAllDistinctUntilChanged() = findAll().distinctUntilChanged()
+    fun findDistinctAll() = findAll().distinctUntilChanged()
 
-    @Query("SELECT * FROM payers WHERE payerId = :payerId")
+    @Query("SELECT * FROM ${PayerEntity.TABLE_NAME} WHERE payerId = :payerId")
     fun findById(payerId: UUID): Flow<PayerEntity>
 
     @ExperimentalCoroutinesApi
-    fun findByIdDistinctUntilChanged(id: UUID) = findById(id).distinctUntilChanged()
+    fun findDistinctById(id: UUID) = findById(id).distinctUntilChanged()
 
-    @Query("SELECT * FROM payers WHERE isFavorite = 1")
+    @Query("SELECT * FROM ${PayerEntity.TABLE_NAME} WHERE isFavorite = 1")
     fun findFavorite(): Flow<PayerEntity>
 
     @ExperimentalCoroutinesApi
-    fun findFavoriteDistinctUntilChanged() = findFavorite().distinctUntilChanged()
+    fun findDistinctFavorite() = findFavorite().distinctUntilChanged()
 
     @Transaction
-    @Query("SELECT * FROM payers ORDER BY isFavorite DESC")
-    fun findPayersWithServices(): List<PayerWithServices>
+    @Query("SELECT * FROM ${PayerEntity.TABLE_NAME} ORDER BY isFavorite DESC")
+    fun findPayersWithServices(): Flow<List<PayerWithServices>>
 
     // INSERTS:
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insert(vararg payer: PayerEntity)
-
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun addAll(payers: List<PayerEntity>)
-
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insert(vararg payerService: PayerServiceCrossRefEntity)
 
@@ -55,26 +46,26 @@ interface PayerDao {
 
     // UPDATES:
     @Update
-    suspend fun update(vararg payer: PayerEntity)
+    suspend fun update(vararg payerService: PayerServiceCrossRefEntity)
 
     // DELETES:
-    @Delete
-    suspend fun delete(vararg payer: PayerEntity)
-
-    @Delete
-    suspend fun delete(payers: List<PayerEntity>)
-
-    @Query("DELETE FROM payers WHERE payerId = :payerId")
+    @Query("DELETE FROM ${PayerEntity.TABLE_NAME} WHERE payerId = :payerId")
     suspend fun deleteById(payerId: UUID)
 
-    @Query("DELETE FROM payers")
+    @Delete
+    suspend fun deleteService(vararg payerService: PayerServiceCrossRefEntity)
+
+    @Query("DELETE FROM ${PayerServiceCrossRefEntity.TABLE_NAME} WHERE payerServiceId = :payerServiceId")
+    suspend fun deleteServiceById(payerServiceId: UUID)
+
+    @Query("DELETE FROM ${PayerEntity.TABLE_NAME}")
     suspend fun deleteAll()
 
     // API:
-    @Query("UPDATE payers SET isFavorite = 1 WHERE payerId = :payerId AND isFavorite = 0")
+    @Query("UPDATE ${PayerEntity.TABLE_NAME} SET isFavorite = 1 WHERE payerId = :payerId AND isFavorite = 0")
     suspend fun setFavoriteById(payerId: UUID)
 
-    @Query("UPDATE payers SET isFavorite = 0 WHERE payerId <> :payerId AND isFavorite = 1")
+    @Query("UPDATE ${PayerEntity.TABLE_NAME} SET isFavorite = 0 WHERE payerId <> :payerId AND isFavorite = 1")
     suspend fun clearFavoritesById(payerId: UUID)
 
     @Transaction

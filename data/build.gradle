@@ -5,6 +5,7 @@ plugins {
     id 'org.jetbrains.kotlin.kapt'
 }
 android {
+    namespace 'com.oborodulin.home.data'
     compileSdk cfg.sdk.compileVersion
 
     defaultConfig {
@@ -20,10 +21,15 @@ android {
             }
         }
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        testInstrumentationRunnerArguments clearPackageData: 'true'
+        testInstrumentationRunnerArguments useTestStorageService: 'true'
+
         consumerProguardFiles "consumer-rules.pro"
     }
-
     buildTypes {
+        debug {
+            testCoverageEnabled true
+        }
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
@@ -42,12 +48,16 @@ android {
     kotlinOptions {
         jvmTarget = cfg.jvm.target
     }
-    namespace 'com.oborodulin.home.data'
+    testOptions {
+        unitTests {
+            includeAndroidResources = true
+        }
+    }
 }
 
 dependencies {
-    implementation(project(":common"))
-    implementation(project(":domain"))
+    implementation(project(':common'))
+    implementation(project(':domain'))
 
     // Logging
     implementation deps.logging.timber
@@ -72,19 +82,28 @@ dependencies {
     implementation deps.retrofit2.converterScalars
     implementation deps.okhttp3.loggingInterceptor
 
-    // Testing
+    // Testing: Local
     testImplementation deps.test.junit
+    testImplementation deps.test.robolectric
     testImplementation deps.kotlinx.coroutinesTest
     testImplementation deps.kotlinx.coroutinesAndroid
     testImplementation deps.test.extJunit
     implementation deps.test.extJunitKtx
-    testImplementation deps.test.hamcrest
+    implementation deps.test.runner
+    testImplementation deps.test.core
+    testImplementation deps.test.truth
+    //testImplementation deps.test.hamcrest
     testImplementation deps.dagger.testing
+    testImplementation deps.test.turbine
     kaptTest deps.dagger.hiltCompiler
 
+    // Testing: Instrumental
+    /*
     kaptAndroidTest deps.dagger.hiltCompiler
     androidTestImplementation deps.dagger.testing
     androidTestImplementation deps.kotlinx.coroutinesTest
     androidTestImplementation deps.test.espressoCore
+    androidTestImplementation deps.test.hamcrest
     androidTestImplementation deps.test.turbine
+     */
 }

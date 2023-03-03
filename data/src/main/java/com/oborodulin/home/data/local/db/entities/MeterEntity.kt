@@ -2,6 +2,7 @@ package com.oborodulin.home.data.local.db.entities
 
 import android.content.Context
 import androidx.room.*
+import com.oborodulin.home.common.util.Utils
 import com.oborodulin.home.data.R
 import com.oborodulin.home.data.util.MeterType
 import java.math.BigDecimal
@@ -24,8 +25,8 @@ data class MeterEntity(
     val num: String,
     val type: MeterType,
     val maxValue: BigDecimal,
-    //@TypeConverters(DateTypeConverter::class)
-    val passportDate: OffsetDateTime? = null,
+    val passportDate: OffsetDateTime,
+    val initValue: BigDecimal = BigDecimal.ZERO,
     val verificationPeriod: Int? = null,
     @ColumnInfo(index = true) var payersId: UUID,
 ) {
@@ -36,28 +37,36 @@ data class MeterEntity(
             num = ctx.resources.getString(R.string.def_meter_num),
             payersId = payerId,
             type = MeterType.ELECTRICITY,
-            maxValue = BigDecimal.valueOf(9999)
+            maxValue = BigDecimal.valueOf(9999),
+            passportDate = Utils.toOffsetDateTime("2022-06-19T14:29:10.212"),
+            initValue = BigDecimal.valueOf(9344)
         )
 
         fun populateColdWaterMeter(ctx: Context, payerId: UUID) = MeterEntity(
             num = ctx.resources.getString(R.string.def_meter_num),
             payersId = payerId,
             type = MeterType.COLD_WATER,
-            maxValue = BigDecimal.valueOf(99999.999)
+            maxValue = BigDecimal.valueOf(99999.999),
+            passportDate = Utils.toOffsetDateTime("2022-08-11T14:29:10.212"),
+            initValue = BigDecimal.valueOf(1523.125)
         )
 
         fun populateHotWaterMeter(ctx: Context, payerId: UUID) = MeterEntity(
             num = ctx.resources.getString(R.string.def_meter_num),
             payersId = payerId,
             type = MeterType.HOT_WATER,
-            maxValue = BigDecimal.valueOf(99999.999)
+            maxValue = BigDecimal.valueOf(99999.999),
+            passportDate = Utils.toOffsetDateTime("2022-09-03T14:29:10.212"),
+            initValue = BigDecimal.valueOf(2145.755)
         )
 
         fun populateHeatingMeter(ctx: Context, payerId: UUID) = MeterEntity(
             num = ctx.resources.getString(R.string.def_meter_num),
             payersId = payerId,
             type = MeterType.HEATING,
-            maxValue = BigDecimal.valueOf(9.99999)
+            maxValue = BigDecimal.valueOf(9.99999),
+            passportDate = Utils.toOffsetDateTime("2022-10-21T14:29:10.212"),
+            initValue = BigDecimal.valueOf(0.02113)
         )
     }
 
