@@ -9,11 +9,13 @@ import java.util.*
 interface RatesRepository {
     fun getAll(): Flow<List<Rate>>
     fun get(id: UUID): Flow<Rate>
+    fun getByPayer(payerId: UUID): Flow<List<Rate>>
+    fun getByService(serviceId: UUID): Flow<List<Rate>>
     fun getSubtotalDebts(payerId: UUID): Flow<List<Service>>
     fun getTotalDebts(): Flow<List<Payer>>
     fun getTotalDebt(payerId: UUID): Flow<Payer>
-    fun save(service: Service): Flow<Service>
-    fun delete(service: Service): Flow<Service>
-    fun delete(serviceId: UUID): Flow<UUID>
+    fun save(rate: Rate): Flow<Rate>
+    fun delete(rate: Rate): Flow<Rate>
+    fun delete(rateId: UUID): Flow<UUID>
     suspend fun deleteAll()
 }

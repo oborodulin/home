@@ -1,11 +1,13 @@
 plugins {
     id 'com.android.library'
     id 'org.jetbrains.kotlin.android'
+    id 'kotlin-parcelize'
     id 'dagger.hilt.android.plugin'
     id 'org.jetbrains.kotlin.kapt'
 }
 
 android {
+    namespace 'com.oborodulin.home.billing'
     compileSdk cfg.sdk.compileVersion
 
     defaultConfig {
@@ -33,16 +35,15 @@ android {
     kotlinOptions {
         jvmTarget = cfg.jvm.target
     }
-    namespace 'com.oborodulin.home.billing'
 }
 
 dependencies {
-    implementation project(":common")
-    implementation project(":data")
-    implementation project(":domain")
-    implementation project(":presentation")
+    implementation project(':common')
+    implementation project(':data')
+    implementation project(':domain')
+    implementation project(':presentation')
 
-    implementation project(":servicing")
+    implementation project(':servicing')
 
     // Logging
     implementation deps.logging.timber
@@ -75,6 +76,8 @@ dependencies {
     // Network
     implementation deps.retrofit2.retrofit
     implementation deps.retrofit2.converterGson
+    // Desugaring
+    //coreLibraryDesugaring deps.tools.desugar
 
     implementation deps.androidx.coreKtx
     implementation deps.androidx.appcompat

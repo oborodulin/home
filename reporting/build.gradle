@@ -4,6 +4,7 @@ plugins {
 }
 
 android {
+    namespace 'com.oborodulin.home.reporting'
     compileSdk cfg.sdk.compileVersion
 
     defaultConfig {
@@ -27,7 +28,6 @@ android {
     kotlinOptions {
         jvmTarget = cfg.jvm.target
     }
-    namespace 'com.oborodulin.home.reporting'
 }
 
 dependencies {

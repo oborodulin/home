@@ -7,6 +7,7 @@ plugins {
 }
 
 android {
+    namespace 'com.oborodulin.home.metering'
     compileSdk cfg.sdk.compileVersion
 
     defaultConfig {
@@ -50,13 +51,12 @@ android {
     composeOptions {
         kotlinCompilerExtensionVersion versions.composeKotlinExt
     }
-    namespace 'com.oborodulin.home.metering'
 }
 
 dependencies {
-    implementation project(":common")
-    implementation project(":data")
-    implementation project(":domain")
+    implementation project(':common')
+    implementation project(':data')
+    implementation project(':domain')
     implementation project(':presentation')
 
     // Logging

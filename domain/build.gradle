@@ -5,6 +5,7 @@ plugins {
     id 'org.jetbrains.kotlin.kapt'
 }
 android {
+    namespace 'com.oborodulin.home.domain'
     compileSdk cfg.sdk.compileVersion
 
     defaultConfig {
@@ -38,11 +39,10 @@ android {
     kotlinOptions {
         jvmTarget = cfg.jvm.target
     }
-    namespace 'com.oborodulin.home.domain'
 }
 
 dependencies {
-    implementation(project(":common"))
+    implementation(project(':common'))
 
     // Logging
     implementation deps.logging.timber
