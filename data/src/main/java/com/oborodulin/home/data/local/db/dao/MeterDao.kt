@@ -47,7 +47,7 @@ interface MeterDao : BaseDao<MeterEntity> {
         """
 SELECT * FROM ${MeterValuePrevPeriodView.VIEW_NAME}  
 WHERE payerId = :payerId AND meterLocaleCode = :locale AND serviceLocaleCode = :locale 
-ORDER BY pos
+ORDER BY servicePos
 """
     )
     fun findPrevMetersValuesByPayerId(
@@ -58,7 +58,7 @@ ORDER BY pos
         """
 SELECT * FROM ${MeterValuePrevPeriodView.VIEW_NAME} 
 WHERE isFavorite = 1 AND meterLocaleCode = :locale AND serviceLocaleCode = :locale
-ORDER BY pos
+ORDER BY servicePos
 """
     )
     fun findPrevMetersValuesByPayerIsFavorite(

@@ -21,13 +21,6 @@ class ServicesRepositoryImp @Inject constructor(
     override fun getPayerService(payerServiceId: UUID) =
         servicingDataSource.getPayerService(payerServiceId)
 
-    override fun getSubtotalDebts(payerId: UUID) =
-        servicingDataSource.getServiceSubtotalDebts(payerId)
-
-    override fun getTotalDebts() = servicingDataSource.getServiceTotalDebts()
-
-    override fun getTotalDebt(payerId: UUID) = servicingDataSource.getServiceTotalDebt(payerId)
-
     override fun save(service: Service): Flow<Service> = flow {
         servicingDataSource.saveService(service)
         emit(service)

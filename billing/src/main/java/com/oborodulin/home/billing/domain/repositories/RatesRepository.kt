@@ -11,6 +11,7 @@ interface RatesRepository {
     fun get(id: UUID): Flow<Rate>
     fun getByPayer(payerId: UUID): Flow<List<Rate>>
     fun getByService(serviceId: UUID): Flow<List<Rate>>
+    fun getByPayerService(payerServiceId: UUID): Flow<List<Rate>>
     fun getSubtotalDebts(payerId: UUID): Flow<List<Service>>
     fun getTotalDebts(): Flow<List<Payer>>
     fun getTotalDebt(payerId: UUID): Flow<Payer>

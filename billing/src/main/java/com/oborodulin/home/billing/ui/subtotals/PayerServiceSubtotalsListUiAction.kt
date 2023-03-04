@@ -1,4 +1,4 @@
-package com.oborodulin.home.servicing.ui.payerservice.subtotals
+package com.oborodulin.home.billing.ui.subtotals
 
 import com.oborodulin.home.common.ui.state.UiAction
 import java.util.*

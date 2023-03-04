@@ -18,8 +18,8 @@ class PrevMetersValuesViewToMeterValueModelMapper :
         */
         return MeterValueListItem(
             id = input.meterValueId,
-            type = input.type,
-            name = input.name,
+            serviceType = input.serviceType,
+            serviceName = input.serviceName,
             payerId = input.payerId,
             metersId = input.meterId,
             measureUnit = input.measureUnit,

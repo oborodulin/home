@@ -8,11 +8,11 @@ class ServiceViewToServiceMapper : Mapper<ServiceView, Service> {
     override fun map(input: ServiceView): Service {
         val service = Service(
             serviceTlId = input.tl.serviceTlId,
-            pos = input.data.pos!!,
-            name = input.tl.name,
-            type = input.data.type,
+            servicePos = input.data.servicePos!!,
+            serviceName = input.tl.serviceName,
+            serviceType = input.data.serviceType,
             measureUnit = input.tl.measureUnit,
-            descr = input.tl.descr
+            serviceDesc = input.tl.serviceDesc
         )
         service.id = input.data.serviceId
         return service

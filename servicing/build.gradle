@@ -7,12 +7,17 @@ plugins {
 }
 
 android {
+    namespace 'com.oborodulin.home.servicing'
     compileSdk cfg.sdk.compileVersion
 
     defaultConfig {
         minSdk cfg.sdk.minVersion
         targetSdk cfg.sdk.targetVersion
-
+        kapt {
+            //ERROR : error.NonExistentClass Kotlin In multi module Dagger project
+            //https://kotlinlang.org/docs/reference/kapt.html#non-existent-type-correction
+            correctErrorTypes = true
+        }
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         consumerProguardFiles "consumer-rules.pro"
     }
@@ -40,7 +45,6 @@ android {
     composeOptions {
         kotlinCompilerExtensionVersion versions.composeKotlinExt
     }
-    namespace 'com.oborodulin.home.servicing'
 }
 
 dependencies {

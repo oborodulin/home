@@ -324,8 +324,8 @@ class MeterValuesListViewModelImp @Inject constructor(
                 MeterValueListItem(
                     id = UUID.randomUUID(),
                     metersId = UUID.randomUUID(),
-                    type = ServiceType.ELECTRICITY,
-                    name = ctx.resources.getString(R.string.service_electricity),
+                    serviceType = ServiceType.ELECTRICITY,
+                    serviceName = ctx.resources.getString(R.string.service_electricity),
                     measureUnit = ctx.resources.getString(com.oborodulin.home.common.R.string.kWh_unit),
                     prevLastDate = Utils.toOffsetDateTime("2022-08-01T14:29:10.212"),
                     prevValue = BigDecimal.valueOf(9628),
@@ -335,8 +335,8 @@ class MeterValuesListViewModelImp @Inject constructor(
                 MeterValueListItem(
                     id = UUID.randomUUID(),
                     metersId = UUID.randomUUID(),
-                    type = ServiceType.COLD_WATER,
-                    name = ctx.resources.getString(R.string.service_cold_water),
+                    serviceType = ServiceType.COLD_WATER,
+                    serviceName = ctx.resources.getString(R.string.service_cold_water),
                     measureUnit = ctx.resources.getString(com.oborodulin.home.common.R.string.m3_unit),
                     prevLastDate = Utils.toOffsetDateTime("2022-08-01T14:29:10.212"),
                     prevValue = BigDecimal.valueOf(1553),

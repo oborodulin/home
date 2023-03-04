@@ -1,20 +1,20 @@
-package com.oborodulin.home.servicing.domain.usecases
+package com.oborodulin.home.billing.domain.usecases
 
+import com.oborodulin.home.billing.domain.repositories.RatesRepository
 import com.oborodulin.home.common.domain.usecases.UseCase
 import com.oborodulin.home.servicing.domain.model.Service
-import com.oborodulin.home.servicing.domain.repositories.ServicesRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import java.util.*
 
 class GetPayerServiceSubtotalsUseCase(
     configuration: Configuration,
-    private val servicesRepository: ServicesRepository
+    private val ratesRepository: RatesRepository
 ) : UseCase<GetPayerServiceSubtotalsUseCase.Request, GetPayerServiceSubtotalsUseCase.Response>(
     configuration
 ) {
     override fun process(request: Request): Flow<Response> =
-        servicesRepository.getSubtotalDebts(request.payerId).map {
+        ratesRepository.getSubtotalDebts(request.payerId).map {
             Response(it)
         }
 

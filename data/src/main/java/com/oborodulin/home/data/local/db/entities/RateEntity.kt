@@ -33,7 +33,7 @@ class RateEntity(
     val isPerPerson: Boolean = false, // считаем по норме на 1 человека, но приоритет для тарифов по счётчику
     val isPrivileges: Boolean = false, // считаем по счётчику, но по льготному тарифу
     @ColumnInfo(index = true) val servicesId: UUID,
-    @ColumnInfo(index = true) val payersServicesId: UUID? = null,
+    @ColumnInfo(index = true) val payersServicesId: UUID? = null
 ) {
     companion object {
         const val TABLE_NAME = "rates"
@@ -101,6 +101,61 @@ class RateEntity(
                 servicesId = serviceId, payersServicesId = payersServiceId,
                 isPerPerson = true, rateValue = BigDecimal.valueOf(15.73)
             )
+
+        fun populatePerPersonRate(
+            serviceId: UUID, payersServiceId: UUID, rateId: UUID = UUID.randomUUID(),
+            startDate: OffsetDateTime = OffsetDateTime.now(),
+            fromMeterValue: BigDecimal? = null,
+            toMeterValue: BigDecimal? = null,
+            rateValue: BigDecimal,
+            isPrivileges: Boolean = false
+        ) = RateEntity(
+            servicesId = serviceId, payersServicesId = payersServiceId,
+            rateId = rateId,
+            startDate = startDate,
+            fromMeterValue = fromMeterValue,
+            toMeterValue = toMeterValue,
+            rateValue = rateValue,
+            isPerPerson = true,
+            isPrivileges = isPrivileges
+        )
+
+        fun populatePrivilegesRate(
+            serviceId: UUID, payersServiceId: UUID, rateId: UUID = UUID.randomUUID(),
+            startDate: OffsetDateTime = OffsetDateTime.now(),
+            fromMeterValue: BigDecimal? = null,
+            toMeterValue: BigDecimal? = null,
+            rateValue: BigDecimal,
+            isPerPerson: Boolean = false
+        ) = RateEntity(
+            servicesId = serviceId, payersServicesId = payersServiceId,
+            rateId = rateId,
+            startDate = startDate,
+            fromMeterValue = fromMeterValue,
+            toMeterValue = toMeterValue,
+            rateValue = rateValue,
+            isPerPerson = isPerPerson,
+            isPrivileges = true
+        )
+
+        fun populateRate(
+            serviceId: UUID, payersServiceId: UUID, rateId: UUID = UUID.randomUUID(),
+            startDate: OffsetDateTime = OffsetDateTime.now(),
+            fromMeterValue: BigDecimal? = null,
+            toMeterValue: BigDecimal? = null,
+            rateValue: BigDecimal,
+            isPerPerson: Boolean = false,
+            isPrivileges: Boolean = false
+        ) = RateEntity(
+            servicesId = serviceId, payersServicesId = payersServiceId,
+            rateId = rateId,
+            startDate = startDate,
+            fromMeterValue = fromMeterValue,
+            toMeterValue = toMeterValue,
+            rateValue = rateValue,
+            isPerPerson = isPerPerson,
+            isPrivileges = isPrivileges
+        )
     }
 
     override fun equals(other: Any?): Boolean {

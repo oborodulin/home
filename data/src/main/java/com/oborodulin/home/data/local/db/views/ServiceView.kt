@@ -8,7 +8,7 @@ import com.oborodulin.home.data.local.db.entities.ServiceTlEntity
     viewName = ServiceView.VIEW_NAME,
     value = """
 SELECT s.*, stl.* FROM ${ServiceEntity.TABLE_NAME} s JOIN ${ServiceTlEntity.TABLE_NAME} stl ON stl.servicesId = s.serviceId
-ORDER BY s.pos
+ORDER BY s.servicePos
 """
 )
 class ServiceView(

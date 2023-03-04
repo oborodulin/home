@@ -1,18 +1,17 @@
-package com.oborodulin.home.servicing.ui.model.mappers
+package com.oborodulin.home.billing.ui.model.mappers
 
 import com.oborodulin.home.common.mapping.Mapper
 import com.oborodulin.home.servicing.domain.model.Service
-import com.oborodulin.home.servicing.ui.model.ServiceSubtotalListItem
 import java.util.*
 
-class ServiceToServiceSubtotalListItemMapper : Mapper<Service, ServiceSubtotalListItem> {
+class ServiceToServiceSubtotalListItemMapper : Mapper<Service, com.oborodulin.home.billing.ui.model.ServiceSubtotalListItem> {
     override fun map(input: Service) =
-        ServiceSubtotalListItem(
+        com.oborodulin.home.billing.ui.model.ServiceSubtotalListItem(
             id = input.id ?: UUID.randomUUID(),
-            name = input.name,
-            type = input.type,
+            serviceName = input.serviceName,
+            serviceType = input.serviceType,
             measureUnit = input.measureUnit,
-            serviceDescr = input.descr,
+            serviceDesc = input.serviceDesc,
             isPrivileges = input.isPrivileges,
             isAllocateRate = input.isAllocateRate,
             fromPaymentDate = input.fromPaymentDate,

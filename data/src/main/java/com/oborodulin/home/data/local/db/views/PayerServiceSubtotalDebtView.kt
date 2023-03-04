@@ -12,14 +12,14 @@ import java.util.*
     viewName = PayerServiceSubtotalDebtView.VIEW_NAME,
     value = """
 SELECT payerId, MIN(paymentDate) AS fromPaymentDate, MAX(paymentDate) AS toPaymentDate, 
-        serviceId, payerServiceId, COUNT(payerServiceId) AS MonthsCount, pos, type, name, 
+        serviceId, payerServiceId, COUNT(payerServiceId) AS MonthsCount, servicePos, serviceType, serviceName, 
         serviceLocaleCode, rateValue, fromMeterValue, toMeterValue, 
         SUM(diffMeterValue) AS diffMeterValue, measureUnit, SUM(serviceDebt) AS serviceDebt, 
         isMeterUses
 FROM ${PayerServiceDebtView.VIEW_NAME}
-GROUP BY payerId, serviceId, payerServiceId, pos, type, name, serviceLocaleCode, rateValue, 
+GROUP BY payerId, serviceId, payerServiceId, servicePos, serviceType, serviceName, serviceLocaleCode, rateValue, 
         fromMeterValue, toMeterValue, measureUnit, isMeterUses
-ORDER BY payerId, paymentDate, pos
+ORDER BY payerId, paymentDate, servicePos
 """
 )
 class PayerServiceSubtotalDebtView(
@@ -31,9 +31,9 @@ class PayerServiceSubtotalDebtView(
     val serviceId: UUID,
     val payerServiceId: UUID,
     val MonthsCount: Int,
-    val pos: Int,
-    val type: ServiceType,
-    val name: String,
+    val servicePos: Int,
+    val serviceType: ServiceType,
+    val serviceName: String,
     val serviceLocaleCode: String,
     val rateValue: BigDecimal,
     val fromMeterValue: BigDecimal?,

@@ -3,9 +3,7 @@ package com.oborodulin.home.data.local.db.dao
 import androidx.room.*
 import com.oborodulin.home.data.local.db.entities.ServiceEntity
 import com.oborodulin.home.data.local.db.entities.ServiceTlEntity
-import com.oborodulin.home.data.local.db.views.PayerServiceSubtotalDebtView
 import com.oborodulin.home.data.local.db.views.PayerServiceView
-import com.oborodulin.home.data.local.db.views.PayerTotalDebtView
 import com.oborodulin.home.data.local.db.views.ServiceView
 import com.oborodulin.home.data.util.Constants
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -16,7 +14,7 @@ import java.util.*
 @Dao
 interface ServiceDao : BaseDao<ServiceEntity> {
     // READS:
-    @Query("SELECT * FROM ${ServiceView.VIEW_NAME} WHERE localeCode = :locale ORDER BY pos")
+    @Query("SELECT * FROM ${ServiceView.VIEW_NAME} WHERE localeCode = :locale ORDER BY servicePos")
     fun findAll(locale: String? = Locale.getDefault().language): Flow<List<ServiceView>>
 
     @ExperimentalCoroutinesApi
@@ -28,7 +26,7 @@ interface ServiceDao : BaseDao<ServiceEntity> {
     @ExperimentalCoroutinesApi
     fun findDistinctById(id: UUID) = findById(id).distinctUntilChanged()
 
-    @Query("SELECT * FROM ${ServiceView.VIEW_NAME} WHERE meterType <> ${Constants.MTR_NONE_VAL} AND localeCode = :locale ORDER BY pos")
+    @Query("SELECT * FROM ${ServiceView.VIEW_NAME} WHERE meterType <> ${Constants.MTR_NONE_VAL} AND localeCode = :locale ORDER BY servicePos")
     fun findMeterAllowed(locale: String? = Locale.getDefault().language): Flow<List<ServiceView>>
 
     @Query(
@@ -50,36 +48,14 @@ interface ServiceDao : BaseDao<ServiceEntity> {
     fun findDistinctPayerServiceById(payerServiceId: UUID) =
         findPayerServiceById(payerServiceId).distinctUntilChanged()
 
-    @Query(
-        """
-SELECT * FROM ${PayerServiceSubtotalDebtView.VIEW_NAME} WHERE payerId = :payerId AND serviceLocaleCode = :locale
-ORDER BY pos            
-"""
-    )
-    fun findSubtotalDebtsByPayerId(
-        payerId: UUID, locale: String? = Locale.getDefault().language
-    ): Flow<List<PayerServiceSubtotalDebtView>>
-
-    @Query(
-        "SELECT * FROM ${PayerTotalDebtView.VIEW_NAME} WHERE serviceLocaleCode = :locale"
-    )
-    fun findTotalDebts(locale: String? = Locale.getDefault().language): Flow<List<PayerTotalDebtView>>
-
-    @Query(
-        "SELECT * FROM payer_total_debts_view WHERE payerId = :payerId AND serviceLocaleCode = :locale"
-    )
-    fun findTotalDebtByPayerId(
-        payerId: UUID, locale: String? = Locale.getDefault().language
-    ): Flow<PayerTotalDebtView>
-
     // INSERTS:
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insert(vararg textContent: ServiceTlEntity)
 
     @Transaction
     suspend fun insert(service: ServiceEntity, textContent: ServiceTlEntity) {
-        service.pos = service.pos ?: nextPos()
-        updatePos(service.pos!!)
+        service.servicePos = service.servicePos ?: nextPos()
+        updatePos(service.servicePos!!)
         insert(service)
         textContent.servicesId = service.serviceId
         insert(textContent)
@@ -91,8 +67,8 @@ ORDER BY pos
 
     @Transaction
     suspend fun update(service: ServiceEntity, textContent: ServiceTlEntity) {
-        service.pos = service.pos ?: nextPos()
-        updatePos(service.pos!!)
+        service.servicePos = service.servicePos ?: nextPos()
+        updatePos(service.servicePos!!)
         update(service)
         update(textContent)
     }
@@ -105,12 +81,12 @@ ORDER BY pos
     suspend fun deleteAll()
 
     // API:
-    @Query("SELECT IFNULL(MAX(pos), 0) FROM ${ServiceEntity.TABLE_NAME}")
+    @Query("SELECT IFNULL(MAX(servicePos), 0) FROM ${ServiceEntity.TABLE_NAME}")
     fun maxPos(): Int
 
-    @Query("SELECT IFNULL(MAX(pos), 0) + 1 FROM ${ServiceEntity.TABLE_NAME}")
+    @Query("SELECT IFNULL(MAX(servicePos), 0) + 1 FROM ${ServiceEntity.TABLE_NAME}")
     fun nextPos(): Int
 
-    @Query("UPDATE ${ServiceEntity.TABLE_NAME} SET pos = pos + 1 WHERE pos >= :pos")
+    @Query("UPDATE ${ServiceEntity.TABLE_NAME} SET servicePos = servicePos + 1 WHERE servicePos >= :pos")
     suspend fun updatePos(pos: Int)
 }

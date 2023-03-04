@@ -8,8 +8,8 @@ import java.util.*
 class MeterToMeterEntityMapper : Mapper<Meter, MeterEntity> {
     override fun map(input: Meter) = MeterEntity(
         meterId = input.id ?: input.apply { id = UUID.randomUUID() }.id!!,
-        type = input.type,
-        num = input.num,
+        meterType = input.meterType,
+        meterNum = input.meterNum,
         maxValue = input.maxValue,
         passportDate = input.passportDate,
         initValue = input.initValue,

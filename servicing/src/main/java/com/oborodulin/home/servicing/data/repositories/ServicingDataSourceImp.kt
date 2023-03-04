@@ -20,11 +20,8 @@ class ServicingDataSourceImp @Inject constructor(
     private val serviceViewToServiceMapper: ServiceViewToServiceMapper,
     private val payerServiceViewToServiceMapper: PayerServiceViewToServiceMapper,
     private val payerServiceViewListToServiceListMapper: PayerServiceViewListToServiceListMapper,
-    private val payerServiceSubtotalDebtViewListToServiceListMapper: PayerServiceSubtotalDebtViewListToServiceListMapper,
-    private val payerTotalDebtViewToPayerMapper: PayerTotalDebtViewToPayerMapper,
-    private val payerTotalDebtViewListToPayerListMapper: PayerTotalDebtViewListToPayerListMapper,
     private val serviceToServiceEntityMapper: ServiceToServiceEntityMapper,
-    private val serviceToServiceTlEntityMapper: ServiceToServiceTlEntityMapper,
+    private val serviceToServiceTlEntityMapper: ServiceToServiceTlEntityMapper
 ) : ServicingDataSource {
     override fun getServices() = serviceDao.findDistinctAll()
         .map(serviceViewListToServiceListMapper::map)
@@ -40,16 +37,6 @@ class ServicingDataSourceImp @Inject constructor(
 
     override fun getPayerService(payerServiceId: UUID) =
         serviceDao.findPayerServiceById(payerServiceId).map(payerServiceViewToServiceMapper::map)
-
-    override fun getServiceSubtotalDebts(payerId: UUID) =
-        serviceDao.findSubtotalDebtsByPayerId(payerId)
-            .map(payerServiceSubtotalDebtViewListToServiceListMapper::map)
-
-    override fun getServiceTotalDebts() =
-        serviceDao.findTotalDebts().map(payerTotalDebtViewListToPayerListMapper::map)
-
-    override fun getServiceTotalDebt(payerId: UUID) = serviceDao.findTotalDebtByPayerId(payerId)
-        .map(payerTotalDebtViewToPayerMapper::map)
 
     override suspend fun saveService(service: Service) = withContext(dispatcher) {
         if (service.id == null) {

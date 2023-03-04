@@ -146,6 +146,18 @@ data class MeterValueEntity(
             valueDate = valueDate,
             meterValue = meterValue ?: BigDecimal.valueOf(0.02394)
         )
+
+        fun populateMeterValue(
+            meterId: UUID,
+            meterValueId: UUID = UUID.randomUUID(),
+            valueDate: OffsetDateTime = OffsetDateTime.now(),
+            meterValue: BigDecimal? = null
+        ) = MeterValueEntity(
+            metersId = meterId,
+            meterValueId = meterValueId,
+            valueDate = valueDate,
+            meterValue = meterValue
+        )
     }
 
     override fun equals(other: Any?): Boolean {

@@ -2,14 +2,15 @@ package com.oborodulin.home.data.local.db.views
 
 import androidx.room.DatabaseView
 import androidx.room.Embedded
+import com.oborodulin.home.data.local.db.entities.PayerServiceCrossRefEntity
 import java.util.*
 
 @DatabaseView(
     viewName = PayerServiceView.VIEW_NAME,
     value = """
 SELECT sv.*, ps.payerServiceId, ps.payersId, ps.isPrivileges, ps.isAllocateRate 
-FROM ${ServiceView.VIEW_NAME} sv JOIN payers_services AS ps ON ps.servicesId = sv.serviceId
-ORDER BY sv.pos
+FROM ${ServiceView.VIEW_NAME} sv JOIN ${PayerServiceCrossRefEntity.TABLE_NAME} ps ON ps.servicesId = sv.serviceId
+ORDER BY sv.servicePos
 """
 )
 class PayerServiceView(

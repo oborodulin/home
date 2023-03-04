@@ -25,6 +25,10 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.oborodulin.home.accounting.R
 import com.oborodulin.home.accounting.ui.model.PayerListItem
+import com.oborodulin.home.billing.ui.subtotals.PayerServiceSubtotalsListUiAction
+import com.oborodulin.home.billing.ui.subtotals.PayerServiceSubtotalsListView
+import com.oborodulin.home.billing.ui.subtotals.PayerServiceSubtotalsListViewModel
+import com.oborodulin.home.billing.ui.subtotals.PayerServiceSubtotalsListViewModelImp
 import com.oborodulin.home.common.ui.ComponentUiAction
 import com.oborodulin.home.common.ui.components.items.ListItemComponent
 import com.oborodulin.home.common.ui.state.CommonScreen
@@ -34,10 +38,6 @@ import com.oborodulin.home.metering.ui.value.MeterValuesListViewModel
 import com.oborodulin.home.metering.ui.value.MeterValuesListViewModelImp
 import com.oborodulin.home.presentation.AppState
 import com.oborodulin.home.presentation.navigation.PayerInput
-import com.oborodulin.home.servicing.ui.payerservice.subtotals.PayerServiceSubtotalsListUiAction
-import com.oborodulin.home.servicing.ui.payerservice.subtotals.PayerServiceSubtotalsListView
-import com.oborodulin.home.servicing.ui.payerservice.subtotals.PayerServiceSubtotalsListViewModel
-import com.oborodulin.home.servicing.ui.payerservice.subtotals.PayerServiceSubtotalsListViewModelImp
 import kotlinx.coroutines.flow.collectLatest
 import timber.log.Timber
 import java.util.*

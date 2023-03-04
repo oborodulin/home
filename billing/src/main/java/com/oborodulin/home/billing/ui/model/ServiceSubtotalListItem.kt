@@ -1,4 +1,4 @@
-package com.oborodulin.home.servicing.ui.model
+package com.oborodulin.home.billing.ui.model
 
 import com.oborodulin.home.common.ui.model.ListItemModel
 import com.oborodulin.home.data.util.ServiceType
@@ -8,10 +8,10 @@ import java.util.*
 
 data class ServiceSubtotalListItem(
     val id: UUID,
-    val name: String = "",
-    val type: ServiceType,
+    val serviceName: String = "",
+    val serviceType: ServiceType,
     val measureUnit: String? = null,
-    val serviceDescr: String? = null,
+    val serviceDesc: String? = null,
     var isPrivileges: Boolean? = null,
     var isAllocateRate: Boolean? = null,
     val fromPaymentDate: OffsetDateTime? = null,
@@ -21,12 +21,12 @@ data class ServiceSubtotalListItem(
     val serviceDebt: BigDecimal? = null
 ) : ListItemModel(
     itemId = id,
-    title = name,
-    descr = serviceDescr,
+    title = serviceName,
+    descr = serviceDesc,
     value = serviceDebt,
     fromDate = fromPaymentDate,
     toDate = toPaymentDate
-){
+) {
     init {
 
     }

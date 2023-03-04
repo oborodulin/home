@@ -8,11 +8,8 @@ import com.oborodulin.home.servicing.data.repositories.ServicesRepositoryImp
 import com.oborodulin.home.servicing.data.repositories.ServicingDataSource
 import com.oborodulin.home.servicing.data.repositories.ServicingDataSourceImp
 import com.oborodulin.home.servicing.domain.repositories.ServicesRepository
-import com.oborodulin.home.servicing.domain.usecases.GetPayerServiceSubtotalsUseCase
-import com.oborodulin.home.servicing.domain.usecases.PayerServiceUseCases
-import com.oborodulin.home.servicing.ui.model.converters.ServiceSubtotalListConverter
-import com.oborodulin.home.servicing.ui.model.mappers.ServiceListToServiceSubtotalListItemMapper
-import com.oborodulin.home.servicing.ui.model.mappers.ServiceToServiceSubtotalListItemMapper
+import com.oborodulin.home.servicing.domain.usecases.GetServicesUseCase
+import com.oborodulin.home.servicing.domain.usecases.ServicingUseCases
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -54,42 +51,9 @@ object ServicingModule {
     fun providePayerServiceViewListToServiceListMapper(mapper: PayerServiceViewToServiceMapper): PayerServiceViewListToServiceListMapper =
         PayerServiceViewListToServiceListMapper(mapper = mapper)
 
-    @Singleton
-    @Provides
-    fun providePayerServiceSubtotalDebtViewToServiceMapper(): PayerServiceSubtotalDebtViewToServiceMapper =
-        PayerServiceSubtotalDebtViewToServiceMapper()
-
-    @Singleton
-    @Provides
-    fun providePayerServiceSubtotalDebtViewListToServiceListMapper(mapper: PayerServiceSubtotalDebtViewToServiceMapper): PayerServiceSubtotalDebtViewListToServiceListMapper =
-        PayerServiceSubtotalDebtViewListToServiceListMapper(mapper = mapper)
-
-    @Singleton
-    @Provides
-    fun providePayerTotalDebtViewToPayerMapper(): PayerTotalDebtViewToPayerMapper =
-        PayerTotalDebtViewToPayerMapper()
-
-    @Singleton
-    @Provides
-    fun providePayerTotalDebtViewListToPayerListMapper(mapper: PayerTotalDebtViewToPayerMapper): PayerTotalDebtViewListToPayerListMapper =
-        PayerTotalDebtViewListToPayerListMapper(mapper = mapper)
-
     // UI MAPPERS:
-    @Singleton
-    @Provides
-    fun provideServiceToServiceSubtotalListItemMapper(): ServiceToServiceSubtotalListItemMapper =
-        ServiceToServiceSubtotalListItemMapper()
-
-    @Singleton
-    @Provides
-    fun provideServiceListToServiceSubtotalListItemMapper(mapper: ServiceToServiceSubtotalListItemMapper): ServiceListToServiceSubtotalListItemMapper =
-        ServiceListToServiceSubtotalListItemMapper(mapper = mapper)
 
     // CONVERTERS:
-    @Singleton
-    @Provides
-    fun provideServiceSubtotalListConverter(mapper: ServiceListToServiceSubtotalListItemMapper): ServiceSubtotalListConverter =
-        ServiceSubtotalListConverter(mapper = mapper)
 
     // DATA SOURCES:
     @Singleton
@@ -101,9 +65,6 @@ object ServicingModule {
         serviceViewToServiceMapper: ServiceViewToServiceMapper,
         payerServiceViewToServiceMapper: PayerServiceViewToServiceMapper,
         payerServiceViewListToServiceListMapper: PayerServiceViewListToServiceListMapper,
-        payerServiceSubtotalDebtViewListToServiceListMapper: PayerServiceSubtotalDebtViewListToServiceListMapper,
-        payerTotalDebtViewToPayerMapper: PayerTotalDebtViewToPayerMapper,
-        payerTotalDebtViewListToPayerListMapper: PayerTotalDebtViewListToPayerListMapper,
         serviceToServiceEntityMapper: ServiceToServiceEntityMapper,
         serviceToServiceTlEntityMapper: ServiceToServiceTlEntityMapper
     ): ServicingDataSource =
@@ -114,9 +75,6 @@ object ServicingModule {
             serviceViewToServiceMapper,
             payerServiceViewToServiceMapper,
             payerServiceViewListToServiceListMapper,
-            payerServiceSubtotalDebtViewListToServiceListMapper,
-            payerTotalDebtViewToPayerMapper,
-            payerTotalDebtViewListToPayerListMapper,
             serviceToServiceEntityMapper,
             serviceToServiceTlEntityMapper
         )
@@ -132,9 +90,9 @@ object ServicingModule {
     @Provides
     fun providePayerServiceUseCases(
         configuration: UseCase.Configuration, repository: ServicesRepository
-    ): PayerServiceUseCases =
-        PayerServiceUseCases(
-            getPayerServiceSubtotalsUseCase = GetPayerServiceSubtotalsUseCase(
+    ): ServicingUseCases =
+        ServicingUseCases(
+            getServicesUseCase = GetServicesUseCase(
                 configuration,
                 repository
             )

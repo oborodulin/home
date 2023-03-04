@@ -1,4 +1,4 @@
-package com.oborodulin.home.servicing.ui.payerservice.subtotals
+package com.oborodulin.home.billing.ui.subtotals
 
 import android.content.res.Configuration
 import androidx.compose.foundation.focusable
@@ -23,11 +23,11 @@ import com.oborodulin.home.common.ui.state.CommonScreen
 import com.oborodulin.home.presentation.navigation.PayerInput
 import com.oborodulin.home.presentation.util.serviceIconId
 import com.oborodulin.home.servicing.R
-import com.oborodulin.home.servicing.ui.model.ServiceSubtotalListItem
+import com.oborodulin.home.billing.ui.model.ServiceSubtotalListItem
 import kotlinx.coroutines.flow.collectLatest
 import timber.log.Timber
 
-private const val TAG = "Servicing.ui.PayerServiceSubtotalsListView"
+private const val TAG = "Billing.ui.PayerServiceSubtotalsListView"
 
 @Composable
 fun PayerServiceSubtotalsListView(
@@ -44,7 +44,7 @@ fun PayerServiceSubtotalsListView(
     viewModel.uiStateFlow.collectAsState().value.let { state ->
         Timber.tag(TAG).d("Collect ui state flow: %s", state)
         CommonScreen(state = state) {
-            PayerServiceSubtotalsList(payerServiceSubtotals = it) {}
+            PayerServiceSubtotalsList(payerServiceSubtotals = it) {println()}
         }
     }
     LaunchedEffect(Unit) {
@@ -80,12 +80,12 @@ fun PayerServiceSubtotalsList(
             items(payerServiceSubtotals.size) { index ->
                 payerServiceSubtotals[index].let { payerServiceSubtotal ->
                     ListItemComponent(
-                        icon = serviceIconId(payerServiceSubtotal.type),
+                        icon = serviceIconId(payerServiceSubtotal.serviceType),
                         item = payerServiceSubtotal,
                         itemActions = listOf(ComponentUiAction.PayListItem(
                             stringResource(
                                 R.string.dlg_confirm_del_payer_service,
-                                payerServiceSubtotal.name
+                                payerServiceSubtotal.serviceName
                             )
                         ) {
                             onPay(payerServiceSubtotal)

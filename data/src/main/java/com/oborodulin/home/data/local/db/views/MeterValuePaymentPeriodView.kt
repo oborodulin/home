@@ -3,6 +3,9 @@ package com.oborodulin.home.data.local.db.views
 import androidx.room.DatabaseView
 import androidx.room.Embedded
 import com.oborodulin.home.data.local.db.entities.MeterValueEntity
+import com.oborodulin.home.data.local.db.entities.PayerEntity
+import com.oborodulin.home.data.local.db.entities.PayerServiceCrossRefEntity
+import com.oborodulin.home.data.local.db.entities.PayerServiceMeterCrossRefEntity
 import com.oborodulin.home.data.util.Constants
 import java.math.BigDecimal
 import java.time.OffsetDateTime
@@ -15,11 +18,11 @@ SELECT mv.*, lv.measureUnit, lv.isDerivedUnit, lv.derivedUnit, lv.localeCode, lv
     lv.payerId, lv.payerServiceId, lv.paymentDate,
     CAST(strftime('%m', lv.paymentDate) AS INTEGER) AS paymentMonth, 
     CAST(strftime('%Y', lv.paymentDate) AS INTEGER) AS paymentYear
-FROM meter_values mv JOIN 
+FROM ${MeterValueEntity.TABLE_NAME} mv JOIN 
     (SELECT mvp.payerId, ps.payerServiceId, mvp.meterId, MAX(strftime(${Constants.DB_FRACT_SEC_TIME}, mvp.valueDate)) maxValueDate, 
         mvp.paymentDate, IFNULL(sv.measureUnit, mvp.measureUnit) AS measureUnit, 
         mvp.isDerivedUnit, mvp.derivedUnit, mvp.localeCode, mvp.maxValue
-    FROM (SELECT mv.meterId, p.payerId, mv.type, v.valueDate, mv.measureUnit, mv.isDerivedUnit, 
+    FROM (SELECT mv.meterId, p.payerId, mv.meterType, v.valueDate, mv.measureUnit, mv.isDerivedUnit, 
             mv.derivedUnit, mv.localeCode, mv.maxValue,
             (CASE WHEN p.isAlignByPaymentDay = 0
                 THEN strftime(${Constants.DB_FRACT_SEC_TIME}, v.valueDate, 'start of month')
@@ -34,11 +37,11 @@ FROM meter_values mv JOIN
                         THEN strftime(${Constants.DB_FRACT_SEC_TIME}, v.valueDate, '+1 months', 'start of month') 
                     END
             END) paymentDate
-        FROM meter_values v JOIN ${MeterView.VIEW_NAME} mv ON mv.meterId = v.metersId
-            JOIN payers p ON p.payerId = mv.payersId) mvp
-        JOIN payers_services_meters AS psm ON psm.metersId = mvp.meterId 
-        JOIN payers_services AS ps ON ps.payerServiceId = psm.payersServicesId
-        JOIN services_view sv ON sv.serviceId = ps.servicesId AND sv.localeCode = mvp.localeCode
+        FROM ${MeterValueEntity.TABLE_NAME} v JOIN ${MeterView.VIEW_NAME} mv ON mv.meterId = v.metersId
+            JOIN ${PayerEntity.TABLE_NAME} p ON p.payerId = mv.payersId) mvp
+        JOIN ${PayerServiceMeterCrossRefEntity.TABLE_NAME} psm ON psm.metersId = mvp.meterId 
+        JOIN ${PayerServiceCrossRefEntity.TABLE_NAME} ps ON ps.payerServiceId = psm.payersServicesId
+        JOIN ${ServiceView.VIEW_NAME} sv ON sv.serviceId = ps.servicesId AND sv.localeCode = mvp.localeCode
     GROUP BY mvp.payerId, ps.payerServiceId, mvp.meterId, mvp.paymentDate, sv.measureUnit, mvp.measureUnit,
             mvp.isDerivedUnit, mvp.derivedUnit, mvp.localeCode, mvp.maxValue) lv 
         ON mv.metersId = lv.meterId 

@@ -21,7 +21,10 @@ android {
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         consumerProguardFiles "consumer-rules.pro"
     }
-
+    buildFeatures {
+        // Enables Jetpack Compose for this module
+        compose true
+    }
     buildTypes {
         release {
             minifyEnabled false
@@ -34,6 +37,13 @@ android {
     }
     kotlinOptions {
         jvmTarget = cfg.jvm.target
+
+        // Enable Coroutines and Flow APIs
+        freeCompilerArgs += "-opt-in=kotlinx.coroutines.ExperimentalCoroutinesApi"
+        freeCompilerArgs += "-opt-in=kotlinx.coroutines.FlowPreview"
+    }
+    composeOptions {
+        kotlinCompilerExtensionVersion versions.composeKotlinExt
     }
 }
 

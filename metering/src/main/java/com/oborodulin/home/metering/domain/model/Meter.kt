@@ -9,8 +9,8 @@ import java.util.*
 data class Meter(
     val payersId: UUID,
     val payersServicesId: UUID,
-    val type: MeterType,
-    val num: String,
+    val meterType: MeterType,
+    val meterNum: String,
     val maxValue: BigDecimal,
     val passportDate: OffsetDateTime,
     val initValue: BigDecimal = BigDecimal.ZERO,

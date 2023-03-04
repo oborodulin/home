@@ -11,6 +11,6 @@ class MeterToMeterTlEntityMapper : Mapper<Meter, MeterTlEntity> {
         metersId = input.id ?: input.apply { id = UUID.randomUUID() }.id!!,
         localeCode = Locale.getDefault().language,
         measureUnit = input.tl.measureUnit,
-        descr = input.tl.descr,
+        meterDesc = input.tl.meterDesc,
     )
 }

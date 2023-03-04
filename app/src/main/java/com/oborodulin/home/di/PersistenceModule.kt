@@ -30,4 +30,8 @@ object PersistenceModule {
     @Singleton
     @Provides
     fun provideServiceDao(db: HomeDatabase) = db.serviceDao()
+
+    @Singleton
+    @Provides
+    fun provideRateDao(db: HomeDatabase) = db.rateDao()
 }

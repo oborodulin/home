@@ -4,5 +4,5 @@ import com.oborodulin.home.domain.model.DomainModel
 
 data class MeterTl(
     val measureUnit: String,
-    val descr: String?,
+    val meterDesc: String?,
 ) : DomainModel()

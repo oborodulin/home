@@ -1,7 +1,7 @@
-package com.oborodulin.home.servicing.ui.payerservice.subtotals
+package com.oborodulin.home.billing.ui.subtotals
 
 import com.oborodulin.home.common.ui.state.UiState
-import com.oborodulin.home.servicing.ui.model.ServiceSubtotalListItem
+import com.oborodulin.home.billing.ui.model.ServiceSubtotalListItem
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.SharedFlow

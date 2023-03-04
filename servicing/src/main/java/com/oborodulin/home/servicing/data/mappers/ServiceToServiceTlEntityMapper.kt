@@ -8,9 +8,9 @@ import java.util.*
 class ServiceToServiceTlEntityMapper : Mapper<Service, ServiceTlEntity> {
     override fun map(input: Service) = ServiceTlEntity(
         serviceTlId = input.serviceTlId ?: input.apply { serviceTlId = UUID.randomUUID() }.serviceTlId!!,
-        name = input.name,
+        serviceName = input.serviceName,
         measureUnit = input.measureUnit,
-        descr = input.descr,
+        serviceDesc = input.serviceDesc,
         servicesId = input.id!!
     )
 }

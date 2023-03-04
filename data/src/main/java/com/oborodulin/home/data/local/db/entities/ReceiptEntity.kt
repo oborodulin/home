@@ -23,7 +23,7 @@ class ReceiptEntity(
     val livingSpace: BigDecimal? = null,
     val heatedVolume: BigDecimal? = null,
     val personsNum: Int = 1,
-    val isPaid: Boolean = false,
+    val isReceiptPaid: Boolean = false,
     @ColumnInfo(index = true) val payersId: UUID,
 ) {
     companion object {
@@ -33,7 +33,7 @@ class ReceiptEntity(
             payersId = payerId,
             receiptMonth = receiptMonth,
             receiptYear = receiptYear,
-            isPaid = true
+            isReceiptPaid = true
         )
 
         fun populateReceiptNotPaid(payerId: UUID, receiptMonth: Int, receiptYear: Int) =

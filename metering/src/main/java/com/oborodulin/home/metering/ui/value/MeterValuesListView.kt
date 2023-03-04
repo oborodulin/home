@@ -154,10 +154,10 @@ fun MeterValuesList(
                                     .weight(0.22f),
                                 verticalArrangement = Arrangement.Center
                             ) {
-                                MeterIcon(meterValue.type)
+                                MeterIcon(meterValue.serviceType)
                                 Spacer(modifier = Modifier.height(4.dp))
                                 Text(
-                                    text = meterValue.name,
+                                    text = meterValue.serviceName,
                                     style = Typography.body1.copy(fontWeight = FontWeight.Bold),
                                     maxLines = 2
                                 )

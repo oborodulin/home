@@ -19,7 +19,7 @@ data class MeterTlEntity(
     @PrimaryKey var meterTlId: UUID = UUID.randomUUID(),
     val localeCode: String = Locale.getDefault().language,
     val measureUnit: String,
-    val descr: String? = null,
+    val meterDesc: String? = null,
     @ColumnInfo(index = true) var metersId: UUID,
 ) {
     companion object {

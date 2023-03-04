@@ -5,11 +5,11 @@ import com.oborodulin.home.accounting.ui.model.converters.FavoritePayerConverter
 import com.oborodulin.home.accounting.ui.model.converters.PayerConverter
 import com.oborodulin.home.accounting.ui.model.converters.PayersListConverter
 import com.oborodulin.home.accounting.ui.model.mappers.*
+import com.oborodulin.home.billing.domain.repositories.RatesRepository
 import com.oborodulin.home.common.domain.usecases.UseCase
 import com.oborodulin.home.domain.repositories.PayersRepository
 import com.oborodulin.home.domain.usecases.*
 import com.oborodulin.home.metering.domain.repositories.MetersRepository
-import com.oborodulin.home.servicing.domain.repositories.ServicesRepository
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -73,12 +73,12 @@ object AccountingModule {
     @Provides
     fun providePayerUseCases(
         configuration: UseCase.Configuration, payersRepository: PayersRepository,
-        servicesRepository: ServicesRepository
+        ratesRepository: RatesRepository
     ): PayerUseCases =
         PayerUseCases(
             getPayerUseCase = GetPayerUseCase(configuration, payersRepository),
             getPayersUseCase = GetPayersUseCase(
-                configuration, payersRepository, servicesRepository
+                configuration, payersRepository, ratesRepository
             ),
             savePayerUseCase = SavePayerUseCase(configuration, payersRepository),
             deletePayerUseCase = DeletePayerUseCase(configuration, payersRepository),

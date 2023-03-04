@@ -1,17 +1,17 @@
-package com.oborodulin.home.servicing.ui.payerservice.subtotals
+package com.oborodulin.home.billing.ui.subtotals
 
 import android.content.Context
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
+import com.oborodulin.home.billing.domain.usecases.BillingUseCases
+import com.oborodulin.home.billing.domain.usecases.GetPayerServiceSubtotalsUseCase
+import com.oborodulin.home.billing.ui.model.ServiceSubtotalListItem
+import com.oborodulin.home.billing.ui.model.converters.ServiceSubtotalListConverter
 import com.oborodulin.home.common.ui.state.MviViewModel
 import com.oborodulin.home.common.ui.state.UiState
 import com.oborodulin.home.common.util.Utils
 import com.oborodulin.home.data.util.ServiceType
 import com.oborodulin.home.servicing.R
-import com.oborodulin.home.servicing.domain.usecases.GetPayerServiceSubtotalsUseCase
-import com.oborodulin.home.servicing.domain.usecases.PayerServiceUseCases
-import com.oborodulin.home.servicing.ui.model.ServiceSubtotalListItem
-import com.oborodulin.home.servicing.ui.model.converters.ServiceSubtotalListConverter
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.channels.Channel
@@ -22,12 +22,12 @@ import java.math.BigDecimal
 import java.util.*
 import javax.inject.Inject
 
-private const val TAG = "Servicing.ui.PayerServiceSubtotalsListViewModel"
+private const val TAG = "Billing.ui.PayerServiceSubtotalsListViewModel"
 
 @HiltViewModel
 class PayerServiceSubtotalsListViewModelImp @Inject constructor(
     private val state: SavedStateHandle,
-    private val payerServiceUseCases: PayerServiceUseCases,
+    private val billingUseCases: BillingUseCases,
     private val serviceSubtotalListConverter: ServiceSubtotalListConverter
 ) : PayerServiceSubtotalsListViewModel,
     MviViewModel<List<ServiceSubtotalListItem>, UiState<List<ServiceSubtotalListItem>>, PayerServiceSubtotalsListUiAction, PayerServiceSubtotalsListUiSingleEvent>(
@@ -50,7 +50,7 @@ class PayerServiceSubtotalsListViewModelImp @Inject constructor(
     private fun loadPayerServiceSubtotals(payerId: UUID): Job {
         Timber.tag(TAG).d("loadPayerServiceSubtotals() called")
         val job = viewModelScope.launch(errorHandler) {
-            payerServiceUseCases.getPayerServiceSubtotalsUseCase.execute(
+            billingUseCases.getPayerServiceSubtotalsUseCase.execute(
                 GetPayerServiceSubtotalsUseCase.Request(payerId)
             ).map {
                 serviceSubtotalListConverter.convert(it)
@@ -83,8 +83,8 @@ class PayerServiceSubtotalsListViewModelImp @Inject constructor(
         fun previewList(ctx: Context) = listOf(
             ServiceSubtotalListItem(
                 id = UUID.randomUUID(),
-                name = ctx.resources.getString(com.oborodulin.home.data.R.string.service_rent),
-                type = ServiceType.RENT,
+                serviceName = ctx.resources.getString(com.oborodulin.home.data.R.string.service_rent),
+                serviceType = ServiceType.RENT,
                 isPrivileges = false,
                 isAllocateRate = false,
                 fromPaymentDate = Utils.toOffsetDateTime("2023-01-01T00:00:00.000"),
@@ -94,10 +94,10 @@ class PayerServiceSubtotalsListViewModelImp @Inject constructor(
             ),
             ServiceSubtotalListItem(
                 id = UUID.randomUUID(),
-                name = ctx.resources.getString(com.oborodulin.home.data.R.string.service_electricity),
-                type = ServiceType.ELECTRICITY,
+                serviceName = ctx.resources.getString(com.oborodulin.home.data.R.string.service_electricity),
+                serviceType = ServiceType.ELECTRICITY,
                 measureUnit = ctx.resources.getString(com.oborodulin.home.common.R.string.kWh_unit),
-                serviceDescr = "",
+                serviceDesc = "",
                 isPrivileges = false,
                 isAllocateRate = true,
                 fromPaymentDate = Utils.toOffsetDateTime("2023-01-01T00:00:00.000"),
@@ -108,8 +108,8 @@ class PayerServiceSubtotalsListViewModelImp @Inject constructor(
             ),
             ServiceSubtotalListItem(
                 id = UUID.randomUUID(),
-                name = ctx.resources.getString(com.oborodulin.home.data.R.string.service_gas),
-                type = ServiceType.GAS,
+                serviceName = ctx.resources.getString(com.oborodulin.home.data.R.string.service_gas),
+                serviceType = ServiceType.GAS,
                 isPrivileges = true,
                 isAllocateRate = false,
                 fromPaymentDate = Utils.toOffsetDateTime("2023-01-01T00:00:00.000"),
@@ -119,8 +119,8 @@ class PayerServiceSubtotalsListViewModelImp @Inject constructor(
             ),
             ServiceSubtotalListItem(
                 id = UUID.randomUUID(),
-                name = ctx.resources.getString(com.oborodulin.home.data.R.string.service_cold_water),
-                type = ServiceType.COLD_WATER,
+                serviceName = ctx.resources.getString(com.oborodulin.home.data.R.string.service_cold_water),
+                serviceType = ServiceType.COLD_WATER,
                 measureUnit = ctx.resources.getString(com.oborodulin.home.common.R.string.m3_unit),
                 isPrivileges = false,
                 isAllocateRate = false,
@@ -132,9 +132,9 @@ class PayerServiceSubtotalsListViewModelImp @Inject constructor(
             ),
             ServiceSubtotalListItem(
                 id = UUID.randomUUID(),
-                name = ctx.resources.getString(com.oborodulin.home.data.R.string.service_internet),
-                type = ServiceType.INTERNET,
-                serviceDescr = ctx.resources.getString(R.string.def_internet_descr),
+                serviceName = ctx.resources.getString(com.oborodulin.home.data.R.string.service_internet),
+                serviceType = ServiceType.INTERNET,
+                serviceDesc = ctx.resources.getString(R.string.def_internet_descr),
                 isPrivileges = false,
                 isAllocateRate = false,
                 fromPaymentDate = Utils.toOffsetDateTime("2023-01-01T00:00:00.000"),

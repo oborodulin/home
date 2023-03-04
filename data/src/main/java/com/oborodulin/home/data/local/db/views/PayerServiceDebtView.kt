@@ -12,15 +12,15 @@ import java.util.*
     viewName = PayerServiceDebtView.VIEW_NAME,
     value = """
 SELECT rps.payerId, rps.personsNum, rps.totalArea, rps.livingSpace, mrv.paymentDate, 
-        mrv.paymentMonth, mrv.paymentYear, rps.isPerPerson, rps.pos, rps.type, rps.name, 
+        mrv.paymentMonth, mrv.paymentYear, rps.isPerPerson, rps.servicePos, rps.serviceType, rps.serviceName, 
         rps.serviceLocaleCode, rps.rateValue, rps.fromMeterValue, rps.toMeterValue, 
         NULL AS diffMeterValue, NULL AS measureUnit, 0 AS isDerivedUnit, rps.serviceId, 
         rps.payerServiceId,
         (CASE WHEN rps.isPerPerson = 1
             -- GAS, GARBAGE
             THEN rps.rateValue * rps.personsNum
-            ELSE CASE WHEN rps.type IN (${Constants.SRV_RENT_VAL}) THEN rps.rateValue * ifnull(rps.totalArea, 1)
-                    WHEN rps.type IN (${Constants.SRV_HEATING_VAL}) THEN rps.rateValue * ifnull(rps.livingSpace, 1)
+            ELSE CASE WHEN rps.serviceType IN (${Constants.SRV_RENT_VAL}) THEN rps.rateValue * ifnull(rps.totalArea, 1)
+                    WHEN rps.serviceType IN (${Constants.SRV_HEATING_VAL}) THEN rps.rateValue * ifnull(rps.livingSpace, 1)
                     -- DOORPHONE, PHONE, INTERNET, USGO
                     ELSE rps.rateValue
                 END
@@ -51,13 +51,15 @@ WHERE rps.isMeterUses = 0
     AND ifnull(mrv.isLinePaid, 0) = 0
 UNION ALL
 SELECT rps.payerId, rps.personsNum, rps.totalArea, rps.livingSpace, mvp.paymentDate, 
-        mvp.paymentMonth, mvp.paymentYear, 0 AS isPerPerson, rps.pos, rps.type, rps.name, 
+        mvp.paymentMonth, mvp.paymentYear, 0 AS isPerPerson, rps.servicePos, rps.serviceType, rps.serviceName, 
         rps.serviceLocaleCode, rps.rateValue, rps.fromMeterValue, rps.toMeterValue, 
         mvp.diffMeterValue, mvp.measureUnit, mvp.isDerivedUnit, rps.serviceId, rps.payerServiceId,
         (CASE WHEN mvp.isDerivedUnit = 0 
             THEN rps.rateValue * mvp.diffMeterValue / ${CONV_COEFF_BIGDECIMAL}.0
-            ELSE CASE rps.type WHEN ${Constants.SRV_HEATING_VAL} THEN rps.rateValue * rps.livingSpace
-                    ELSE rps.rateValue
+            ELSE CASE rps.serviceType 
+                    WHEN ${Constants.SRV_HEATING_VAL} 
+                        THEN rps.rateValue * rps.livingSpace
+                        ELSE rps.rateValue
                 END
         END) serviceDebt,
         rps.isMeterUses
@@ -95,9 +97,9 @@ class PayerServiceDebtView(
     val paymentMonth: Int,
     val paymentYear: Int,
     val isPerPerson: Boolean,
-    val pos: Int,
-    val type: ServiceType,
-    val name: String,
+    val servicePos: Int,
+    val serviceType: ServiceType,
+    val serviceName: String,
     val serviceLocaleCode: String,
     val rateValue: BigDecimal,
     val fromMeterValue: BigDecimal?,

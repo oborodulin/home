@@ -18,11 +18,18 @@ class AppSettingEntity(
     companion object {
         const val TABLE_NAME = "app_settings"
 
-        fun populateLocalParam(ctx: Context) =
+        fun populateLangParam(ctx: Context) =
             AppSettingEntity(
                 paramName = "PARAM_LANG",
                 paramValue = "ru"
             )
+
+        fun populateParam(
+            settingId: UUID = UUID.randomUUID(),
+            paramName: String = "",
+            paramValue: String = ""
+        ) =
+            AppSettingEntity(settingId = settingId, paramName = paramName, paramValue = paramValue)
     }
 
     override fun equals(other: Any?): Boolean {
@@ -30,7 +37,7 @@ class AppSettingEntity(
         if (javaClass != other?.javaClass) return false
 
         other as AppSettingEntity
-        if (settingId != other.settingId) return false
+        if (settingId != other.settingId || paramName != other.paramName) return false
 
         return true
     }

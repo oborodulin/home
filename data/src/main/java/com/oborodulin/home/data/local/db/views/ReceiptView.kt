@@ -8,7 +8,7 @@ import com.oborodulin.home.data.local.db.entities.ReceiptLineEntity
 @DatabaseView(
     viewName = ReceiptView.VIEW_NAME,
     value = """
-SELECT r.*, rl.* FROM receipts AS r JOIN receipt_lines AS rl ON rl.receiptsId = r.receiptId
+SELECT r.*, rl.* FROM ${ReceiptEntity.TABLE_NAME} r JOIN ${ReceiptLineEntity.TABLE_NAME} rl ON rl.receiptsId = r.receiptId
 """
 )
 class ReceiptView(
