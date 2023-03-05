@@ -22,7 +22,7 @@ import java.util.*
     )]
 )
 data class PayerServiceCrossRefEntity(
-    @PrimaryKey var payerServiceId: UUID = UUID.randomUUID(),
+    @PrimaryKey val payerServiceId: UUID = UUID.randomUUID(),
     val isPrivileges: Boolean = false,
     val isAllocateRate: Boolean = false,
     //warning: servicesId column references a foreign key but it is not part of an index.

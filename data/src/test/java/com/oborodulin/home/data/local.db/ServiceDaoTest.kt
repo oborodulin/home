@@ -6,9 +6,10 @@ import androidx.test.filters.SmallTest
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
 import com.oborodulin.home.data.local.db.dao.ServiceDao
-import com.oborodulin.home.data.local.db.entities.PayerEntity
 import com.oborodulin.home.data.local.db.entities.ServiceEntity
 import com.oborodulin.home.data.local.db.entities.ServiceTlEntity
+import com.oborodulin.home.data.local.db.views.ServiceView
+import com.oborodulin.home.data.util.ServiceType
 import kotlinx.coroutines.*
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.*
@@ -17,7 +18,6 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
 import org.robolectric.annotation.Config
-import java.util.concurrent.CountDownLatch
 
 /**
  * Example local unit test, which will execute on the development machine (host).
@@ -50,11 +50,12 @@ class ServiceDaoTest : HomeDatabaseTest() {
         serviceDao.insert(electricityService, electricityServiceTl)
         // ASSERT
         serviceDao.findDistinctAll().test {
-            assertThat(awaitItem()).hasSize(2)
-            assertThat(awaitItem()[0].data).isEqualTo(rentService)
-            assertThat(awaitItem()[0].tl).isEqualTo(rentServiceTl)
-            assertThat(awaitItem()[1].data).isEqualTo(electricityService)
-            assertThat(awaitItem()[1].tl).isEqualTo(electricityServiceTl)
+            val services = awaitItem()
+            assertThat(services).hasSize(2)
+            assertThat(services[0].data).isEqualTo(rentService)
+            assertThat(services[0].tl).isEqualTo(rentServiceTl)
+            assertThat(services[1].data).isEqualTo(electricityService)
+            assertThat(services[1].tl).isEqualTo(electricityServiceTl)
             cancel()
         }
     }
@@ -72,10 +73,10 @@ class ServiceDaoTest : HomeDatabaseTest() {
         // ACT
         serviceDao.update(electricityService, electricityServiceTl)
         // ASSERT
-        serviceDao.findDistinctById(electricityService.serviceId).test {
-            assertThat(awaitItem()).isNotNull()
-            assertThat(awaitItem().data).isEqualTo(electricityService)
-            assertThat(awaitItem().tl).isEqualTo(electricityServiceTl)
+        serviceDao.findDistinctById(rentService.serviceId).test {
+            val service = awaitItem()
+            assertThat(service).isNotNull()
+            assertThat(service.data).isEqualTo(electricityService)
             cancel()
         }
     }
@@ -118,47 +119,85 @@ class ServiceDaoTest : HomeDatabaseTest() {
 
     @OptIn(ExperimentalCoroutinesApi::class)
     @Test
-    fun findFavorite_return_theFavoritePayer_inFlow() = runTest {
-        // ARRANGE
-        val twoPersonsPayer = PayerEntity.populateTwoPersonsPayer(appContext)
-        val favoritePayer = PayerEntity.populateFavoritePayer(appContext)
-        serviceDao.insert(twoPersonsPayer, favoritePayer)
-        // ACT & ASSERT
-        serviceDao.findDistinctFavorite().test {
-            assertThat(awaitItem()).isEqualTo(favoritePayer)
+    fun initiateServicePosAndFindAll_return_theSeqServicesPosOrdered_inFlow() = runTest {
+        // 1. ARRANGE
+        val service1 = ServiceEntity.populateService(serviceType = ServiceType.RENT)
+        val serviceTl1 = ServiceTlEntity.populateRentServiceTl(appContext, service1.serviceId)
+        val service2 = ServiceEntity.populateService(serviceType = ServiceType.INTERNET)
+        val serviceTl2 = ServiceTlEntity.populateRentServiceTl(appContext, service2.serviceId)
+        // 1. ACT
+        serviceDao.insert(service1, serviceTl1)
+        serviceDao.insert(service2, serviceTl2)
+        // 2. ARRANGE
+        val service3 =
+            ServiceEntity.populateService(servicePos = 2, serviceType = ServiceType.GARBAGE)
+        val serviceTl3 = ServiceTlEntity.populateRentServiceTl(appContext, service3.serviceId)
+        // 2. ACT
+        serviceDao.insert(service3, serviceTl3)
+        // ASSERT
+        serviceDao.findDistinctAll().test {
+            val services = awaitItem()
+            assertThat(services).hasSize(3)
+            assertThat(services[0].data).isEqualTo(service1)
+            assertThat(services[0].data.servicePos).isEqualTo(1)
+            assertThat(services[1].data).isEqualTo(service3)
+            assertThat(services[1].data.servicePos).isEqualTo(2)
+            assertThat(services[2].data).isEqualTo(service2)
+            assertThat(services[2].data.servicePos).isEqualTo(3)
             cancel()
         }
     }
 
     @OptIn(ExperimentalCoroutinesApi::class)
     @Test
-    fun favoriteById_return_theChangedFavoritePayer_inFlow() = runTest {
+    fun updateServicePosAndFindAll_return_theSeqServicesPosOrdered_inFlow() = runTest {
         // ARRANGE
-        val twoPersonsPayer = PayerEntity.populateTwoPersonsPayer(appContext)
-        val favoritePayer = PayerEntity.populateFavoritePayer(appContext)
-        serviceDao.insert(twoPersonsPayer, favoritePayer)
+        val service1 = ServiceEntity.populateService(serviceType = ServiceType.RENT)
+        val serviceTl1 = ServiceTlEntity.populateRentServiceTl(appContext, service1.serviceId)
+        val service2 = ServiceEntity.populateService(serviceType = ServiceType.INTERNET)
+        val serviceTl2 = ServiceTlEntity.populateRentServiceTl(appContext, service2.serviceId)
+        val service3 = ServiceEntity.populateService(serviceType = ServiceType.GARBAGE)
+        val serviceTl3 = ServiceTlEntity.populateRentServiceTl(appContext, service3.serviceId)
+        serviceDao.insert(service1, serviceTl1)
+        serviceDao.insert(service2, serviceTl2)
+        serviceDao.insert(service3, serviceTl3)
+        lateinit var testService: ServiceView
+        serviceDao.findDistinctById(service3.serviceId).test {
+            testService = awaitItem()
+        }
         // ACT
-        serviceDao.setFavoriteById(twoPersonsPayer.payerId)
+        serviceDao.update(
+            ServiceEntity.populateService(
+                serviceId = testService.data.serviceId,
+                servicePos = 2,
+                serviceType = testService.data.serviceType
+            ), serviceTl3
+        )
         // ASSERT
-        serviceDao.findDistinctFavorite().test {
-            assertThat(awaitItem()).isEqualTo(twoPersonsPayer)
+        serviceDao.findDistinctAll().test {
+            val services = awaitItem()
+            assertThat(services).hasSize(3)
+            assertThat(services[0].data).isEqualTo(service1)
+            assertThat(services[0].data.servicePos).isEqualTo(1)
+            assertThat(services[1].data).isEqualTo(service3)
+            assertThat(services[1].data.servicePos).isEqualTo(2)
+            assertThat(services[2].data).isEqualTo(service2)
+            assertThat(services[2].data.servicePos).isEqualTo(3)
             cancel()
         }
     }
 
     @OptIn(ExperimentalCoroutinesApi::class)
     @Test(expected = SQLiteConstraintException::class)
-    fun duplicatePayer_ExceptionThrown() = runTest {
+    fun duplicateServiceType_ExceptionThrown() = runTest {
         // ARRANGE
-        val payer1 = PayerEntity.populateTwoPersonsPayer(appContext)
-        val payer2 = PayerEntity.populateTwoPersonsPayer(appContext)
+        val service1 = ServiceEntity.populateService(serviceType = ServiceType.RENT)
+        val serviceTl1 = ServiceTlEntity.populateRentServiceTl(appContext, service1.serviceId)
+        val service2 = ServiceEntity.populateService(serviceType = ServiceType.RENT)
+        val serviceTl2 = ServiceTlEntity.populateRentServiceTl(appContext, service2.serviceId)
         // ACT
-        serviceDao.insert(payer1, payer2)
-    }
+        serviceDao.insert(service1, serviceTl1)
+        serviceDao.insert(service2, serviceTl2)
 
-    @Test
-    fun useAppContext() {
-        // Context of the app under test.
-        assertEquals("com.oborodulin.home.data.test", this.appContext.packageName)
     }
 }

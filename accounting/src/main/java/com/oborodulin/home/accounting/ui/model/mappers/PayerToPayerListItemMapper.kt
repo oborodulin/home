@@ -15,6 +15,7 @@ class PayerToPayerListItemMapper : Mapper<Payer, PayerListItem> {
             livingSpace = input.livingSpace,
             paymentDay = input.paymentDay,
             personsNum = input.personsNum,
+            isAlignByPaymentDay = input.isAlignByPaymentDay,
             isFavorite = input.isFavorite
         )
 }

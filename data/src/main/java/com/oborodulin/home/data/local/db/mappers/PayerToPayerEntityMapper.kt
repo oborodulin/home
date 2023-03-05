@@ -5,7 +5,7 @@ import com.oborodulin.home.data.local.db.entities.PayerEntity
 import com.oborodulin.home.domain.model.Payer
 import java.util.*
 
-class PayerToPayerEntityMapper: Mapper<Payer, PayerEntity> {
+class PayerToPayerEntityMapper : Mapper<Payer, PayerEntity> {
     override fun map(input: Payer) = PayerEntity(
         payerId = input.id ?: input.apply { id = UUID.randomUUID() }.id!!,
         ercCode = input.ercCode,
@@ -16,6 +16,7 @@ class PayerToPayerEntityMapper: Mapper<Payer, PayerEntity> {
         heatedVolume = input.heatedVolume,
         paymentDay = input.paymentDay,
         personsNum = input.personsNum,
-        isFavorite = input.isFavorite,
+        isAlignByPaymentDay = input.isAlignByPaymentDay,
+        isFavorite = input.isFavorite
     )
 }

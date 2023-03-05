@@ -15,6 +15,7 @@ class PayerEntityToPayerMapper: Mapper<PayerEntity, Payer> {
             heatedVolume = input.heatedVolume,
             paymentDay = input.paymentDay,
             personsNum = input.personsNum,
+            isAlignByPaymentDay = input.isAlignByPaymentDay,
             isFavorite = input.isFavorite,
         )
         payer.id = input.payerId

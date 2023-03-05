@@ -1,6 +1,5 @@
 package com.oborodulin.home.common.domain.usecases
 
-import androidx.lifecycle.ViewModel
 import com.oborodulin.home.common.domain.entities.Result
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow

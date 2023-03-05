@@ -15,6 +15,7 @@ class PayerUiToPayerMapper : Mapper<PayerUi, Payer> {
             heatedVolume = input.heatedVolume,
             paymentDay = input.paymentDay,
             personsNum = input.personsNum,
+            isAlignByPaymentDay = input.isAlignByPaymentDay,
             isFavorite = input.isFavorite
         )
         payer.id = input.id

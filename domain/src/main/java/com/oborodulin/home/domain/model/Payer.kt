@@ -12,6 +12,7 @@ data class Payer(
     val heatedVolume: BigDecimal? = null,
     val paymentDay: Int = 20,
     val personsNum: Int = 1,
+    val isAlignByPaymentDay: Boolean = false,
     val isFavorite: Boolean = false,
     var fromPaymentDate: OffsetDateTime? = null,
     var toPaymentDate: OffsetDateTime? = null,

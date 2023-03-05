@@ -6,9 +6,11 @@ import androidx.test.filters.SmallTest
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
 import com.oborodulin.home.data.local.db.dao.PayerDao
+import com.oborodulin.home.data.local.db.dao.ServiceDao
 import com.oborodulin.home.data.local.db.entities.PayerEntity
 import com.oborodulin.home.data.local.db.entities.PayerServiceCrossRefEntity
 import com.oborodulin.home.data.local.db.entities.ServiceEntity
+import com.oborodulin.home.data.local.db.entities.ServiceTlEntity
 import kotlinx.coroutines.*
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.*
@@ -39,11 +41,13 @@ class PayerDaoTest : HomeDatabaseTest() {
 
      */
     private lateinit var payerDao: PayerDao
+    private lateinit var serviceDao: ServiceDao
 
     @Before
     override fun setUp() {
         super.setUp()
         payerDao = payerDao()
+        serviceDao = serviceDao()
     }
 
     @OptIn(ExperimentalCoroutinesApi::class)
@@ -224,7 +228,7 @@ class PayerDaoTest : HomeDatabaseTest() {
 
     @OptIn(ExperimentalCoroutinesApi::class)
     @Test(expected = SQLiteConstraintException::class)
-    fun duplicatePayer_ExceptionThrown() = runTest {
+    fun duplicatePayerErcCode_ExceptionThrown() = runTest {
         // ARRANGE
         val payer1 = PayerEntity.populateTwoPersonsPayer(appContext)
         val payer2 = PayerEntity.populateTwoPersonsPayer(appContext)
@@ -237,16 +241,21 @@ class PayerDaoTest : HomeDatabaseTest() {
     fun insertPayerServicesAndFindPayersWithServices_returnsPayersWithServices_inFlow() = runTest {
         // ARRANGE
         val payer = PayerEntity.populateTwoPersonsPayer(appContext)
+        payerDao.insert(payer)
         val rentService = ServiceEntity.populateRentService()
+        val rentServiceTl = ServiceTlEntity.populateRentServiceTl(appContext, rentService.serviceId)
         val electricityService = ServiceEntity.populateElectricityService()
+        val electricityServiceTl =
+            ServiceTlEntity.populateElectricityServiceTl(appContext, electricityService.serviceId)
+        serviceDao.insert(rentService, rentServiceTl)
+        serviceDao.insert(electricityService, electricityServiceTl)
         // ACT
         payerDao.insert(
             PayerServiceCrossRefEntity.populatePrivilegesPayerService(
-                payer.payerId,
-                rentService.serviceId
+                payerId = payer.payerId, serviceId = rentService.serviceId
             ),
             PayerServiceCrossRefEntity.populateAllocateRatePayerService(
-                payer.payerId, electricityService.serviceId
+                payerId = payer.payerId, serviceId = electricityService.serviceId
             )
         )
         // ASSERT
@@ -265,15 +274,20 @@ class PayerDaoTest : HomeDatabaseTest() {
     fun deletePayerServiceAndFindPayersWithServices_returnsPayersWithServices_inFlow() = runTest {
         // ARRANGE
         val payer = PayerEntity.populateTwoPersonsPayer(appContext)
+        payerDao.insert(payer)
         val rentService = ServiceEntity.populateRentService()
+        val rentServiceTl = ServiceTlEntity.populateRentServiceTl(appContext, rentService.serviceId)
         val electricityService = ServiceEntity.populateElectricityService()
+        val electricityServiceTl =
+            ServiceTlEntity.populateElectricityServiceTl(appContext, electricityService.serviceId)
+        serviceDao.insert(rentService, rentServiceTl)
+        serviceDao.insert(electricityService, electricityServiceTl)
         val payerRentService =
             PayerServiceCrossRefEntity.populatePayerService(payer.payerId, rentService.serviceId)
         val payerElectricityService = PayerServiceCrossRefEntity.populatePayerService(
             payer.payerId, electricityService.serviceId
         )
-        payerDao.insert(payer, rentService)
-        payerDao.insert(payer, electricityService)
+        payerDao.insert(payerRentService, payerElectricityService)
         // ACT
         payerDao.deleteServiceById(payerElectricityService.payerServiceId)
         // ASSERT

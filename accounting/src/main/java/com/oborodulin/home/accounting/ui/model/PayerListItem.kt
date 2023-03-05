@@ -7,14 +7,15 @@ import java.time.OffsetDateTime
 import java.util.*
 
 data class PayerListItem(
-    var id: UUID,
-    var fullName: String = "",
-    var address: String = "",
-    var totalArea: BigDecimal? = null,
-    var livingSpace: BigDecimal? = null,
-    var paymentDay: Int = DEF_PAYMENT_DAY,
-    var personsNum: Int = 1,
-    var isFavorite: Boolean = false,
+    val id: UUID,
+    val fullName: String = "",
+    val address: String = "",
+    val totalArea: BigDecimal? = null,
+    val livingSpace: BigDecimal? = null,
+    val paymentDay: Int = DEF_PAYMENT_DAY,
+    val personsNum: Int = 1,
+    val isAlignByPaymentDay: Boolean = false,
+    val isFavorite: Boolean = false,
     val fromPaymentDate: OffsetDateTime? = null,
     val toPaymentDate: OffsetDateTime? = null,
     val totalDebt: BigDecimal? = null
