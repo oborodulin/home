@@ -2,7 +2,7 @@ package com.oborodulin.home.data.local.db
 
 import android.database.sqlite.SQLiteConstraintException
 import android.os.Build
-import androidx.test.filters.SmallTest
+import androidx.test.filters.MediumTest
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
 import com.oborodulin.home.data.local.db.dao.PayerDao
@@ -19,6 +19,7 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
 import org.robolectric.annotation.Config
+import java.util.UUID
 import java.util.concurrent.CountDownLatch
 
 /**
@@ -31,7 +32,7 @@ import java.util.concurrent.CountDownLatch
 @RunWith(RobolectricTestRunner::class)
 //@Config(constants = BuildConfig::class)
 @Config(sdk = [Build.VERSION_CODES.P]) // This config setting is the key to make things work
-@SmallTest
+@MediumTest
 class PayerDaoTest : HomeDatabaseTest() {
     /*    @get:Rule
         var hiltRule = HiltAndroidRule(this)
@@ -54,8 +55,8 @@ class PayerDaoTest : HomeDatabaseTest() {
     @Test
     fun insertPayersListAndFindAll_shouldReturn_theOrderedItem_inFlow() = runTest {
         // ARRANGE
-        val twoPersonsPayer = PayerEntity.populateTwoPersonsPayer(appContext)
-        val favoritePayer = PayerEntity.populateFavoritePayer(appContext)
+        val twoPersonsPayer = PayerEntity.payerWithTwoPersons(appContext)
+        val favoritePayer = PayerEntity.favoritePayer(appContext)
         // ACT
         payerDao.insert(listOf(twoPersonsPayer, favoritePayer))
         // ASSERT
@@ -69,14 +70,13 @@ class PayerDaoTest : HomeDatabaseTest() {
     @Test
     fun updatePayerAndFindById_shouldReturn_theUpdatedPayer_inFlow() = runTest {
         // ARRANGE
-        val payer = PayerEntity.populateTwoPersonsPayer(appContext)
-        payerDao.insert(payer)
-        val testPayer = PayerEntity.populateFavoritePayer(appContext, payer.payerId)
+        val actualPayerId = insertPayer(payerDao, PayerEntity.payerWithTwoPersons(appContext))
+        val expectedPayer = PayerEntity.favoritePayer(appContext, actualPayerId)
         // ACT
-        payerDao.update(testPayer)
+        payerDao.update(expectedPayer)
         // ASSERT
-        payerDao.findDistinctById(payer.payerId).test {
-            assertThat(awaitItem()).isEqualTo(testPayer)
+        payerDao.findDistinctById(actualPayerId).test {
+            assertThat(awaitItem()).isEqualTo(expectedPayer)
             cancel()
         }
     }
@@ -85,8 +85,8 @@ class PayerDaoTest : HomeDatabaseTest() {
     @Test
     fun updatePayersAndFindAll_shouldReturn_theUpdatedPayers_inFlow() = runTest {
         // 1. ARRANGE
-        val twoPersonsPayer = PayerEntity.populateTwoPersonsPayer(appContext)
-        val favoritePayer = PayerEntity.populateFavoritePayer(appContext)
+        val twoPersonsPayer = PayerEntity.payerWithTwoPersons(appContext)
+        val favoritePayer = PayerEntity.favoritePayer(appContext)
         // 1. ACT
         payerDao.insert(twoPersonsPayer, favoritePayer)
         // 1. ASSERT
@@ -96,45 +96,46 @@ class PayerDaoTest : HomeDatabaseTest() {
         }
 
         // 2. ARRANGE
-        val testPayer1 =
-            PayerEntity.populateAlignByPaymentDayPayer(appContext, favoritePayer.payerId)
-        val testPayer2 = PayerEntity.populateFavoritePayer(appContext, twoPersonsPayer.payerId)
+        val expectedByPaymentDayPayer =
+            PayerEntity.payerWithAlignByPaymentDay(appContext, favoritePayer.payerId)
+        val expectedFavoritePayer =
+            PayerEntity.favoritePayer(appContext, twoPersonsPayer.payerId)
 
         // 2. ACT
-        payerDao.update(testPayer1, testPayer2)
+        payerDao.update(expectedByPaymentDayPayer, expectedFavoritePayer)
         // 2. ASSERT
         payerDao.findDistinctById(favoritePayer.payerId).test {
-            assertThat(awaitItem()).isEqualTo(testPayer1)
+            assertThat(awaitItem()).isEqualTo(expectedByPaymentDayPayer)
             cancel()
         }
         payerDao.findDistinctById(twoPersonsPayer.payerId).test {
-            assertThat(awaitItem()).isEqualTo(testPayer2)
+            assertThat(awaitItem()).isEqualTo(expectedFavoritePayer)
             cancel()
         }
     }
 
     @Test
-    fun deleteInsertedPayerAndFindById_returnsIsNull() = runBlocking {
+    fun deleteInsertedPayerAndFindById_shouldReturn_IsNull() = runBlocking {
         // ARRANGE
-        val payer = PayerEntity.populateTwoPersonsPayer(appContext)
+        val actualPayer = PayerEntity.payerWithTwoPersons(appContext)
         // 1. ACT
-        payerDao.insert(payer)
+        payerDao.insert(actualPayer)
         // 1. ASSERT
         val latch1 = CountDownLatch(1)
         val job1 = async(Dispatchers.IO) {
-            payerDao.findDistinctById(payer.payerId).collect {
-                assertThat(it).isEqualTo(payer)
+            payerDao.findDistinctById(actualPayer.payerId).collect {
+                assertThat(it).isEqualTo(actualPayer)
                 latch1.countDown()
             }
         }
         latch1.await()
         job1.cancelAndJoin()
         // 2. ACT
-        payerDao.delete(payer)
+        payerDao.delete(actualPayer)
         // 2. ASSERT
         val latch2 = CountDownLatch(1)
         val job2 = async(Dispatchers.IO) {
-            payerDao.findDistinctById(payer.payerId).collect {
+            payerDao.findDistinctById(actualPayer.payerId).collect {
                 assertThat(it).isNull()
                 latch2.countDown()
             }
@@ -145,14 +146,13 @@ class PayerDaoTest : HomeDatabaseTest() {
 
     @OptIn(ExperimentalCoroutinesApi::class)
     @Test
-    fun deletePayerById_returnsIsNull() = runTest {
+    fun deletePayerByIdAndFindById_shouldReturn_IsNull() = runTest {
         // ARRANGE
-        val payer = PayerEntity.populateTwoPersonsPayer(appContext)
-        payerDao.insert(payer)
+        val actualPayerId = insertPayer(payerDao, PayerEntity.payerWithTwoPersons(appContext))
         // ACT
-        payerDao.deleteById(payer.payerId)
+        payerDao.deleteById(actualPayerId)
         // ASSERT
-        payerDao.findDistinctById(payer.payerId).test {
+        payerDao.findDistinctById(actualPayerId).test {
             assertThat(awaitItem()).isNull()
             cancel()
         }
@@ -160,13 +160,13 @@ class PayerDaoTest : HomeDatabaseTest() {
 
     @OptIn(ExperimentalCoroutinesApi::class)
     @Test
-    fun deleteInsertedPayersListAndFindAll_returnsIsEmpty() = runTest {
+    fun deleteInsertedPayersListAndFindAll_shouldReturn_IsEmptyList() = runTest {
         // ARRANGE
-        val payer1 = PayerEntity.populateTwoPersonsPayer(appContext)
-        val payer2 = PayerEntity.populateFavoritePayer(appContext)
-        payerDao.insert(payer1, payer2)
+        val actualTwoPersonsPayer = PayerEntity.payerWithTwoPersons(appContext)
+        val actualFavoritePayer = PayerEntity.favoritePayer(appContext)
+        payerDao.insert(actualTwoPersonsPayer, actualFavoritePayer)
         // ACT
-        payerDao.delete(listOf(payer1, payer2))
+        payerDao.delete(listOf(actualTwoPersonsPayer, actualFavoritePayer))
         // ASSERT
         payerDao.findDistinctAll().test {
             assertThat(awaitItem()).isEmpty()
@@ -176,15 +176,15 @@ class PayerDaoTest : HomeDatabaseTest() {
 
     @OptIn(ExperimentalCoroutinesApi::class)
     @Test
-    fun deleteAllInsertedPayersAndFindAll_returnsIsEmpty() = runTest {
+    fun deleteAllInsertedPayersAndFindAll_shouldReturn_IsEmptyList() = runTest {
         // ARRANGE
-        val payer1 = PayerEntity.populateTwoPersonsPayer(appContext)
-        val payer2 = PayerEntity.populateFavoritePayer(appContext)
+        val actualTwoPersonsPayer = PayerEntity.payerWithTwoPersons(appContext)
+        val actualFavoritePayer = PayerEntity.favoritePayer(appContext)
         // 1. ACT
-        payerDao.insert(payer1, payer2)
+        payerDao.insert(actualTwoPersonsPayer, actualFavoritePayer)
         // 1. ASSERT
         payerDao.findDistinctAll().test {
-            assertThat(awaitItem()).containsExactly(payer2, payer1)
+            assertThat(awaitItem()).containsExactly(actualFavoritePayer, actualTwoPersonsPayer)
             cancel()
         }
         // 2. ACT
@@ -200,12 +200,12 @@ class PayerDaoTest : HomeDatabaseTest() {
     @Test
     fun findFavorite_return_theFavoritePayer_inFlow() = runTest {
         // ARRANGE
-        val twoPersonsPayer = PayerEntity.populateTwoPersonsPayer(appContext)
-        val favoritePayer = PayerEntity.populateFavoritePayer(appContext)
-        payerDao.insert(twoPersonsPayer, favoritePayer)
+        val twoPersonsPayer = PayerEntity.payerWithTwoPersons(appContext)
+        val expectedFavoritePayer = PayerEntity.favoritePayer(appContext)
+        payerDao.insert(twoPersonsPayer, expectedFavoritePayer)
         // ACT & ASSERT
         payerDao.findDistinctFavorite().test {
-            assertThat(awaitItem()).isEqualTo(favoritePayer)
+            assertThat(awaitItem()).isEqualTo(expectedFavoritePayer)
             cancel()
         }
     }
@@ -214,14 +214,14 @@ class PayerDaoTest : HomeDatabaseTest() {
     @Test
     fun favoriteById_return_theChangedFavoritePayer_inFlow() = runTest {
         // ARRANGE
-        val twoPersonsPayer = PayerEntity.populateTwoPersonsPayer(appContext)
-        val favoritePayer = PayerEntity.populateFavoritePayer(appContext)
-        payerDao.insert(twoPersonsPayer, favoritePayer)
+        val expectedTwoPersonsPayer = PayerEntity.payerWithTwoPersons(appContext)
+        val favoritePayer = PayerEntity.favoritePayer(appContext)
+        payerDao.insert(expectedTwoPersonsPayer, favoritePayer)
         // ACT
-        payerDao.setFavoriteById(twoPersonsPayer.payerId)
+        payerDao.setFavoriteById(expectedTwoPersonsPayer.payerId)
         // ASSERT
         payerDao.findDistinctFavorite().test {
-            assertThat(awaitItem()).isEqualTo(twoPersonsPayer)
+            assertThat(awaitItem()).isEqualTo(expectedTwoPersonsPayer)
             cancel()
         }
     }
@@ -230,39 +230,38 @@ class PayerDaoTest : HomeDatabaseTest() {
     @Test(expected = SQLiteConstraintException::class)
     fun duplicatePayerErcCode_ExceptionThrown() = runTest {
         // ARRANGE
-        val payer1 = PayerEntity.populateTwoPersonsPayer(appContext)
-        val payer2 = PayerEntity.populateTwoPersonsPayer(appContext)
+        val twoPersonsPayer = PayerEntity.payerWithTwoPersons(appContext)
+        val anotherTwoPersonsPayer = PayerEntity.payerWithTwoPersons(appContext)
         // ACT
-        payerDao.insert(payer1, payer2)
+        payerDao.insert(twoPersonsPayer, anotherTwoPersonsPayer)
     }
 
     @OptIn(ExperimentalCoroutinesApi::class)
     @Test
     fun insertPayerServicesAndFindPayersWithServices_returnsPayersWithServices_inFlow() = runTest {
         // ARRANGE
-        val payer = PayerEntity.populateTwoPersonsPayer(appContext)
-        payerDao.insert(payer)
-        val rentService = ServiceEntity.populateRentService()
-        val rentServiceTl = ServiceTlEntity.populateRentServiceTl(appContext, rentService.serviceId)
-        val electricityService = ServiceEntity.populateElectricityService()
-        val electricityServiceTl =
-            ServiceTlEntity.populateElectricityServiceTl(appContext, electricityService.serviceId)
+        val actualPayerId = insertPayer(payerDao, PayerEntity.payerWithTwoPersons(appContext))
+        val rentService = ServiceEntity.rentService()
+        val rentServiceTl = ServiceTlEntity.rentServiceTl(appContext, rentService.serviceId)
         serviceDao.insert(rentService, rentServiceTl)
+        val electricityService = ServiceEntity.electricityService()
+        val electricityServiceTl =
+            ServiceTlEntity.electricityServiceTl(appContext, electricityService.serviceId)
         serviceDao.insert(electricityService, electricityServiceTl)
         // ACT
         payerDao.insert(
             PayerServiceCrossRefEntity.populatePrivilegesPayerService(
-                payerId = payer.payerId, serviceId = rentService.serviceId
+                payerId = actualPayerId, serviceId = rentService.serviceId
             ),
             PayerServiceCrossRefEntity.populateAllocateRatePayerService(
-                payerId = payer.payerId, serviceId = electricityService.serviceId
+                payerId = actualPayerId, serviceId = electricityService.serviceId
             )
         )
         // ASSERT
         payerDao.findPayersWithServices().test {
             val payerServices = awaitItem()
             assertThat(payerServices).isNotEmpty()
-            assertThat(payerServices[0].payer).isEqualTo(payer)
+            assertThat(payerServices[0].payer.payerId).isEqualTo(actualPayerId)
             assertThat(payerServices[0].services).hasSize(2)
             assertThat(payerServices[0].services).containsAtLeast(rentService, electricityService)
             cancel()
@@ -271,21 +270,20 @@ class PayerDaoTest : HomeDatabaseTest() {
 
     @OptIn(ExperimentalCoroutinesApi::class)
     @Test
-    fun deletePayerServiceAndFindPayersWithServices_returnsPayersWithServices_inFlow() = runTest {
+    fun deletePayerServiceAndFindPayersWithServices_returnsPayerWithService_inFlow() = runTest {
         // ARRANGE
-        val payer = PayerEntity.populateTwoPersonsPayer(appContext)
-        payerDao.insert(payer)
-        val rentService = ServiceEntity.populateRentService()
-        val rentServiceTl = ServiceTlEntity.populateRentServiceTl(appContext, rentService.serviceId)
-        val electricityService = ServiceEntity.populateElectricityService()
-        val electricityServiceTl =
-            ServiceTlEntity.populateElectricityServiceTl(appContext, electricityService.serviceId)
+        val actualPayerId = insertPayer(payerDao, PayerEntity.payerWithTwoPersons(appContext))
+        val rentService = ServiceEntity.rentService()
+        val rentServiceTl = ServiceTlEntity.rentServiceTl(appContext, rentService.serviceId)
         serviceDao.insert(rentService, rentServiceTl)
+        val electricityService = ServiceEntity.electricityService()
+        val electricityServiceTl =
+            ServiceTlEntity.electricityServiceTl(appContext, electricityService.serviceId)
         serviceDao.insert(electricityService, electricityServiceTl)
         val payerRentService =
-            PayerServiceCrossRefEntity.populatePayerService(payer.payerId, rentService.serviceId)
+            PayerServiceCrossRefEntity.populatePayerService(actualPayerId, rentService.serviceId)
         val payerElectricityService = PayerServiceCrossRefEntity.populatePayerService(
-            payer.payerId, electricityService.serviceId
+            actualPayerId, electricityService.serviceId
         )
         payerDao.insert(payerRentService, payerElectricityService)
         // ACT
@@ -294,7 +292,7 @@ class PayerDaoTest : HomeDatabaseTest() {
         payerDao.findPayersWithServices().test {
             val payerServices = awaitItem()
             assertThat(payerServices).isNotEmpty()
-            assertThat(payerServices[0].payer).isEqualTo(payer)
+            assertThat(payerServices[0].payer.payerId).isEqualTo(actualPayerId)
             assertThat(payerServices[0].services).hasSize(1)
             assertThat(payerServices[0].services).containsExactly(rentService)
             cancel()
@@ -305,5 +303,14 @@ class PayerDaoTest : HomeDatabaseTest() {
     fun useAppContext() {
         // Context of the app under test.
         assertEquals("com.oborodulin.home.data.test", this.appContext.packageName)
+    }
+
+    companion object {
+        suspend fun insertPayer(
+            payerDao: PayerDao, payer: PayerEntity = PayerEntity.defaultPayer()
+        ): UUID {
+            payerDao.insert(payer)
+            return payer.payerId
+        }
     }
 }

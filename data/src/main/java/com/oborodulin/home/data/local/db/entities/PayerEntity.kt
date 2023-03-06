@@ -26,45 +26,7 @@ class PayerEntity(
     companion object {
         const val TABLE_NAME = "payers"
 
-        fun populateTwoPersonsPayer(ctx: Context, payerId: UUID = UUID.randomUUID()) =
-            PayerEntity(
-                payerId = payerId,
-                ercCode = ctx.resources.getString(R.string.def_payer1_erc_code),
-                fullName = ctx.resources.getString(R.string.def_payer1_full_name),
-                address = ctx.resources.getString(R.string.def_payer1_address),
-                paymentDay = 20,
-                totalArea = BigDecimal.valueOf(53.5),
-                livingSpace = BigDecimal.valueOf(49.7),
-                heatedVolume = BigDecimal.valueOf(122.75),
-                personsNum = 2
-            )
-
-        fun populateFavoritePayer(ctx: Context, payerId: UUID = UUID.randomUUID()) =
-            PayerEntity(
-                payerId = payerId,
-                ercCode = ctx.resources.getString(R.string.def_payer2_erc_code),
-                fullName = ctx.resources.getString(R.string.def_payer2_full_name),
-                address = ctx.resources.getString(R.string.def_payer2_address),
-                totalArea = BigDecimal.valueOf(52.5),
-                livingSpace = BigDecimal.valueOf(48.7),
-                heatedVolume = BigDecimal.valueOf(121.75),
-                personsNum = 1,
-                isFavorite = true
-            )
-
-        fun populateAlignByPaymentDayPayer(ctx: Context, payerId: UUID = UUID.randomUUID()) =
-            PayerEntity(
-                payerId = payerId,
-                ercCode = ctx.resources.getString(R.string.def_payer3_erc_code),
-                fullName = ctx.resources.getString(R.string.def_payer3_full_name),
-                address = ctx.resources.getString(R.string.def_payer3_address),
-                totalArea = BigDecimal.valueOf(51.5),
-                livingSpace = BigDecimal.valueOf(47.7),
-                heatedVolume = BigDecimal.valueOf(120.75),
-                isAlignByPaymentDay = true
-            )
-
-        fun populatePayer(
+        fun defaultPayer(
             payerId: UUID = UUID.randomUUID(),
             ercCode: String = "",
             fullName: String = "",
@@ -76,15 +38,52 @@ class PayerEntity(
             personsNum: Int = 1,
             isAlignByPaymentDay: Boolean = false,
             isFavorite: Boolean = false
-        ) =
-            PayerEntity(
+        ) = PayerEntity(
+            payerId = payerId,
+            ercCode = ercCode,
+            fullName = fullName,
+            address = address,
+            totalArea = totalArea,
+            livingSpace = livingSpace,
+            heatedVolume = heatedVolume,
+            isAlignByPaymentDay = true
+        )
+
+        fun payerWithTwoPersons(ctx: Context, payerId: UUID = UUID.randomUUID()) =
+            defaultPayer(
                 payerId = payerId,
-                ercCode = ercCode,
-                fullName = fullName,
-                address = address,
-                totalArea = totalArea,
-                livingSpace = livingSpace,
-                heatedVolume = heatedVolume,
+                ercCode = ctx.resources.getString(R.string.def_payer1_erc_code),
+                fullName = ctx.resources.getString(R.string.def_payer1_full_name),
+                address = ctx.resources.getString(R.string.def_payer1_address),
+                paymentDay = 20,
+                totalArea = BigDecimal.valueOf(53.5),
+                livingSpace = BigDecimal.valueOf(49.7),
+                heatedVolume = BigDecimal.valueOf(122.75),
+                personsNum = 2
+            )
+
+        fun favoritePayer(ctx: Context, payerId: UUID = UUID.randomUUID()) =
+            defaultPayer(
+                payerId = payerId,
+                ercCode = ctx.resources.getString(R.string.def_payer2_erc_code),
+                fullName = ctx.resources.getString(R.string.def_payer2_full_name),
+                address = ctx.resources.getString(R.string.def_payer2_address),
+                totalArea = BigDecimal.valueOf(52.5),
+                livingSpace = BigDecimal.valueOf(48.7),
+                heatedVolume = BigDecimal.valueOf(121.75),
+                personsNum = 1,
+                isFavorite = true
+            )
+
+        fun payerWithAlignByPaymentDay(ctx: Context, payerId: UUID = UUID.randomUUID()) =
+            defaultPayer(
+                payerId = payerId,
+                ercCode = ctx.resources.getString(R.string.def_payer3_erc_code),
+                fullName = ctx.resources.getString(R.string.def_payer3_full_name),
+                address = ctx.resources.getString(R.string.def_payer3_address),
+                totalArea = BigDecimal.valueOf(51.5),
+                livingSpace = BigDecimal.valueOf(47.7),
+                heatedVolume = BigDecimal.valueOf(120.75),
                 isAlignByPaymentDay = true
             )
     }

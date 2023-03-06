@@ -7,7 +7,10 @@ import com.oborodulin.home.data.util.MeterType
 import com.oborodulin.home.data.util.ServiceType
 import java.util.*
 
-@Entity(tableName = ServiceEntity.TABLE_NAME, indices = [Index(value = ["serviceType"], unique = true)])
+@Entity(
+    tableName = ServiceEntity.TABLE_NAME,
+    indices = [Index(value = ["serviceType"], unique = true)]
+)
 data class ServiceEntity(
     @PrimaryKey val serviceId: UUID = UUID.randomUUID(),
     var servicePos: Int? = null,
@@ -17,84 +20,10 @@ data class ServiceEntity(
     companion object {
         const val TABLE_NAME = "services"
 
-        fun populateRentService(serviceId: UUID = UUID.randomUUID()) =
-            ServiceEntity(serviceId = serviceId, servicePos = 1, serviceType = ServiceType.RENT)
-
-        fun populateElectricityService(serviceId: UUID = UUID.randomUUID()) =
-            ServiceEntity(
-                serviceId = serviceId,
-                servicePos = 2,
-                serviceType = ServiceType.ELECTRICITY,
-                meterType = MeterType.ELECTRICITY
-            )
-
-        fun populateGasService(serviceId: UUID = UUID.randomUUID()) =
-            ServiceEntity(
-                serviceId = serviceId,
-                servicePos = 3,
-                serviceType = ServiceType.GAS,
-                meterType = MeterType.GAS
-            )
-
-        fun populateColdWaterService(serviceId: UUID = UUID.randomUUID()) =
-            ServiceEntity(
-                serviceId = serviceId,
-                servicePos = 4,
-                serviceType = ServiceType.COLD_WATER,
-                meterType = MeterType.COLD_WATER
-            )
-
-        fun populateWasteService(serviceId: UUID = UUID.randomUUID()) =
-            ServiceEntity(
-                serviceId = serviceId,
-                servicePos = 5,
-                serviceType = ServiceType.WASTE,
-                meterType = MeterType.HOT_WATER
-            )
-
-        fun populateHeatingService(serviceId: UUID = UUID.randomUUID()) =
-            ServiceEntity(
-                serviceId = serviceId,
-                servicePos = 6,
-                serviceType = ServiceType.HEATING,
-                meterType = MeterType.HEATING
-            )
-
-        fun populateHotWaterService(serviceId: UUID = UUID.randomUUID()) =
-            ServiceEntity(
-                serviceId = serviceId,
-                servicePos = 7,
-                serviceType = ServiceType.HOT_WATER,
-                meterType = MeterType.HOT_WATER
-            )
-
-        fun populateGarbageService(serviceId: UUID = UUID.randomUUID()) =
-            ServiceEntity(serviceId = serviceId, servicePos = 8, serviceType = ServiceType.GARBAGE)
-
-        fun populateDoorphoneService(serviceId: UUID = UUID.randomUUID()) =
-            ServiceEntity(
-                serviceId = serviceId,
-                servicePos = 9,
-                serviceType = ServiceType.DOORPHONE
-            )
-
-        fun populatePhoneService(serviceId: UUID = UUID.randomUUID()) =
-            ServiceEntity(serviceId = serviceId, servicePos = 10, serviceType = ServiceType.PHONE)
-
-        fun populateUgsoService(serviceId: UUID = UUID.randomUUID()) =
-            ServiceEntity(serviceId = serviceId, servicePos = 11, serviceType = ServiceType.USGO)
-
-        fun populateInternetService(serviceId: UUID = UUID.randomUUID()) =
-            ServiceEntity(
-                serviceId = serviceId,
-                servicePos = 12,
-                serviceType = ServiceType.INTERNET
-            )
-
-        fun populateService(
+        fun defaultService(
             serviceId: UUID = UUID.randomUUID(),
             servicePos: Int? = null,
-            serviceType: ServiceType,
+            serviceType: ServiceType = ServiceType.RENT,
             meterType: MeterType = MeterType.NONE
         ) = ServiceEntity(
             serviceId = serviceId,
@@ -102,6 +31,80 @@ data class ServiceEntity(
             serviceType = serviceType,
             meterType = meterType
         )
+
+        fun rentService(serviceId: UUID = UUID.randomUUID()) =
+            defaultService(serviceId = serviceId, servicePos = 1, serviceType = ServiceType.RENT)
+
+        fun electricityService(serviceId: UUID = UUID.randomUUID()) =
+            defaultService(
+                serviceId = serviceId,
+                servicePos = 2,
+                serviceType = ServiceType.ELECTRICITY,
+                meterType = MeterType.ELECTRICITY
+            )
+
+        fun gasService(serviceId: UUID = UUID.randomUUID()) =
+            defaultService(
+                serviceId = serviceId,
+                servicePos = 3,
+                serviceType = ServiceType.GAS,
+                meterType = MeterType.GAS
+            )
+
+        fun coldWaterService(serviceId: UUID = UUID.randomUUID()) =
+            defaultService(
+                serviceId = serviceId,
+                servicePos = 4,
+                serviceType = ServiceType.COLD_WATER,
+                meterType = MeterType.COLD_WATER
+            )
+
+        fun wasteService(serviceId: UUID = UUID.randomUUID()) =
+            defaultService(
+                serviceId = serviceId,
+                servicePos = 5,
+                serviceType = ServiceType.WASTE,
+                meterType = MeterType.HOT_WATER
+            )
+
+        fun heatingService(serviceId: UUID = UUID.randomUUID()) =
+            defaultService(
+                serviceId = serviceId,
+                servicePos = 6,
+                serviceType = ServiceType.HEATING,
+                meterType = MeterType.HEATING
+            )
+
+        fun hotWaterService(serviceId: UUID = UUID.randomUUID()) =
+            defaultService(
+                serviceId = serviceId,
+                servicePos = 7,
+                serviceType = ServiceType.HOT_WATER,
+                meterType = MeterType.HOT_WATER
+            )
+
+        fun garbageService(serviceId: UUID = UUID.randomUUID()) =
+            defaultService(serviceId = serviceId, servicePos = 8, serviceType = ServiceType.GARBAGE)
+
+        fun doorphoneService(serviceId: UUID = UUID.randomUUID()) =
+            defaultService(
+                serviceId = serviceId,
+                servicePos = 9,
+                serviceType = ServiceType.DOORPHONE
+            )
+
+        fun phoneService(serviceId: UUID = UUID.randomUUID()) =
+            defaultService(serviceId = serviceId, servicePos = 10, serviceType = ServiceType.PHONE)
+
+        fun ugsoService(serviceId: UUID = UUID.randomUUID()) =
+            defaultService(serviceId = serviceId, servicePos = 11, serviceType = ServiceType.USGO)
+
+        fun internetService(serviceId: UUID = UUID.randomUUID()) =
+            defaultService(
+                serviceId = serviceId,
+                servicePos = 12,
+                serviceType = ServiceType.INTERNET
+            )
     }
 
     override fun equals(other: Any?): Boolean {

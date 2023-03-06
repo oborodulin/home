@@ -16,6 +16,7 @@ import com.oborodulin.home.data.local.db.dao.ServiceDao
 import com.oborodulin.home.data.local.db.entities.*
 import com.oborodulin.home.data.local.db.views.*
 import com.oborodulin.home.data.util.Constants
+import com.oborodulin.home.data.util.ServiceType
 import kotlinx.coroutines.*
 import timber.log.Timber
 import java.time.OffsetDateTime
@@ -188,7 +189,7 @@ abstract class HomeDatabase : RoomDatabase() {
             try {
                 // Default payers:
                 // 1
-                val payer1Entity = PayerEntity.populateTwoPersonsPayer(context)
+                val payer1Entity = PayerEntity.payerWithTwoPersons(context)
                 db.insert(
                     PayerEntity.TABLE_NAME,
                     SQLiteDatabase.CONFLICT_REPLACE,
@@ -197,7 +198,7 @@ abstract class HomeDatabase : RoomDatabase() {
                 Timber.tag(TAG)
                     .i("Default 1 PayerEntity imported: {%s}", jsonLogger?.toJson(payer1Entity))
                 // 2
-                val payer2Entity = PayerEntity.populateFavoritePayer(context)
+                val payer2Entity = PayerEntity.favoritePayer(context)
                 db.insert(
                     PayerEntity.TABLE_NAME,
                     SQLiteDatabase.CONFLICT_REPLACE,
@@ -207,94 +208,61 @@ abstract class HomeDatabase : RoomDatabase() {
                     .i("Default 2 PayerEntity imported: {%s}", jsonLogger?.toJson(payer2Entity))
                 // Default services:
                 // rent
-                val rentService = ServiceEntity.populateRentService();
-                insertDefService(
-                    db, rentService,
-                    ServiceTlEntity.populateRentServiceTl(context, rentService.serviceId)
-                )
+                val rentService = ServiceEntity.rentService()
+                insertDefService(db, rentService)
                 // electricity
-                val electricityService = ServiceEntity.populateElectricityService()
-                insertDefService(
-                    db, electricityService,
-                    ServiceTlEntity.populateElectricityServiceTl(
-                        context,
-                        electricityService.serviceId
-                    )
-                )
+                val electricityService = ServiceEntity.electricityService()
+                insertDefService(db, electricityService)
                 // gas
-                val gasService = ServiceEntity.populateGasService()
-                insertDefService(
-                    db, gasService,
-                    ServiceTlEntity.populateGasServiceTl(context, gasService.serviceId)
-                )
+                val gasService = ServiceEntity.gasService()
+                insertDefService(db, gasService)
                 // cold water
-                val coldWaterService = ServiceEntity.populateColdWaterService()
-                insertDefService(
-                    db, coldWaterService,
-                    ServiceTlEntity.populateColdWaterServiceTl(context, coldWaterService.serviceId)
-                )
+                val coldWaterService = ServiceEntity.coldWaterService()
+                insertDefService(db, coldWaterService)
                 // waste
-                val wasteService = ServiceEntity.populateWasteService()
-                insertDefService(
-                    db, wasteService,
-                    ServiceTlEntity.populateWasteServiceTl(context, wasteService.serviceId)
-                )
+                val wasteService = ServiceEntity.wasteService()
+                insertDefService(db, wasteService)
                 // heating
-                val heatingService = ServiceEntity.populateHeatingService()
-                insertDefService(
-                    db, heatingService,
-                    ServiceTlEntity.populateHeatingServiceTl(context, heatingService.serviceId)
-                )
+                val heatingService = ServiceEntity.heatingService()
+                insertDefService(db, heatingService)
                 // hot water
-                val hotWaterService = ServiceEntity.populateHotWaterService()
-                insertDefService(
-                    db, hotWaterService,
-                    ServiceTlEntity.populateHotWaterServiceTl(context, hotWaterService.serviceId)
-                )
+                val hotWaterService = ServiceEntity.hotWaterService()
+                insertDefService(db, hotWaterService)
                 // garbage
-                val garbageService = ServiceEntity.populateGarbageService()
-                insertDefService(
-                    db, garbageService,
-                    ServiceTlEntity.populateGarbageServiceTl(context, garbageService.serviceId)
-                )
+                val garbageService = ServiceEntity.garbageService()
+                insertDefService(db, garbageService)
                 // doorphone
-                val doorphoneService = ServiceEntity.populateDoorphoneService()
-                insertDefService(
-                    db, doorphoneService,
-                    ServiceTlEntity.populateDoorphoneServiceTl(context, doorphoneService.serviceId)
-                )
+                val doorphoneService = ServiceEntity.doorphoneService()
+                insertDefService(db, doorphoneService)
                 // phone
-                val phoneService = ServiceEntity.populatePhoneService()
-                insertDefService(
-                    db, phoneService,
-                    ServiceTlEntity.populatePhoneServiceTl(context, phoneService.serviceId)
-                )
+                val phoneService = ServiceEntity.phoneService()
+                insertDefService(db, phoneService)
                 // ugso
-                val ugsoService = ServiceEntity.populateUgsoService()
-                insertDefService(
-                    db, ugsoService,
-                    ServiceTlEntity.populateUgsoServiceTl(context, ugsoService.serviceId)
-                )
+                val ugsoService = ServiceEntity.ugsoService()
+                insertDefService(db, ugsoService)
 
                 // Default rates:
                 // electricity
-                insertDefRate(db, RateEntity.populateElectricityRate1(electricityService.serviceId))
-                insertDefRate(db, RateEntity.populateElectricityRate2(electricityService.serviceId))
-                insertDefRate(db, RateEntity.populateElectricityRate3(electricityService.serviceId))
                 insertDefRate(
-                    db,
-                    RateEntity.populateElectricityPrivilegesRate(electricityService.serviceId)
+                    db, RateEntity.electricityRateFrom0To150(electricityService.serviceId)
+                )
+                insertDefRate(
+                    db, RateEntity.electricityRateFrom150To800(electricityService.serviceId)
+                )
+                insertDefRate(db, RateEntity.electricityRateFrom800(electricityService.serviceId))
+                insertDefRate(
+                    db, RateEntity.electricityPrivilegesRate(electricityService.serviceId)
                 )
                 // gas
-                insertDefRate(db, RateEntity.populateGasRate(gasService.serviceId))
+                insertDefRate(db, RateEntity.gasRate(gasService.serviceId))
                 // cold water
-                insertDefRate(db, RateEntity.populateColdWaterRate(coldWaterService.serviceId))
+                insertDefRate(db, RateEntity.coldWaterRate(coldWaterService.serviceId))
                 // heating
-                insertDefRate(db, RateEntity.populateHeatingRate(heatingService.serviceId))
+                insertDefRate(db, RateEntity.heatingRate(heatingService.serviceId))
                 // waste
-                insertDefRate(db, RateEntity.populateWasteRate(wasteService.serviceId))
+                insertDefRate(db, RateEntity.wasteRate(wasteService.serviceId))
                 // hot water
-                insertDefRate(db, RateEntity.populateHotWaterRate(hotWaterService.serviceId))
+                insertDefRate(db, RateEntity.hotWaterRate(hotWaterService.serviceId))
 
                 // ==============================
                 // FOR Payer 1:
@@ -439,7 +407,7 @@ abstract class HomeDatabase : RoomDatabase() {
                 // Payer 1 rates:
                 // rent
                 insertDefRate(
-                    db, RateEntity.populateRentRateForPayer(
+                    db, RateEntity.rentRateForPayer(
                         rentService.serviceId,
                         rentPayer1ServiceId
                     )
@@ -447,14 +415,14 @@ abstract class HomeDatabase : RoomDatabase() {
                 // heating
                 // garbage
                 insertDefRate(
-                    db, RateEntity.populateGarbageRateForPayer(
+                    db, RateEntity.garbageRateForPayer(
                         garbageService.serviceId,
                         garbagePayer1ServiceId
                     )
                 )
                 // doorphone
                 val doorphoneRateId = insertDefRate(
-                    db, RateEntity.populateDoorphoneRateForPayer(
+                    db, RateEntity.doorphoneRateForPayer(
                         doorphoneService.serviceId,
                         doorphonePayer1ServiceId
                     )
@@ -613,28 +581,28 @@ abstract class HomeDatabase : RoomDatabase() {
                 // Payer 2 rates:
                 // rent
                 insertDefRate(
-                    db, RateEntity.populateRentRateForPayer(
+                    db, RateEntity.rentRateForPayer(
                         rentService.serviceId,
                         rentPayer2ServiceId
                     )
                 )
                 // heating
                 insertDefRate(
-                    db, RateEntity.populateHeatingRateForPayer(
+                    db, RateEntity.heatingRateForPayer(
                         heatingService.serviceId,
                         heatingPayer2ServiceId
                     )
                 )
                 // garbage
                 insertDefRate(
-                    db, RateEntity.populateGarbageRateForPayer(
+                    db, RateEntity.garbageRateForPayer(
                         garbageService.serviceId,
                         garbagePayer2ServiceId
                     )
                 )
                 // doorphone
                 insertDefRate(
-                    db, RateEntity.populateDoorphoneRateForPayer(
+                    db, RateEntity.doorphoneRateForPayer(
                         doorphoneService.serviceId,
                         doorphonePayer2ServiceId
                     )
@@ -659,11 +627,36 @@ abstract class HomeDatabase : RoomDatabase() {
             }
         }
 
-        private fun insertDefService(
-            db: SupportSQLiteDatabase,
-            service: ServiceEntity,
-            textContent: ServiceTlEntity
-        ) {
+        private fun insertDefService(db: SupportSQLiteDatabase, service: ServiceEntity) {
+            val textContent =
+                when (service.serviceType) {
+                    ServiceType.RENT -> ServiceTlEntity.rentServiceTl(context, service.serviceId)
+                    ServiceType.ELECTRICITY -> ServiceTlEntity.electricityServiceTl(
+                        context, service.serviceId
+                    )
+                    ServiceType.GAS -> ServiceTlEntity.gasServiceTl(context, service.serviceId)
+                    ServiceType.COLD_WATER -> ServiceTlEntity.coldWaterServiceTl(
+                        context, service.serviceId
+                    )
+                    ServiceType.WASTE -> ServiceTlEntity.wasteServiceTl(context, service.serviceId)
+                    ServiceType.HEATING -> ServiceTlEntity.heatingServiceTl(
+                        context, service.serviceId
+                    )
+                    ServiceType.HOT_WATER -> ServiceTlEntity.hotWaterServiceTl(
+                        context, service.serviceId
+                    )
+                    ServiceType.GARBAGE -> ServiceTlEntity.garbageServiceTl(
+                        context, service.serviceId
+                    )
+                    ServiceType.DOORPHONE -> ServiceTlEntity.doorphoneServiceTl(
+                        context, service.serviceId
+                    )
+                    ServiceType.PHONE -> ServiceTlEntity.phoneServiceTl(context, service.serviceId)
+                    ServiceType.USGO -> ServiceTlEntity.ugsoServiceTl(context, service.serviceId)
+                    ServiceType.INTERNET -> ServiceTlEntity.internetServiceTl(
+                        context, service.serviceId
+                    )
+                }
             db.insert(
                 ServiceEntity.TABLE_NAME,
                 SQLiteDatabase.CONFLICT_REPLACE,
