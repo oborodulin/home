@@ -7,15 +7,15 @@ import org.junit.Before
 import java.io.IOException
 
 open class HomeDatabaseTest {
-    protected val appContext = ApplicationProvider.getApplicationContext<Context>()
+    protected val ctx: Context = ApplicationProvider.getApplicationContext()
 
     //getApplicationContext<App>()//: Context// = InstrumentationRegistry.getInstrumentation().targetContext
-    private lateinit var database: HomeDatabase
+    protected lateinit var db: HomeDatabase
 
     @Before
     open fun setUp() {
         //app.setLocationProvider(mockLocationProvider)
-        database = HomeDatabase.getTestInstance(this.appContext)
+        db = HomeDatabase.getTestInstance(this.ctx)
     }
 
     @After
@@ -27,9 +27,9 @@ open class HomeDatabaseTest {
         HomeDatabase.close()
     }
 
-    fun payerDao() = database.payerDao()
-    fun serviceDao() = database.serviceDao()
-    fun meterDao() = database.meterDao()
-    fun rateDao() = database.rateDao()
+    fun payerDao() = db.payerDao()
+    fun serviceDao() = db.serviceDao()
+    fun meterDao() = db.meterDao()
+    fun rateDao() = db.rateDao()
 
 }

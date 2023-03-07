@@ -16,33 +16,45 @@ import java.util.*
     )]
 )
 data class MeterTlEntity(
-    @PrimaryKey var meterTlId: UUID = UUID.randomUUID(),
+    @PrimaryKey val meterTlId: UUID = UUID.randomUUID(),
     val localeCode: String = Locale.getDefault().language,
     val measureUnit: String,
     val meterDesc: String? = null,
-    @ColumnInfo(index = true) var metersId: UUID,
+    @ColumnInfo(index = true) val metersId: UUID,
 ) {
     companion object {
         const val TABLE_NAME = "meters_tl"
 
-        fun populateElectricityMeterTl(ctx: Context, meterId: UUID) = MeterTlEntity(
+        fun defaultMeterTl(meterId: UUID, measureUnit: String, meterDesc: String? = null) =
+            MeterTlEntity(
+                measureUnit = measureUnit,
+                meterDesc = meterDesc,
+                metersId = meterId
+            )
+
+        fun electricityMeterTl(ctx: Context, meterId: UUID) = defaultMeterTl(
             measureUnit = ctx.resources.getString(com.oborodulin.home.common.R.string.kWh_unit),
-            metersId = meterId
+            meterId = meterId
         )
 
-        fun populateColdWaterMeterTl(ctx: Context, meterId: UUID) = MeterTlEntity(
+        fun gasMeterTl(ctx: Context, meterId: UUID) = defaultMeterTl(
             measureUnit = ctx.resources.getString(com.oborodulin.home.common.R.string.m3_unit),
-            metersId = meterId
+            meterId = meterId
         )
 
-        fun populateHotWaterMeterTl(ctx: Context, meterId: UUID) = MeterTlEntity(
+        fun coldWaterMeterTl(ctx: Context, meterId: UUID) = defaultMeterTl(
             measureUnit = ctx.resources.getString(com.oborodulin.home.common.R.string.m3_unit),
-            metersId = meterId
+            meterId = meterId
         )
 
-        fun populateHeatingMeterTl(ctx: Context, meterId: UUID) = MeterTlEntity(
+        fun hotWaterMeterTl(ctx: Context, meterId: UUID) = defaultMeterTl(
+            measureUnit = ctx.resources.getString(com.oborodulin.home.common.R.string.m3_unit),
+            meterId = meterId
+        )
+
+        fun heatingMeterTl(ctx: Context, meterId: UUID) = defaultMeterTl(
             measureUnit = ctx.resources.getString(com.oborodulin.home.common.R.string.Gcalm2_unit),
-            metersId = meterId
+            meterId = meterId
         )
     }
 

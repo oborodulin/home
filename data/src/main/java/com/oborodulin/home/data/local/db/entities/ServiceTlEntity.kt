@@ -22,7 +22,7 @@ class ServiceTlEntity(
     val serviceName: String = "",
     var measureUnit: String? = null,
     val serviceDesc: String? = null,
-    @ColumnInfo(index = true) var servicesId: UUID,
+    @ColumnInfo(index = true) val servicesId: UUID,
 ) {
     companion object {
         const val TABLE_NAME = "services_tl"

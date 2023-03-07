@@ -3,16 +3,13 @@ package com.oborodulin.home.data.local.db
 import android.content.Context
 import android.database.sqlite.SQLiteConstraintException
 import android.os.Build
-import androidx.room.withTransaction
 import androidx.test.filters.MediumTest
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
+import com.oborodulin.home.data.local.db.dao.MeterDao
 import com.oborodulin.home.data.local.db.dao.PayerDao
-import com.oborodulin.home.data.local.db.dao.ServiceDao
-import com.oborodulin.home.data.local.db.entities.PayerEntity
-import com.oborodulin.home.data.local.db.entities.PayerServiceCrossRefEntity
-import com.oborodulin.home.data.local.db.entities.ServiceEntity
-import com.oborodulin.home.data.local.db.entities.ServiceTlEntity
+import com.oborodulin.home.data.local.db.entities.*
+import com.oborodulin.home.data.util.MeterType
 import kotlinx.coroutines.*
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.*
@@ -29,41 +26,35 @@ import java.util.concurrent.CountDownLatch
  *
  * See [testing documentation](http://d.android.com/tools/testing).
  */
-//https://clintpauldev.com/room-testing-using-dagger-hilt/
-//@HiltAndroidTest
 @RunWith(RobolectricTestRunner::class)
-//@Config(constants = BuildConfig::class)
-@Config(sdk = [Build.VERSION_CODES.P]) // This config setting is the key to make things work
+@Config(sdk = [Build.VERSION_CODES.P])
 @MediumTest
-class PayerDaoTest : HomeDatabaseTest() {
-    /*    @get:Rule
-        var hiltRule = HiltAndroidRule(this)
-
-        @get:Rule
-        var instantTaskExecutorRule = InstantTaskExecutorRule()
-
-     */
-    private lateinit var payerDao: PayerDao
-    private lateinit var serviceDao: ServiceDao
+class MeterDaoTest : HomeDatabaseTest() {
+    private lateinit var meterDao: MeterDao
+    private lateinit var meter1Dao: PayerDao
 
     @Before
     override fun setUp() {
         super.setUp()
-        payerDao = payerDao()
-        serviceDao = serviceDao()
+        meterDao = meterDao()
+        meter1Dao = payerDao()
     }
 
     @OptIn(ExperimentalCoroutinesApi::class)
     @Test
-    fun insertPayersListAndFindAll_shouldReturn_theOrderedItem_inFlow() = runTest {
+    fun insertMetersAndFindAll_shouldReturn_theMetersList_inFlow() = runTest {
         // ARRANGE
-        val twoPersonsPayer = PayerEntity.payerWithTwoPersons(ctx)
-        val favoritePayer = PayerEntity.favoritePayer(ctx)
+        val actualPayerId = PayerDaoTest.insertPayer(db, PayerEntity.payerWithTwoPersons(ctx))
+        val electricityMeter = MeterEntity.electricityMeter(ctx, actualPayerId)
+        val gasMeter = MeterEntity.gasMeter(ctx, actualPayerId)
         // ACT
-        payerDao.insert(listOf(twoPersonsPayer, favoritePayer))
+        meterDao.insert(
+            electricityMeter, MeterTlEntity.electricityMeterTl(ctx, electricityMeter.meterId)
+        )
+        meterDao.insert(gasMeter, MeterTlEntity.gasMeterTl(ctx, gasMeter.meterId))
         // ASSERT
-        payerDao.findDistinctAll().test {
-            assertThat(awaitItem()).containsExactly(favoritePayer, twoPersonsPayer).inOrder()
+        meterDao.findDistinctAll().test {
+            assertThat(awaitItem()).hasSize(2)
             cancel()
         }
     }
@@ -75,9 +66,9 @@ class PayerDaoTest : HomeDatabaseTest() {
         val actualPayerId = insertPayer(db, PayerEntity.payerWithTwoPersons(ctx))
         val expectedPayer = PayerEntity.favoritePayer(ctx, actualPayerId)
         // ACT
-        payerDao.update(expectedPayer)
+        meterDao.update(expectedPayer)
         // ASSERT
-        payerDao.findDistinctById(actualPayerId).test {
+        meterDao.findDistinctById(actualPayerId).test {
             assertThat(awaitItem()).isEqualTo(expectedPayer)
             cancel()
         }
@@ -90,9 +81,9 @@ class PayerDaoTest : HomeDatabaseTest() {
         val twoPersonsPayer = PayerEntity.payerWithTwoPersons(ctx)
         val favoritePayer = PayerEntity.favoritePayer(ctx)
         // 1. ACT
-        payerDao.insert(twoPersonsPayer, favoritePayer)
+        meterDao.insert(twoPersonsPayer, favoritePayer)
         // 1. ASSERT
-        payerDao.findDistinctAll().test {
+        meterDao.findDistinctAll().test {
             assertThat(awaitItem()).containsExactly(favoritePayer, twoPersonsPayer)
             cancel()
         }
@@ -104,13 +95,13 @@ class PayerDaoTest : HomeDatabaseTest() {
             PayerEntity.favoritePayer(ctx, twoPersonsPayer.payerId)
 
         // 2. ACT
-        payerDao.update(expectedByPaymentDayPayer, expectedFavoritePayer)
+        meterDao.update(expectedByPaymentDayPayer, expectedFavoritePayer)
         // 2. ASSERT
-        payerDao.findDistinctById(favoritePayer.payerId).test {
+        meterDao.findDistinctById(favoritePayer.payerId).test {
             assertThat(awaitItem()).isEqualTo(expectedByPaymentDayPayer)
             cancel()
         }
-        payerDao.findDistinctById(twoPersonsPayer.payerId).test {
+        meterDao.findDistinctById(twoPersonsPayer.payerId).test {
             assertThat(awaitItem()).isEqualTo(expectedFavoritePayer)
             cancel()
         }
@@ -121,11 +112,11 @@ class PayerDaoTest : HomeDatabaseTest() {
         // ARRANGE
         val actualPayer = PayerEntity.payerWithTwoPersons(ctx)
         // 1. ACT
-        payerDao.insert(actualPayer)
+        meterDao.insert(actualPayer)
         // 1. ASSERT
         val latch1 = CountDownLatch(1)
         val job1 = async(Dispatchers.IO) {
-            payerDao.findDistinctById(actualPayer.payerId).collect {
+            meterDao.findDistinctById(actualPayer.payerId).collect {
                 assertThat(it).isEqualTo(actualPayer)
                 latch1.countDown()
             }
@@ -133,11 +124,11 @@ class PayerDaoTest : HomeDatabaseTest() {
         latch1.await()
         job1.cancelAndJoin()
         // 2. ACT
-        payerDao.delete(actualPayer)
+        meterDao.delete(actualPayer)
         // 2. ASSERT
         val latch2 = CountDownLatch(1)
         val job2 = async(Dispatchers.IO) {
-            payerDao.findDistinctById(actualPayer.payerId).collect {
+            meterDao.findDistinctById(actualPayer.payerId).collect {
                 assertThat(it).isNull()
                 latch2.countDown()
             }
@@ -152,9 +143,9 @@ class PayerDaoTest : HomeDatabaseTest() {
         // ARRANGE
         val actualPayerId = insertPayer(db, PayerEntity.payerWithTwoPersons(ctx))
         // ACT
-        payerDao.deleteById(actualPayerId)
+        meterDao.deleteById(actualPayerId)
         // ASSERT
-        payerDao.findDistinctById(actualPayerId).test {
+        meterDao.findDistinctById(actualPayerId).test {
             assertThat(awaitItem()).isNull()
             cancel()
         }
@@ -166,11 +157,11 @@ class PayerDaoTest : HomeDatabaseTest() {
         // ARRANGE
         val actualTwoPersonsPayer = PayerEntity.payerWithTwoPersons(ctx)
         val actualFavoritePayer = PayerEntity.favoritePayer(ctx)
-        payerDao.insert(actualTwoPersonsPayer, actualFavoritePayer)
+        meterDao.insert(actualTwoPersonsPayer, actualFavoritePayer)
         // ACT
-        payerDao.delete(listOf(actualTwoPersonsPayer, actualFavoritePayer))
+        meterDao.delete(listOf(actualTwoPersonsPayer, actualFavoritePayer))
         // ASSERT
-        payerDao.findDistinctAll().test {
+        meterDao.findDistinctAll().test {
             assertThat(awaitItem()).isEmpty()
             cancel()
         }
@@ -183,16 +174,16 @@ class PayerDaoTest : HomeDatabaseTest() {
         val actualTwoPersonsPayer = PayerEntity.payerWithTwoPersons(ctx)
         val actualFavoritePayer = PayerEntity.favoritePayer(ctx)
         // 1. ACT
-        payerDao.insert(actualTwoPersonsPayer, actualFavoritePayer)
+        meterDao.insert(actualTwoPersonsPayer, actualFavoritePayer)
         // 1. ASSERT
-        payerDao.findDistinctAll().test {
+        meterDao.findDistinctAll().test {
             assertThat(awaitItem()).containsExactly(actualFavoritePayer, actualTwoPersonsPayer)
             cancel()
         }
         // 2. ACT
-        payerDao.deleteAll()
+        meterDao.deleteAll()
         // 2. ASSERT
-        payerDao.findDistinctAll().test {
+        meterDao.findDistinctAll().test {
             assertThat(awaitItem()).isEmpty()
             cancel()
         }
@@ -204,9 +195,9 @@ class PayerDaoTest : HomeDatabaseTest() {
         // ARRANGE
         val twoPersonsPayer = PayerEntity.payerWithTwoPersons(ctx)
         val expectedFavoritePayer = PayerEntity.favoritePayer(ctx)
-        payerDao.insert(twoPersonsPayer, expectedFavoritePayer)
+        meterDao.insert(twoPersonsPayer, expectedFavoritePayer)
         // ACT & ASSERT
-        payerDao.findDistinctFavorite().test {
+        meterDao.findDistinctFavorite().test {
             assertThat(awaitItem()).isEqualTo(expectedFavoritePayer)
             cancel()
         }
@@ -218,11 +209,11 @@ class PayerDaoTest : HomeDatabaseTest() {
         // ARRANGE
         val expectedTwoPersonsPayer = PayerEntity.payerWithTwoPersons(ctx)
         val favoritePayer = PayerEntity.favoritePayer(ctx)
-        payerDao.insert(expectedTwoPersonsPayer, favoritePayer)
+        meterDao.insert(expectedTwoPersonsPayer, favoritePayer)
         // ACT
-        payerDao.setFavoriteById(expectedTwoPersonsPayer.payerId)
+        meterDao.setFavoriteById(expectedTwoPersonsPayer.payerId)
         // ASSERT
-        payerDao.findDistinctFavorite().test {
+        meterDao.findDistinctFavorite().test {
             assertThat(awaitItem()).isEqualTo(expectedTwoPersonsPayer)
             cancel()
         }
@@ -235,7 +226,7 @@ class PayerDaoTest : HomeDatabaseTest() {
         val twoPersonsPayer = PayerEntity.payerWithTwoPersons(ctx)
         val anotherTwoPersonsPayer = PayerEntity.payerWithTwoPersons(ctx)
         // ACT
-        payerDao.insert(twoPersonsPayer, anotherTwoPersonsPayer)
+        meterDao.insert(twoPersonsPayer, anotherTwoPersonsPayer)
     }
 
     @OptIn(ExperimentalCoroutinesApi::class)
@@ -245,13 +236,13 @@ class PayerDaoTest : HomeDatabaseTest() {
         val actualPayerId = insertPayer(db, PayerEntity.payerWithTwoPersons(ctx))
         val rentService = ServiceEntity.rentService()
         val rentServiceTl = ServiceTlEntity.rentServiceTl(ctx, rentService.serviceId)
-        serviceDao.insert(rentService, rentServiceTl)
+        meter1Dao.insert(rentService, rentServiceTl)
         val electricityService = ServiceEntity.electricityService()
         val electricityServiceTl =
             ServiceTlEntity.electricityServiceTl(ctx, electricityService.serviceId)
-        serviceDao.insert(electricityService, electricityServiceTl)
+        meter1Dao.insert(electricityService, electricityServiceTl)
         // ACT
-        payerDao.insert(
+        meterDao.insert(
             PayerServiceCrossRefEntity.populatePrivilegesPayerService(
                 payerId = actualPayerId, serviceId = rentService.serviceId
             ),
@@ -260,7 +251,7 @@ class PayerDaoTest : HomeDatabaseTest() {
             )
         )
         // ASSERT
-        payerDao.findPayersWithServices().test {
+        meterDao.findPayersWithServices().test {
             val payerServices = awaitItem()
             assertThat(payerServices).isNotEmpty()
             assertThat(payerServices[0].payer.payerId).isEqualTo(actualPayerId)
@@ -277,7 +268,7 @@ class PayerDaoTest : HomeDatabaseTest() {
         val actualPayerId = insertPayer(db, PayerEntity.payerWithTwoPersons(ctx))
         val rentService = ServiceEntity.rentService()
         val rentServiceTl = ServiceTlEntity.rentServiceTl(ctx, rentService.serviceId)
-        serviceDao.insert(rentService, rentServiceTl)
+        meter1Dao.insert(rentService, rentServiceTl)
         val electricityServiceId =
             ServiceDaoTest.insertService(ctx, db, ServiceEntity.electricityService())
         val payerRentService =
@@ -285,11 +276,11 @@ class PayerDaoTest : HomeDatabaseTest() {
         val payerElectricityService = PayerServiceCrossRefEntity.defaultPayerService(
             actualPayerId, electricityServiceId
         )
-        payerDao.insert(payerRentService, payerElectricityService)
+        meterDao.insert(payerRentService, payerElectricityService)
         // ACT
-        payerDao.deleteServiceById(payerElectricityService.payerServiceId)
+        meterDao.deleteServiceById(payerElectricityService.payerServiceId)
         // ASSERT
-        payerDao.findPayersWithServices().test {
+        meterDao.findPayersWithServices().test {
             val payerServices = awaitItem()
             assertThat(payerServices).isNotEmpty()
             assertThat(payerServices[0].payer.payerId).isEqualTo(actualPayerId)
@@ -306,36 +297,21 @@ class PayerDaoTest : HomeDatabaseTest() {
     }
 
     companion object {
-        suspend fun insertPayer(
-            db: HomeDatabase, payer: PayerEntity = PayerEntity.defaultPayer()
+        suspend fun insertMeter(
+            ctx: Context, db: HomeDatabase,
+            meter: MeterEntity = MeterEntity.defaultMeter()
         ): UUID {
-            db.payerDao().insert(payer)
-            return payer.payerId
-        }
-
-        suspend fun insertPayerService(
-            db: HomeDatabase, payer: PayerEntity = PayerEntity.defaultPayer(),
-            ctx: Context, service: ServiceEntity = ServiceEntity.defaultService()
-        ): UUID? {
-            var payerServiceId: UUID? = null
-            db.withTransaction {
-                val payerId = insertPayer(db, payer)
-                val serviceId = ServiceDaoTest.insertService(ctx, db, service)
-                payerServiceId = insertPayerService(db, payerId, serviceId)
-            }
-            return payerServiceId
-        }
-
-        suspend fun insertPayerService(
-            db: HomeDatabase, payerId: UUID, serviceId: UUID,
-            isPrivileges: Boolean = false, isAllocateRate: Boolean = false
-        ): UUID {
-            val payerService =
-                PayerServiceCrossRefEntity.defaultPayerService(
-                    payerId, serviceId, isPrivileges, isAllocateRate
-                )
-            db.payerDao().insert(payerService)
-            return payerService.payerServiceId
+            val meterTl =
+                when (meter.meterType) {
+                    MeterType.ELECTRICITY -> MeterTlEntity.electricityMeterTl(ctx, meter.meterId)
+                    MeterType.GAS -> MeterTlEntity.gasMeterTl(ctx, meter.meterId)
+                    MeterType.COLD_WATER -> MeterTlEntity.coldWaterMeterTl(ctx, meter.meterId)
+                    MeterType.HEATING -> MeterTlEntity.heatingMeterTl(ctx, meter.meterId)
+                    MeterType.HOT_WATER -> MeterTlEntity.hotWaterMeterTl(ctx, meter.meterId)
+                    MeterType.NONE -> MeterTlEntity.defaultMeterTl(UUID.randomUUID(), "", "")
+                }
+            db.meterDao().insert(meter, meterTl)
+            return meter.meterId
         }
     }
 }

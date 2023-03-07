@@ -43,10 +43,10 @@ class ServiceDaoTest : HomeDatabaseTest() {
     fun insertServicesAndFindAll_shouldReturn_theOrderedItem_inFlow() = runTest {
         // ARRANGE
         val rentService = ServiceEntity.rentService()
-        val rentServiceTl = ServiceTlEntity.rentServiceTl(appContext, rentService.serviceId)
+        val rentServiceTl = ServiceTlEntity.rentServiceTl(ctx, rentService.serviceId)
         val electricityService = ServiceEntity.electricityService()
         val electricityServiceTl =
-            ServiceTlEntity.electricityServiceTl(appContext, electricityService.serviceId)
+            ServiceTlEntity.electricityServiceTl(ctx, electricityService.serviceId)
         // ACT
         serviceDao.insert(rentService, rentServiceTl)
         serviceDao.insert(electricityService, electricityServiceTl)
@@ -67,11 +67,11 @@ class ServiceDaoTest : HomeDatabaseTest() {
     fun updateServiceAndFindById_shouldReturn_theUpdatedService_inFlow() = runTest {
         // ARRANGE
         val rentService = ServiceEntity.rentService()
-        val rentServiceTl = ServiceTlEntity.rentServiceTl(appContext, rentService.serviceId)
+        val rentServiceTl = ServiceTlEntity.rentServiceTl(ctx, rentService.serviceId)
         serviceDao.insert(rentService, rentServiceTl)
         val electricityService = ServiceEntity.electricityService(rentService.serviceId)
         val electricityServiceTl =
-            ServiceTlEntity.electricityServiceTl(appContext, electricityService.serviceId)
+            ServiceTlEntity.electricityServiceTl(ctx, electricityService.serviceId)
         // ACT
         serviceDao.update(electricityService, electricityServiceTl)
         // ASSERT
@@ -88,7 +88,7 @@ class ServiceDaoTest : HomeDatabaseTest() {
     fun deleteServiceById_returnsIsNull() = runTest {
         // ARRANGE
         val rentService = ServiceEntity.rentService()
-        val rentServiceTl = ServiceTlEntity.rentServiceTl(appContext, rentService.serviceId)
+        val rentServiceTl = ServiceTlEntity.rentServiceTl(ctx, rentService.serviceId)
         serviceDao.insert(rentService, rentServiceTl)
         // ACT
         serviceDao.deleteById(rentService.serviceId)
@@ -104,10 +104,10 @@ class ServiceDaoTest : HomeDatabaseTest() {
     fun deleteAllServicesAndFindAll_returnsIsEmpty() = runTest {
         // ARRANGE
         val rentService = ServiceEntity.rentService()
-        val rentServiceTl = ServiceTlEntity.rentServiceTl(appContext, rentService.serviceId)
+        val rentServiceTl = ServiceTlEntity.rentServiceTl(ctx, rentService.serviceId)
         val electricityService = ServiceEntity.electricityService()
         val electricityServiceTl =
-            ServiceTlEntity.electricityServiceTl(appContext, electricityService.serviceId)
+            ServiceTlEntity.electricityServiceTl(ctx, electricityService.serviceId)
         serviceDao.insert(rentService, rentServiceTl)
         serviceDao.insert(electricityService, electricityServiceTl)
         // ACT
@@ -124,16 +124,16 @@ class ServiceDaoTest : HomeDatabaseTest() {
     fun initiateServicePosAndFindAll_return_theSeqServicesPosOrdered_inFlow() = runTest {
         // 1. ARRANGE
         val service1 = ServiceEntity.defaultService(serviceType = ServiceType.RENT)
-        val serviceTl1 = ServiceTlEntity.rentServiceTl(appContext, service1.serviceId)
+        val serviceTl1 = ServiceTlEntity.rentServiceTl(ctx, service1.serviceId)
         val service2 = ServiceEntity.defaultService(serviceType = ServiceType.INTERNET)
-        val serviceTl2 = ServiceTlEntity.rentServiceTl(appContext, service2.serviceId)
+        val serviceTl2 = ServiceTlEntity.rentServiceTl(ctx, service2.serviceId)
         // 1. ACT
         serviceDao.insert(service1, serviceTl1)
         serviceDao.insert(service2, serviceTl2)
         // 2. ARRANGE
         val service3 =
             ServiceEntity.defaultService(servicePos = 2, serviceType = ServiceType.GARBAGE)
-        val serviceTl3 = ServiceTlEntity.rentServiceTl(appContext, service3.serviceId)
+        val serviceTl3 = ServiceTlEntity.rentServiceTl(ctx, service3.serviceId)
         // 2. ACT
         serviceDao.insert(service3, serviceTl3)
         // ASSERT
@@ -155,11 +155,11 @@ class ServiceDaoTest : HomeDatabaseTest() {
     fun updateServicePosAndFindAll_return_theSeqServicesPosOrdered_inFlow() = runTest {
         // ARRANGE
         val service1 = ServiceEntity.defaultService(serviceType = ServiceType.RENT)
-        val serviceTl1 = ServiceTlEntity.rentServiceTl(appContext, service1.serviceId)
+        val serviceTl1 = ServiceTlEntity.rentServiceTl(ctx, service1.serviceId)
         val service2 = ServiceEntity.defaultService(serviceType = ServiceType.INTERNET)
-        val serviceTl2 = ServiceTlEntity.rentServiceTl(appContext, service2.serviceId)
+        val serviceTl2 = ServiceTlEntity.rentServiceTl(ctx, service2.serviceId)
         val service3 = ServiceEntity.defaultService(serviceType = ServiceType.GARBAGE)
-        val serviceTl3 = ServiceTlEntity.rentServiceTl(appContext, service3.serviceId)
+        val serviceTl3 = ServiceTlEntity.rentServiceTl(ctx, service3.serviceId)
         serviceDao.insert(service1, serviceTl1)
         serviceDao.insert(service2, serviceTl2)
         serviceDao.insert(service3, serviceTl3)
@@ -194,9 +194,9 @@ class ServiceDaoTest : HomeDatabaseTest() {
     fun duplicateServiceType_ExceptionThrown() = runTest {
         // ARRANGE
         val service1 = ServiceEntity.defaultService(serviceType = ServiceType.RENT)
-        val serviceTl1 = ServiceTlEntity.rentServiceTl(appContext, service1.serviceId)
+        val serviceTl1 = ServiceTlEntity.rentServiceTl(ctx, service1.serviceId)
         val service2 = ServiceEntity.defaultService(serviceType = ServiceType.RENT)
-        val serviceTl2 = ServiceTlEntity.rentServiceTl(appContext, service2.serviceId)
+        val serviceTl2 = ServiceTlEntity.rentServiceTl(ctx, service2.serviceId)
         // ACT
         serviceDao.insert(service1, serviceTl1)
         serviceDao.insert(service2, serviceTl2)
@@ -205,7 +205,7 @@ class ServiceDaoTest : HomeDatabaseTest() {
 
     companion object {
         suspend fun insertService(
-            ctx: Context, serviceDao: ServiceDao,
+            ctx: Context, db: HomeDatabase,
             service: ServiceEntity = ServiceEntity.defaultService()
         ): UUID {
             val serviceTl =
@@ -233,7 +233,7 @@ class ServiceDaoTest : HomeDatabaseTest() {
                         ctx, service.serviceId
                     )
                 }
-            serviceDao.insert(service, serviceTl)
+            db.serviceDao().insert(service, serviceTl)
             return service.serviceId
         }
     }

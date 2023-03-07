@@ -9,7 +9,7 @@ import java.util.*
 @Entity(
     tableName = RateEntity.TABLE_NAME,
     indices = [Index(
-        value = ["startDate", "fromMeterValue", "isPerPerson", "isPrivileges", "servicesId", "payersServicesId"],
+        value = ["servicesId", "payersServicesId", "startDate", "fromMeterValue", "isPerPerson", "isPrivileges"],
         unique = true
     )],
     foreignKeys = [ForeignKey(

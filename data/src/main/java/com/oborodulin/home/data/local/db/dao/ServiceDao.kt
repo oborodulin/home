@@ -57,7 +57,6 @@ interface ServiceDao : BaseDao<ServiceEntity> {
         service.servicePos = service.servicePos ?: nextPos()
         updatePos(service.servicePos!!)
         insert(service)
-        textContent.servicesId = service.serviceId
         insert(textContent)
     }
 

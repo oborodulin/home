@@ -13,20 +13,20 @@ import java.util.*
 @Dao
 interface MeterDao : BaseDao<MeterEntity> {
     // READS:
-    @Query("SELECT * FROM ${MeterView.VIEW_NAME} WHERE meters_view.localeCode = :locale")
+    @Query("SELECT * FROM ${MeterView.VIEW_NAME} WHERE localeCode = :locale")
     fun findAll(locale: String? = Locale.getDefault().language): Flow<List<MeterView>>
 
     @ExperimentalCoroutinesApi
     fun findDistinctAll() = findAll().distinctUntilChanged()
 
-    @Query("SELECT mv.* FROM ${MeterView.VIEW_NAME} mv WHERE mv.meterId = :meterId AND mv.localeCode = :locale")
+    @Query("SELECT * FROM ${MeterView.VIEW_NAME} WHERE meterId = :meterId AND localeCode = :locale")
     fun findById(meterId: UUID, locale: String? = Locale.getDefault().language): Flow<MeterView>
 
     @ExperimentalCoroutinesApi
     fun findDistinctById(id: UUID) = findById(id).distinctUntilChanged()
 
     @Query(
-        "SELECT mv.* FROM ${MeterView.VIEW_NAME} mv WHERE mv.payersId = :payerId AND mv.localeCode = :locale"
+        "SELECT * FROM ${MeterView.VIEW_NAME} WHERE payersId = :payerId AND localeCode = :locale"
     )
     fun findByPayerId(payerId: UUID, locale: String? = Locale.getDefault().language):
             Flow<List<MeterView>>
@@ -35,7 +35,7 @@ interface MeterDao : BaseDao<MeterEntity> {
     fun findDistinctByPayerId(payerId: UUID) = findByPayerId(payerId).distinctUntilChanged()
 
     @Query(
-        "SELECT mv.* FROM ${MeterView.VIEW_NAME} mv WHERE mv.servicesId = :serviceId AND mv.localeCode = :locale"
+        "SELECT * FROM ${MeterView.VIEW_NAME} WHERE servicesId = :serviceId AND localeCode = :locale"
     )
     fun findByServiceId(serviceId: UUID, locale: String? = Locale.getDefault().language):
             Flow<List<MeterView>>
@@ -90,7 +90,6 @@ ORDER BY servicePos
     @Transaction
     suspend fun insert(meter: MeterEntity, textContent: MeterTlEntity) {
         insert(meter)
-        textContent.metersId = meter.meterId
         insert(textContent)
     }
 

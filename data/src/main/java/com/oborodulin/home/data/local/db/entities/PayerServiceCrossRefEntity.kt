@@ -1,12 +1,11 @@
 package com.oborodulin.home.data.local.db.entities
 
 import androidx.room.*
-import com.oborodulin.home.data.util.ServiceType
 import java.util.*
 
 @Entity(
     tableName = PayerServiceCrossRefEntity.TABLE_NAME,
-    indices = [Index(value = ["payersId", "servicesId"], unique = true)],
+    indices = [Index(value = ["payersId", "servicesId", "isPrivileges"], unique = true)],
     foreignKeys = [ForeignKey(
         entity = PayerEntity::class,
         parentColumns = arrayOf("payerId"),
@@ -33,26 +32,26 @@ data class PayerServiceCrossRefEntity(
     companion object {
         const val TABLE_NAME = "payers_services"
 
+        fun defaultPayerService(
+            payerId: UUID, serviceId: UUID, isPrivileges: Boolean = false,
+            isAllocateRate: Boolean = false
+        ) = PayerServiceCrossRefEntity(
+            payersId = payerId, servicesId = serviceId,
+            isPrivileges = isPrivileges, isAllocateRate = isAllocateRate
+        )
+
         fun populatePrivilegesPayerService(
             payerId: UUID, serviceId: UUID, isAllocateRate: Boolean = false
-        ) = PayerServiceCrossRefEntity(
-            payersId = payerId, servicesId = serviceId, isPrivileges = true,
-            isAllocateRate = isAllocateRate
+        ) = defaultPayerService(
+            payerId = payerId, serviceId = serviceId,
+            isPrivileges = true, isAllocateRate = isAllocateRate
         )
 
         fun populateAllocateRatePayerService(
             payerId: UUID, serviceId: UUID, isPrivileges: Boolean = false
-        ) = PayerServiceCrossRefEntity(
-            payersId = payerId, servicesId = serviceId, isPrivileges = isPrivileges,
-            isAllocateRate = true
-        )
-
-        fun populatePayerService(
-            payerId: UUID, serviceId: UUID, isPrivileges: Boolean = false,
-            isAllocateRate: Boolean = false
-        ) = PayerServiceCrossRefEntity(
-            payersId = payerId, servicesId = serviceId, isPrivileges = isPrivileges,
-            isAllocateRate = isAllocateRate
+        ) = defaultPayerService(
+            payerId = payerId, serviceId = serviceId,
+            isPrivileges = isPrivileges, isAllocateRate = true
         )
     }
 

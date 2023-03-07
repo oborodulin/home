@@ -5,6 +5,7 @@ import com.oborodulin.home.data.local.db.entities.PayerServiceCrossRefEntity
 import com.oborodulin.home.data.local.db.entities.RateEntity
 import com.oborodulin.home.data.local.db.views.PayerServiceSubtotalDebtView
 import com.oborodulin.home.data.local.db.views.PayerTotalDebtView
+import com.oborodulin.home.data.local.db.views.RatePayerServiceView
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.distinctUntilChanged
@@ -56,8 +57,12 @@ SELECT r.* FROM ${RateEntity.TABLE_NAME} r JOIN ${PayerServiceCrossRefEntity.TAB
     fun findByPayerServiceId(payerServiceId: UUID): Flow<List<RateEntity>>
 
     @ExperimentalCoroutinesApi
-    fun findDistinctByPayerServiceId(serviceId: UUID) =
-        findByPayerServiceId(serviceId).distinctUntilChanged()
+    fun findDistinctByPayerServiceId(payerServiceId: UUID) =
+        findByPayerServiceId(payerServiceId).distinctUntilChanged()
+
+    @Query("SELECT * FROM ${RatePayerServiceView.VIEW_NAME} WHERE payerId = :payerId AND serviceLocaleCode = :locale ORDER BY servicePos")
+    fun findRatesByPayerServices(payerId: UUID, locale: String? = Locale.getDefault().language):
+            Flow<List<RatePayerServiceView>>
 
     @Query(
         """

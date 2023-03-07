@@ -315,10 +315,10 @@ abstract class HomeDatabase : RoomDatabase() {
                 // Meters:
                 // Electricity
                 val electricityPayer1Meter =
-                    MeterEntity.populateElectricityMeter(context, payer1Entity.payerId)
+                    MeterEntity.electricityMeter(context, payer1Entity.payerId)
                 insertDefMeter(
                     db, listOf(electricityPayer1ServiceId), electricityPayer1Meter,
-                    MeterTlEntity.populateElectricityMeterTl(
+                    MeterTlEntity.electricityMeterTl(
                         context,
                         electricityPayer1Meter.meterId
                     )
@@ -344,10 +344,10 @@ abstract class HomeDatabase : RoomDatabase() {
                 )
                 // Cold water
                 val coldWaterPayer1Meter =
-                    MeterEntity.populateColdWaterMeter(context, payer1Entity.payerId)
+                    MeterEntity.coldWaterMeter(context, payer1Entity.payerId)
                 insertDefMeter(
                     db, listOf(coldWaterPayer1ServiceId), coldWaterPayer1Meter,
-                    MeterTlEntity.populateColdWaterMeterTl(context, coldWaterPayer1Meter.meterId)
+                    MeterTlEntity.coldWaterMeterTl(context, coldWaterPayer1Meter.meterId)
                 )
                 // values:
                 insertDefMeterValue(
@@ -370,17 +370,17 @@ abstract class HomeDatabase : RoomDatabase() {
                 )
                 // Hot water
                 val hotWaterPayer1Meter =
-                    MeterEntity.populateHotWaterMeter(context, payer1Entity.payerId)
+                    MeterEntity.hotWaterMeter(context, payer1Entity.payerId)
                 insertDefMeter(
                     db, listOf(hotWaterPayer1ServiceId, wastePayer1ServiceId), hotWaterPayer1Meter,
-                    MeterTlEntity.populateHotWaterMeterTl(context, hotWaterPayer1Meter.meterId)
+                    MeterTlEntity.hotWaterMeterTl(context, hotWaterPayer1Meter.meterId)
                 )
                 // Heating
                 val heatingPayer1Meter =
-                    MeterEntity.populateHeatingMeter(context, payer1Entity.payerId)
+                    MeterEntity.heatingMeter(context, payer1Entity.payerId)
                 insertDefMeter(
                     db, listOf(heatingPayer1ServiceId), heatingPayer1Meter,
-                    MeterTlEntity.populateHeatingMeterTl(
+                    MeterTlEntity.heatingMeterTl(
                         context,
                         heatingPayer1Meter.meterId
                     )
@@ -407,24 +407,19 @@ abstract class HomeDatabase : RoomDatabase() {
                 // Payer 1 rates:
                 // rent
                 insertDefRate(
-                    db, RateEntity.rentRateForPayer(
-                        rentService.serviceId,
-                        rentPayer1ServiceId
-                    )
+                    db, RateEntity.rentRateForPayer(rentService.serviceId, rentPayer1ServiceId)
                 )
                 // heating
                 // garbage
                 insertDefRate(
                     db, RateEntity.garbageRateForPayer(
-                        garbageService.serviceId,
-                        garbagePayer1ServiceId
+                        garbageService.serviceId, garbagePayer1ServiceId
                     )
                 )
                 // doorphone
                 val doorphoneRateId = insertDefRate(
                     db, RateEntity.doorphoneRateForPayer(
-                        doorphoneService.serviceId,
-                        doorphonePayer1ServiceId
+                        doorphoneService.serviceId, doorphonePayer1ServiceId
                     )
                 )
                 // phone
@@ -499,10 +494,10 @@ abstract class HomeDatabase : RoomDatabase() {
                 // Meters:
                 // Electricity
                 val electricityPayer2Meter =
-                    MeterEntity.populateElectricityMeter(context, payer2Entity.payerId)
+                    MeterEntity.electricityMeter(context, payer2Entity.payerId)
                 insertDefMeter(
                     db, listOf(electricityPayer2ServiceId), electricityPayer2Meter,
-                    MeterTlEntity.populateElectricityMeterTl(
+                    MeterTlEntity.electricityMeterTl(
                         context,
                         electricityPayer2Meter.meterId
                     )
@@ -528,10 +523,10 @@ abstract class HomeDatabase : RoomDatabase() {
                 )
                 // Cold water
                 val coldWaterPayer2Meter =
-                    MeterEntity.populateColdWaterMeter(context, payer2Entity.payerId)
+                    MeterEntity.coldWaterMeter(context, payer2Entity.payerId)
                 insertDefMeter(
                     db, listOf(coldWaterPayer2ServiceId), coldWaterPayer2Meter,
-                    MeterTlEntity.populateColdWaterMeterTl(context, coldWaterPayer2Meter.meterId)
+                    MeterTlEntity.coldWaterMeterTl(context, coldWaterPayer2Meter.meterId)
                 )
                 // values:
                 insertDefMeterValue(
@@ -554,10 +549,10 @@ abstract class HomeDatabase : RoomDatabase() {
                 )
                 // Hot water
                 val hotWaterPayer2Meter =
-                    MeterEntity.populateHotWaterMeter(context, payer2Entity.payerId)
+                    MeterEntity.hotWaterMeter(context, payer2Entity.payerId)
                 insertDefMeter(
                     db, listOf(hotWaterPayer2ServiceId, wastePayer2ServiceId), hotWaterPayer2Meter,
-                    MeterTlEntity.populateHotWaterMeterTl(context, hotWaterPayer2Meter.meterId)
+                    MeterTlEntity.hotWaterMeterTl(context, hotWaterPayer2Meter.meterId)
                 )
                 // values:
                 insertDefMeterValue(
