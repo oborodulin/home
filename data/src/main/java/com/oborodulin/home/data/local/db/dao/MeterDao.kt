@@ -2,6 +2,7 @@ package com.oborodulin.home.data.local.db.dao
 
 import androidx.room.*
 import com.oborodulin.home.data.local.db.entities.*
+import com.oborodulin.home.data.local.db.views.MeterPayerServiceView
 import com.oborodulin.home.data.local.db.views.MeterValuePrevPeriodView
 import com.oborodulin.home.data.local.db.views.MeterView
 import com.oborodulin.home.data.util.Constants
@@ -13,20 +14,20 @@ import java.util.*
 @Dao
 interface MeterDao : BaseDao<MeterEntity> {
     // READS:
-    @Query("SELECT * FROM ${MeterView.VIEW_NAME} WHERE localeCode = :locale")
+    @Query("SELECT * FROM ${MeterView.VIEW_NAME} WHERE meterLocCode = :locale")
     fun findAll(locale: String? = Locale.getDefault().language): Flow<List<MeterView>>
 
     @ExperimentalCoroutinesApi
     fun findDistinctAll() = findAll().distinctUntilChanged()
 
-    @Query("SELECT * FROM ${MeterView.VIEW_NAME} WHERE meterId = :meterId AND localeCode = :locale")
+    @Query("SELECT * FROM ${MeterView.VIEW_NAME} WHERE meterId = :meterId AND meterLocCode = :locale")
     fun findById(meterId: UUID, locale: String? = Locale.getDefault().language): Flow<MeterView>
 
     @ExperimentalCoroutinesApi
     fun findDistinctById(id: UUID) = findById(id).distinctUntilChanged()
 
     @Query(
-        "SELECT * FROM ${MeterView.VIEW_NAME} WHERE payersId = :payerId AND localeCode = :locale"
+        "SELECT * FROM ${MeterView.VIEW_NAME} WHERE payersId = :payerId AND meterLocCode = :locale"
     )
     fun findByPayerId(payerId: UUID, locale: String? = Locale.getDefault().language):
             Flow<List<MeterView>>
@@ -35,18 +36,18 @@ interface MeterDao : BaseDao<MeterEntity> {
     fun findDistinctByPayerId(payerId: UUID) = findByPayerId(payerId).distinctUntilChanged()
 
     @Query(
-        "SELECT * FROM ${MeterView.VIEW_NAME} WHERE servicesId = :serviceId AND localeCode = :locale"
+        "SELECT * FROM ${MeterPayerServiceView.VIEW_NAME} WHERE serviceId = :serviceId AND serviceLocCode = :locale"
     )
     fun findByServiceId(serviceId: UUID, locale: String? = Locale.getDefault().language):
-            Flow<List<MeterView>>
+            Flow<List<MeterPayerServiceView>>
 
     @ExperimentalCoroutinesApi
-    fun findDistinctByServiceId(serviceId: UUID) = findByPayerId(serviceId).distinctUntilChanged()
+    fun findDistinctByServiceId(serviceId: UUID) = findByServiceId(serviceId).distinctUntilChanged()
 
     @Query(
         """
 SELECT * FROM ${MeterValuePrevPeriodView.VIEW_NAME}  
-WHERE payerId = :payerId AND meterLocaleCode = :locale AND serviceLocaleCode = :locale 
+WHERE payerId = :payerId AND meterLocCode = :locale AND serviceLocCode = :locale 
 ORDER BY servicePos
 """
     )
@@ -57,11 +58,11 @@ ORDER BY servicePos
     @Query(
         """
 SELECT * FROM ${MeterValuePrevPeriodView.VIEW_NAME} 
-WHERE isFavorite = 1 AND meterLocaleCode = :locale AND serviceLocaleCode = :locale
+WHERE isFavorite = 1 AND meterLocCode = :locale AND serviceLocCode = :locale
 ORDER BY servicePos
 """
     )
-    fun findPrevMetersValuesByPayerIsFavorite(
+    fun findPrevMetersValuesByFavoritePayer(
         locale: String? = Locale.getDefault().language
     ): Flow<List<MeterValuePrevPeriodView>>
 
@@ -91,6 +92,18 @@ ORDER BY servicePos
     suspend fun insert(meter: MeterEntity, textContent: MeterTlEntity) {
         insert(meter)
         insert(textContent)
+    }
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insert(vararg payerServiceMeters: PayerServiceMeterCrossRefEntity)
+
+    @Transaction
+    suspend fun insert(meter: MeterEntity, payerService: PayerServiceCrossRefEntity) {
+        insert(
+            PayerServiceMeterCrossRefEntity(
+                metersId = meter.meterId, payersServicesId = payerService.payerServiceId
+            )
+        )
     }
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)

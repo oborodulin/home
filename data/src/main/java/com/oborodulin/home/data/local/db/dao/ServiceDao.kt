@@ -3,6 +3,7 @@ package com.oborodulin.home.data.local.db.dao
 import androidx.room.*
 import com.oborodulin.home.data.local.db.entities.ServiceEntity
 import com.oborodulin.home.data.local.db.entities.ServiceTlEntity
+import com.oborodulin.home.data.local.db.views.MeterPayerServiceView
 import com.oborodulin.home.data.local.db.views.PayerServiceView
 import com.oborodulin.home.data.local.db.views.ServiceView
 import com.oborodulin.home.data.util.Constants
@@ -14,23 +15,23 @@ import java.util.*
 @Dao
 interface ServiceDao : BaseDao<ServiceEntity> {
     // READS:
-    @Query("SELECT * FROM ${ServiceView.VIEW_NAME} WHERE localeCode = :locale ORDER BY servicePos")
+    @Query("SELECT * FROM ${ServiceView.VIEW_NAME} WHERE serviceLocCode = :locale ORDER BY servicePos")
     fun findAll(locale: String? = Locale.getDefault().language): Flow<List<ServiceView>>
 
     @ExperimentalCoroutinesApi
     fun findDistinctAll() = findAll().distinctUntilChanged()
 
-    @Query("SELECT * FROM ${ServiceView.VIEW_NAME} WHERE serviceId = :id AND localeCode = :locale")
+    @Query("SELECT * FROM ${ServiceView.VIEW_NAME} WHERE serviceId = :id AND serviceLocCode = :locale")
     fun findById(id: UUID, locale: String? = Locale.getDefault().language): Flow<ServiceView>
 
     @ExperimentalCoroutinesApi
     fun findDistinctById(id: UUID) = findById(id).distinctUntilChanged()
 
-    @Query("SELECT * FROM ${ServiceView.VIEW_NAME} WHERE meterType <> ${Constants.MTR_NONE_VAL} AND localeCode = :locale ORDER BY servicePos")
+    @Query("SELECT * FROM ${ServiceView.VIEW_NAME} WHERE serviceMeterType <> ${Constants.MTR_NONE_VAL} AND serviceLocCode = :locale ORDER BY servicePos")
     fun findMeterAllowed(locale: String? = Locale.getDefault().language): Flow<List<ServiceView>>
 
     @Query(
-        "SELECT * FROM ${PayerServiceView.VIEW_NAME} WHERE payersId = :payerId AND localeCode = :locale"
+        "SELECT * FROM ${PayerServiceView.VIEW_NAME} WHERE payersId = :payerId AND serviceLocCode = :locale ORDER BY servicePos"
     )
     fun findByPayerId(payerId: UUID, locale: String? = Locale.getDefault().language):
             Flow<List<PayerServiceView>>
@@ -39,7 +40,7 @@ interface ServiceDao : BaseDao<ServiceEntity> {
     fun findDistinctByPayerId(payerId: UUID) = findByPayerId(payerId).distinctUntilChanged()
 
     @Query(
-        "SELECT * FROM ${PayerServiceView.VIEW_NAME} WHERE payerServiceId = :payerServiceId AND localeCode = :locale"
+        "SELECT * FROM ${PayerServiceView.VIEW_NAME} WHERE payerServiceId = :payerServiceId AND serviceLocCode = :locale"
     )
     fun findPayerServiceById(payerServiceId: UUID, locale: String? = Locale.getDefault().language):
             Flow<PayerServiceView>
@@ -47,6 +48,16 @@ interface ServiceDao : BaseDao<ServiceEntity> {
     @ExperimentalCoroutinesApi
     fun findDistinctPayerServiceById(payerServiceId: UUID) =
         findPayerServiceById(payerServiceId).distinctUntilChanged()
+
+    @Query(
+        "SELECT * FROM ${MeterPayerServiceView.VIEW_NAME} WHERE meterId = :meterId AND serviceLocCode = :locale"
+    )
+    fun findPayerServiceByMeterId(meterId: UUID, locale: String? = Locale.getDefault().language):
+            Flow<List<MeterPayerServiceView>>
+
+    @ExperimentalCoroutinesApi
+    fun findDistinctPayerServiceByMeterId(meterId: UUID) =
+        findPayerServiceByMeterId(meterId).distinctUntilChanged()
 
     // INSERTS:
     @Insert(onConflict = OnConflictStrategy.REPLACE)

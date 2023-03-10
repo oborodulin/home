@@ -11,7 +11,7 @@ class ServiceViewToServiceMapper : Mapper<ServiceView, Service> {
             servicePos = input.data.servicePos!!,
             serviceName = input.tl.serviceName,
             serviceType = input.data.serviceType,
-            measureUnit = input.tl.measureUnit,
+            serviceMeasureUnit = input.tl.serviceMeasureUnit,
             serviceDesc = input.tl.serviceDesc
         )
         service.id = input.data.serviceId

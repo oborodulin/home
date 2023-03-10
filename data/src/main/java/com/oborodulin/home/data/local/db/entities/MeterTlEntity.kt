@@ -6,7 +6,7 @@ import java.util.*
 
 @Entity(
     tableName = MeterTlEntity.TABLE_NAME,
-    indices = [Index(value = ["localeCode", "metersId"], unique = true)],
+    indices = [Index(value = ["meterLocCode", "metersId"], unique = true)],
     foreignKeys = [ForeignKey(
         entity = MeterEntity::class,
         parentColumns = arrayOf("meterId"),
@@ -17,8 +17,8 @@ import java.util.*
 )
 data class MeterTlEntity(
     @PrimaryKey val meterTlId: UUID = UUID.randomUUID(),
-    val localeCode: String = Locale.getDefault().language,
-    val measureUnit: String,
+    val meterLocCode: String = Locale.getDefault().language,
+    val meterMeasureUnit: String,
     val meterDesc: String? = null,
     @ColumnInfo(index = true) val metersId: UUID,
 ) {
@@ -27,7 +27,7 @@ data class MeterTlEntity(
 
         fun defaultMeterTl(meterId: UUID, measureUnit: String, meterDesc: String? = null) =
             MeterTlEntity(
-                measureUnit = measureUnit,
+                meterMeasureUnit = measureUnit,
                 meterDesc = meterDesc,
                 metersId = meterId
             )

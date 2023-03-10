@@ -19,12 +19,12 @@ SELECT lmv.payerId, lmv.payerServiceId, lmv.metersId, lmv.meterValueId,
         ELSE lmv.meterValue 
     END) AS diffMeterValue, 
     lmv.isDerivedUnit, lmv.derivedUnit, lmv.measureUnit, lmv.paymentDate, 
-    lmv.paymentMonth, lmv.paymentYear, lmv.localeCode 
+    lmv.paymentMonth, lmv.paymentYear, lmv.meterLocCode 
 FROM ${MeterValuePaymentPeriodView.VIEW_NAME} lmv 
     JOIN ${MeterValuePaymentPeriodView.VIEW_NAME} pmv ON pmv.metersId = lmv.metersId 
         AND pmv.payerServiceId = lmv.payerServiceId
         AND pmv.paymentDate = strftime(${Constants.DB_FRACT_SEC_TIME}, lmv.paymentDate, '-1 months')
-        AND pmv.localeCode = lmv.localeCode
+        AND pmv.meterLocCode = lmv.meterLocCode
 """
 )
 class MeterValuePaymentView(
@@ -41,7 +41,7 @@ class MeterValuePaymentView(
     val paymentDate: OffsetDateTime,
     val paymentMonth: Int,
     val paymentYear: Int,
-    val localeCode: String
+    val meterLocCode: String
 ) {
     companion object {
         const val VIEW_NAME = "meter_value_payments_view"

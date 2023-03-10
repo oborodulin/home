@@ -9,7 +9,6 @@ class PayerServiceViewToServiceMapper(private val mapper: ServiceViewToServiceMa
     override fun map(input: PayerServiceView): Service {
         val service = mapper.map(input.service)
         with(service) {
-            payer.id = input.payersId
             payerServiceId = input.payerServiceId
             isPrivileges = input.isPrivileges
             isAllocateRate = input.isAllocateRate

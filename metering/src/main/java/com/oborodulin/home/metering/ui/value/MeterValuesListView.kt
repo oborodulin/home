@@ -191,14 +191,14 @@ fun MeterValuesList(
                                             )
                                         ).plus(
                                             AnnotatedString(
-                                                when (meterValue.measureUnit) {
+                                                when (meterValue.meterMeasureUnit) {
                                                     null -> ""
                                                     else -> " "
                                                 }
                                             )
                                         ).plus(
                                             Utils.scriptText(
-                                                meterValue.measureUnit, listOf("2", "3")
+                                                meterValue.meterMeasureUnit, listOf("2", "3")
                                             )
                                         ),
                                         maxLines = 2,

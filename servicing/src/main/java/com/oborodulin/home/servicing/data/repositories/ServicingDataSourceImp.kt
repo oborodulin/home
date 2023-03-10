@@ -19,7 +19,7 @@ class ServicingDataSourceImp @Inject constructor(
     private val serviceViewListToServiceListMapper: ServiceViewListToServiceListMapper,
     private val serviceViewToServiceMapper: ServiceViewToServiceMapper,
     private val payerServiceViewToServiceMapper: PayerServiceViewToServiceMapper,
-    private val payerServiceViewListToServiceListMapper: PayerServiceViewListToServiceListMapper,
+    private val payerServiceViewListToPayerServiceListMapper: PayerServiceViewListToPayerServiceListMapper,
     private val serviceToServiceEntityMapper: ServiceToServiceEntityMapper,
     private val serviceToServiceTlEntityMapper: ServiceToServiceTlEntityMapper
 ) : ServicingDataSource {
@@ -33,7 +33,7 @@ class ServicingDataSourceImp @Inject constructor(
         .map(serviceViewListToServiceListMapper::map)
 
     override fun getPayerServices(payerId: UUID) = serviceDao.findByPayerId(payerId)
-        .map(payerServiceViewListToServiceListMapper::map)
+        .map(payerServiceViewListToPayerServiceListMapper::map)
 
     override fun getPayerService(payerServiceId: UUID) =
         serviceDao.findPayerServiceById(payerServiceId).map(payerServiceViewToServiceMapper::map)

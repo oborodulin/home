@@ -60,13 +60,13 @@ SELECT r.* FROM ${RateEntity.TABLE_NAME} r JOIN ${PayerServiceCrossRefEntity.TAB
     fun findDistinctByPayerServiceId(payerServiceId: UUID) =
         findByPayerServiceId(payerServiceId).distinctUntilChanged()
 
-    @Query("SELECT * FROM ${RatePayerServiceView.VIEW_NAME} WHERE payerId = :payerId AND serviceLocaleCode = :locale ORDER BY servicePos")
+    @Query("SELECT * FROM ${RatePayerServiceView.VIEW_NAME} WHERE payerId = :payerId AND serviceLocCode = :locale ORDER BY servicePos")
     fun findRatesByPayerServices(payerId: UUID, locale: String? = Locale.getDefault().language):
             Flow<List<RatePayerServiceView>>
 
     @Query(
         """
-SELECT * FROM ${PayerServiceSubtotalDebtView.VIEW_NAME} WHERE payerId = :payerId AND serviceLocaleCode = :locale
+SELECT * FROM ${PayerServiceSubtotalDebtView.VIEW_NAME} WHERE payerId = :payerId AND serviceLocCode = :locale
 ORDER BY servicePos            
 """
     )
@@ -75,12 +75,12 @@ ORDER BY servicePos
     ): Flow<List<PayerServiceSubtotalDebtView>>
 
     @Query(
-        "SELECT * FROM ${PayerTotalDebtView.VIEW_NAME} WHERE serviceLocaleCode = :locale"
+        "SELECT * FROM ${PayerTotalDebtView.VIEW_NAME} WHERE serviceLocCode = :locale"
     )
     fun findTotalDebts(locale: String? = Locale.getDefault().language): Flow<List<PayerTotalDebtView>>
 
     @Query(
-        "SELECT * FROM ${PayerTotalDebtView.VIEW_NAME} WHERE payerId = :payerId AND serviceLocaleCode = :locale"
+        "SELECT * FROM ${PayerTotalDebtView.VIEW_NAME} WHERE payerId = :payerId AND serviceLocCode = :locale"
     )
     fun findTotalDebtByPayerId(
         payerId: UUID, locale: String? = Locale.getDefault().language

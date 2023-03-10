@@ -11,9 +11,9 @@ import java.util.*
     viewName = PayerTotalDebtView.VIEW_NAME,
     value = """
 SELECT payerId, MIN(fromPaymentDate) AS fromPaymentDate, MAX(toPaymentDate) AS toPaymentDate, 
-        serviceLocaleCode, SUM(serviceDebt) AS totalDebt
+        serviceLocCode, SUM(serviceDebt) AS totalDebt
 FROM ${PayerServiceSubtotalDebtView.VIEW_NAME}
-GROUP BY payerId, serviceLocaleCode
+GROUP BY payerId, serviceLocCode
 """
 )
 class PayerTotalDebtView(
@@ -22,7 +22,7 @@ class PayerTotalDebtView(
     val fromPaymentDate: OffsetDateTime? = null,
     @field:TypeConverters(DateTypeConverter::class)
     val toPaymentDate: OffsetDateTime? = null,
-    val serviceLocaleCode: String?,
+    val serviceLocCode: String?,
     val totalDebt: BigDecimal = BigDecimal.ZERO
 ) {
     companion object {

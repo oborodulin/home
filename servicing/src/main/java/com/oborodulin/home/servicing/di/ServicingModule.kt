@@ -48,8 +48,8 @@ object ServicingModule {
 
     @Singleton
     @Provides
-    fun providePayerServiceViewListToServiceListMapper(mapper: PayerServiceViewToServiceMapper): PayerServiceViewListToServiceListMapper =
-        PayerServiceViewListToServiceListMapper(mapper = mapper)
+    fun providePayerServiceViewListToServiceListMapper(mapper: PayerServiceViewToServiceMapper): PayerServiceViewListToPayerServiceListMapper =
+        PayerServiceViewListToPayerServiceListMapper(mapper = mapper)
 
     // UI MAPPERS:
 
@@ -64,7 +64,7 @@ object ServicingModule {
         serviceViewListToServiceListMapper: ServiceViewListToServiceListMapper,
         serviceViewToServiceMapper: ServiceViewToServiceMapper,
         payerServiceViewToServiceMapper: PayerServiceViewToServiceMapper,
-        payerServiceViewListToServiceListMapper: PayerServiceViewListToServiceListMapper,
+        payerServiceViewListToPayerServiceListMapper: PayerServiceViewListToPayerServiceListMapper,
         serviceToServiceEntityMapper: ServiceToServiceEntityMapper,
         serviceToServiceTlEntityMapper: ServiceToServiceTlEntityMapper
     ): ServicingDataSource =
@@ -74,7 +74,7 @@ object ServicingModule {
             serviceViewListToServiceListMapper,
             serviceViewToServiceMapper,
             payerServiceViewToServiceMapper,
-            payerServiceViewListToServiceListMapper,
+            payerServiceViewListToPayerServiceListMapper,
             serviceToServiceEntityMapper,
             serviceToServiceTlEntityMapper
         )

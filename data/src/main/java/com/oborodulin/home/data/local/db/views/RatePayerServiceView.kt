@@ -16,7 +16,7 @@ SELECT rps.*, (CASE WHEN EXISTS(SELECT psm.payerServiceMeterId FROM payers_servi
                     ELSE 0 
                 END) isMeterUses
 FROM (SELECT p.payerId, p.personsNum, p.totalArea, p.livingSpace, p.heatedVolume, psv.payerServiceId, psv.isAllocateRate, 
-        psv.serviceId, psv.serviceName, psv.servicePos, psv.serviceType, psv.localeCode AS serviceLocaleCode, 
+        psv.serviceId, psv.serviceName, psv.servicePos, psv.serviceType, psv.serviceLocCode, psv.serviceMeasureUnit, 
         r.startDate, r.fromMeterValue, r.toMeterValue, r.rateValue, r.isPerPerson, r.isPrivileges
     FROM ${PayerEntity.TABLE_NAME} p JOIN ${PayerServiceView.VIEW_NAME} psv ON psv.payersId = p.payerId 
                                         AND NOT EXISTS(SELECT rateId FROM ${RateEntity.TABLE_NAME} WHERE payersServicesId = psv.payerServiceId)
@@ -24,7 +24,7 @@ FROM (SELECT p.payerId, p.personsNum, p.totalArea, p.livingSpace, p.heatedVolume
                                                                     AND r.isPrivileges = psv.isPrivileges
     UNION ALL
     SELECT p.payerId, p.personsNum, p.totalArea, p.livingSpace, p.heatedVolume, psv.payerServiceId, psv.isAllocateRate, 
-        psv.serviceId, psv.serviceName, psv.servicePos, psv.serviceType, psv.localeCode AS serviceLocaleCode, 
+        psv.serviceId, psv.serviceName, psv.servicePos, psv.serviceType, psv.serviceLocCode, psv.serviceMeasureUnit, 
         r.startDate, r.fromMeterValue, r.toMeterValue, r.rateValue, r.isPerPerson, r.isPrivileges
     FROM ${PayerEntity.TABLE_NAME} p JOIN ${PayerServiceView.VIEW_NAME} psv ON psv.payersId = p.payerId
         JOIN ${RateEntity.TABLE_NAME} r ON r.payersServicesId = psv.payerServiceId AND r.isPrivileges = psv.isPrivileges) rps
@@ -42,7 +42,8 @@ class RatePayerServiceView(
     val serviceName: String,
     val servicePos: Int,
     val serviceType: ServiceType,
-    val serviceLocaleCode: String,
+    val serviceLocCode: String,
+    val serviceMeasureUnit: String?,
     val startDate: OffsetDateTime,
     val fromMeterValue: BigDecimal?,
     val toMeterValue: BigDecimal?,

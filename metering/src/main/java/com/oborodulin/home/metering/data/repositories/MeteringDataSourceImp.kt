@@ -43,7 +43,7 @@ class MeteringDataSourceImp @Inject constructor(
 
     override fun getPrevServiceMeterValues(payerId: UUID?) =
         when (payerId) {
-            null -> meterDao.findPrevMetersValuesByPayerIsFavorite()
+            null -> meterDao.findPrevMetersValuesByFavoritePayer()
             else -> meterDao.findDistinctPrevMetersValuesByPayerId(payerId)
         }
 

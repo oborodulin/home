@@ -13,8 +13,8 @@ import java.util.*
     value = """
 SELECT rps.payerId, rps.personsNum, rps.totalArea, rps.livingSpace, mrv.paymentDate, 
         mrv.paymentMonth, mrv.paymentYear, rps.isPerPerson, rps.servicePos, rps.serviceType, rps.serviceName, 
-        rps.serviceLocaleCode, rps.rateValue, rps.fromMeterValue, rps.toMeterValue, 
-        NULL AS diffMeterValue, NULL AS measureUnit, 0 AS isDerivedUnit, rps.serviceId, 
+        rps.serviceLocCode, rps.rateValue, rps.fromMeterValue, rps.toMeterValue, 
+        NULL AS diffMeterValue, rps.serviceMeasureUnit AS measureUnit, 0 AS isDerivedUnit, rps.serviceId, 
         rps.payerServiceId,
         (CASE WHEN rps.isPerPerson = 1
             -- GAS, GARBAGE
@@ -28,23 +28,23 @@ SELECT rps.payerId, rps.personsNum, rps.totalArea, rps.livingSpace, mrv.paymentD
         rps.isMeterUses
 FROM ${RatePayerServiceView.VIEW_NAME} rps JOIN 
         (SELECT rv.receiptId, rv.payersId, rv.payersServicesId, rv.isLinePaid, 
-                mvp.paymentDate, mvp.paymentMonth, mvp.paymentYear, mvp.localeCode
+                mvp.paymentDate, mvp.paymentMonth, mvp.paymentYear, mvp.meterLocCode
             FROM ${MeterValuePaymentView.VIEW_NAME} mvp LEFT JOIN receipts_view rv 
                 ON rv.payersId = mvp.payerId 
                 AND rv.receiptMonth = mvp.paymentMonth 
                 AND rv.receiptYear = mvp.paymentYear
                 AND rv.payersServicesId <> mvp.payerServiceId
         GROUP BY rv.receiptId, rv.payersId, rv.payersServicesId, rv.isLinePaid, 
-                mvp.paymentDate, mvp.paymentMonth, mvp.paymentYear, mvp.localeCode) mrv
+                mvp.paymentDate, mvp.paymentMonth, mvp.paymentYear, mvp.meterLocCode) mrv
             ON ifnull(mrv.payersServicesId, rps.payerServiceId) = rps.payerServiceId
-                AND mrv.localeCode = rps.serviceLocaleCode
+                AND mrv.meterLocCode = rps.serviceLocCode
 WHERE rps.isMeterUses = 0
     AND strftime(${Constants.DB_FRACT_SEC_TIME}, rps.startDate) = ifnull(
                                                     (SELECT MAX(strftime(${Constants.DB_FRACT_SEC_TIME}, rsv.startDate)) 
                                                     FROM ${RatePayerServiceView.VIEW_NAME} rsv 
                                                     WHERE rsv.payerId = rps.payerId 
                                                         AND rsv.payerServiceId = rps.payerServiceId
-                                                        AND rsv.serviceLocaleCode = rps.serviceLocaleCode
+                                                        AND rsv.serviceLocCode = rps.serviceLocCode
                                                         AND rsv.isMeterUses = 0
                                                         AND rsv.startDate <= mrv.paymentDate),
                                                     strftime(${Constants.DB_FRACT_SEC_TIME}, rps.startDate))
@@ -52,7 +52,7 @@ WHERE rps.isMeterUses = 0
 UNION ALL
 SELECT rps.payerId, rps.personsNum, rps.totalArea, rps.livingSpace, mvp.paymentDate, 
         mvp.paymentMonth, mvp.paymentYear, 0 AS isPerPerson, rps.servicePos, rps.serviceType, rps.serviceName, 
-        rps.serviceLocaleCode, rps.rateValue, rps.fromMeterValue, rps.toMeterValue, 
+        rps.serviceLocCode, rps.rateValue, rps.fromMeterValue, rps.toMeterValue, 
         mvp.diffMeterValue, mvp.measureUnit, mvp.isDerivedUnit, rps.serviceId, rps.payerServiceId,
         (CASE WHEN mvp.isDerivedUnit = 0 
             THEN rps.rateValue * mvp.diffMeterValue / ${CONV_COEFF_BIGDECIMAL}.0
@@ -65,13 +65,13 @@ SELECT rps.payerId, rps.personsNum, rps.totalArea, rps.livingSpace, mvp.paymentD
         rps.isMeterUses
 FROM ${RatePayerServiceView.VIEW_NAME} rps JOIN ${MeterValuePaymentView.VIEW_NAME} mvp 
     ON mvp.payerId = rps.payerId AND mvp.payerServiceId = rps.payerServiceId
-        AND mvp.localeCode = rps.serviceLocaleCode
+        AND mvp.meterLocCode = rps.serviceLocCode
         AND strftime(${Constants.DB_FRACT_SEC_TIME}, rps.startDate) = ifnull(
                                                     (SELECT MAX(strftime(${Constants.DB_FRACT_SEC_TIME}, rsv.startDate)) 
                                                     FROM ${RatePayerServiceView.VIEW_NAME} rsv 
                                                     WHERE rsv.payerId = rps.payerId 
                                                         AND rsv.payerServiceId = rps.payerServiceId
-                                                        AND rsv.serviceLocaleCode = rps.serviceLocaleCode
+                                                        AND rsv.serviceLocCode = rps.serviceLocCode
                                                         AND rsv.isMeterUses = 1 
                                                         AND rsv.startDate <= mvp.paymentDate),
                                                     strftime(${Constants.DB_FRACT_SEC_TIME}, rps.startDate))
@@ -100,7 +100,7 @@ class PayerServiceDebtView(
     val servicePos: Int,
     val serviceType: ServiceType,
     val serviceName: String,
-    val serviceLocaleCode: String,
+    val serviceLocCode: String,
     val rateValue: BigDecimal,
     val fromMeterValue: BigDecimal?,
     val toMeterValue: BigDecimal?,

@@ -22,7 +22,7 @@ class PrevMetersValuesViewToMeterValueModelMapper :
             serviceName = input.serviceName,
             payerId = input.payerId,
             metersId = input.meterId,
-            measureUnit = input.measureUnit,
+            meterMeasureUnit = input.measureUnit,
             prevLastDate = input.prevLastDate,
             prevValue = input.prevValue,
             currentValue = input.currentValue,

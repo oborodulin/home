@@ -9,7 +9,7 @@ class ServiceToServiceTlEntityMapper : Mapper<Service, ServiceTlEntity> {
     override fun map(input: Service) = ServiceTlEntity(
         serviceTlId = input.serviceTlId ?: input.apply { serviceTlId = UUID.randomUUID() }.serviceTlId!!,
         serviceName = input.serviceName,
-        measureUnit = input.measureUnit,
+        serviceMeasureUnit = input.serviceMeasureUnit,
         serviceDesc = input.serviceDesc,
         servicesId = input.id!!
     )

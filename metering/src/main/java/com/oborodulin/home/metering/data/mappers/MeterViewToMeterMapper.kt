@@ -7,11 +7,10 @@ import com.oborodulin.home.metering.domain.model.MeterTl
 
 class MeterViewToMeterMapper : Mapper<MeterView, Meter> {
     override fun map(input: MeterView): Meter {
-        val tl = MeterTl(measureUnit = input.tl.measureUnit, meterDesc = input.tl.meterDesc)
+        val tl = MeterTl(measureUnit = input.tl.meterMeasureUnit, meterDesc = input.tl.meterDesc)
         tl.id = input.tl.meterTlId
         val meter = Meter(
             payersId = input.data.payersId,
-            payersServicesId = input.payerServiceId,
             meterType = input.data.meterType,
             meterNum = input.data.meterNum,
             maxValue = input.data.maxValue,

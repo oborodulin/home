@@ -5,5 +5,5 @@ import com.oborodulin.home.domain.model.Payer
 
 data class PayerService(
     val payer: Payer = Payer(),
-    val services: List<Service> = emptyList()
+    val services: MutableList<Service> = mutableListOf()
 ) : DomainModel()

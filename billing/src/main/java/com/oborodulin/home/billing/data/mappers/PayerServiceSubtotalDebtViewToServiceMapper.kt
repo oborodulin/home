@@ -10,7 +10,7 @@ class PayerServiceSubtotalDebtViewToServiceMapper : Mapper<PayerServiceSubtotalD
             servicePos = input.servicePos,
             serviceName = input.serviceName,
             serviceType = input.serviceType,
-            measureUnit = input.measureUnit,
+            serviceMeasureUnit = input.measureUnit,
             payerServiceId = input.payerServiceId,
             fromPaymentDate = input.fromPaymentDate,
             toPaymentDate = input.toPaymentDate,

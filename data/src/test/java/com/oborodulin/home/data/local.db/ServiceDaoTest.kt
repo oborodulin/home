@@ -6,7 +6,10 @@ import android.os.Build
 import androidx.test.filters.SmallTest
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
+import com.oborodulin.home.data.local.db.dao.MeterDao
 import com.oborodulin.home.data.local.db.dao.ServiceDao
+import com.oborodulin.home.data.local.db.entities.MeterEntity
+import com.oborodulin.home.data.local.db.entities.PayerEntity
 import com.oborodulin.home.data.local.db.entities.ServiceEntity
 import com.oborodulin.home.data.local.db.entities.ServiceTlEntity
 import com.oborodulin.home.data.local.db.views.ServiceView
@@ -31,11 +34,13 @@ import java.util.*
 @SmallTest
 class ServiceDaoTest : HomeDatabaseTest() {
     private lateinit var serviceDao: ServiceDao
+    private lateinit var meterDao: MeterDao
 
     @Before
     override fun setUp() {
         super.setUp()
         serviceDao = serviceDao()
+        meterDao = meterDao()
     }
 
     @OptIn(ExperimentalCoroutinesApi::class)
@@ -79,6 +84,82 @@ class ServiceDaoTest : HomeDatabaseTest() {
             val service = awaitItem()
             assertThat(service).isNotNull()
             assertThat(service.data).isEqualTo(electricityService)
+            cancel()
+        }
+    }
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    @Test
+    fun findMeterAllowedServices_shouldReturn_theOrderedMeterAllowedServices_inFlow() = runTest {
+        // ARRANGE
+        val rentId = insertService(ctx, db, ServiceEntity.rentService())
+        // ACT
+        val hotWaterId = insertService(ctx, db, ServiceEntity.hotWaterService())
+        val wasteId = insertService(ctx, db, ServiceEntity.wasteService())
+        // ASSERT
+        serviceDao.findMeterAllowed().test {
+            val services = awaitItem()
+            assertThat(services).hasSize(2)
+            assertThat(services[0].data.serviceId).isEqualTo(wasteId)
+            assertThat(services[1].data.serviceId).isEqualTo(hotWaterId)
+            cancel()
+        }
+    }
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    @Test
+    fun findPayerServicesByPayerId_shouldReturn_theOrderedPayerServices_inFlow() = runTest {
+        // ARRANGE
+        val twoPersonsPayerId = PayerDaoTest.insertPayer(db, PayerEntity.payerWithTwoPersons(ctx))
+        val rentId = insertService(ctx, db, ServiceEntity.rentService())
+        val heatingId = ServiceDaoTest.insertService(ctx, db, ServiceEntity.heatingService())
+        // ACT
+        val payerRentId = PayerDaoTest.insertPayerService(db, twoPersonsPayerId, rentId)
+        val payerHeatingId = PayerDaoTest.insertPayerService(db, twoPersonsPayerId, heatingId)
+        // ASSERT
+        serviceDao.findDistinctByPayerId(twoPersonsPayerId).test {
+            val payerServices = awaitItem()
+            assertThat(payerServices).hasSize(2)
+            assertThat(payerServices[0].payerServiceId).isEqualTo(payerRentId)
+            assertThat(payerServices[1].payerServiceId).isEqualTo(payerHeatingId)
+            cancel()
+        }
+    }
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    @Test
+    fun findPayerServicesById_shouldReturn_thePayerService_inFlow() = runTest {
+        // ARRANGE
+        val twoPersonsPayerId = PayerDaoTest.insertPayer(db, PayerEntity.payerWithTwoPersons(ctx))
+        val rentId = insertService(ctx, db, ServiceEntity.rentService())
+        // ACT
+        val payerRentId = PayerDaoTest.insertPayerService(db, twoPersonsPayerId, rentId)
+        // ASSERT
+        serviceDao.findDistinctPayerServiceById(payerRentId).test {
+            val payerService = awaitItem()
+            assertThat(payerService).isNotNull()
+            assertThat(payerService.payerServiceId).isEqualTo(payerRentId)
+            cancel()
+        }
+    }
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    @Test
+    fun findPayerServiceByMeterId_shouldReturn_thePayerService_inFlow() = runTest {
+        // ARRANGE
+        val twoPersonsPayerId = PayerDaoTest.insertPayer(db, PayerEntity.payerWithTwoPersons(ctx))
+        val electricityId = insertService(ctx, db, ServiceEntity.electricityService())
+        val payerElectricityId =
+            PayerDaoTest.insertPayerService(db, twoPersonsPayerId, electricityId)
+        val electricityMeterId =
+            MeterDaoTest.insertMeter(ctx, db, MeterEntity.electricityMeter(ctx, twoPersonsPayerId))
+        // ACT
+        MeterDaoTest.insertMeterPayerService(db, electricityMeterId, payerElectricityId)
+        // ASSERT
+        serviceDao.findDistinctPayerServiceByMeterId(electricityMeterId).test {
+            val payerService = awaitItem()
+            assertThat(payerService).hasSize(1)
+            assertThat(payerService[0].payerServiceId).isEqualTo(payerElectricityId)
             cancel()
         }
     }
@@ -188,6 +269,32 @@ class ServiceDaoTest : HomeDatabaseTest() {
             cancel()
         }
     }
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    @Test
+    fun insertMeterPayerServicesAndFindPayerServiceByMeterId_shouldReturn_theOrderedPayerServices_inFlow() =
+        runTest {
+            // ARRANGE
+            val twoPersonsPayerId =
+                PayerDaoTest.insertPayer(db, PayerEntity.payerWithTwoPersons(ctx))
+            // Services:
+            val hotWaterId = insertService(ctx, db, ServiceEntity.hotWaterService())
+            val wasteId = insertService(ctx, db, ServiceEntity.wasteService())
+            // Meters:
+            val hotWaterMeterId =
+                MeterDaoTest.insertMeter(ctx, db, MeterEntity.hotWaterMeter(ctx, twoPersonsPayerId))
+            // ACT
+            MeterDaoTest.insertMeterPayerService(db, hotWaterMeterId, twoPersonsPayerId, hotWaterId)
+            MeterDaoTest.insertMeterPayerService(db, hotWaterMeterId, twoPersonsPayerId, wasteId)
+            // ASSERT
+            serviceDao.findDistinctPayerServiceByMeterId(hotWaterMeterId).test {
+                val services = awaitItem()
+                assertThat(services).hasSize(2)
+                assertThat(services[0].service.data.serviceId).isEqualTo(hotWaterId)
+                assertThat(services[1].service.data.serviceId).isEqualTo(wasteId)
+                cancel()
+            }
+        }
 
     @OptIn(ExperimentalCoroutinesApi::class)
     @Test(expected = SQLiteConstraintException::class)

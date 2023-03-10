@@ -9,8 +9,8 @@ class MeterToMeterTlEntityMapper : Mapper<Meter, MeterTlEntity> {
     override fun map(input: Meter) = MeterTlEntity(
         meterTlId = input.tl.id ?: input.tl.apply { id = UUID.randomUUID() }.id!!,
         metersId = input.id ?: input.apply { id = UUID.randomUUID() }.id!!,
-        localeCode = Locale.getDefault().language,
-        measureUnit = input.tl.measureUnit,
+        meterLocCode = Locale.getDefault().language,
+        meterMeasureUnit = input.tl.measureUnit,
         meterDesc = input.tl.meterDesc,
     )
 }

@@ -8,13 +8,13 @@ import java.time.OffsetDateTime
 import java.util.*
 
 data class Service(
-    val payerServiceId: UUID? = null,
-    val serviceTlId: UUID? = null,
+    var payerServiceId: UUID? = null,
+    var serviceTlId: UUID? = null,
     val servicePos: Int,
     val serviceName: String = "",
     val serviceType: ServiceType,
     val meterType: MeterType = MeterType.NONE,
-    val measureUnit: String? = null,
+    val serviceMeasureUnit: String? = null,
     val serviceDesc: String? = null,
     var isPrivileges: Boolean? = null,
     var isAllocateRate: Boolean? = null,

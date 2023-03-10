@@ -10,7 +10,7 @@ data class ServiceSubtotalListItem(
     val id: UUID,
     val serviceName: String = "",
     val serviceType: ServiceType,
-    val measureUnit: String? = null,
+    val serviceMeasureUnit: String? = null,
     val serviceDesc: String? = null,
     var isPrivileges: Boolean? = null,
     var isAllocateRate: Boolean? = null,

@@ -22,11 +22,11 @@ import java.util.*
 )
 data class MeterEntity(
     @PrimaryKey val meterId: UUID = UUID.randomUUID(),
-    val meterNum: String,
+    val meterNum: String = "",
     val meterType: MeterType,
     val maxValue: BigDecimal,
-    val passportDate: OffsetDateTime,
-    val initValue: BigDecimal = BigDecimal.ZERO,
+    val passportDate: OffsetDateTime? = null,
+    val initValue: BigDecimal? = null,
     val verificationPeriod: Int? = null,
     @ColumnInfo(index = true) val payersId: UUID,
 ) {
@@ -38,8 +38,8 @@ data class MeterEntity(
             meterNum: String = "",
             meterType: MeterType = MeterType.NONE,
             maxValue: BigDecimal = BigDecimal.valueOf(9999.999),
-            passportDate: OffsetDateTime = OffsetDateTime.now(),
-            initValue: BigDecimal = BigDecimal.ZERO,
+            passportDate: OffsetDateTime? = OffsetDateTime.now(),
+            initValue: BigDecimal? = BigDecimal.ZERO,
             verificationPeriod: Int? = null
         ) = MeterEntity(
             payersId = payerId,
@@ -52,40 +52,56 @@ data class MeterEntity(
             verificationPeriod = verificationPeriod
         )
 
-        fun electricityMeter(ctx: Context, payerId: UUID) = defaultMeter(
+        fun electricityMeter(
+            ctx: Context, payerId: UUID,
+            passportDate: OffsetDateTime? = null,
+            initValue: BigDecimal? = null
+        ) = defaultMeter(
             meterNum = ctx.resources.getString(R.string.def_meter_num),
             payerId = payerId,
             meterType = MeterType.ELECTRICITY,
             maxValue = BigDecimal.valueOf(9999),
-            passportDate = Utils.toOffsetDateTime("2022-06-19T14:29:10.212"),
-            initValue = BigDecimal.valueOf(9344)
+            passportDate = passportDate,// ?: Utils.toOffsetDateTime("2022-06-19T14:29:10.212"),
+            initValue = initValue// ?: BigDecimal.valueOf(9344)
         )
 
-        fun gasMeter(ctx: Context, payerId: UUID) = defaultMeter(
+        fun gasMeter(
+            ctx: Context, payerId: UUID,
+            passportDate: OffsetDateTime? = null,
+            initValue: BigDecimal? = null
+        ) = defaultMeter(
             meterNum = ctx.resources.getString(R.string.def_meter_num),
             payerId = payerId,
             meterType = MeterType.GAS,
-            maxValue = BigDecimal.valueOf(9999),
-            passportDate = Utils.toOffsetDateTime("2022-06-19T14:29:10.212"),
-            initValue = BigDecimal.valueOf(9344)
+            maxValue = BigDecimal.valueOf(9999.999),
+            passportDate = passportDate ?: Utils.toOffsetDateTime("2022-06-19T14:29:10.212"),
+            initValue = initValue ?: BigDecimal.valueOf(0.695)
         )
 
-        fun coldWaterMeter(ctx: Context, payerId: UUID) = defaultMeter(
+        fun coldWaterMeter(
+            ctx: Context, payerId: UUID,
+            passportDate: OffsetDateTime? = null,
+            initValue: BigDecimal? = null
+        ) = defaultMeter(
             meterNum = ctx.resources.getString(R.string.def_meter_num),
             payerId = payerId,
             meterType = MeterType.COLD_WATER,
             maxValue = BigDecimal.valueOf(99999.999),
-            passportDate = Utils.toOffsetDateTime("2022-08-11T14:29:10.212"),
-            initValue = BigDecimal.valueOf(1523.125)
+            passportDate = passportDate ?: Utils.toOffsetDateTime("2022-08-11T14:29:10.212"),
+            initValue = initValue ?: BigDecimal.valueOf(1523.125)
         )
 
-        fun hotWaterMeter(ctx: Context, payerId: UUID) = defaultMeter(
+        fun hotWaterMeter(
+            ctx: Context, payerId: UUID,
+            passportDate: OffsetDateTime? = null,
+            initValue: BigDecimal? = null
+        ) = defaultMeter(
             meterNum = ctx.resources.getString(R.string.def_meter_num),
             payerId = payerId,
             meterType = MeterType.HOT_WATER,
             maxValue = BigDecimal.valueOf(99999.999),
-            passportDate = Utils.toOffsetDateTime("2022-09-03T14:29:10.212"),
-            initValue = BigDecimal.valueOf(2145.755)
+            passportDate = passportDate ?: Utils.toOffsetDateTime("2022-09-03T14:29:10.212"),
+            initValue = initValue ?: BigDecimal.valueOf(2145.755)
         )
 
         fun heatingMeter(ctx: Context, payerId: UUID) = defaultMeter(

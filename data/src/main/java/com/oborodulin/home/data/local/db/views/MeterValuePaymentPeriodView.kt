@@ -14,16 +14,16 @@ import java.util.*
 @DatabaseView(
     viewName = MeterValuePaymentPeriodView.VIEW_NAME,
     value = """
-SELECT mv.*, lv.measureUnit, lv.isDerivedUnit, lv.derivedUnit, lv.localeCode, lv.maxValue,
+SELECT mvl.*, lv.measureUnit, lv.isDerivedUnit, lv.derivedUnit, lv.meterLocCode, lv.maxValue,
     lv.payerId, lv.payerServiceId, lv.paymentDate,
     CAST(strftime('%m', lv.paymentDate) AS INTEGER) AS paymentMonth, 
     CAST(strftime('%Y', lv.paymentDate) AS INTEGER) AS paymentYear
-FROM ${MeterValueEntity.TABLE_NAME} mv JOIN 
+FROM ${MeterValueEntity.TABLE_NAME} mvl JOIN 
     (SELECT mvp.payerId, ps.payerServiceId, mvp.meterId, MAX(strftime(${Constants.DB_FRACT_SEC_TIME}, mvp.valueDate)) maxValueDate, 
-        mvp.paymentDate, IFNULL(sv.measureUnit, mvp.measureUnit) AS measureUnit, 
-        mvp.isDerivedUnit, mvp.derivedUnit, mvp.localeCode, mvp.maxValue
-    FROM (SELECT mv.meterId, p.payerId, mv.meterType, v.valueDate, mv.measureUnit, mv.isDerivedUnit, 
-            mv.derivedUnit, mv.localeCode, mv.maxValue,
+        mvp.paymentDate, IFNULL(sv.serviceMeasureUnit, mvp.meterMeasureUnit) AS measureUnit, 
+        mvp.isDerivedUnit, mvp.derivedUnit, mvp.meterLocCode, mvp.maxValue
+    FROM (SELECT mv.meterId, p.payerId, mv.meterType, v.valueDate, mv.meterMeasureUnit, mv.isDerivedUnit, 
+            mv.derivedUnit, mv.meterLocCode, mv.maxValue,
             (CASE WHEN p.isAlignByPaymentDay = 0
                 THEN strftime(${Constants.DB_FRACT_SEC_TIME}, v.valueDate, 'start of month')
                 ELSE
@@ -41,20 +41,20 @@ FROM ${MeterValueEntity.TABLE_NAME} mv JOIN
             JOIN ${PayerEntity.TABLE_NAME} p ON p.payerId = mv.payersId) mvp
         JOIN ${PayerServiceMeterCrossRefEntity.TABLE_NAME} psm ON psm.metersId = mvp.meterId 
         JOIN ${PayerServiceCrossRefEntity.TABLE_NAME} ps ON ps.payerServiceId = psm.payersServicesId
-        JOIN ${ServiceView.VIEW_NAME} sv ON sv.serviceId = ps.servicesId AND sv.localeCode = mvp.localeCode
-    GROUP BY mvp.payerId, ps.payerServiceId, mvp.meterId, mvp.paymentDate, sv.measureUnit, mvp.measureUnit,
-            mvp.isDerivedUnit, mvp.derivedUnit, mvp.localeCode, mvp.maxValue) lv 
-        ON mv.metersId = lv.meterId 
-        AND strftime(${Constants.DB_FRACT_SEC_TIME}, mv.valueDate) = lv.maxValueDate
+        JOIN ${ServiceView.VIEW_NAME} sv ON sv.serviceId = ps.servicesId AND sv.serviceLocCode = mvp.meterLocCode
+    GROUP BY mvp.payerId, ps.payerServiceId, mvp.meterId, mvp.paymentDate, sv.serviceMeasureUnit, mvp.meterMeasureUnit,
+            mvp.isDerivedUnit, mvp.derivedUnit, mvp.meterLocCode, mvp.maxValue) lv 
+        ON mvl.metersId = lv.meterId 
+        AND strftime(${Constants.DB_FRACT_SEC_TIME}, mvl.valueDate) = lv.maxValueDate
 """
 )
 class MeterValuePaymentPeriodView(
     @Embedded
-    val data: MeterValueEntity,
-    val measureUnit: String,
+    val meterValue: MeterValueEntity,
+    val meterMeasureUnit: String,
     val isDerivedUnit: Boolean,
     val derivedUnit: String,
-    val localeCode: String,
+    val meterLocCode: String,
     val maxValue: BigDecimal,
     val payerId: UUID,
     val payerServiceId: UUID,

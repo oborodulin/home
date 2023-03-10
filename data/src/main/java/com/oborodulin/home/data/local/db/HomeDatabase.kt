@@ -61,7 +61,7 @@ private val MIGRATION_4_5 = object : Migration(4, 5) {
         MeterEntity::class, MeterTlEntity::class, MeterValueEntity::class, MeterVerificationEntity::class,
         PayerServiceMeterCrossRefEntity::class,
         ReceiptEntity::class, ReceiptLineEntity::class],
-    views = [MeterView::class, ServiceView::class, ReceiptView::class,
+    views = [MeterView::class, MeterPayerServiceView::class, ServiceView::class, ReceiptView::class,
         MeterValueMaxPrevDateView::class, MeterValuePrevPeriodView::class,
         MeterValuePaymentPeriodView::class, MeterValuePaymentView::class,
         PayerServiceView::class, RatePayerServiceView::class,
@@ -278,35 +278,25 @@ abstract class HomeDatabase : RoomDatabase() {
                     insertPayerService(db, payer = payer1Entity, serviceId = gasService.serviceId)
                 val coldWaterPayer1ServiceId =
                     insertPayerService(
-                        db,
-                        payer = payer1Entity,
-                        serviceId = coldWaterService.serviceId
+                        db, payer = payer1Entity, serviceId = coldWaterService.serviceId
                     )
                 val wastePayer1ServiceId =
                     insertPayerService(db, payer = payer1Entity, serviceId = wasteService.serviceId)
                 val heatingPayer1ServiceId =
                     insertPayerService(
-                        db,
-                        payer = payer1Entity,
-                        serviceId = heatingService.serviceId
+                        db, payer = payer1Entity, serviceId = heatingService.serviceId
                     )
                 val hotWaterPayer1ServiceId =
                     insertPayerService(
-                        db,
-                        payer = payer1Entity,
-                        serviceId = hotWaterService.serviceId
+                        db, payer = payer1Entity, serviceId = hotWaterService.serviceId
                     )
                 val garbagePayer1ServiceId =
                     insertPayerService(
-                        db,
-                        payer = payer1Entity,
-                        serviceId = garbageService.serviceId
+                        db, payer = payer1Entity, serviceId = garbageService.serviceId
                     )
                 val doorphonePayer1ServiceId =
                     insertPayerService(
-                        db,
-                        payer = payer1Entity,
-                        serviceId = doorphoneService.serviceId
+                        db, payer = payer1Entity, serviceId = doorphoneService.serviceId
                     )
                 val phonePayer1ServiceId =
                     insertPayerService(db, payer = payer1Entity, serviceId = phoneService.serviceId)
@@ -325,19 +315,19 @@ abstract class HomeDatabase : RoomDatabase() {
                 )
                 // values:
                 insertDefMeterValue(
-                    db, MeterValueEntity.populateElectricityMeterValue1(
+                    db, MeterValueEntity.electricityMeterValue1(
                         electricityPayer1Meter.meterId,
                         currentDateTime.minusMonths(2).withDayOfMonth(1)
                     )
                 )
                 insertDefMeterValue(
-                    db, MeterValueEntity.populateElectricityMeterValue2(
+                    db, MeterValueEntity.electricityMeterValue2(
                         electricityPayer1Meter.meterId,
                         currentDateTime.minusMonths(1).withDayOfMonth(1)
                     )
                 )
                 insertDefMeterValue(
-                    db, MeterValueEntity.populateElectricityMeterValue3(
+                    db, MeterValueEntity.electricityMeterValue3(
                         electricityPayer1Meter.meterId,
                         currentDateTime.withDayOfMonth(1)
                     )
@@ -351,19 +341,19 @@ abstract class HomeDatabase : RoomDatabase() {
                 )
                 // values:
                 insertDefMeterValue(
-                    db, MeterValueEntity.populateColdWaterMeterValue1(
+                    db, MeterValueEntity.coldWaterMeterValue1(
                         coldWaterPayer1Meter.meterId,
                         currentDateTime.minusMonths(2).withDayOfMonth(1)
                     )
                 )
                 insertDefMeterValue(
-                    db, MeterValueEntity.populateColdWaterMeterValue2(
+                    db, MeterValueEntity.coldWaterMeterValue2(
                         coldWaterPayer1Meter.meterId,
                         currentDateTime.minusMonths(1).withDayOfMonth(1)
                     )
                 )
                 insertDefMeterValue(
-                    db, MeterValueEntity.populateColdWaterMeterValue3(
+                    db, MeterValueEntity.coldWaterMeterValue3(
                         coldWaterPayer1Meter.meterId,
                         currentDateTime.withDayOfMonth(1)
                     )
@@ -387,19 +377,19 @@ abstract class HomeDatabase : RoomDatabase() {
                 )
                 // values:
                 insertDefMeterValue(
-                    db, MeterValueEntity.populateHeatingMeterValue1(
+                    db, MeterValueEntity.heatingMeterValue1(
                         heatingPayer1Meter.meterId,
                         currentDateTime.minusMonths(2).withDayOfMonth(1)
                     )
                 )
                 insertDefMeterValue(
-                    db, MeterValueEntity.populateHeatingMeterValue2(
+                    db, MeterValueEntity.heatingMeterValue2(
                         heatingPayer1Meter.meterId,
                         currentDateTime.minusMonths(1).withDayOfMonth(1)
                     )
                 )
                 insertDefMeterValue(
-                    db, MeterValueEntity.populateHeatingMeterValue3(
+                    db, MeterValueEntity.heatingMeterValue3(
                         heatingPayer1Meter.meterId,
                         currentDateTime.withDayOfMonth(1)
                     )
@@ -504,19 +494,19 @@ abstract class HomeDatabase : RoomDatabase() {
                 )
                 // values:
                 insertDefMeterValue(
-                    db, MeterValueEntity.populateElectricityMeterValue1(
+                    db, MeterValueEntity.electricityMeterValue1(
                         electricityPayer2Meter.meterId,
                         currentDateTime.minusMonths(2).withDayOfMonth(1)
                     )
                 )
                 insertDefMeterValue(
-                    db, MeterValueEntity.populateElectricityMeterValue2(
+                    db, MeterValueEntity.electricityMeterValue2(
                         electricityPayer2Meter.meterId,
                         currentDateTime.minusMonths(1).withDayOfMonth(1)
                     )
                 )
                 insertDefMeterValue(
-                    db, MeterValueEntity.populateElectricityMeterValue3(
+                    db, MeterValueEntity.electricityMeterValue3(
                         electricityPayer2Meter.meterId,
                         currentDateTime.withDayOfMonth(1)
                     )
@@ -530,19 +520,19 @@ abstract class HomeDatabase : RoomDatabase() {
                 )
                 // values:
                 insertDefMeterValue(
-                    db, MeterValueEntity.populateColdWaterMeterValue1(
+                    db, MeterValueEntity.coldWaterMeterValue1(
                         coldWaterPayer2Meter.meterId,
                         currentDateTime.minusMonths(2).withDayOfMonth(1)
                     )
                 )
                 insertDefMeterValue(
-                    db, MeterValueEntity.populateColdWaterMeterValue2(
+                    db, MeterValueEntity.coldWaterMeterValue2(
                         coldWaterPayer2Meter.meterId,
                         currentDateTime.minusMonths(1).withDayOfMonth(1)
                     )
                 )
                 insertDefMeterValue(
-                    db, MeterValueEntity.populateColdWaterMeterValue3(
+                    db, MeterValueEntity.coldWaterMeterValue3(
                         coldWaterPayer2Meter.meterId,
                         currentDateTime.withDayOfMonth(1)
                     )
@@ -556,19 +546,19 @@ abstract class HomeDatabase : RoomDatabase() {
                 )
                 // values:
                 insertDefMeterValue(
-                    db, MeterValueEntity.populateHotWaterMeterValue1(
+                    db, MeterValueEntity.hotWaterMeterValue1(
                         hotWaterPayer2Meter.meterId,
                         currentDateTime.minusMonths(2).withDayOfMonth(1)
                     )
                 )
                 insertDefMeterValue(
-                    db, MeterValueEntity.populateHotWaterMeterValue2(
+                    db, MeterValueEntity.hotWaterMeterValue2(
                         hotWaterPayer2Meter.meterId,
                         currentDateTime.minusMonths(1).withDayOfMonth(1)
                     )
                 )
                 insertDefMeterValue(
-                    db, MeterValueEntity.populateHotWaterMeterValue3(
+                    db, MeterValueEntity.hotWaterMeterValue3(
                         hotWaterPayer2Meter.meterId,
                         currentDateTime.withDayOfMonth(1)
                     )

@@ -7,7 +7,7 @@ import java.util.*
 
 @Entity(
     tableName = ServiceTlEntity.TABLE_NAME,
-    indices = [Index(value = ["localeCode", "servicesId"], unique = true)],
+    indices = [Index(value = ["serviceLocCode", "servicesId"], unique = true)],
     foreignKeys = [ForeignKey(
         entity = ServiceEntity::class,
         parentColumns = arrayOf("serviceId"),
@@ -18,9 +18,9 @@ import java.util.*
 )
 class ServiceTlEntity(
     @PrimaryKey val serviceTlId: UUID = UUID.randomUUID(),
-    val localeCode: String = Locale.getDefault().language,
+    val serviceLocCode: String = Locale.getDefault().language,
     val serviceName: String = "",
-    var measureUnit: String? = null,
+    var serviceMeasureUnit: String? = null,
     val serviceDesc: String? = null,
     @ColumnInfo(index = true) val servicesId: UUID,
 ) {
@@ -36,9 +36,9 @@ class ServiceTlEntity(
         ) = ServiceTlEntity(
             servicesId = serviceId,
             serviceTlId = serviceTlId,
-            localeCode = localeCode,
+            serviceLocCode = localeCode,
             serviceName = serviceName,
-            measureUnit = measureUnit,
+            serviceMeasureUnit = measureUnit,
             serviceDesc = serviceDesc
         )
 

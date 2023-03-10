@@ -10,7 +10,7 @@ class ServiceToServiceSubtotalListItemMapper : Mapper<Service, com.oborodulin.ho
             id = input.id ?: UUID.randomUUID(),
             serviceName = input.serviceName,
             serviceType = input.serviceType,
-            measureUnit = input.measureUnit,
+            serviceMeasureUnit = input.serviceMeasureUnit,
             serviceDesc = input.serviceDesc,
             isPrivileges = input.isPrivileges,
             isAllocateRate = input.isAllocateRate,

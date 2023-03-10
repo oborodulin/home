@@ -15,7 +15,7 @@ data class ServiceEntity(
     @PrimaryKey val serviceId: UUID = UUID.randomUUID(),
     var servicePos: Int? = null,
     val serviceType: ServiceType,
-    val meterType: MeterType = MeterType.NONE
+    val serviceMeterType: MeterType = MeterType.NONE
 ) {
     companion object {
         const val TABLE_NAME = "services"
@@ -29,7 +29,7 @@ data class ServiceEntity(
             serviceId = serviceId,
             servicePos = servicePos,
             serviceType = serviceType,
-            meterType = meterType
+            serviceMeterType = meterType
         )
 
         fun rentService(serviceId: UUID = UUID.randomUUID()) =
