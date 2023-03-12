@@ -25,8 +25,12 @@ data class MeterTlEntity(
     companion object {
         const val TABLE_NAME = "meters_tl"
 
-        fun defaultMeterTl(meterId: UUID, measureUnit: String, meterDesc: String? = null) =
+        fun defaultMeterTl(
+            meterTlId: UUID = UUID.randomUUID(), meterId: UUID,
+            measureUnit: String, meterDesc: String? = null
+        ) =
             MeterTlEntity(
+                meterTlId = meterTlId,
                 meterMeasureUnit = measureUnit,
                 meterDesc = meterDesc,
                 metersId = meterId

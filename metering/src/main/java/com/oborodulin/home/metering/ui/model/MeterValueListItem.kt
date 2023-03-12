@@ -1,5 +1,6 @@
 package com.oborodulin.home.metering.ui.model
 
+import com.oborodulin.home.data.util.MeterType
 import com.oborodulin.home.data.util.ServiceType
 import java.math.BigDecimal
 import java.time.OffsetDateTime
@@ -11,6 +12,7 @@ data class MeterValueListItem(
     val metersId: UUID,
     val serviceType: ServiceType? = null,
     val serviceName: String = "",
+    val meterType: MeterType? = null,
     val meterMeasureUnit: String? = null,
     val prevLastDate: OffsetDateTime? = null,
     val prevValue: BigDecimal? = null,

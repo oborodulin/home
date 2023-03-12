@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 5,
-    "identityHash": "ae923dfb32a0549c1626335b7c841574",
+    "identityHash": "fe869a77387bcd53bb16c05935529c30",
     "entities": [
       {
         "tableName": "payers",
@@ -226,12 +226,18 @@
       },
       {
         "tableName": "payers_services",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`payerServiceId` TEXT NOT NULL, `isPrivileges` INTEGER NOT NULL, `isAllocateRate` INTEGER NOT NULL, `payersId` TEXT NOT NULL, `servicesId` TEXT NOT NULL, PRIMARY KEY(`payerServiceId`), FOREIGN KEY(`payersId`) REFERENCES `payers`(`payerId`) ON UPDATE NO ACTION ON DELETE CASCADE DEFERRABLE INITIALLY DEFERRED, FOREIGN KEY(`servicesId`) REFERENCES `services`(`serviceId`) ON UPDATE NO ACTION ON DELETE CASCADE DEFERRABLE INITIALLY DEFERRED)",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`payerServiceId` TEXT NOT NULL, `isMeterOwner` INTEGER NOT NULL, `isPrivileges` INTEGER NOT NULL, `isAllocateRate` INTEGER NOT NULL, `payersId` TEXT NOT NULL, `servicesId` TEXT NOT NULL, PRIMARY KEY(`payerServiceId`), FOREIGN KEY(`payersId`) REFERENCES `payers`(`payerId`) ON UPDATE NO ACTION ON DELETE CASCADE DEFERRABLE INITIALLY DEFERRED, FOREIGN KEY(`servicesId`) REFERENCES `services`(`serviceId`) ON UPDATE NO ACTION ON DELETE CASCADE DEFERRABLE INITIALLY DEFERRED)",
         "fields": [
           {
             "fieldPath": "payerServiceId",
             "columnName": "payerServiceId",
             "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "isMeterOwner",
+            "columnName": "isMeterOwner",
+            "affinity": "INTEGER",
             "notNull": true
           },
           {
@@ -664,15 +670,16 @@
         },
         "indices": [
           {
-            "name": "index_meters_payersId_meterNum_meterType",
+            "name": "index_meters_payersId_meterNum_meterType_passportDate",
             "unique": true,
             "columnNames": [
               "payersId",
               "meterNum",
-              "meterType"
+              "meterType",
+              "passportDate"
             ],
             "orders": [],
-            "createSql": "CREATE UNIQUE INDEX IF NOT EXISTS `index_meters_payersId_meterNum_meterType` ON `${TABLE_NAME}` (`payersId`, `meterNum`, `meterType`)"
+            "createSql": "CREATE UNIQUE INDEX IF NOT EXISTS `index_meters_payersId_meterNum_meterType_passportDate` ON `${TABLE_NAME}` (`payersId`, `meterNum`, `meterType`, `passportDate`)"
           },
           {
             "name": "index_meters_payersId",
@@ -899,90 +906,6 @@
           }
         ],
         "foreignKeys": [
-          {
-            "table": "meters",
-            "onDelete": "CASCADE",
-            "onUpdate": "NO ACTION",
-            "columns": [
-              "metersId"
-            ],
-            "referencedColumns": [
-              "meterId"
-            ]
-          }
-        ]
-      },
-      {
-        "tableName": "payers_services_meters",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`payerServiceMeterId` TEXT NOT NULL, `payersServicesId` TEXT NOT NULL, `metersId` TEXT NOT NULL, PRIMARY KEY(`payerServiceMeterId`), FOREIGN KEY(`payersServicesId`) REFERENCES `payers_services`(`payerServiceId`) ON UPDATE NO ACTION ON DELETE CASCADE DEFERRABLE INITIALLY DEFERRED, FOREIGN KEY(`metersId`) REFERENCES `meters`(`meterId`) ON UPDATE NO ACTION ON DELETE CASCADE DEFERRABLE INITIALLY DEFERRED)",
-        "fields": [
-          {
-            "fieldPath": "payerServiceMeterId",
-            "columnName": "payerServiceMeterId",
-            "affinity": "TEXT",
-            "notNull": true
-          },
-          {
-            "fieldPath": "payersServicesId",
-            "columnName": "payersServicesId",
-            "affinity": "TEXT",
-            "notNull": true
-          },
-          {
-            "fieldPath": "metersId",
-            "columnName": "metersId",
-            "affinity": "TEXT",
-            "notNull": true
-          }
-        ],
-        "primaryKey": {
-          "columnNames": [
-            "payerServiceMeterId"
-          ],
-          "autoGenerate": false
-        },
-        "indices": [
-          {
-            "name": "index_payers_services_meters_payersServicesId_metersId",
-            "unique": true,
-            "columnNames": [
-              "payersServicesId",
-              "metersId"
-            ],
-            "orders": [],
-            "createSql": "CREATE UNIQUE INDEX IF NOT EXISTS `index_payers_services_meters_payersServicesId_metersId` ON `${TABLE_NAME}` (`payersServicesId`, `metersId`)"
-          },
-          {
-            "name": "index_payers_services_meters_payersServicesId",
-            "unique": false,
-            "columnNames": [
-              "payersServicesId"
-            ],
-            "orders": [],
-            "createSql": "CREATE INDEX IF NOT EXISTS `index_payers_services_meters_payersServicesId` ON `${TABLE_NAME}` (`payersServicesId`)"
-          },
-          {
-            "name": "index_payers_services_meters_metersId",
-            "unique": false,
-            "columnNames": [
-              "metersId"
-            ],
-            "orders": [],
-            "createSql": "CREATE INDEX IF NOT EXISTS `index_payers_services_meters_metersId` ON `${TABLE_NAME}` (`metersId`)"
-          }
-        ],
-        "foreignKeys": [
-          {
-            "table": "payers_services",
-            "onDelete": "CASCADE",
-            "onUpdate": "NO ACTION",
-            "columns": [
-              "payersServicesId"
-            ],
-            "referencedColumns": [
-              "payerServiceId"
-            ]
-          },
           {
             "table": "meters",
             "onDelete": "CASCADE",
@@ -1311,11 +1234,11 @@
       },
       {
         "viewName": "meter_payer_services_view",
-        "createSql": "CREATE VIEW `${VIEW_NAME}` AS SELECT m.*, s.*, ps.payerServiceId, ps.isPrivileges, ps.isAllocateRate\nFROM meters_view m JOIN payers_services_meters psm ON psm.metersId = m.meterId\n    JOIN payers_services ps ON ps.payerServiceId = psm.payersServicesId\n    JOIN services_view s ON s.serviceId = ps.servicesId AND s.serviceLocCode = m.meterLocCode \nORDER BY ps.payersId, s.servicePos"
+        "createSql": "CREATE VIEW `${VIEW_NAME}` AS SELECT m.*, s.*, ps.payerServiceId, ps.isMeterOwner, ps.isPrivileges, ps.isAllocateRate\nFROM meters_view m JOIN services_view s ON s.serviceMeterType = m.meterType \n                                                            AND s.serviceLocCode = m.meterLocCode\n    JOIN payers_services ps ON ps.payersId = m.payersId \n                                                    AND ps.servicesId = s.serviceId \nORDER BY m.payersId, s.servicePos"
       },
       {
         "viewName": "meter_value_payment_periods_view",
-        "createSql": "CREATE VIEW `${VIEW_NAME}` AS SELECT mvl.*, lv.measureUnit, lv.isDerivedUnit, lv.derivedUnit, lv.meterLocCode, lv.maxValue,\n    lv.payerId, lv.payerServiceId, lv.paymentDate,\n    CAST(strftime('%m', lv.paymentDate) AS INTEGER) AS paymentMonth, \n    CAST(strftime('%Y', lv.paymentDate) AS INTEGER) AS paymentYear\nFROM meter_values mvl JOIN \n    (SELECT mvp.payerId, ps.payerServiceId, mvp.meterId, MAX(strftime('%Y-%m-%dT%H:%M:%f', mvp.valueDate)) maxValueDate, \n        mvp.paymentDate, IFNULL(sv.serviceMeasureUnit, mvp.meterMeasureUnit) AS measureUnit, \n        mvp.isDerivedUnit, mvp.derivedUnit, mvp.meterLocCode, mvp.maxValue\n    FROM (SELECT mv.meterId, p.payerId, mv.meterType, v.valueDate, mv.meterMeasureUnit, mv.isDerivedUnit, \n            mv.derivedUnit, mv.meterLocCode, mv.maxValue,\n            (CASE WHEN p.isAlignByPaymentDay = 0\n                THEN strftime('%Y-%m-%dT%H:%M:%f', v.valueDate, 'start of month')\n                ELSE\n                    CASE WHEN datetime(v.valueDate) \n                            BETWEEN datetime(v.valueDate, 'start of month') \n                                AND datetime(v.valueDate, 'start of month', '+' || (IFNULL(p.paymentDay, 20) - 1) || ' days') \n                        THEN strftime('%Y-%m-%dT%H:%M:%f', v.valueDate, 'start of month')\n                        WHEN datetime(v.valueDate) \n                            BETWEEN datetime(v.valueDate, 'start of month', '+' || IFNULL(p.paymentDay, 20) || ' days') \n                                AND datetime(v.valueDate, '+1 months', 'start of month') \n                        THEN strftime('%Y-%m-%dT%H:%M:%f', v.valueDate, '+1 months', 'start of month') \n                    END\n            END) paymentDate\n        FROM meter_values v JOIN meters_view mv ON mv.meterId = v.metersId\n            JOIN payers p ON p.payerId = mv.payersId) mvp\n        JOIN payers_services_meters psm ON psm.metersId = mvp.meterId \n        JOIN payers_services ps ON ps.payerServiceId = psm.payersServicesId\n        JOIN services_view sv ON sv.serviceId = ps.servicesId AND sv.serviceLocCode = mvp.meterLocCode\n    GROUP BY mvp.payerId, ps.payerServiceId, mvp.meterId, mvp.paymentDate, sv.serviceMeasureUnit, mvp.meterMeasureUnit,\n            mvp.isDerivedUnit, mvp.derivedUnit, mvp.meterLocCode, mvp.maxValue) lv \n        ON mvl.metersId = lv.meterId \n        AND strftime('%Y-%m-%dT%H:%M:%f', mvl.valueDate) = lv.maxValueDate"
+        "createSql": "CREATE VIEW `${VIEW_NAME}` AS SELECT mvl.*, lv.measureUnit, lv.isDerivedUnit, lv.derivedUnit, lv.meterLocCode, lv.maxValue,\n    lv.payerId, lv.payerServiceId, lv.paymentDate,\n    CAST(strftime('%m', lv.paymentDate) AS INTEGER) AS paymentMonth, \n    CAST(strftime('%Y', lv.paymentDate) AS INTEGER) AS paymentYear\nFROM meter_values mvl JOIN \n    (SELECT mvp.payerId, ps.payerServiceId, mvp.meterId, MAX(strftime('%Y-%m-%dT%H:%M:%f', mvp.valueDate)) maxValueDate, \n        mvp.paymentDate, IFNULL(sv.serviceMeasureUnit, mvp.meterMeasureUnit) AS measureUnit, \n        mvp.isDerivedUnit, mvp.derivedUnit, mvp.meterLocCode, mvp.maxValue\n    FROM (SELECT mv.meterId, p.payerId, mv.meterType, v.valueDate, mv.meterMeasureUnit, mv.isDerivedUnit, \n            mv.derivedUnit, mv.meterLocCode, mv.maxValue,\n            (CASE WHEN p.isAlignByPaymentDay = 0\n                THEN strftime('%Y-%m-%dT%H:%M:%f', v.valueDate, 'start of month')\n                ELSE\n                    CASE WHEN datetime(v.valueDate) \n                            BETWEEN datetime(v.valueDate, 'start of month') \n                                AND datetime(v.valueDate, 'start of month', '+' || (IFNULL(p.paymentDay, 20) - 1) || ' days') \n                        THEN strftime('%Y-%m-%dT%H:%M:%f', v.valueDate, 'start of month')\n                        WHEN datetime(v.valueDate) \n                            BETWEEN datetime(v.valueDate, 'start of month', '+' || IFNULL(p.paymentDay, 20) || ' days') \n                                AND datetime(v.valueDate, '+1 months', 'start of month') \n                        THEN strftime('%Y-%m-%dT%H:%M:%f', v.valueDate, '+1 months', 'start of month') \n                    END\n            END) paymentDate\n        FROM meter_values v JOIN meters_view mv ON mv.meterId = v.metersId\n            JOIN payers p ON p.payerId = mv.payersId) mvp\n        JOIN services_view sv ON sv.serviceMeterType = mvp.meterType AND sv.serviceLocCode = mvp.meterLocCode\n        JOIN payers_services ps ON ps.payersId = mvp.payersId AND ps.servicesId = sv.serviceId \n    GROUP BY mvp.payerId, ps.payerServiceId, mvp.meterId, mvp.paymentDate, sv.serviceMeasureUnit, mvp.meterMeasureUnit,\n            mvp.isDerivedUnit, mvp.derivedUnit, mvp.meterLocCode, mvp.maxValue) lv \n        ON mvl.metersId = lv.meterId \n        AND strftime('%Y-%m-%dT%H:%M:%f', mvl.valueDate) = lv.maxValueDate"
       },
       {
         "viewName": "payer_services_view",
@@ -1323,7 +1246,7 @@
       },
       {
         "viewName": "meter_value_prev_periods_view",
-        "createSql": "CREATE VIEW `${VIEW_NAME}` AS SELECT mvf.meterValueId, p.payerId, sv.serviceId, sv.serviceType, sv.serviceName, sv.servicePos, \n    mvf.meterId, IFNULL(mvf.meterMeasureUnit, sv.serviceMeasureUnit) AS measureUnit,\n    mvf.prevLastDate, mvf.prevValue, p.isFavorite, \n    (SELECT vl.meterValue FROM meter_values vl\n        WHERE vl.metersId = mvf.meterId\n            AND strftime('%Y-%m-%dT%H:%M:%f', vl.valueDate) = \n                    (SELECT MAX(strftime('%Y-%m-%dT%H:%M:%f', v.valueDate)) FROM meter_values v\n                        WHERE v.metersId = mvf.meterId\n                            AND strftime('%Y-%m-%dT%H:%M:%f', v.valueDate) > mpd.maxValueDate)\n    ) AS currentValue,\n    mvf.meterLocCode, sv.serviceLocCode, mvf.valueFormat\nFROM (SELECT mvl.meterValueId, mv.payersId, mv.servicesId, mv.meterId, mv.meterType, mv.meterMeasureUnit, \n        IFNULL(strftime('%Y-%m-%dT%H:%M:%f', mvl.valueDate), \n                strftime('%Y-%m-%dT%H:%M:%f', mv.passportDate, 'start of month', '-1 days')) AS prevLastDate, \n        IFNULL(mvl.meterValue, mv.initValue) AS prevValue, mv.meterLocCode,\n        substr('#0.' || '0000000000', 1, 3 + (length(cast(mv.maxValue / 100000.0 as text)) - \n            CASE WHEN instr(cast(mv.maxValue / 100000.0 as text), '.') = \n                                    length(cast(mv.maxValue / 100000.0 as text)) - 1\n                THEN length(cast(mv.maxValue / 100000.0 as text)) + 1 \n                ELSE instr(cast(mv.maxValue / 100000.0 as text), '.') \n            END)\n        ) AS valueFormat \n    FROM meter_payer_services_view mv LEFT JOIN meter_values mvl ON mvl.metersId = mv.meterId) mvf\n        JOIN services_view sv ON sv.serviceId = mvf.servicesId AND sv.serviceMeterType = mvf.meterType\n        JOIN payers p ON p.payerId = mvf.payersId\n        JOIN meter_value_max_prev_dates_view mpd ON mpd.meterId = mvf.meterId AND mpd.maxValueDate = mvf.prevLastDate"
+        "createSql": "CREATE VIEW `${VIEW_NAME}` AS SELECT mvf.meterValueId, p.payerId, sv.serviceId, sv.serviceType, sv.serviceName, sv.servicePos, \n    mvf.meterId, mvf.meterType, IFNULL(mvf.meterMeasureUnit, sv.serviceMeasureUnit) AS measureUnit,\n    mvf.prevLastDate, mvf.prevValue, p.isFavorite, \n    (SELECT vl.meterValue FROM meter_values vl\n        WHERE vl.metersId = mvf.meterId\n            AND strftime('%Y-%m-%dT%H:%M:%f', vl.valueDate) = \n                    (SELECT MAX(strftime('%Y-%m-%dT%H:%M:%f', v.valueDate)) FROM meter_values v\n                        WHERE v.metersId = mvf.meterId\n                            AND strftime('%Y-%m-%dT%H:%M:%f', v.valueDate) > mpd.maxValueDate)\n    ) AS currentValue,\n    mvf.meterLocCode, sv.serviceLocCode, mvf.valueFormat\nFROM (SELECT mvl.meterValueId, mv.payersId, mv.servicesId, mv.meterId, mv.meterType, mv.meterMeasureUnit, \n        IFNULL(strftime('%Y-%m-%dT%H:%M:%f', mvl.valueDate), \n                strftime('%Y-%m-%dT%H:%M:%f', mv.passportDate, 'start of month', '-1 days')) AS prevLastDate, \n        IFNULL(mvl.meterValue, mv.initValue) AS prevValue, mv.meterLocCode,\n        substr('#0.' || '0000000000', 1, 3 + (length(cast(mv.maxValue / 100000.0 as text)) - \n            CASE WHEN instr(cast(mv.maxValue / 100000.0 as text), '.') = \n                                    length(cast(mv.maxValue / 100000.0 as text)) - 1\n                THEN length(cast(mv.maxValue / 100000.0 as text)) + 1 \n                ELSE instr(cast(mv.maxValue / 100000.0 as text), '.') \n            END)\n        ) AS valueFormat \n    FROM meter_payer_services_view mv LEFT JOIN meter_values mvl ON mvl.metersId = mv.meterId\n            AND mv.isMeterOwner = 1) mvf\n        JOIN services_view sv ON sv.serviceId = mvf.servicesId AND sv.serviceMeterType = mvf.meterType\n        JOIN payers p ON p.payerId = mvf.payersId\n        JOIN meter_value_max_prev_dates_view mpd ON mpd.meterId = mvf.meterId AND mpd.maxValueDate = mvf.prevLastDate\nORDER BY p.payerId, sv.servicePos"
       },
       {
         "viewName": "meter_value_payments_view",
@@ -1348,7 +1271,7 @@
     ],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'ae923dfb32a0549c1626335b7c841574')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'fe869a77387bcd53bb16c05935529c30')"
     ]
   }
 }

@@ -2,10 +2,11 @@ package com.oborodulin.home.data.local.db
 
 import android.content.Context
 import android.os.Build
-import androidx.room.withTransaction
 import androidx.test.filters.MediumTest
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
+import com.oborodulin.home.common.util.Constants
+import com.oborodulin.home.data.local.db.converters.DateTypeConverter
 import com.oborodulin.home.data.local.db.dao.MeterDao
 import com.oborodulin.home.data.local.db.dao.PayerDao
 import com.oborodulin.home.data.local.db.entities.*
@@ -21,6 +22,7 @@ import org.robolectric.annotation.Config
 import timber.log.Timber
 import java.math.BigDecimal
 import java.time.OffsetDateTime
+import java.time.format.DateTimeFormatter
 import java.util.*
 
 /**
@@ -36,6 +38,8 @@ private const val TAG = "Testing.local.db"
 class MeterDaoTest : HomeDatabaseTest() {
     private lateinit var meterDao: MeterDao
     private lateinit var payerDao: PayerDao
+
+    data class MeterIds(val meterId: UUID, val meterTlId: UUID)
 
     @Before
     override fun setUp() {
@@ -65,17 +69,26 @@ class MeterDaoTest : HomeDatabaseTest() {
 
     @OptIn(ExperimentalCoroutinesApi::class)
     @Test
-    fun insertMeterAndFindById_shouldReturn_theMeter_inFlow() = runTest {
+    fun updateMeterAndFindById_shouldReturn_theUpdatedMeter_inFlow() = runTest {
         // ARRANGE
         val actualPayerId = PayerDaoTest.insertPayer(db, PayerEntity.payerWithTwoPersons(ctx))
-        val electricityMeter = MeterEntity.electricityMeter(ctx, actualPayerId)
+        val actualMeterIds = insertMeter(ctx, db, MeterEntity.electricityMeter(ctx, actualPayerId))
+        val updatedMeter = MeterEntity.defaultMeter(
+            payerId = actualPayerId, meterId = actualMeterIds.meterId,
+            meterType = MeterType.COLD_WATER,
+            maxValue = BigDecimal.valueOf(9999.999)
+        )
+        val updatedMeterTl = MeterTlEntity.defaultMeterTl(
+            meterTlId = actualMeterIds.meterTlId, meterId = actualMeterIds.meterId, measureUnit = ""
+        )
         // ACT
-        val meterId = insertMeter(ctx, db, electricityMeter)
+        meterDao.update(updatedMeter, updatedMeterTl)
         // ASSERT
-        meterDao.findDistinctById(meterId).test {
+        meterDao.findDistinctById(actualMeterIds.meterId).test {
             val meter = awaitItem()
             assertThat(meter).isNotNull()
-            assertThat(meter.data).isEqualTo(electricityMeter)
+            assertThat(meter.data).isEqualTo(updatedMeter)
+            assertThat(meter.tl).isEqualTo(updatedMeterTl)
             cancel()
         }
     }
@@ -104,15 +117,26 @@ class MeterDaoTest : HomeDatabaseTest() {
             // Payer:
             val actualPayerId = PayerDaoTest.insertPayer(db, PayerEntity.payerWithTwoPersons(ctx))
             // Services:
-            val electricityId =
-                ServiceDaoTest.insertService(ctx, db, ServiceEntity.electricityService())
-            val gasId = ServiceDaoTest.insertService(ctx, db, ServiceEntity.gasService())
-            val wasteId = ServiceDaoTest.insertService(ctx, db, ServiceEntity.wasteService())
-            val hotWaterId = ServiceDaoTest.insertService(ctx, db, ServiceEntity.hotWaterService())
+            val electricityIds =
+                ServiceDaoTest.insertService(ctx, db, ServiceEntity.electricity2Service())
+            val gasIds = ServiceDaoTest.insertService(ctx, db, ServiceEntity.gas3Service())
+            val wasteIds = ServiceDaoTest.insertService(ctx, db, ServiceEntity.waste5Service())
+            val hotWaterIds =
+                ServiceDaoTest.insertService(ctx, db, ServiceEntity.hotWater7Service())
+            // Payer services:
+            val payerElectricityId =
+                PayerDaoTest.insertPayerService(db, actualPayerId, electricityIds.serviceId, true)
+            val payerGasId =
+                PayerDaoTest.insertPayerService(db, actualPayerId, gasIds.serviceId, true)
+            val payerWasteId =
+                PayerDaoTest.insertPayerService(db, actualPayerId, wasteIds.serviceId)
+            val payerHotWaterId =
+                PayerDaoTest.insertPayerService(db, actualPayerId, hotWaterIds.serviceId, true)
+
             // Meters:
-            val electricityMeterId =
+            val electricityMeterIds =
                 insertMeter(ctx, db, MeterEntity.electricityMeter(ctx, actualPayerId))
-            val gasMeterId =
+            val gasMeterIds =
                 insertMeter(
                     ctx, db,
                     MeterEntity.gasMeter(
@@ -120,7 +144,7 @@ class MeterDaoTest : HomeDatabaseTest() {
                         passportDate = currentDateTime.minusMonths(2).withDayOfMonth(1)
                     )
                 )
-            val hotWaterMeterId =
+            val hotWaterMeterIds =
                 insertMeter(
                     ctx, db, MeterEntity.hotWaterMeter(
                         ctx, actualPayerId,
@@ -128,42 +152,38 @@ class MeterDaoTest : HomeDatabaseTest() {
                     )
                 )
 
-            insertMeterPayerService(db, electricityMeterId, actualPayerId, electricityId)
-            insertMeterPayerService(db, gasMeterId, actualPayerId, gasId)
-            insertMeterPayerService(db, hotWaterMeterId, actualPayerId, hotWaterId)
-            insertMeterPayerService(db, hotWaterMeterId, actualPayerId, wasteId)
             // ACT
             meterDao.insert(
                 // Electricity
                 MeterValueEntity.defaultMeterValue(
-                    meterId = electricityMeterId,
+                    meterId = electricityMeterIds.meterId,
                     valueDate = currentDateTime.minusMonths(2).withDayOfMonth(1),
                     meterValue = BigDecimal.valueOf(9558)
                 ),
                 MeterValueEntity.defaultMeterValue(
-                    meterId = electricityMeterId,
+                    meterId = electricityMeterIds.meterId,
                     valueDate = currentDateTime.minusMonths(1).withDayOfMonth(1),
                     meterValue = BigDecimal.valueOf(9642)
                 ),
                 // Gas
-                MeterValueEntity.defaultMeterValue(
-                    meterId = gasMeterId,
+                /*MeterValueEntity.defaultMeterValue(
+                    meterId = gasMeterIds.meterId,
                     valueDate = currentDateTime.minusMonths(1).withDayOfMonth(1),
                     meterValue = BigDecimal.valueOf(1.954)
-                ),
+                ),*/
                 MeterValueEntity.defaultMeterValue(
-                    meterId = gasMeterId,
+                    meterId = gasMeterIds.meterId,
                     valueDate = currentDateTime.withDayOfMonth(1),
                     meterValue = BigDecimal.valueOf(2.751)
                 ),
                 // Hot Water
                 MeterValueEntity.defaultMeterValue(
-                    meterId = hotWaterMeterId,
+                    meterId = hotWaterMeterIds.meterId,
                     valueDate = currentDateTime.minusMonths(1).withDayOfMonth(1),
                     meterValue = BigDecimal.valueOf(2150.124)
                 ),
                 MeterValueEntity.defaultMeterValue(
-                    meterId = hotWaterMeterId,
+                    meterId = hotWaterMeterIds.meterId,
                     valueDate = currentDateTime.withDayOfMonth(1),
                     meterValue = BigDecimal.valueOf(2154.987)
                 )
@@ -175,6 +195,30 @@ class MeterDaoTest : HomeDatabaseTest() {
                     Timber.tag(TAG).d("prevMeterValue: %s", it)
                 }
                 assertThat(prevMeterValues).isNotEmpty()
+                assertThat(prevMeterValues[0].serviceId).isEqualTo(electricityIds.serviceId)
+                assertThat(prevMeterValues[0].prevValue).isEqualTo(BigDecimal.valueOf(9642))
+                assertThat(prevMeterValues[0].prevLastDate).isEqualTo(
+                    currentDateTime.minusMonths(1).withDayOfMonth(1)
+                )
+                assertThat(prevMeterValues[0].currentValue).isNull()
+
+                assertThat(prevMeterValues[1].serviceId).isEqualTo(gasIds.serviceId)
+                assertThat(prevMeterValues[1].prevValue).isEqualTo(MeterEntity.DEF_GAS_INIT_VAL)
+                assertThat(prevMeterValues[1].prevLastDate).isEqualTo(
+                    currentDateTime.minusMonths(1).withDayOfMonth(1).format(
+                        DateTimeFormatter.ofPattern(Constants.APP_FRACT_SEC_TIME)
+                    )
+                )
+                assertThat(prevMeterValues[1].currentValue).isEqualTo(BigDecimal.valueOf(2154.987))
+
+                assertThat(prevMeterValues[2].serviceId).isEqualTo(hotWaterIds.serviceId)
+                assertThat(prevMeterValues[2].prevValue).isEqualTo(BigDecimal.valueOf(2150.124))
+                assertThat(prevMeterValues[2].prevLastDate).isEqualTo(
+                    currentDateTime.minusMonths(1).withDayOfMonth(1).format(
+                        DateTimeFormatter.ofPattern(Constants.APP_FRACT_SEC_TIME)
+                    )
+                )
+                assertThat(prevMeterValues[2].currentValue).isEqualTo(BigDecimal.valueOf(2154.987))
                 cancel()
             }
         }
@@ -421,7 +465,7 @@ class MeterDaoTest : HomeDatabaseTest() {
         suspend fun insertMeter(
             ctx: Context, db: HomeDatabase,
             meter: MeterEntity = MeterEntity.defaultMeter()
-        ): UUID {
+        ): MeterIds {
             val meterTl =
                 when (meter.meterType) {
                     MeterType.ELECTRICITY -> MeterTlEntity.electricityMeterTl(ctx, meter.meterId)
@@ -429,36 +473,12 @@ class MeterDaoTest : HomeDatabaseTest() {
                     MeterType.COLD_WATER -> MeterTlEntity.coldWaterMeterTl(ctx, meter.meterId)
                     MeterType.HEATING -> MeterTlEntity.heatingMeterTl(ctx, meter.meterId)
                     MeterType.HOT_WATER -> MeterTlEntity.hotWaterMeterTl(ctx, meter.meterId)
-                    MeterType.NONE -> MeterTlEntity.defaultMeterTl(UUID.randomUUID(), "", "")
+                    MeterType.NONE -> MeterTlEntity.defaultMeterTl(
+                        meterId = UUID.randomUUID(), measureUnit = ""
+                    )
                 }
             db.meterDao().insert(meter, meterTl)
-            return meter.meterId
-        }
-
-        suspend fun insertMeterPayerService(
-            db: HomeDatabase,
-            meterId: UUID = UUID.randomUUID(),
-            payerId: UUID = UUID.randomUUID(),
-            serviceId: UUID = UUID.randomUUID()
-        ): UUID? {
-            var payerServiceMeterId: UUID? = null
-            db.withTransaction {
-                val payerServiceId = PayerDaoTest.insertPayerService(db, payerId, serviceId)
-                payerServiceMeterId = insertMeterPayerService(db, meterId, payerServiceId)
-            }
-            return payerServiceMeterId
-        }
-
-        suspend fun insertMeterPayerService(
-            db: HomeDatabase,
-            meterId: UUID = UUID.randomUUID(),
-            payerServiceId: UUID = UUID.randomUUID()
-        ): UUID {
-            val payerServiceMeter = PayerServiceMeterCrossRefEntity(
-                metersId = meterId, payersServicesId = payerServiceId
-            )
-            db.meterDao().insert(payerServiceMeter)
-            return payerServiceMeter.payerServiceMeterId
+            return MeterIds(meterId = meter.meterId, meterTlId = meterTl.meterTlId)
         }
     }
 }

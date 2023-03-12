@@ -7,6 +7,7 @@ import com.oborodulin.home.data.local.db.converters.DateTypeConverter
 import com.oborodulin.home.data.local.db.entities.MeterValueEntity
 import com.oborodulin.home.data.local.db.entities.PayerEntity
 import com.oborodulin.home.data.util.Constants.DB_FRACT_SEC_TIME
+import com.oborodulin.home.data.util.MeterType
 import com.oborodulin.home.data.util.ServiceType
 import java.math.BigDecimal
 import java.time.OffsetDateTime
@@ -16,7 +17,7 @@ import java.util.*
     viewName = MeterValuePrevPeriodView.VIEW_NAME,
     value = """
 SELECT mvf.meterValueId, p.payerId, sv.serviceId, sv.serviceType, sv.serviceName, sv.servicePos, 
-    mvf.meterId, IFNULL(mvf.meterMeasureUnit, sv.serviceMeasureUnit) AS measureUnit,
+    mvf.meterId, mvf.meterType, IFNULL(mvf.meterMeasureUnit, sv.serviceMeasureUnit) AS measureUnit,
     mvf.prevLastDate, mvf.prevValue, p.isFavorite, 
     (SELECT vl.meterValue FROM meter_values vl
         WHERE vl.metersId = mvf.meterId
@@ -37,7 +38,8 @@ FROM (SELECT mvl.meterValueId, mv.payersId, mv.servicesId, mv.meterId, mv.meterT
                 ELSE instr(cast(mv.maxValue / ${Constants.CONV_COEFF_BIGDECIMAL}.0 as text), '.') 
             END)
         ) AS valueFormat 
-    FROM ${MeterPayerServiceView.VIEW_NAME} mv LEFT JOIN ${MeterValueEntity.TABLE_NAME} mvl ON mvl.metersId = mv.meterId) mvf
+    FROM ${MeterPayerServiceView.VIEW_NAME} mv LEFT JOIN ${MeterValueEntity.TABLE_NAME} mvl ON mvl.metersId = mv.meterId
+            AND mv.isMeterOwner = 1) mvf
         JOIN ${ServiceView.VIEW_NAME} sv ON sv.serviceId = mvf.servicesId AND sv.serviceMeterType = mvf.meterType
         JOIN ${PayerEntity.TABLE_NAME} p ON p.payerId = mvf.payersId
         JOIN ${MeterValueMaxPrevDateView.VIEW_NAME} mpd ON mpd.meterId = mvf.meterId AND mpd.maxValueDate = mvf.prevLastDate
@@ -52,9 +54,10 @@ class MeterValuePrevPeriodView(
     val serviceName: String,
     val servicePos: Int,
     val meterId: UUID,
+    val meterType: MeterType,
     val measureUnit: String?,
     @field:TypeConverters(DateTypeConverter::class)
-    val prevLastDate: OffsetDateTime,
+    val prevLastDate: OffsetDateTime?,
     val prevValue: BigDecimal?,
     val isFavorite: Boolean,
     val currentValue: BigDecimal? = null,

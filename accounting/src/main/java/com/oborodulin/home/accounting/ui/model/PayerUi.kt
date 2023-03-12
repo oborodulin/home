@@ -13,7 +13,7 @@ data class PayerUi(
     val livingSpace: BigDecimal? = null,
     val heatedVolume: BigDecimal? = null,
     val paymentDay: Int = Constants.DEF_PAYMENT_DAY,
-    val personsNum: Int = 1,
+    val personsNum: Int = Constants.DEF_PERSON_NUM,
     val isAlignByPaymentDay: Boolean = false,
     val isFavorite: Boolean = false
 )

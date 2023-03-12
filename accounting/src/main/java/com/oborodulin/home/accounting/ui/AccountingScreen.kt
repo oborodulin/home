@@ -21,6 +21,7 @@ import com.oborodulin.home.presentation.navigation.NavRoutes
 import com.oborodulin.home.presentation.navigation.PayerInput
 import kotlinx.coroutines.flow.collectLatest
 import timber.log.Timber
+import java.util.*
 
 /**
  * Created by tfakioglu on 12.December.2021
@@ -79,18 +80,22 @@ fun AccountingScreen(
                 },
                 bottomBar = bottomBar
             ) {
-                CommonScreen(paddingValues = it, state = state) { accountingModel ->
-                    appState.actionBarSubtitle.value = accountingModel.favoritePayer.address
-                    viewModel.setPrimaryObjectData(
-                        arrayListOf(
-                            accountingModel.favoritePayer.id.toString(),
-                            accountingModel.favoritePayer.fullName
+                CommonScreen(paddingValues = it, state = state) { accountingUi ->
+                    var payerId = UUID.randomUUID()
+                    accountingUi.favoritePayer?.let { payer ->
+                        appState.actionBarSubtitle.value = payer.address
+                        viewModel.setPrimaryObjectData(
+                            arrayListOf(
+                                payer.id.toString(),
+                                payer.fullName
+                            )
                         )
-                    )
+                        payer.id?.let { id -> payerId = id }
+                    }
                     PayersListView(
                         appState = appState,
                         navController = appState.commonNavController,
-                        payerInput = PayerInput(accountingModel.favoritePayer.id!!)
+                        payerInput = PayerInput(payerId)
                     )
                 }
             }

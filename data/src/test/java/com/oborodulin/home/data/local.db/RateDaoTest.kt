@@ -1,7 +1,6 @@
 package com.oborodulin.home.data.local.db
 
 import android.content.Context
-import android.database.sqlite.SQLiteConstraintException
 import android.os.Build
 import androidx.test.filters.MediumTest
 import app.cash.turbine.test
@@ -12,9 +11,6 @@ import com.oborodulin.home.data.local.db.dao.ServiceDao
 import com.oborodulin.home.data.local.db.entities.PayerEntity
 import com.oborodulin.home.data.local.db.entities.RateEntity
 import com.oborodulin.home.data.local.db.entities.ServiceEntity
-import com.oborodulin.home.data.local.db.entities.ServiceTlEntity
-import com.oborodulin.home.data.local.db.views.ServiceView
-import com.oborodulin.home.data.util.ServiceType
 import kotlinx.coroutines.*
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.*
@@ -109,21 +105,21 @@ class RateDaoTest : HomeDatabaseTest() {
             val payer2Id = PayerDaoTest.insertPayer(db, PayerEntity.favoritePayer(ctx))
 
             // Services:
-            val rentId = ServiceDaoTest.insertService(ctx, db, ServiceEntity.rentService())
+            val rentId = ServiceDaoTest.insertService(ctx, db, ServiceEntity.rent1Service())
             val electricityId =
-                ServiceDaoTest.insertService(ctx, db, ServiceEntity.electricityService())
-            val gasId = ServiceDaoTest.insertService(ctx, db, ServiceEntity.gasService())
+                ServiceDaoTest.insertService(ctx, db, ServiceEntity.electricity2Service())
+            val gasId = ServiceDaoTest.insertService(ctx, db, ServiceEntity.gas3Service())
             val coldWaterId =
-                ServiceDaoTest.insertService(ctx, db, ServiceEntity.coldWaterService())
-            val heatingId = ServiceDaoTest.insertService(ctx, db, ServiceEntity.heatingService())
-            val wasteId = ServiceDaoTest.insertService(ctx, db, ServiceEntity.wasteService())
-            val hotWaterId = ServiceDaoTest.insertService(ctx, db, ServiceEntity.hotWaterService())
-            val garbageId = ServiceDaoTest.insertService(ctx, db, ServiceEntity.garbageService())
+                ServiceDaoTest.insertService(ctx, db, ServiceEntity.coldWater4Service())
+            val heatingId = ServiceDaoTest.insertService(ctx, db, ServiceEntity.heating6Service())
+            val wasteId = ServiceDaoTest.insertService(ctx, db, ServiceEntity.waste5Service())
+            val hotWaterId = ServiceDaoTest.insertService(ctx, db, ServiceEntity.hotWater7Service())
+            val garbageId = ServiceDaoTest.insertService(ctx, db, ServiceEntity.garbage8Service())
             val doorphoneId =
-                ServiceDaoTest.insertService(ctx, db, ServiceEntity.doorphoneService())
-            val phoneId = ServiceDaoTest.insertService(ctx, db, ServiceEntity.phoneService())
-            val ugsoId = ServiceDaoTest.insertService(ctx, db, ServiceEntity.ugsoService())
-            val internetId = ServiceDaoTest.insertService(ctx, db, ServiceEntity.internetService())
+                ServiceDaoTest.insertService(ctx, db, ServiceEntity.doorphone9Service())
+            val phoneId = ServiceDaoTest.insertService(ctx, db, ServiceEntity.phone10Service())
+            val ugsoId = ServiceDaoTest.insertService(ctx, db, ServiceEntity.ugso11Service())
+            val internetId = ServiceDaoTest.insertService(ctx, db, ServiceEntity.internet12Service())
 
             // Service rates:
             // electricity
@@ -144,12 +140,12 @@ class RateDaoTest : HomeDatabaseTest() {
 
             // Payer 1 services:
             val payer1RentId = PayerDaoTest.insertPayerService(db, payer1Id, rentId)
-            val payer1ElectricityId = PayerDaoTest.insertPayerService(db, payer1Id, electricityId)
-            val payer1GasId = PayerDaoTest.insertPayerService(db, payer1Id, gasId)
-            val payer1ColdWaterId = PayerDaoTest.insertPayerService(db, payer1Id, coldWaterId)
-            val payer1HeatingId = PayerDaoTest.insertPayerService(db, payer1Id, heatingId)
+            val payer1ElectricityId = PayerDaoTest.insertPayerService(db, payer1Id, electricityId, true)
+            val payer1GasId = PayerDaoTest.insertPayerService(db, payer1Id, gasId, true)
+            val payer1ColdWaterId = PayerDaoTest.insertPayerService(db, payer1Id, coldWaterId, true)
+            val payer1HeatingId = PayerDaoTest.insertPayerService(db, payer1Id, heatingId, true)
             val payer1WasteId = PayerDaoTest.insertPayerService(db, payer1Id, wasteId)
-            val payer1HotWaterId = PayerDaoTest.insertPayerService(db, payer1Id, hotWaterId)
+            val payer1HotWaterId = PayerDaoTest.insertPayerService(db, payer1Id, hotWaterId, true)
             val payer1GarbageId = PayerDaoTest.insertPayerService(db, payer1Id, garbageId)
             val payer1DoorphoneId = PayerDaoTest.insertPayerService(db, payer1Id, doorphoneId)
             val payer1PhoneId = PayerDaoTest.insertPayerService(db, payer1Id, phoneId)
@@ -313,7 +309,7 @@ class RateDaoTest : HomeDatabaseTest() {
         suspend fun insertElectricityServiceRates(ctx: Context, db: HomeDatabase): UUID {
             val electricityServiceId =
                 ServiceDaoTest.insertService(
-                    ctx, db, ServiceEntity.electricityService()
+                    ctx, db, ServiceEntity.electricity2Service()
                 )
             db.rateDao().insert(
                 listOf(
@@ -327,7 +323,7 @@ class RateDaoTest : HomeDatabaseTest() {
 
         suspend fun insertPayerRentServiceRates(ctx: Context, db: HomeDatabase): PayerServiceIds {
             val payer = PayerEntity.payerWithTwoPersons(ctx)
-            val rentService = ServiceEntity.rentService()
+            val rentService = ServiceEntity.rent1Service()
             val payerRentServiceId = PayerDaoTest.insertPayerService(
                 db = db, ctx = ctx, payer = payer, service = rentService
             )

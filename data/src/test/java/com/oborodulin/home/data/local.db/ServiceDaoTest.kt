@@ -36,6 +36,8 @@ class ServiceDaoTest : HomeDatabaseTest() {
     private lateinit var serviceDao: ServiceDao
     private lateinit var meterDao: MeterDao
 
+    data class ServiceIds(val serviceId: UUID, val serviceTlId: UUID)
+
     @Before
     override fun setUp() {
         super.setUp()
@@ -47,9 +49,9 @@ class ServiceDaoTest : HomeDatabaseTest() {
     @Test
     fun insertServicesAndFindAll_shouldReturn_theOrderedItem_inFlow() = runTest {
         // ARRANGE
-        val rentService = ServiceEntity.rentService()
+        val rentService = ServiceEntity.rent1Service()
         val rentServiceTl = ServiceTlEntity.rentServiceTl(ctx, rentService.serviceId)
-        val electricityService = ServiceEntity.electricityService()
+        val electricityService = ServiceEntity.electricity2Service()
         val electricityServiceTl =
             ServiceTlEntity.electricityServiceTl(ctx, electricityService.serviceId)
         // ACT
@@ -71,19 +73,23 @@ class ServiceDaoTest : HomeDatabaseTest() {
     @Test
     fun updateServiceAndFindById_shouldReturn_theUpdatedService_inFlow() = runTest {
         // ARRANGE
-        val rentService = ServiceEntity.rentService()
-        val rentServiceTl = ServiceTlEntity.rentServiceTl(ctx, rentService.serviceId)
-        serviceDao.insert(rentService, rentServiceTl)
-        val electricityService = ServiceEntity.electricityService(rentService.serviceId)
-        val electricityServiceTl =
-            ServiceTlEntity.electricityServiceTl(ctx, electricityService.serviceId)
+        val actualService = ServiceEntity.rent1Service()
+        val actualServiceTl = ServiceTlEntity.rentServiceTl(ctx, actualService.serviceId)
+        serviceDao.insert(actualService, actualServiceTl)
+        val updatedService = ServiceEntity.electricity2Service(actualService.serviceId)
+        val updatedServiceTl =
+            ServiceTlEntity.defaultServiceTl(
+                serviceId = updatedService.serviceId,
+                serviceTlId = actualServiceTl.serviceTlId, serviceName = ""
+            )
         // ACT
-        serviceDao.update(electricityService, electricityServiceTl)
+        serviceDao.update(updatedService, updatedServiceTl)
         // ASSERT
-        serviceDao.findDistinctById(rentService.serviceId).test {
+        serviceDao.findDistinctById(actualService.serviceId).test {
             val service = awaitItem()
             assertThat(service).isNotNull()
-            assertThat(service.data).isEqualTo(electricityService)
+            assertThat(service.data).isEqualTo(updatedService)
+            assertThat(service.tl).isEqualTo(updatedServiceTl)
             cancel()
         }
     }
@@ -92,16 +98,16 @@ class ServiceDaoTest : HomeDatabaseTest() {
     @Test
     fun findMeterAllowedServices_shouldReturn_theOrderedMeterAllowedServices_inFlow() = runTest {
         // ARRANGE
-        val rentId = insertService(ctx, db, ServiceEntity.rentService())
+        val rentId = insertService(ctx, db, ServiceEntity.rent1Service())
         // ACT
-        val hotWaterId = insertService(ctx, db, ServiceEntity.hotWaterService())
-        val wasteId = insertService(ctx, db, ServiceEntity.wasteService())
+        val wasteIds = insertService(ctx, db, ServiceEntity.waste5Service())
+        val hotWaterIds = insertService(ctx, db, ServiceEntity.hotWater7Service())
         // ASSERT
         serviceDao.findMeterAllowed().test {
             val services = awaitItem()
             assertThat(services).hasSize(2)
-            assertThat(services[0].data.serviceId).isEqualTo(wasteId)
-            assertThat(services[1].data.serviceId).isEqualTo(hotWaterId)
+            assertThat(services[0].data.serviceId).isEqualTo(wasteIds.serviceId)
+            assertThat(services[1].data.serviceId).isEqualTo(hotWaterIds.serviceId)
             cancel()
         }
     }
@@ -110,14 +116,15 @@ class ServiceDaoTest : HomeDatabaseTest() {
     @Test
     fun findPayerServicesByPayerId_shouldReturn_theOrderedPayerServices_inFlow() = runTest {
         // ARRANGE
-        val twoPersonsPayerId = PayerDaoTest.insertPayer(db, PayerEntity.payerWithTwoPersons(ctx))
-        val rentId = insertService(ctx, db, ServiceEntity.rentService())
-        val heatingId = ServiceDaoTest.insertService(ctx, db, ServiceEntity.heatingService())
+        val actualPayerId = PayerDaoTest.insertPayer(db, PayerEntity.payerWithTwoPersons(ctx))
+        val rentIds = insertService(ctx, db, ServiceEntity.rent1Service())
+        val heatingIds = insertService(ctx, db, ServiceEntity.heating6Service())
         // ACT
-        val payerRentId = PayerDaoTest.insertPayerService(db, twoPersonsPayerId, rentId)
-        val payerHeatingId = PayerDaoTest.insertPayerService(db, twoPersonsPayerId, heatingId)
+        val payerRentId = PayerDaoTest.insertPayerService(db, actualPayerId, rentIds.serviceId)
+        val payerHeatingId =
+            PayerDaoTest.insertPayerService(db, actualPayerId, heatingIds.serviceId, true)
         // ASSERT
-        serviceDao.findDistinctByPayerId(twoPersonsPayerId).test {
+        serviceDao.findDistinctByPayerId(actualPayerId).test {
             val payerServices = awaitItem()
             assertThat(payerServices).hasSize(2)
             assertThat(payerServices[0].payerServiceId).isEqualTo(payerRentId)
@@ -131,9 +138,9 @@ class ServiceDaoTest : HomeDatabaseTest() {
     fun findPayerServicesById_shouldReturn_thePayerService_inFlow() = runTest {
         // ARRANGE
         val twoPersonsPayerId = PayerDaoTest.insertPayer(db, PayerEntity.payerWithTwoPersons(ctx))
-        val rentId = insertService(ctx, db, ServiceEntity.rentService())
+        val rentIds = insertService(ctx, db, ServiceEntity.rent1Service())
         // ACT
-        val payerRentId = PayerDaoTest.insertPayerService(db, twoPersonsPayerId, rentId)
+        val payerRentId = PayerDaoTest.insertPayerService(db, twoPersonsPayerId, rentIds.serviceId)
         // ASSERT
         serviceDao.findDistinctPayerServiceById(payerRentId).test {
             val payerService = awaitItem()
@@ -147,16 +154,15 @@ class ServiceDaoTest : HomeDatabaseTest() {
     @Test
     fun findPayerServiceByMeterId_shouldReturn_thePayerService_inFlow() = runTest {
         // ARRANGE
-        val twoPersonsPayerId = PayerDaoTest.insertPayer(db, PayerEntity.payerWithTwoPersons(ctx))
-        val electricityId = insertService(ctx, db, ServiceEntity.electricityService())
+        val actualPayerId = PayerDaoTest.insertPayer(db, PayerEntity.payerWithTwoPersons(ctx))
+        val electricityIds = insertService(ctx, db, ServiceEntity.electricity2Service())
         val payerElectricityId =
-            PayerDaoTest.insertPayerService(db, twoPersonsPayerId, electricityId)
-        val electricityMeterId =
-            MeterDaoTest.insertMeter(ctx, db, MeterEntity.electricityMeter(ctx, twoPersonsPayerId))
+            PayerDaoTest.insertPayerService(db, actualPayerId, electricityIds.serviceId, true)
         // ACT
-        MeterDaoTest.insertMeterPayerService(db, electricityMeterId, payerElectricityId)
+        val electricityMeterIds =
+            MeterDaoTest.insertMeter(ctx, db, MeterEntity.electricityMeter(ctx, actualPayerId))
         // ASSERT
-        serviceDao.findDistinctPayerServiceByMeterId(electricityMeterId).test {
+        serviceDao.findDistinctPayerServiceByMeterId(electricityMeterIds.meterId).test {
             val payerService = awaitItem()
             assertThat(payerService).hasSize(1)
             assertThat(payerService[0].payerServiceId).isEqualTo(payerElectricityId)
@@ -168,7 +174,7 @@ class ServiceDaoTest : HomeDatabaseTest() {
     @Test
     fun deleteServiceById_returnsIsNull() = runTest {
         // ARRANGE
-        val rentService = ServiceEntity.rentService()
+        val rentService = ServiceEntity.rent1Service()
         val rentServiceTl = ServiceTlEntity.rentServiceTl(ctx, rentService.serviceId)
         serviceDao.insert(rentService, rentServiceTl)
         // ACT
@@ -184,9 +190,9 @@ class ServiceDaoTest : HomeDatabaseTest() {
     @Test
     fun deleteAllServicesAndFindAll_returnsIsEmpty() = runTest {
         // ARRANGE
-        val rentService = ServiceEntity.rentService()
+        val rentService = ServiceEntity.rent1Service()
         val rentServiceTl = ServiceTlEntity.rentServiceTl(ctx, rentService.serviceId)
-        val electricityService = ServiceEntity.electricityService()
+        val electricityService = ServiceEntity.electricity2Service()
         val electricityServiceTl =
             ServiceTlEntity.electricityServiceTl(ctx, electricityService.serviceId)
         serviceDao.insert(rentService, rentServiceTl)
@@ -272,26 +278,26 @@ class ServiceDaoTest : HomeDatabaseTest() {
 
     @OptIn(ExperimentalCoroutinesApi::class)
     @Test
-    fun insertMeterPayerServicesAndFindPayerServiceByMeterId_shouldReturn_theOrderedPayerServices_inFlow() =
+    fun updatePayerServiceIsMeterOwnerAndFindById_return_theSeqServicesPosOrdered_inFlow() =
         runTest {
             // ARRANGE
-            val twoPersonsPayerId =
-                PayerDaoTest.insertPayer(db, PayerEntity.payerWithTwoPersons(ctx))
-            // Services:
-            val hotWaterId = insertService(ctx, db, ServiceEntity.hotWaterService())
-            val wasteId = insertService(ctx, db, ServiceEntity.wasteService())
-            // Meters:
-            val hotWaterMeterId =
-                MeterDaoTest.insertMeter(ctx, db, MeterEntity.hotWaterMeter(ctx, twoPersonsPayerId))
+            val actualPayerId = PayerDaoTest.insertPayer(db, PayerEntity.payerWithTwoPersons(ctx))
+            val wasteIds = insertService(ctx, db, ServiceEntity.waste5Service())
+            val hotWaterIds = insertService(ctx, db, ServiceEntity.hotWater7Service())
+            val payerWasteId =
+                PayerDaoTest.insertPayerService(db, actualPayerId, wasteIds.serviceId, true)
+            val payerHotWaterId =
+                PayerDaoTest.insertPayerService(db, actualPayerId, hotWaterIds.serviceId, false)
             // ACT
-            MeterDaoTest.insertMeterPayerService(db, hotWaterMeterId, twoPersonsPayerId, hotWaterId)
-            MeterDaoTest.insertMeterPayerService(db, hotWaterMeterId, twoPersonsPayerId, wasteId)
+            serviceDao.payerServiceMeterOwnerById(payerHotWaterId)
             // ASSERT
-            serviceDao.findDistinctPayerServiceByMeterId(hotWaterMeterId).test {
-                val services = awaitItem()
-                assertThat(services).hasSize(2)
-                assertThat(services[0].service.data.serviceId).isEqualTo(hotWaterId)
-                assertThat(services[1].service.data.serviceId).isEqualTo(wasteId)
+            serviceDao.findDistinctByPayerId(actualPayerId).test {
+                val payerServices = awaitItem()
+                assertThat(payerServices).hasSize(2)
+                assertThat(payerServices[0].payerServiceId).isEqualTo(payerWasteId)
+                assertThat(payerServices[0].isMeterOwner).isEqualTo(false)
+                assertThat(payerServices[1].payerServiceId).isEqualTo(payerHotWaterId)
+                assertThat(payerServices[1].isMeterOwner).isEqualTo(true)
                 cancel()
             }
         }
@@ -314,7 +320,7 @@ class ServiceDaoTest : HomeDatabaseTest() {
         suspend fun insertService(
             ctx: Context, db: HomeDatabase,
             service: ServiceEntity = ServiceEntity.defaultService()
-        ): UUID {
+        ): ServiceIds {
             val serviceTl =
                 when (service.serviceType) {
                     ServiceType.RENT -> ServiceTlEntity.rentServiceTl(ctx, service.serviceId)
@@ -341,7 +347,7 @@ class ServiceDaoTest : HomeDatabaseTest() {
                     )
                 }
             db.serviceDao().insert(service, serviceTl)
-            return service.serviceId
+            return ServiceIds(serviceId = service.serviceId, serviceTlId = serviceTl.serviceTlId)
         }
     }
 }

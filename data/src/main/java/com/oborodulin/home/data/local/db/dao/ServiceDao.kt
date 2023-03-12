@@ -1,6 +1,7 @@
 package com.oborodulin.home.data.local.db.dao
 
 import androidx.room.*
+import com.oborodulin.home.data.local.db.entities.PayerServiceCrossRefEntity
 import com.oborodulin.home.data.local.db.entities.ServiceEntity
 import com.oborodulin.home.data.local.db.entities.ServiceTlEntity
 import com.oborodulin.home.data.local.db.views.MeterPayerServiceView
@@ -99,4 +100,28 @@ interface ServiceDao : BaseDao<ServiceEntity> {
 
     @Query("UPDATE ${ServiceEntity.TABLE_NAME} SET servicePos = servicePos + 1 WHERE servicePos >= :pos")
     suspend fun updatePos(pos: Int)
+
+    @Query("UPDATE ${PayerServiceCrossRefEntity.TABLE_NAME} SET isMeterOwner = 1 WHERE payerServiceId = :payerServiceId AND isMeterOwner = 0")
+    suspend fun setPayerServiceMeterOwnerById(payerServiceId: UUID)
+
+    @Query(
+        """
+UPDATE ${PayerServiceCrossRefEntity.TABLE_NAME} SET isMeterOwner = 0 
+WHERE payerServiceId <> :payerServiceId 
+    AND payersId = (SELECT ps.payersId FROM ${PayerServiceCrossRefEntity.TABLE_NAME} ps WHERE ps.payerServiceId = :payerServiceId)
+    AND servicesId IN (SELECT serviceId FROM ${ServiceEntity.TABLE_NAME}
+                        WHERE serviceMeterType = (
+                            SELECT s.serviceMeterType FROM ${ServiceEntity.TABLE_NAME} s 
+                                JOIN ${PayerServiceCrossRefEntity.TABLE_NAME} ps ON s.serviceId = ps.servicesId
+                                    AND ps.payerServiceId = :payerServiceId)
+                        )
+    """
+    )
+    suspend fun clearPayerServiceMeterOwnerById(payerServiceId: UUID)
+
+    @Transaction
+    suspend fun payerServiceMeterOwnerById(payerServiceId: UUID) {
+        clearPayerServiceMeterOwnerById(payerServiceId)
+        setPayerServiceMeterOwnerById(payerServiceId)
+    }
 }

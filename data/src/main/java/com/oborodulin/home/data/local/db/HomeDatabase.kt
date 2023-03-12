@@ -59,7 +59,6 @@ private val MIGRATION_4_5 = object : Migration(4, 5) {
         PayerServiceCrossRefEntity::class,
         RateEntity::class, ServiceActivityEntity::class, ServicePromotionEntity::class,
         MeterEntity::class, MeterTlEntity::class, MeterValueEntity::class, MeterVerificationEntity::class,
-        PayerServiceMeterCrossRefEntity::class,
         ReceiptEntity::class, ReceiptLineEntity::class],
     views = [MeterView::class, MeterPayerServiceView::class, ServiceView::class, ReceiptView::class,
         MeterValueMaxPrevDateView::class, MeterValuePrevPeriodView::class,
@@ -208,37 +207,34 @@ abstract class HomeDatabase : RoomDatabase() {
                     .i("Default 2 PayerEntity imported: {%s}", jsonLogger?.toJson(payer2Entity))
                 // Default services:
                 // rent
-                val rentService = ServiceEntity.rentService()
-                insertDefService(db, rentService)
+                val rentService = ServiceEntity.rent1Service(); insertDefService(db, rentService)
                 // electricity
-                val electricityService = ServiceEntity.electricityService()
+                val electricityService = ServiceEntity.electricity2Service()
                 insertDefService(db, electricityService)
                 // gas
-                val gasService = ServiceEntity.gasService()
-                insertDefService(db, gasService)
+                val gasService = ServiceEntity.gas3Service(); insertDefService(db, gasService)
                 // cold water
-                val coldWaterService = ServiceEntity.coldWaterService()
+                val coldWaterService = ServiceEntity.coldWater4Service()
                 insertDefService(db, coldWaterService)
                 // waste
-                val wasteService = ServiceEntity.wasteService()
-                insertDefService(db, wasteService)
+                val wasteService = ServiceEntity.waste5Service(); insertDefService(db, wasteService)
                 // heating
-                val heatingService = ServiceEntity.heatingService()
+                val heatingService = ServiceEntity.heating6Service()
                 insertDefService(db, heatingService)
                 // hot water
-                val hotWaterService = ServiceEntity.hotWaterService()
+                val hotWaterService = ServiceEntity.hotWater7Service()
                 insertDefService(db, hotWaterService)
                 // garbage
-                val garbageService = ServiceEntity.garbageService()
+                val garbageService = ServiceEntity.garbage8Service()
                 insertDefService(db, garbageService)
                 // doorphone
-                val doorphoneService = ServiceEntity.doorphoneService()
+                val doorphoneService = ServiceEntity.doorphone9Service()
                 insertDefService(db, doorphoneService)
                 // phone
-                val phoneService = ServiceEntity.phoneService()
+                val phoneService = ServiceEntity.phone10Service()
                 insertDefService(db, phoneService)
                 // ugso
-                val ugsoService = ServiceEntity.ugsoService()
+                val ugsoService = ServiceEntity.ugso11Service()
                 insertDefService(db, ugsoService)
 
                 // Default rates:
@@ -272,23 +268,29 @@ abstract class HomeDatabase : RoomDatabase() {
                     insertPayerService(
                         db, payer = payer1Entity,
                         serviceId = electricityService.serviceId,
-                        isAllocateRate = true
+                        isMeterOwner = true, isAllocateRate = true
                     )
                 val gasPayer1ServiceId =
-                    insertPayerService(db, payer = payer1Entity, serviceId = gasService.serviceId)
+                    insertPayerService(
+                        db, payer = payer1Entity, serviceId = gasService.serviceId,
+                        isMeterOwner = true
+                    )
                 val coldWaterPayer1ServiceId =
                     insertPayerService(
-                        db, payer = payer1Entity, serviceId = coldWaterService.serviceId
+                        db, payer = payer1Entity, serviceId = coldWaterService.serviceId,
+                        isMeterOwner = true
                     )
                 val wastePayer1ServiceId =
                     insertPayerService(db, payer = payer1Entity, serviceId = wasteService.serviceId)
                 val heatingPayer1ServiceId =
                     insertPayerService(
-                        db, payer = payer1Entity, serviceId = heatingService.serviceId
+                        db, payer = payer1Entity, serviceId = heatingService.serviceId,
+                        isMeterOwner = true
                     )
                 val hotWaterPayer1ServiceId =
                     insertPayerService(
-                        db, payer = payer1Entity, serviceId = hotWaterService.serviceId
+                        db, payer = payer1Entity, serviceId = hotWaterService.serviceId,
+                        isMeterOwner = true
                     )
                 val garbagePayer1ServiceId =
                     insertPayerService(
@@ -441,41 +443,37 @@ abstract class HomeDatabase : RoomDatabase() {
                     insertPayerService(
                         db, payer = payer2Entity,
                         serviceId = electricityService.serviceId,
-                        isPrivilege = true
+                        isMeterOwner = true, isPrivilege = true
                     )
                 val gasPayer2ServiceId =
-                    insertPayerService(db, payer = payer2Entity, serviceId = gasService.serviceId)
+                    insertPayerService(
+                        db, payer = payer2Entity, serviceId = gasService.serviceId,
+                        isMeterOwner = true
+                    )
                 val coldWaterPayer2ServiceId =
                     insertPayerService(
-                        db,
-                        payer = payer2Entity,
-                        serviceId = coldWaterService.serviceId
+                        db, payer = payer2Entity, serviceId = coldWaterService.serviceId,
+                        isMeterOwner = true
                     )
                 val wastePayer2ServiceId =
                     insertPayerService(db, payer = payer2Entity, serviceId = wasteService.serviceId)
                 val heatingPayer2ServiceId =
                     insertPayerService(
-                        db,
-                        payer = payer2Entity,
-                        serviceId = heatingService.serviceId
+                        db, payer = payer2Entity, serviceId = heatingService.serviceId,
+                        isMeterOwner = true
                     )
                 val hotWaterPayer2ServiceId =
                     insertPayerService(
-                        db,
-                        payer = payer2Entity,
-                        serviceId = hotWaterService.serviceId
+                        db, payer = payer2Entity, serviceId = hotWaterService.serviceId,
+                        isMeterOwner = true
                     )
                 val garbagePayer2ServiceId =
                     insertPayerService(
-                        db,
-                        payer = payer2Entity,
-                        serviceId = garbageService.serviceId
+                        db, payer = payer2Entity, serviceId = garbageService.serviceId
                     )
                 val doorphonePayer2ServiceId =
                     insertPayerService(
-                        db,
-                        payer = payer2Entity,
-                        serviceId = doorphoneService.serviceId
+                        db, payer = payer2Entity, serviceId = doorphoneService.serviceId
                     )
                 val phonePayer2ServiceId =
                     insertPayerService(db, payer = payer2Entity, serviceId = phoneService.serviceId)
@@ -662,11 +660,13 @@ abstract class HomeDatabase : RoomDatabase() {
 
         private fun insertPayerService(
             db: SupportSQLiteDatabase, payer: PayerEntity, serviceId: UUID,
-            isPrivilege: Boolean = false, isAllocateRate: Boolean = false
+            isMeterOwner: Boolean = false, isPrivilege: Boolean = false,
+            isAllocateRate: Boolean = false
         ): UUID {
             val payerService =
                 PayerServiceCrossRefEntity(
-                    payersId = payer.payerId, servicesId = serviceId, isPrivileges = isPrivilege,
+                    payersId = payer.payerId, servicesId = serviceId,
+                    isMeterOwner = isMeterOwner, isPrivileges = isPrivilege,
                     isAllocateRate = isAllocateRate
                 )
             db.insert(
@@ -696,24 +696,11 @@ abstract class HomeDatabase : RoomDatabase() {
                 SQLiteDatabase.CONFLICT_REPLACE,
                 Mapper.toContentValues(textContent)
             )
-            for (payerServiceId in payerServiceIds) {
-                val payerServiceMeter =
-                    PayerServiceMeterCrossRefEntity(
-                        payersServicesId = payerServiceId,
-                        metersId = meter.meterId
-                    )
-                db.insert(
-                    PayerServiceMeterCrossRefEntity.TABLE_NAME,
-                    SQLiteDatabase.CONFLICT_REPLACE,
-                    Mapper.toContentValues(payerServiceMeter)
-                )
-                Timber.tag(TAG).i(
-                    "Default meter imported: {\"meter\": {%s}, \"tl\": {%s}, \"psm\": {%s}}",
-                    jsonLogger?.toJson(meter),
-                    jsonLogger?.toJson(textContent),
-                    jsonLogger?.toJson(payerServiceMeter)
-                )
-            }
+            Timber.tag(TAG).i(
+                "Default meter imported: {\"meter\": {%s}, \"tl\": {%s}}",
+                jsonLogger?.toJson(meter),
+                jsonLogger?.toJson(textContent)
+            )
         }
 
         private fun insertDefMeterValue(

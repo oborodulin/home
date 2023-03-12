@@ -243,19 +243,19 @@ class PayerDaoTest : HomeDatabaseTest() {
     fun insertPayerServicesAndFindPayersWithServices_returnsPayersWithServices_inFlow() = runTest {
         // ARRANGE
         val actualPayerId = insertPayer(db, PayerEntity.payerWithTwoPersons(ctx))
-        val rentService = ServiceEntity.rentService()
+        val rentService = ServiceEntity.rent1Service()
         val rentServiceTl = ServiceTlEntity.rentServiceTl(ctx, rentService.serviceId)
         serviceDao.insert(rentService, rentServiceTl)
-        val electricityService = ServiceEntity.electricityService()
+        val electricityService = ServiceEntity.electricity2Service()
         val electricityServiceTl =
             ServiceTlEntity.electricityServiceTl(ctx, electricityService.serviceId)
         serviceDao.insert(electricityService, electricityServiceTl)
         // ACT
         payerDao.insert(
-            PayerServiceCrossRefEntity.populatePrivilegesPayerService(
+            PayerServiceCrossRefEntity.privilegesPayerService(
                 payerId = actualPayerId, serviceId = rentService.serviceId
             ),
-            PayerServiceCrossRefEntity.populateAllocateRatePayerService(
+            PayerServiceCrossRefEntity.allocateRatePayerService(
                 payerId = actualPayerId, serviceId = electricityService.serviceId
             )
         )
@@ -275,15 +275,15 @@ class PayerDaoTest : HomeDatabaseTest() {
     fun deletePayerServiceAndFindPayersWithServices_returnsPayerWithService_inFlow() = runTest {
         // ARRANGE
         val actualPayerId = insertPayer(db, PayerEntity.payerWithTwoPersons(ctx))
-        val rentService = ServiceEntity.rentService()
+        val rentService = ServiceEntity.rent1Service()
         val rentServiceTl = ServiceTlEntity.rentServiceTl(ctx, rentService.serviceId)
         serviceDao.insert(rentService, rentServiceTl)
-        val electricityServiceId =
-            ServiceDaoTest.insertService(ctx, db, ServiceEntity.electricityService())
+        val electricityServiceIds =
+            ServiceDaoTest.insertService(ctx, db, ServiceEntity.electricity2Service())
         val payerRentService =
             PayerServiceCrossRefEntity.defaultPayerService(actualPayerId, rentService.serviceId)
         val payerElectricityService = PayerServiceCrossRefEntity.defaultPayerService(
-            actualPayerId, electricityServiceId
+            actualPayerId, electricityServiceIds.serviceId
         )
         payerDao.insert(payerRentService, payerElectricityService)
         // ACT
@@ -320,19 +320,20 @@ class PayerDaoTest : HomeDatabaseTest() {
             var payerServiceId: UUID? = null
             db.withTransaction {
                 val payerId = insertPayer(db, payer)
-                val serviceId = ServiceDaoTest.insertService(ctx, db, service)
-                payerServiceId = insertPayerService(db, payerId, serviceId)
+                val serviceIds = ServiceDaoTest.insertService(ctx, db, service)
+                payerServiceId = insertPayerService(db, payerId, serviceIds.serviceId)
             }
             return payerServiceId
         }
 
         suspend fun insertPayerService(
             db: HomeDatabase, payerId: UUID, serviceId: UUID,
+            isMeterOwner: Boolean = false,
             isPrivileges: Boolean = false, isAllocateRate: Boolean = false
         ): UUID {
             val payerService =
                 PayerServiceCrossRefEntity.defaultPayerService(
-                    payerId, serviceId, isPrivileges, isAllocateRate
+                    payerId, serviceId, isMeterOwner, isPrivileges, isAllocateRate
                 )
             db.payerDao().insert(payerService)
             return payerService.payerServiceId

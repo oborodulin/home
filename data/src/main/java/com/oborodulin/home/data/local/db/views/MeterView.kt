@@ -23,7 +23,7 @@ class MeterView(
     @Embedded
     val tl: MeterTlEntity,
     val isDerivedUnit: Boolean,
-    val derivedUnit: String
+    val derivedUnit: String?
 ) {
     companion object {
         const val VIEW_NAME = "meters_view"

@@ -32,10 +32,10 @@ data class ServiceEntity(
             serviceMeterType = meterType
         )
 
-        fun rentService(serviceId: UUID = UUID.randomUUID()) =
+        fun rent1Service(serviceId: UUID = UUID.randomUUID()) =
             defaultService(serviceId = serviceId, servicePos = 1, serviceType = ServiceType.RENT)
 
-        fun electricityService(serviceId: UUID = UUID.randomUUID()) =
+        fun electricity2Service(serviceId: UUID = UUID.randomUUID()) =
             defaultService(
                 serviceId = serviceId,
                 servicePos = 2,
@@ -43,7 +43,7 @@ data class ServiceEntity(
                 meterType = MeterType.ELECTRICITY
             )
 
-        fun gasService(serviceId: UUID = UUID.randomUUID()) =
+        fun gas3Service(serviceId: UUID = UUID.randomUUID()) =
             defaultService(
                 serviceId = serviceId,
                 servicePos = 3,
@@ -51,7 +51,7 @@ data class ServiceEntity(
                 meterType = MeterType.GAS
             )
 
-        fun coldWaterService(serviceId: UUID = UUID.randomUUID()) =
+        fun coldWater4Service(serviceId: UUID = UUID.randomUUID()) =
             defaultService(
                 serviceId = serviceId,
                 servicePos = 4,
@@ -59,7 +59,7 @@ data class ServiceEntity(
                 meterType = MeterType.COLD_WATER
             )
 
-        fun wasteService(serviceId: UUID = UUID.randomUUID()) =
+        fun waste5Service(serviceId: UUID = UUID.randomUUID()) =
             defaultService(
                 serviceId = serviceId,
                 servicePos = 5,
@@ -67,7 +67,7 @@ data class ServiceEntity(
                 meterType = MeterType.HOT_WATER
             )
 
-        fun heatingService(serviceId: UUID = UUID.randomUUID()) =
+        fun heating6Service(serviceId: UUID = UUID.randomUUID()) =
             defaultService(
                 serviceId = serviceId,
                 servicePos = 6,
@@ -75,7 +75,7 @@ data class ServiceEntity(
                 meterType = MeterType.HEATING
             )
 
-        fun hotWaterService(serviceId: UUID = UUID.randomUUID()) =
+        fun hotWater7Service(serviceId: UUID = UUID.randomUUID()) =
             defaultService(
                 serviceId = serviceId,
                 servicePos = 7,
@@ -83,23 +83,23 @@ data class ServiceEntity(
                 meterType = MeterType.HOT_WATER
             )
 
-        fun garbageService(serviceId: UUID = UUID.randomUUID()) =
+        fun garbage8Service(serviceId: UUID = UUID.randomUUID()) =
             defaultService(serviceId = serviceId, servicePos = 8, serviceType = ServiceType.GARBAGE)
 
-        fun doorphoneService(serviceId: UUID = UUID.randomUUID()) =
+        fun doorphone9Service(serviceId: UUID = UUID.randomUUID()) =
             defaultService(
                 serviceId = serviceId,
                 servicePos = 9,
                 serviceType = ServiceType.DOORPHONE
             )
 
-        fun phoneService(serviceId: UUID = UUID.randomUUID()) =
+        fun phone10Service(serviceId: UUID = UUID.randomUUID()) =
             defaultService(serviceId = serviceId, servicePos = 10, serviceType = ServiceType.PHONE)
 
-        fun ugsoService(serviceId: UUID = UUID.randomUUID()) =
+        fun ugso11Service(serviceId: UUID = UUID.randomUUID()) =
             defaultService(serviceId = serviceId, servicePos = 11, serviceType = ServiceType.USGO)
 
-        fun internetService(serviceId: UUID = UUID.randomUUID()) =
+        fun internet12Service(serviceId: UUID = UUID.randomUUID()) =
             defaultService(
                 serviceId = serviceId,
                 servicePos = 12,

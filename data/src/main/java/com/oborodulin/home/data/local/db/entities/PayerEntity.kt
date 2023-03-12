@@ -46,7 +46,10 @@ class PayerEntity(
             totalArea = totalArea,
             livingSpace = livingSpace,
             heatedVolume = heatedVolume,
-            isAlignByPaymentDay = true
+            paymentDay = paymentDay,
+            personsNum = personsNum,
+            isAlignByPaymentDay = isAlignByPaymentDay,
+            isFavorite = isFavorite
         )
 
         fun payerWithTwoPersons(ctx: Context, payerId: UUID = UUID.randomUUID()) =

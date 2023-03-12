@@ -154,7 +154,7 @@ fun MeterValuesList(
                                     .weight(0.22f),
                                 verticalArrangement = Arrangement.Center
                             ) {
-                                MeterIcon(meterValue.serviceType)
+                                MeterIcon(meterValue.meterType)
                                 Spacer(modifier = Modifier.height(4.dp))
                                 Text(
                                     text = meterValue.serviceName,

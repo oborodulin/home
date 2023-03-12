@@ -95,18 +95,6 @@ ORDER BY servicePos
     }
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insert(vararg payerServiceMeters: PayerServiceMeterCrossRefEntity)
-
-    @Transaction
-    suspend fun insert(meter: MeterEntity, payerService: PayerServiceCrossRefEntity) {
-        insert(
-            PayerServiceMeterCrossRefEntity(
-                metersId = meter.meterId, payersServicesId = payerService.payerServiceId
-            )
-        )
-    }
-
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insert(vararg meterValues: MeterValueEntity)
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)

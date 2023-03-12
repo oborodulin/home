@@ -1,8 +1,10 @@
 package com.oborodulin.home.data.local.db.views
 
 import androidx.room.DatabaseView
+import com.oborodulin.home.data.local.db.entities.MeterEntity
 import com.oborodulin.home.data.local.db.entities.PayerEntity
 import com.oborodulin.home.data.local.db.entities.RateEntity
+import com.oborodulin.home.data.local.db.entities.ServiceEntity
 import com.oborodulin.home.data.util.ServiceType
 import java.math.BigDecimal
 import java.time.OffsetDateTime
@@ -11,7 +13,10 @@ import java.util.*
 @DatabaseView(
     viewName = RatePayerServiceView.VIEW_NAME,
     value = """
-SELECT rps.*, (CASE WHEN EXISTS(SELECT psm.payerServiceMeterId FROM payers_services_meters psm WHERE psm.payersServicesId = rps.payerServiceId) 
+SELECT rps.*, (CASE WHEN EXISTS(SELECT m.meterId 
+                                FROM ${MeterEntity.TABLE_NAME} m JOIN ${ServiceEntity.TABLE_NAME} s 
+                                    ON s.serviceMeterType = m.meterType AND m.payersId = rps.payerId 
+                                        AND s.serviceId = rps.serviceId)
                     THEN 1 
                     ELSE 0 
                 END) isMeterUses

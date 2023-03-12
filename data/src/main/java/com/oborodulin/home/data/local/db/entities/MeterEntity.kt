@@ -11,7 +11,7 @@ import java.util.*
 
 @Entity(
     tableName = MeterEntity.TABLE_NAME,
-    indices = [Index(value = ["payersId", "meterNum", "meterType"], unique = true)],
+    indices = [Index(value = ["payersId", "meterNum", "meterType", "passportDate"], unique = true)],
     foreignKeys = [ForeignKey(
         entity = PayerEntity::class,
         parentColumns = arrayOf("payerId"),
@@ -32,14 +32,16 @@ data class MeterEntity(
 ) {
     companion object {
         const val TABLE_NAME = "meters"
+        val DEF_PASSPORT_DATE = Utils.toOffsetDateTime("2022-06-19T14:29:10.212")
+        val DEF_GAS_INIT_VAL = BigDecimal.valueOf(0.695)
 
         fun defaultMeter(
             payerId: UUID = UUID.randomUUID(), meterId: UUID = UUID.randomUUID(),
             meterNum: String = "",
             meterType: MeterType = MeterType.NONE,
             maxValue: BigDecimal = BigDecimal.valueOf(9999.999),
-            passportDate: OffsetDateTime? = OffsetDateTime.now(),
-            initValue: BigDecimal? = BigDecimal.ZERO,
+            passportDate: OffsetDateTime? = null,
+            initValue: BigDecimal? = null,
             verificationPeriod: Int? = null
         ) = MeterEntity(
             payersId = payerId,
@@ -61,46 +63,46 @@ data class MeterEntity(
             payerId = payerId,
             meterType = MeterType.ELECTRICITY,
             maxValue = BigDecimal.valueOf(9999),
-            passportDate = passportDate,// ?: Utils.toOffsetDateTime("2022-06-19T14:29:10.212"),
-            initValue = initValue// ?: BigDecimal.valueOf(9344)
+            passportDate = passportDate,
+            initValue = initValue
         )
 
         fun gasMeter(
             ctx: Context, payerId: UUID,
-            passportDate: OffsetDateTime? = null,
-            initValue: BigDecimal? = null
+            passportDate: OffsetDateTime? = DEF_PASSPORT_DATE,
+            initValue: BigDecimal? = DEF_GAS_INIT_VAL
         ) = defaultMeter(
             meterNum = ctx.resources.getString(R.string.def_meter_num),
             payerId = payerId,
             meterType = MeterType.GAS,
             maxValue = BigDecimal.valueOf(9999.999),
-            passportDate = passportDate ?: Utils.toOffsetDateTime("2022-06-19T14:29:10.212"),
-            initValue = initValue ?: BigDecimal.valueOf(0.695)
+            passportDate = passportDate,
+            initValue = initValue
         )
 
         fun coldWaterMeter(
             ctx: Context, payerId: UUID,
-            passportDate: OffsetDateTime? = null,
+            passportDate: OffsetDateTime? = DEF_PASSPORT_DATE,
             initValue: BigDecimal? = null
         ) = defaultMeter(
             meterNum = ctx.resources.getString(R.string.def_meter_num),
             payerId = payerId,
             meterType = MeterType.COLD_WATER,
             maxValue = BigDecimal.valueOf(99999.999),
-            passportDate = passportDate ?: Utils.toOffsetDateTime("2022-08-11T14:29:10.212"),
+            passportDate = passportDate,
             initValue = initValue ?: BigDecimal.valueOf(1523.125)
         )
 
         fun hotWaterMeter(
             ctx: Context, payerId: UUID,
-            passportDate: OffsetDateTime? = null,
+            passportDate: OffsetDateTime? = DEF_PASSPORT_DATE,
             initValue: BigDecimal? = null
         ) = defaultMeter(
             meterNum = ctx.resources.getString(R.string.def_meter_num),
             payerId = payerId,
             meterType = MeterType.HOT_WATER,
             maxValue = BigDecimal.valueOf(99999.999),
-            passportDate = passportDate ?: Utils.toOffsetDateTime("2022-09-03T14:29:10.212"),
+            passportDate = passportDate,
             initValue = initValue ?: BigDecimal.valueOf(2145.755)
         )
 
@@ -109,7 +111,7 @@ data class MeterEntity(
             payerId = payerId,
             meterType = MeterType.HEATING,
             maxValue = BigDecimal.valueOf(9.99999),
-            passportDate = Utils.toOffsetDateTime("2022-10-21T14:29:10.212"),
+            passportDate = DEF_PASSPORT_DATE,
             initValue = BigDecimal.valueOf(0.02113)
         )
     }

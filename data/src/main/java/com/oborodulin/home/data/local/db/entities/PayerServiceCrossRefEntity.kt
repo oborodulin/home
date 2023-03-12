@@ -22,6 +22,7 @@ import java.util.*
 )
 data class PayerServiceCrossRefEntity(
     @PrimaryKey val payerServiceId: UUID = UUID.randomUUID(),
+    val isMeterOwner: Boolean = false,
     val isPrivileges: Boolean = false,
     val isAllocateRate: Boolean = false,
     //warning: servicesId column references a foreign key but it is not part of an index.
@@ -33,24 +34,29 @@ data class PayerServiceCrossRefEntity(
         const val TABLE_NAME = "payers_services"
 
         fun defaultPayerService(
-            payerId: UUID, serviceId: UUID, isPrivileges: Boolean = false,
-            isAllocateRate: Boolean = false
+            payerId: UUID, serviceId: UUID, isMeterOwner: Boolean = false,
+            isPrivileges: Boolean = false, isAllocateRate: Boolean = false
         ) = PayerServiceCrossRefEntity(
             payersId = payerId, servicesId = serviceId,
-            isPrivileges = isPrivileges, isAllocateRate = isAllocateRate
+            isMeterOwner = isMeterOwner, isPrivileges = isPrivileges,
+            isAllocateRate = isAllocateRate
         )
 
-        fun populatePrivilegesPayerService(
-            payerId: UUID, serviceId: UUID, isAllocateRate: Boolean = false
+        fun privilegesPayerService(
+            payerId: UUID, serviceId: UUID,
+            isMeterOwner: Boolean = false, isAllocateRate: Boolean = false
         ) = defaultPayerService(
             payerId = payerId, serviceId = serviceId,
+            isMeterOwner = isMeterOwner,
             isPrivileges = true, isAllocateRate = isAllocateRate
         )
 
-        fun populateAllocateRatePayerService(
-            payerId: UUID, serviceId: UUID, isPrivileges: Boolean = false
+        fun allocateRatePayerService(
+            payerId: UUID, serviceId: UUID,
+            isMeterOwner: Boolean = false, isPrivileges: Boolean = false
         ) = defaultPayerService(
             payerId = payerId, serviceId = serviceId,
+            isMeterOwner = isMeterOwner,
             isPrivileges = isPrivileges, isAllocateRate = true
         )
     }

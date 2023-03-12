@@ -7,6 +7,7 @@ object Constants {
     const val DATABASE_NAME = "home-database.sqlite"
 
     const val DEF_PAYMENT_DAY = 20
+    const val DEF_PERSON_NUM = 1
     const val DB_FRACT_SEC_TIME = "'%Y-%m-%dT%H:%M:%f'"
     const val TZ_TIME = "STRFTIME('%Y-%m-%dT%H:%M:%S', DATETIME('now', 'localtime')) || PRINTF('%+.2d:%.2d', ROUND((JULIANDAY('now', 'localtime') - JULIANDAY('now')) * 24), ABS(ROUND((JULIANDAY('now', 'localtime') - JULIANDAY('now')) * 24 * 60) % 60))"
 

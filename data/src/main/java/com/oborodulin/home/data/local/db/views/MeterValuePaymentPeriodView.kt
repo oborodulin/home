@@ -5,7 +5,6 @@ import androidx.room.Embedded
 import com.oborodulin.home.data.local.db.entities.MeterValueEntity
 import com.oborodulin.home.data.local.db.entities.PayerEntity
 import com.oborodulin.home.data.local.db.entities.PayerServiceCrossRefEntity
-import com.oborodulin.home.data.local.db.entities.PayerServiceMeterCrossRefEntity
 import com.oborodulin.home.data.util.Constants
 import java.math.BigDecimal
 import java.time.OffsetDateTime
@@ -39,9 +38,8 @@ FROM ${MeterValueEntity.TABLE_NAME} mvl JOIN
             END) paymentDate
         FROM ${MeterValueEntity.TABLE_NAME} v JOIN ${MeterView.VIEW_NAME} mv ON mv.meterId = v.metersId
             JOIN ${PayerEntity.TABLE_NAME} p ON p.payerId = mv.payersId) mvp
-        JOIN ${PayerServiceMeterCrossRefEntity.TABLE_NAME} psm ON psm.metersId = mvp.meterId 
-        JOIN ${PayerServiceCrossRefEntity.TABLE_NAME} ps ON ps.payerServiceId = psm.payersServicesId
-        JOIN ${ServiceView.VIEW_NAME} sv ON sv.serviceId = ps.servicesId AND sv.serviceLocCode = mvp.meterLocCode
+        JOIN ${ServiceView.VIEW_NAME} sv ON sv.serviceMeterType = mvp.meterType AND sv.serviceLocCode = mvp.meterLocCode
+        JOIN ${PayerServiceCrossRefEntity.TABLE_NAME} ps ON ps.payersId = mvp.payerId AND ps.servicesId = sv.serviceId 
     GROUP BY mvp.payerId, ps.payerServiceId, mvp.meterId, mvp.paymentDate, sv.serviceMeasureUnit, mvp.meterMeasureUnit,
             mvp.isDerivedUnit, mvp.derivedUnit, mvp.meterLocCode, mvp.maxValue) lv 
         ON mvl.metersId = lv.meterId 
