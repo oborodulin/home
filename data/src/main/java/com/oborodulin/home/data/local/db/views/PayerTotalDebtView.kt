@@ -3,6 +3,7 @@ package com.oborodulin.home.data.local.db.views
 import androidx.room.DatabaseView
 import androidx.room.TypeConverters
 import com.oborodulin.home.data.local.db.converters.DateTypeConverter
+import com.oborodulin.home.data.util.Constants
 import java.math.BigDecimal
 import java.time.OffsetDateTime
 import java.util.*
@@ -10,10 +11,20 @@ import java.util.*
 @DatabaseView(
     viewName = PayerTotalDebtView.VIEW_NAME,
     value = """
-SELECT payerId, MIN(fromPaymentDate) AS fromPaymentDate, MAX(toPaymentDate) AS toPaymentDate, 
+SELECT ptb.payerId, 
+        STRFTIME(${Constants.DB_FRACT_SEC_TIME}, DATETIME(ptb.fromPaymentDate, 'localtime')) || 
+            PRINTF('%+.2d:%.2d', ROUND((JULIANDAY(ptb.fromPaymentDate, 'localtime') - JULIANDAY(ptb.fromPaymentDate)) * 24), 
+                ABS(ROUND((JULIANDAY(ptb.fromPaymentDate, 'localtime') - JULIANDAY(ptb.fromPaymentDate)) * 24 * 60) % 60)) AS fromPaymentDate, 
+        STRFTIME(${Constants.DB_FRACT_SEC_TIME}, DATETIME(ptb.toPaymentDate, 'localtime')) || 
+            PRINTF('%+.2d:%.2d', ROUND((JULIANDAY(ptb.toPaymentDate, 'localtime') - JULIANDAY(ptb.toPaymentDate)) * 24), 
+                ABS(ROUND((JULIANDAY(ptb.toPaymentDate, 'localtime') - JULIANDAY(ptb.toPaymentDate)) * 24 * 60) % 60)) AS toPaymentDate, 
+        ptb.serviceLocCode, ptb.totalDebt
+FROM (SELECT payerId, 
+        MIN(strftime(${Constants.DB_FRACT_SEC_TIME}, fromPaymentDate)) AS fromPaymentDate, 
+        MAX(strftime(${Constants.DB_FRACT_SEC_TIME}, toPaymentDate)) AS toPaymentDate, 
         serviceLocCode, SUM(serviceDebt) AS totalDebt
-FROM ${PayerServiceSubtotalDebtView.VIEW_NAME}
-GROUP BY payerId, serviceLocCode
+    FROM ${PayerServiceSubtotalDebtView.VIEW_NAME}
+    GROUP BY payerId, serviceLocCode) ptb    
 """
 )
 class PayerTotalDebtView(

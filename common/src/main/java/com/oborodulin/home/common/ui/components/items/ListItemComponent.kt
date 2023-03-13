@@ -280,8 +280,8 @@ fun PreviewListItemComponent() {
         title = context.resources.getString(R.string.preview_blank_title),
         descr = context.resources.getString(R.string.preview_blank_descr),
         value = BigDecimal.valueOf(123456.54),
-        fromDate = Utils.toOffsetDateTime("2022-08-01T14:29:10.212"),
-        toDate = Utils.toOffsetDateTime("2022-09-01T14:29:10.212")
+        fromDate = Utils.toOffsetDateTime("2022-08-01T14:29:10.212+03:00"),
+        toDate = Utils.toOffsetDateTime("2022-09-01T14:29:10.212+03:00")
     )
     ListItemComponent(
         icon = R.drawable.outline_photo_24,

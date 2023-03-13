@@ -11,7 +11,7 @@ import java.util.*
 SELECT mv.meterId, MAX(mv.valueDate) AS maxValueDate 
 FROM (SELECT m.meterId, m.payersId, 
             IFNULL(strftime(${Constants.DB_FRACT_SEC_TIME}, v.valueDate), 
-                    strftime(${Constants.DB_FRACT_SEC_TIME}, m.passportDate, 'localtime', 'start of month', '-1 days')) valueDate 
+                    strftime(${Constants.DB_FRACT_SEC_TIME}, m.passportDate, 'start of month', '-1 days')) valueDate 
         FROM meters m LEFT JOIN meter_values v ON v.metersId = m.meterId) mv 
     JOIN payers p ON p.payerId = mv.payersId
  WHERE mv.valueDate <= 

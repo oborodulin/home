@@ -321,31 +321,7 @@ class ServiceDaoTest : HomeDatabaseTest() {
             ctx: Context, db: HomeDatabase,
             service: ServiceEntity = ServiceEntity.defaultService()
         ): ServiceIds {
-            val serviceTl =
-                when (service.serviceType) {
-                    ServiceType.RENT -> ServiceTlEntity.rentServiceTl(ctx, service.serviceId)
-                    ServiceType.ELECTRICITY -> ServiceTlEntity.electricityServiceTl(
-                        ctx, service.serviceId
-                    )
-                    ServiceType.GAS -> ServiceTlEntity.gasServiceTl(ctx, service.serviceId)
-                    ServiceType.COLD_WATER -> ServiceTlEntity.coldWaterServiceTl(
-                        ctx, service.serviceId
-                    )
-                    ServiceType.WASTE -> ServiceTlEntity.wasteServiceTl(ctx, service.serviceId)
-                    ServiceType.HEATING -> ServiceTlEntity.heatingServiceTl(ctx, service.serviceId)
-                    ServiceType.HOT_WATER -> ServiceTlEntity.hotWaterServiceTl(
-                        ctx, service.serviceId
-                    )
-                    ServiceType.GARBAGE -> ServiceTlEntity.garbageServiceTl(ctx, service.serviceId)
-                    ServiceType.DOORPHONE -> ServiceTlEntity.doorphoneServiceTl(
-                        ctx, service.serviceId
-                    )
-                    ServiceType.PHONE -> ServiceTlEntity.phoneServiceTl(ctx, service.serviceId)
-                    ServiceType.USGO -> ServiceTlEntity.ugsoServiceTl(ctx, service.serviceId)
-                    ServiceType.INTERNET -> ServiceTlEntity.internetServiceTl(
-                        ctx, service.serviceId
-                    )
-                }
+            val serviceTl = ServiceTlEntity.serviceTl(ctx, service.serviceType, service.serviceId)
             db.serviceDao().insert(service, serviceTl)
             return ServiceIds(serviceId = service.serviceId, serviceTlId = serviceTl.serviceTlId)
         }

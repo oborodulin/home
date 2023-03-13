@@ -14,7 +14,10 @@ import java.util.*
     viewName = MeterValuePaymentPeriodView.VIEW_NAME,
     value = """
 SELECT mvl.*, lv.measureUnit, lv.isDerivedUnit, lv.derivedUnit, lv.meterLocCode, lv.maxValue,
-    lv.payerId, lv.payerServiceId, lv.paymentDate,
+    lv.payerId, lv.payerServiceId, 
+    STRFTIME(${Constants.DB_FRACT_SEC_TIME}, DATETIME(lv.paymentDate, 'localtime')) || 
+        PRINTF('%+.2d:%.2d', ROUND((JULIANDAY(lv.paymentDate, 'localtime') - JULIANDAY(lv.paymentDate)) * 24), 
+            ABS(ROUND((JULIANDAY(lv.paymentDate, 'localtime') - JULIANDAY(lv.paymentDate)) * 24 * 60) % 60)) AS paymentDate, 
     CAST(strftime('%m', lv.paymentDate) AS INTEGER) AS paymentMonth, 
     CAST(strftime('%Y', lv.paymentDate) AS INTEGER) AS paymentYear
 FROM ${MeterValueEntity.TABLE_NAME} mvl JOIN 
@@ -49,7 +52,7 @@ FROM ${MeterValueEntity.TABLE_NAME} mvl JOIN
 class MeterValuePaymentPeriodView(
     @Embedded
     val meterValue: MeterValueEntity,
-    val meterMeasureUnit: String,
+    val measureUnit: String,
     val isDerivedUnit: Boolean,
     val derivedUnit: String,
     val meterLocCode: String,

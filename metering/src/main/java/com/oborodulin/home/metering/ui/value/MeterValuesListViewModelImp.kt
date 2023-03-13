@@ -327,7 +327,7 @@ class MeterValuesListViewModelImp @Inject constructor(
                     serviceType = ServiceType.ELECTRICITY,
                     serviceName = ctx.resources.getString(R.string.service_electricity),
                     meterMeasureUnit = ctx.resources.getString(com.oborodulin.home.common.R.string.kWh_unit),
-                    prevLastDate = Utils.toOffsetDateTime("2022-08-01T14:29:10.212"),
+                    prevLastDate = Utils.toOffsetDateTime("2022-08-01T14:29:10.212+03:00"),
                     prevValue = BigDecimal.valueOf(9628),
                     valueFormat = "#0",
                     valueDate = OffsetDateTime.now()
@@ -338,7 +338,7 @@ class MeterValuesListViewModelImp @Inject constructor(
                     serviceType = ServiceType.COLD_WATER,
                     serviceName = ctx.resources.getString(R.string.service_cold_water),
                     meterMeasureUnit = ctx.resources.getString(com.oborodulin.home.common.R.string.m3_unit),
-                    prevLastDate = Utils.toOffsetDateTime("2022-08-01T14:29:10.212"),
+                    prevLastDate = Utils.toOffsetDateTime("2022-08-01T14:29:10.212+03:00"),
                     prevValue = BigDecimal.valueOf(1553),
                     valueFormat = "#0.000",
                     valueDate = OffsetDateTime.now()

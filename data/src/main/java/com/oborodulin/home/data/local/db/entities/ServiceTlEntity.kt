@@ -3,6 +3,7 @@ package com.oborodulin.home.data.local.db.entities
 import android.content.Context
 import androidx.room.*
 import com.oborodulin.home.data.R
+import com.oborodulin.home.data.util.ServiceType
 import java.util.*
 
 @Entity(
@@ -119,6 +120,22 @@ class ServiceTlEntity(
                 serviceName = ctx.resources.getString(R.string.service_internet),
                 serviceId = serviceId
             )
+
+        fun serviceTl(ctx: Context, serviceType: ServiceType, serviceId: UUID) =
+            when (serviceType) {
+                ServiceType.RENT -> rentServiceTl(ctx, serviceId)
+                ServiceType.ELECTRICITY -> electricityServiceTl(ctx, serviceId)
+                ServiceType.GAS -> gasServiceTl(ctx, serviceId)
+                ServiceType.COLD_WATER -> coldWaterServiceTl(ctx, serviceId)
+                ServiceType.WASTE -> wasteServiceTl(ctx, serviceId)
+                ServiceType.HEATING -> heatingServiceTl(ctx, serviceId)
+                ServiceType.HOT_WATER -> hotWaterServiceTl(ctx, serviceId)
+                ServiceType.GARBAGE -> garbageServiceTl(ctx, serviceId)
+                ServiceType.DOORPHONE -> doorphoneServiceTl(ctx, serviceId)
+                ServiceType.PHONE -> phoneServiceTl(ctx, serviceId)
+                ServiceType.USGO -> ugsoServiceTl(ctx, serviceId)
+                ServiceType.INTERNET -> internetServiceTl(ctx, serviceId)
+            }
     }
 
     override fun equals(other: Any?): Boolean {

@@ -6,7 +6,6 @@ import androidx.test.filters.MediumTest
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
 import com.oborodulin.home.common.util.Constants
-import com.oborodulin.home.data.local.db.converters.DateTypeConverter
 import com.oborodulin.home.data.local.db.dao.MeterDao
 import com.oborodulin.home.data.local.db.dao.PayerDao
 import com.oborodulin.home.data.local.db.entities.*
@@ -23,6 +22,7 @@ import timber.log.Timber
 import java.math.BigDecimal
 import java.time.OffsetDateTime
 import java.time.format.DateTimeFormatter
+import java.time.temporal.ChronoUnit
 import java.util.*
 
 /**
@@ -114,6 +114,9 @@ class MeterDaoTest : HomeDatabaseTest() {
         runTest {
             // ARRANGE
             val currentDateTime: OffsetDateTime = OffsetDateTime.now()
+            val expectedPrevMonth =
+                currentDateTime.minusMonths(1).withDayOfMonth(1).truncatedTo(ChronoUnit.SECONDS)
+            //    .format(DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ssxxx"))
             // Payer:
             val actualPayerId = PayerDaoTest.insertPayer(db, PayerEntity.payerWithTwoPersons(ctx))
             // Services:
@@ -192,32 +195,22 @@ class MeterDaoTest : HomeDatabaseTest() {
             meterDao.findDistinctPrevMetersValuesByPayerId(actualPayerId).test {
                 val prevMeterValues = awaitItem()
                 prevMeterValues.forEach {
-                    Timber.tag(TAG).d("prevMeterValue: %s", it)
+                    println("prevMeterValue: %s".format(it.serviceType))
                 }
-                assertThat(prevMeterValues).isNotEmpty()
+                assertThat(prevMeterValues).hasSize(3)
                 assertThat(prevMeterValues[0].serviceId).isEqualTo(electricityIds.serviceId)
                 assertThat(prevMeterValues[0].prevValue).isEqualTo(BigDecimal.valueOf(9642))
-                assertThat(prevMeterValues[0].prevLastDate).isEqualTo(
-                    currentDateTime.minusMonths(1).withDayOfMonth(1)
-                )
+                assertThat(prevMeterValues[0].prevLastDate).isEqualTo(expectedPrevMonth)
                 assertThat(prevMeterValues[0].currentValue).isNull()
 
                 assertThat(prevMeterValues[1].serviceId).isEqualTo(gasIds.serviceId)
                 assertThat(prevMeterValues[1].prevValue).isEqualTo(MeterEntity.DEF_GAS_INIT_VAL)
-                assertThat(prevMeterValues[1].prevLastDate).isEqualTo(
-                    currentDateTime.minusMonths(1).withDayOfMonth(1).format(
-                        DateTimeFormatter.ofPattern(Constants.APP_FRACT_SEC_TIME)
-                    )
-                )
+                assertThat(prevMeterValues[1].prevLastDate).isEqualTo(expectedPrevMonth)
                 assertThat(prevMeterValues[1].currentValue).isEqualTo(BigDecimal.valueOf(2154.987))
 
                 assertThat(prevMeterValues[2].serviceId).isEqualTo(hotWaterIds.serviceId)
                 assertThat(prevMeterValues[2].prevValue).isEqualTo(BigDecimal.valueOf(2150.124))
-                assertThat(prevMeterValues[2].prevLastDate).isEqualTo(
-                    currentDateTime.minusMonths(1).withDayOfMonth(1).format(
-                        DateTimeFormatter.ofPattern(Constants.APP_FRACT_SEC_TIME)
-                    )
-                )
+                assertThat(prevMeterValues[2].prevLastDate).isEqualTo(expectedPrevMonth)
                 assertThat(prevMeterValues[2].currentValue).isEqualTo(BigDecimal.valueOf(2154.987))
                 cancel()
             }
@@ -463,20 +456,9 @@ class MeterDaoTest : HomeDatabaseTest() {
     */
     companion object {
         suspend fun insertMeter(
-            ctx: Context, db: HomeDatabase,
-            meter: MeterEntity = MeterEntity.defaultMeter()
+            ctx: Context, db: HomeDatabase, meter: MeterEntity = MeterEntity.defaultMeter()
         ): MeterIds {
-            val meterTl =
-                when (meter.meterType) {
-                    MeterType.ELECTRICITY -> MeterTlEntity.electricityMeterTl(ctx, meter.meterId)
-                    MeterType.GAS -> MeterTlEntity.gasMeterTl(ctx, meter.meterId)
-                    MeterType.COLD_WATER -> MeterTlEntity.coldWaterMeterTl(ctx, meter.meterId)
-                    MeterType.HEATING -> MeterTlEntity.heatingMeterTl(ctx, meter.meterId)
-                    MeterType.HOT_WATER -> MeterTlEntity.hotWaterMeterTl(ctx, meter.meterId)
-                    MeterType.NONE -> MeterTlEntity.defaultMeterTl(
-                        meterId = UUID.randomUUID(), measureUnit = ""
-                    )
-                }
+            val meterTl = MeterTlEntity.meterTl(ctx, meter.meterType, meter.meterId)
             db.meterDao().insert(meter, meterTl)
             return MeterIds(meterId = meter.meterId, meterTlId = meterTl.meterTlId)
         }

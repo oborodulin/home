@@ -3,6 +3,7 @@ package com.oborodulin.home.data.local.db.converters
 import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.room.TypeConverter
+import com.oborodulin.home.common.util.Constants
 import com.oborodulin.home.common.util.Constants.CONV_COEFF_BIGDECIMAL
 import com.oborodulin.home.data.util.MeterType
 import com.oborodulin.home.data.util.ServiceType
@@ -12,7 +13,7 @@ import java.time.format.DateTimeFormatter
 import java.util.*
 
 object HomeTypeConverters {
-    private val formatter = DateTimeFormatter.ISO_OFFSET_DATE_TIME
+    private val formatter = DateTimeFormatter.ofPattern(Constants.APP_OFFSET_DATE_TIME)//.ISO_OFFSET_DATE_TIME
 
     @TypeConverter
     fun toUUID(uuid: String?): UUID? = UUID.fromString(uuid)

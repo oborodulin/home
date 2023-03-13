@@ -18,12 +18,13 @@ SELECT lmv.payerId, lmv.payerServiceId, lmv.metersId, lmv.meterValueId,
             END 
         ELSE lmv.meterValue 
     END) AS diffMeterValue, 
-    lmv.isDerivedUnit, lmv.derivedUnit, lmv.measureUnit, lmv.paymentDate, 
+    lmv.isDerivedUnit, lmv.derivedUnit, lmv.measureUnit, 
+    lmv.paymentDate, 
     lmv.paymentMonth, lmv.paymentYear, lmv.meterLocCode 
 FROM ${MeterValuePaymentPeriodView.VIEW_NAME} lmv 
     JOIN ${MeterValuePaymentPeriodView.VIEW_NAME} pmv ON pmv.metersId = lmv.metersId 
         AND pmv.payerServiceId = lmv.payerServiceId
-        AND pmv.paymentDate = strftime(${Constants.DB_FRACT_SEC_TIME}, lmv.paymentDate, '-1 months')
+        AND strftime(${Constants.DB_FRACT_SEC_TIME}, pmv.paymentDate) = strftime(${Constants.DB_FRACT_SEC_TIME}, lmv.paymentDate, '-1 months')
         AND pmv.meterLocCode = lmv.meterLocCode
 """
 )

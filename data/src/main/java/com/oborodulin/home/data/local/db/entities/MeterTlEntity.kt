@@ -2,6 +2,7 @@ package com.oborodulin.home.data.local.db.entities
 
 import android.content.Context
 import androidx.room.*
+import com.oborodulin.home.data.util.MeterType
 import java.util.*
 
 @Entity(
@@ -60,6 +61,17 @@ data class MeterTlEntity(
             measureUnit = ctx.resources.getString(com.oborodulin.home.common.R.string.Gcalm2_unit),
             meterId = meterId
         )
+
+        fun meterTl(ctx: Context, meterType: MeterType, meterId: UUID) =
+            when (meterType) {
+                MeterType.ELECTRICITY -> electricityMeterTl(ctx, meterId)
+                MeterType.GAS -> gasMeterTl(ctx, meterId)
+                MeterType.COLD_WATER -> coldWaterMeterTl(ctx, meterId)
+                MeterType.HEATING -> heatingMeterTl(ctx, meterId)
+                MeterType.HOT_WATER -> hotWaterMeterTl(ctx, meterId)
+                MeterType.NONE -> defaultMeterTl(meterId = UUID.randomUUID(), measureUnit = "")
+            }
+
     }
 
     override fun equals(other: Any?): Boolean {

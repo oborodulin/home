@@ -11,7 +11,7 @@ import java.util.*
 
 object DateTypeConverter {
     private val formatter = SimpleDateFormat("dd.MM.yyyy")
-    private val offsetFormatter = DateTimeFormatter.ofPattern(Constants.APP_FRACT_SEC_TIME)
+    private val offsetFormatter = DateTimeFormatter.ofPattern(Constants.APP_OFFSET_DATE_TIME)
 
     @TypeConverter
     fun fromDate(date: Date?): Long? = date?.let { formatter.format(it).toLong() }
@@ -22,9 +22,10 @@ object DateTypeConverter {
     @TypeConverter
     @JvmStatic
     fun toOffsetDateTime(value: String?): OffsetDateTime? = value?.let {
-        LocalDateTime.parse(it)
+        offsetFormatter.parse(value, OffsetDateTime::from)
+        /*LocalDateTime.parse(it)
             .atZone(ZoneId.systemDefault())
-            .toOffsetDateTime()
+            .toOffsetDateTime()*/
     }
 
     @TypeConverter

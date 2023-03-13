@@ -16,7 +16,6 @@ import com.oborodulin.home.data.local.db.dao.ServiceDao
 import com.oborodulin.home.data.local.db.entities.*
 import com.oborodulin.home.data.local.db.views.*
 import com.oborodulin.home.data.util.Constants
-import com.oborodulin.home.data.util.ServiceType
 import kotlinx.coroutines.*
 import timber.log.Timber
 import java.time.OffsetDateTime
@@ -84,7 +83,7 @@ abstract class HomeDatabase : RoomDatabase() {
         private var INSTANCE: HomeDatabase? = null
 
         @Synchronized
-        fun getInstance(context: Context, jsonLogger: Gson? = null): HomeDatabase {
+        fun getInstance(context: Context, jsonLogger: Gson? = Gson()): HomeDatabase {
             // Multiple threads can ask for the database at the same time, ensure we only initialize
             // it once by using synchronized. Only one thread may enter a synchronized block at a
             // time.
@@ -305,16 +304,11 @@ abstract class HomeDatabase : RoomDatabase() {
                 val ugsoPayer1ServiceId =
                     insertPayerService(db, payer = payer1Entity, serviceId = ugsoService.serviceId)
                 // Meters:
+                Timber.tag(TAG).i("Meters:")
                 // Electricity
                 val electricityPayer1Meter =
                     MeterEntity.electricityMeter(context, payer1Entity.payerId)
-                insertDefMeter(
-                    db, listOf(electricityPayer1ServiceId), electricityPayer1Meter,
-                    MeterTlEntity.electricityMeterTl(
-                        context,
-                        electricityPayer1Meter.meterId
-                    )
-                )
+                insertDefMeter(db, electricityPayer1Meter)
                 // values:
                 insertDefMeterValue(
                     db, MeterValueEntity.electricityMeterValue1(
@@ -337,10 +331,7 @@ abstract class HomeDatabase : RoomDatabase() {
                 // Cold water
                 val coldWaterPayer1Meter =
                     MeterEntity.coldWaterMeter(context, payer1Entity.payerId)
-                insertDefMeter(
-                    db, listOf(coldWaterPayer1ServiceId), coldWaterPayer1Meter,
-                    MeterTlEntity.coldWaterMeterTl(context, coldWaterPayer1Meter.meterId)
-                )
+                insertDefMeter(db, coldWaterPayer1Meter)
                 // values:
                 insertDefMeterValue(
                     db, MeterValueEntity.coldWaterMeterValue1(
@@ -363,20 +354,11 @@ abstract class HomeDatabase : RoomDatabase() {
                 // Hot water
                 val hotWaterPayer1Meter =
                     MeterEntity.hotWaterMeter(context, payer1Entity.payerId)
-                insertDefMeter(
-                    db, listOf(hotWaterPayer1ServiceId, wastePayer1ServiceId), hotWaterPayer1Meter,
-                    MeterTlEntity.hotWaterMeterTl(context, hotWaterPayer1Meter.meterId)
-                )
+                insertDefMeter(db, hotWaterPayer1Meter)
                 // Heating
                 val heatingPayer1Meter =
                     MeterEntity.heatingMeter(context, payer1Entity.payerId)
-                insertDefMeter(
-                    db, listOf(heatingPayer1ServiceId), heatingPayer1Meter,
-                    MeterTlEntity.heatingMeterTl(
-                        context,
-                        heatingPayer1Meter.meterId
-                    )
-                )
+                insertDefMeter(db, heatingPayer1Meter)
                 // values:
                 insertDefMeterValue(
                     db, MeterValueEntity.heatingMeterValue1(
@@ -483,13 +465,7 @@ abstract class HomeDatabase : RoomDatabase() {
                 // Electricity
                 val electricityPayer2Meter =
                     MeterEntity.electricityMeter(context, payer2Entity.payerId)
-                insertDefMeter(
-                    db, listOf(electricityPayer2ServiceId), electricityPayer2Meter,
-                    MeterTlEntity.electricityMeterTl(
-                        context,
-                        electricityPayer2Meter.meterId
-                    )
-                )
+                insertDefMeter(db, electricityPayer2Meter)
                 // values:
                 insertDefMeterValue(
                     db, MeterValueEntity.electricityMeterValue1(
@@ -512,10 +488,7 @@ abstract class HomeDatabase : RoomDatabase() {
                 // Cold water
                 val coldWaterPayer2Meter =
                     MeterEntity.coldWaterMeter(context, payer2Entity.payerId)
-                insertDefMeter(
-                    db, listOf(coldWaterPayer2ServiceId), coldWaterPayer2Meter,
-                    MeterTlEntity.coldWaterMeterTl(context, coldWaterPayer2Meter.meterId)
-                )
+                insertDefMeter(db, coldWaterPayer2Meter)
                 // values:
                 insertDefMeterValue(
                     db, MeterValueEntity.coldWaterMeterValue1(
@@ -538,10 +511,7 @@ abstract class HomeDatabase : RoomDatabase() {
                 // Hot water
                 val hotWaterPayer2Meter =
                     MeterEntity.hotWaterMeter(context, payer2Entity.payerId)
-                insertDefMeter(
-                    db, listOf(hotWaterPayer2ServiceId, wastePayer2ServiceId), hotWaterPayer2Meter,
-                    MeterTlEntity.hotWaterMeterTl(context, hotWaterPayer2Meter.meterId)
-                )
+                insertDefMeter(db, hotWaterPayer2Meter)
                 // values:
                 insertDefMeterValue(
                     db, MeterValueEntity.hotWaterMeterValue1(
@@ -564,10 +534,7 @@ abstract class HomeDatabase : RoomDatabase() {
                 // Payer 2 rates:
                 // rent
                 insertDefRate(
-                    db, RateEntity.rentRateForPayer(
-                        rentService.serviceId,
-                        rentPayer2ServiceId
-                    )
+                    db, RateEntity.rentRateForPayer(rentService.serviceId, rentPayer2ServiceId)
                 )
                 // heating
                 insertDefRate(
@@ -612,34 +579,7 @@ abstract class HomeDatabase : RoomDatabase() {
 
         private fun insertDefService(db: SupportSQLiteDatabase, service: ServiceEntity) {
             val textContent =
-                when (service.serviceType) {
-                    ServiceType.RENT -> ServiceTlEntity.rentServiceTl(context, service.serviceId)
-                    ServiceType.ELECTRICITY -> ServiceTlEntity.electricityServiceTl(
-                        context, service.serviceId
-                    )
-                    ServiceType.GAS -> ServiceTlEntity.gasServiceTl(context, service.serviceId)
-                    ServiceType.COLD_WATER -> ServiceTlEntity.coldWaterServiceTl(
-                        context, service.serviceId
-                    )
-                    ServiceType.WASTE -> ServiceTlEntity.wasteServiceTl(context, service.serviceId)
-                    ServiceType.HEATING -> ServiceTlEntity.heatingServiceTl(
-                        context, service.serviceId
-                    )
-                    ServiceType.HOT_WATER -> ServiceTlEntity.hotWaterServiceTl(
-                        context, service.serviceId
-                    )
-                    ServiceType.GARBAGE -> ServiceTlEntity.garbageServiceTl(
-                        context, service.serviceId
-                    )
-                    ServiceType.DOORPHONE -> ServiceTlEntity.doorphoneServiceTl(
-                        context, service.serviceId
-                    )
-                    ServiceType.PHONE -> ServiceTlEntity.phoneServiceTl(context, service.serviceId)
-                    ServiceType.USGO -> ServiceTlEntity.ugsoServiceTl(context, service.serviceId)
-                    ServiceType.INTERNET -> ServiceTlEntity.internetServiceTl(
-                        context, service.serviceId
-                    )
-                }
+                ServiceTlEntity.serviceTl(context, service.serviceType, service.serviceId)
             db.insert(
                 ServiceEntity.TABLE_NAME,
                 SQLiteDatabase.CONFLICT_REPLACE,
@@ -682,10 +622,8 @@ abstract class HomeDatabase : RoomDatabase() {
             return payerService.payerServiceId
         }
 
-        private fun insertDefMeter(
-            db: SupportSQLiteDatabase, payerServiceIds: List<UUID>,
-            meter: MeterEntity, textContent: MeterTlEntity
-        ) {
+        private fun insertDefMeter(db: SupportSQLiteDatabase, meter: MeterEntity) {
+            val textContent = MeterTlEntity.meterTl(context, meter.meterType, meter.meterId)
             db.insert(
                 MeterEntity.TABLE_NAME,
                 SQLiteDatabase.CONFLICT_REPLACE,

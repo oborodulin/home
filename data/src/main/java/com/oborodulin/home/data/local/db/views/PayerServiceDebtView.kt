@@ -11,7 +11,8 @@ import java.util.*
 @DatabaseView(
     viewName = PayerServiceDebtView.VIEW_NAME,
     value = """
-SELECT rps.payerId, rps.personsNum, rps.totalArea, rps.livingSpace, mrv.paymentDate, 
+SELECT rps.payerId, rps.personsNum, rps.totalArea, rps.livingSpace, 
+        mrv.paymentDate, 
         mrv.paymentMonth, mrv.paymentYear, rps.isPerPerson, rps.servicePos, rps.serviceType, rps.serviceName, 
         rps.serviceLocCode, rps.rateValue, rps.fromMeterValue, rps.toMeterValue, 
         NULL AS diffMeterValue, rps.serviceMeasureUnit AS measureUnit, 0 AS isDerivedUnit, rps.serviceId, 
@@ -50,7 +51,8 @@ WHERE rps.isMeterUses = 0
                                                     strftime(${Constants.DB_FRACT_SEC_TIME}, rps.startDate))
     AND ifnull(mrv.isLinePaid, 0) = 0
 UNION ALL
-SELECT rps.payerId, rps.personsNum, rps.totalArea, rps.livingSpace, mvp.paymentDate, 
+SELECT rps.payerId, rps.personsNum, rps.totalArea, rps.livingSpace, 
+        mvp.paymentDate, 
         mvp.paymentMonth, mvp.paymentYear, 0 AS isPerPerson, rps.servicePos, rps.serviceType, rps.serviceName, 
         rps.serviceLocCode, rps.rateValue, rps.fromMeterValue, rps.toMeterValue, 
         mvp.diffMeterValue, mvp.measureUnit, mvp.isDerivedUnit, rps.serviceId, rps.payerServiceId,
