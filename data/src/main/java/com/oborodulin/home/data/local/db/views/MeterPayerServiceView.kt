@@ -9,10 +9,9 @@ import java.util.*
     viewName = MeterPayerServiceView.VIEW_NAME,
     value = """
 SELECT m.*, s.*, ps.payerServiceId, ps.isMeterOwner, ps.isPrivileges, ps.isAllocateRate
-FROM ${MeterView.VIEW_NAME} m JOIN ${ServiceView.VIEW_NAME} s ON s.serviceMeterType = m.meterType 
-                                                            AND s.serviceLocCode = m.meterLocCode
-    JOIN ${PayerServiceCrossRefEntity.TABLE_NAME} ps ON ps.payersId = m.payersId 
-                                                    AND ps.servicesId = s.serviceId 
+FROM ${MeterView.VIEW_NAME} m 
+    JOIN ${ServiceView.VIEW_NAME} s ON s.serviceMeterType = m.meterType AND s.serviceLocCode = m.meterLocCode
+    JOIN ${PayerServiceCrossRefEntity.TABLE_NAME} ps ON ps.payersId = m.payersId AND ps.servicesId = s.serviceId 
 ORDER BY m.payersId, s.servicePos
 """
 )

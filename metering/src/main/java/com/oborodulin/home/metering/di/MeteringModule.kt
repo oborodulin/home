@@ -13,7 +13,7 @@ import com.oborodulin.home.metering.ui.model.converters.PrevServiceMeterValuesLi
 import com.oborodulin.home.metering.ui.model.mappers.MeterValueListItemToMeterValueMapper
 import com.oborodulin.home.metering.ui.model.mappers.MeterValueToMeterValueListItemMapper
 import com.oborodulin.home.metering.ui.model.mappers.PrevMetersValuesViewToMeterValueListItemListMapper
-import com.oborodulin.home.metering.ui.model.mappers.PrevMetersValuesViewToMeterValueModelMapper
+import com.oborodulin.home.metering.ui.model.mappers.PrevMetersValuesViewToMeterValueListItemMapper
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -86,18 +86,18 @@ object MeteringModule {
 
     @Singleton
     @Provides
-    fun providePrevMetersValuesViewToMeterValueModelMapper(): PrevMetersValuesViewToMeterValueModelMapper =
-        PrevMetersValuesViewToMeterValueModelMapper()
+    fun providePrevMetersValuesViewToMeterValueListItemMapper(): PrevMetersValuesViewToMeterValueListItemMapper =
+        PrevMetersValuesViewToMeterValueListItemMapper()
 
     @Singleton
     @Provides
-    fun providePrevMetersValuesViewToMeterValueListItemListMapper(mapper: PrevMetersValuesViewToMeterValueModelMapper): PrevMetersValuesViewToMeterValueListItemListMapper =
+    fun providePrevMetersValuesViewToMeterValueListItemListMapper(mapper: PrevMetersValuesViewToMeterValueListItemMapper): PrevMetersValuesViewToMeterValueListItemListMapper =
         PrevMetersValuesViewToMeterValueListItemListMapper(mapper = mapper)
 
     // CONVERTERS:
     @Singleton
     @Provides
-    fun providePrevServiceMeterValuesListConverter(mapper: PrevMetersValuesViewToMeterValueModelMapper): PrevServiceMeterValuesListConverter =
+    fun providePrevServiceMeterValuesListConverter(mapper: PrevMetersValuesViewToMeterValueListItemMapper): PrevServiceMeterValuesListConverter =
         PrevServiceMeterValuesListConverter(mapper = mapper)
 
     // DATA SOURCES:

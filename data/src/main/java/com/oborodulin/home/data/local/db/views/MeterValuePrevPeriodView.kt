@@ -6,6 +6,7 @@ import com.oborodulin.home.common.util.Constants
 import com.oborodulin.home.data.local.db.converters.DateTypeConverter
 import com.oborodulin.home.data.local.db.entities.MeterValueEntity
 import com.oborodulin.home.data.local.db.entities.PayerEntity
+import com.oborodulin.home.data.local.db.entities.PayerServiceCrossRefEntity
 import com.oborodulin.home.data.util.Constants.DB_FRACT_SEC_TIME
 import com.oborodulin.home.data.util.MeterType
 import com.oborodulin.home.data.util.ServiceType
@@ -45,12 +46,13 @@ FROM (SELECT mvl.meterValueId, mv.payersId, mv.servicesId, mv.meterId, mv.meterT
             AND mv.isMeterOwner = 1) mvf
         JOIN ${ServiceView.VIEW_NAME} sv ON sv.serviceId = mvf.servicesId AND sv.serviceMeterType = mvf.meterType
         JOIN ${PayerEntity.TABLE_NAME} p ON p.payerId = mvf.payersId
+        JOIN ${PayerServiceCrossRefEntity.TABLE_NAME} ps ON ps.servicesId = sv.serviceId AND ps.payersId = p.payerId AND ps.isMeterOwner = 1
         JOIN ${MeterValueMaxPrevDateView.VIEW_NAME} mpd ON mpd.meterId = mvf.meterId AND mpd.maxValueDate = mvf.prevLastDate
 ORDER BY p.payerId, sv.servicePos
 """
 )
 class MeterValuePrevPeriodView(
-    val meterValueId: UUID,
+    val meterValueId: UUID?,
     val payerId: UUID,
     val serviceId: UUID,
     val serviceType: ServiceType,

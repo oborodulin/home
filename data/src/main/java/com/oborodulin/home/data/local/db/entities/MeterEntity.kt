@@ -2,7 +2,6 @@ package com.oborodulin.home.data.local.db.entities
 
 import android.content.Context
 import androidx.room.*
-import com.oborodulin.home.common.util.Utils
 import com.oborodulin.home.data.R
 import com.oborodulin.home.data.util.MeterType
 import java.math.BigDecimal
@@ -33,18 +32,20 @@ data class MeterEntity(
     companion object {
         const val TABLE_NAME = "meters"
 
-        val DEF_PASSPORT_DATE: OffsetDateTime =
-            Utils.toOffsetDateTime("2022-06-19T14:29:10.212+03:00")
-        val DEF_GAS_INIT_VAL: BigDecimal = BigDecimal.valueOf(0.695)
-        val DEF_COLD_WATER_INIT_VAL: BigDecimal = BigDecimal.valueOf(1523.125)
-        val DEF_HOT_WATER_INIT_VAL: BigDecimal = BigDecimal.valueOf(2145.755)
-        val DEF_HEATING_INIT_VAL: BigDecimal = BigDecimal.valueOf(0.02113)
+        val DEF_PASSPORT_DATE: OffsetDateTime = OffsetDateTime.now().minusMonths(7)
+
+        //Utils.toOffsetDateTime("2022-06-19T14:29:10.212+03:00")
+        val DEF_ELECTRO_INIT_VAL: BigDecimal? = null
+        val DEF_GAS_INIT_VAL: BigDecimal = BigDecimal("0.695")
+        val DEF_COLD_WATER_INIT_VAL: BigDecimal = BigDecimal("1523.125")
+        val DEF_HOT_WATER_INIT_VAL: BigDecimal = BigDecimal("2145.755")
+        val DEF_HEATING_INIT_VAL: BigDecimal = BigDecimal("0.02113")
 
         fun defaultMeter(
             payerId: UUID = UUID.randomUUID(), meterId: UUID = UUID.randomUUID(),
             meterNum: String = "",
             meterType: MeterType = MeterType.NONE,
-            maxValue: BigDecimal = BigDecimal.valueOf(9999.999),
+            maxValue: BigDecimal = BigDecimal("9999.999"),
             passportDate: OffsetDateTime? = null,
             initValue: BigDecimal? = null,
             verificationPeriod: Int? = null
@@ -60,64 +61,63 @@ data class MeterEntity(
         )
 
         fun electricityMeter(
-            ctx: Context, payerId: UUID,
-            passportDate: OffsetDateTime? = null,
-            initValue: BigDecimal? = null
+            ctx: Context, payerId: UUID, currDate: OffsetDateTime? = null,
+            initValue: BigDecimal? = DEF_ELECTRO_INIT_VAL
         ) = defaultMeter(
             meterNum = ctx.resources.getString(R.string.def_meter_num),
             payerId = payerId,
             meterType = MeterType.ELECTRICITY,
-            maxValue = BigDecimal.valueOf(9999),
-            passportDate = passportDate,
+            maxValue = BigDecimal("9999"),
+            passportDate = currDate?.minusMonths(7),
             initValue = initValue
         )
 
         fun gasMeter(
-            ctx: Context, payerId: UUID,
-            passportDate: OffsetDateTime? = DEF_PASSPORT_DATE,
+            ctx: Context, payerId: UUID, currDate: OffsetDateTime? = DEF_PASSPORT_DATE,
             initValue: BigDecimal? = DEF_GAS_INIT_VAL
         ) = defaultMeter(
             meterNum = ctx.resources.getString(R.string.def_meter_num),
             payerId = payerId,
             meterType = MeterType.GAS,
-            maxValue = BigDecimal.valueOf(9999.999),
-            passportDate = passportDate,
+            maxValue = BigDecimal("9999.999"),
+            passportDate = currDate?.minusMonths(7),
             initValue = initValue
         )
 
         fun coldWaterMeter(
-            ctx: Context, payerId: UUID,
-            passportDate: OffsetDateTime? = DEF_PASSPORT_DATE,
+            ctx: Context, payerId: UUID, currDate: OffsetDateTime? = DEF_PASSPORT_DATE,
             initValue: BigDecimal? = DEF_COLD_WATER_INIT_VAL
         ) = defaultMeter(
             meterNum = ctx.resources.getString(R.string.def_meter_num),
             payerId = payerId,
             meterType = MeterType.COLD_WATER,
-            maxValue = BigDecimal.valueOf(99999.999),
-            passportDate = passportDate,
+            maxValue = BigDecimal("99999.999"),
+            passportDate = currDate?.minusMonths(7),
             initValue = initValue
         )
 
         fun hotWaterMeter(
-            ctx: Context, payerId: UUID,
-            passportDate: OffsetDateTime? = DEF_PASSPORT_DATE,
+            ctx: Context, payerId: UUID, currDate: OffsetDateTime? = DEF_PASSPORT_DATE,
             initValue: BigDecimal? = DEF_HOT_WATER_INIT_VAL
         ) = defaultMeter(
             meterNum = ctx.resources.getString(R.string.def_meter_num),
             payerId = payerId,
             meterType = MeterType.HOT_WATER,
-            maxValue = BigDecimal.valueOf(99999.999),
-            passportDate = passportDate,
+            maxValue = BigDecimal("99999.999"),
+            passportDate = currDate?.minusMonths(7),
             initValue = initValue
         )
 
-        fun heatingMeter(ctx: Context, payerId: UUID) = defaultMeter(
+        fun heatingMeter(
+            ctx: Context, payerId: UUID, currDate: OffsetDateTime? = DEF_PASSPORT_DATE,
+            initValue: BigDecimal? = DEF_HEATING_INIT_VAL
+        ) = defaultMeter(
             meterNum = ctx.resources.getString(R.string.def_meter_num),
             payerId = payerId,
             meterType = MeterType.HEATING,
-            maxValue = BigDecimal.valueOf(9.99999),
-            passportDate = DEF_PASSPORT_DATE,
-            initValue = DEF_HEATING_INIT_VAL
+            maxValue = BigDecimal("9.99999"),
+            passportDate = currDate?.minusMonths(7),
+            initValue = initValue
         )
     }
 

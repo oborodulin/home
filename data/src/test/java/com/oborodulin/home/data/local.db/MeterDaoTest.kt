@@ -5,7 +5,6 @@ import android.os.Build
 import androidx.test.filters.MediumTest
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
-import com.oborodulin.home.common.util.Constants
 import com.oborodulin.home.data.local.db.dao.MeterDao
 import com.oborodulin.home.data.local.db.dao.PayerDao
 import com.oborodulin.home.data.local.db.entities.*
@@ -18,10 +17,8 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
 import org.robolectric.annotation.Config
-import timber.log.Timber
 import java.math.BigDecimal
 import java.time.OffsetDateTime
-import java.time.format.DateTimeFormatter
 import java.time.temporal.ChronoUnit
 import java.util.*
 
@@ -110,12 +107,14 @@ class MeterDaoTest : HomeDatabaseTest() {
 
     @OptIn(ExperimentalCoroutinesApi::class)
     @Test
-    fun insertMeterValuesAndFindPrevMetersValuesByPayerId_shouldReturn_theCorrectPrevMetersValues_inFlow() =
+    fun insertMeterValuesAndFindPrevMetersValuesByPayerId_return_correctPrevMetersValues_inFlow() =
         runTest {
             // ARRANGE
             val currentDateTime: OffsetDateTime = OffsetDateTime.now()
             val expectedPrevMonth =
                 currentDateTime.minusMonths(1).withDayOfMonth(1).truncatedTo(ChronoUnit.SECONDS)
+            val expectedPassportDate =
+                currentDateTime.minusMonths(7).truncatedTo(ChronoUnit.SECONDS)
             //    .format(DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ssxxx"))
             // Payer:
             val actualPayerId = PayerDaoTest.insertPayer(db, PayerEntity.payerWithTwoPersons(ctx))
@@ -123,7 +122,11 @@ class MeterDaoTest : HomeDatabaseTest() {
             val electricityIds =
                 ServiceDaoTest.insertService(ctx, db, ServiceEntity.electricity2Service())
             val gasIds = ServiceDaoTest.insertService(ctx, db, ServiceEntity.gas3Service())
+            val coldWaterIds =
+                ServiceDaoTest.insertService(ctx, db, ServiceEntity.coldWater4Service())
             val wasteIds = ServiceDaoTest.insertService(ctx, db, ServiceEntity.waste5Service())
+            val heatingIds =
+                ServiceDaoTest.insertService(ctx, db, ServiceEntity.heating6Service())
             val hotWaterIds =
                 ServiceDaoTest.insertService(ctx, db, ServiceEntity.hotWater7Service())
             // Payer services:
@@ -131,87 +134,110 @@ class MeterDaoTest : HomeDatabaseTest() {
                 PayerDaoTest.insertPayerService(db, actualPayerId, electricityIds.serviceId, true)
             val payerGasId =
                 PayerDaoTest.insertPayerService(db, actualPayerId, gasIds.serviceId, true)
+            val payerColdWaterId =
+                PayerDaoTest.insertPayerService(db, actualPayerId, coldWaterIds.serviceId, true)
             val payerWasteId =
                 PayerDaoTest.insertPayerService(db, actualPayerId, wasteIds.serviceId)
+            val payerHeatingId =
+                PayerDaoTest.insertPayerService(db, actualPayerId, heatingIds.serviceId, true)
             val payerHotWaterId =
                 PayerDaoTest.insertPayerService(db, actualPayerId, hotWaterIds.serviceId, true)
-
             // Meters:
             val electricityMeterIds =
-                insertMeter(ctx, db, MeterEntity.electricityMeter(ctx, actualPayerId))
+                insertMeter(
+                    ctx, db, MeterEntity.electricityMeter(ctx, actualPayerId, currentDateTime)
+                )
             val gasMeterIds =
+                insertMeter(ctx, db, MeterEntity.gasMeter(ctx, actualPayerId, currentDateTime))
+            val coldWaterMeterIds =
                 insertMeter(
-                    ctx, db,
-                    MeterEntity.gasMeter(
-                        ctx, actualPayerId,
-                        passportDate = currentDateTime.minusMonths(2).withDayOfMonth(1)
-                    )
+                    ctx, db, MeterEntity.coldWaterMeter(ctx, actualPayerId, currentDateTime)
                 )
+            val heatingMeterIds =
+                insertMeter(ctx, db, MeterEntity.heatingMeter(ctx, actualPayerId, currentDateTime))
             val hotWaterMeterIds =
-                insertMeter(
-                    ctx, db, MeterEntity.hotWaterMeter(
-                        ctx, actualPayerId,
-                        passportDate = currentDateTime.minusMonths(1).withDayOfMonth(1)
-                    )
-                )
+                insertMeter(ctx, db, MeterEntity.hotWaterMeter(ctx, actualPayerId, currentDateTime))
 
             // ACT
             meterDao.insert(
                 // Electricity
-                MeterValueEntity.defaultMeterValue(
-                    meterId = electricityMeterIds.meterId,
-                    valueDate = currentDateTime.minusMonths(2).withDayOfMonth(1),
-                    meterValue = BigDecimal.valueOf(9558)
+                MeterValueEntity.electricityMeterValue1(
+                    meterId = electricityMeterIds.meterId, currDate = currentDateTime
                 ),
-                MeterValueEntity.defaultMeterValue(
-                    meterId = electricityMeterIds.meterId,
-                    valueDate = currentDateTime.minusMonths(1).withDayOfMonth(1),
-                    meterValue = BigDecimal.valueOf(9642)
+                MeterValueEntity.electricityMeterValue2(
+                    meterId = electricityMeterIds.meterId, currDate = currentDateTime
+                ),
+                MeterValueEntity.electricityMeterValue3(
+                    meterId = electricityMeterIds.meterId, currDate = currentDateTime
+                ),
+                MeterValueEntity.electricityMeterValue4(
+                    meterId = electricityMeterIds.meterId, currDate = currentDateTime
                 ),
                 // Gas
-                /*MeterValueEntity.defaultMeterValue(
-                    meterId = gasMeterIds.meterId,
-                    valueDate = currentDateTime.minusMonths(1).withDayOfMonth(1),
-                    meterValue = BigDecimal.valueOf(1.954)
-                ),*/
-                MeterValueEntity.defaultMeterValue(
-                    meterId = gasMeterIds.meterId,
-                    valueDate = currentDateTime.withDayOfMonth(1),
-                    meterValue = BigDecimal.valueOf(2.751)
+                MeterValueEntity.gasMeterValue1(
+                    meterId = gasMeterIds.meterId, currDate = currentDateTime
+                ),
+                MeterValueEntity.gasMeterValue2(
+                    meterId = gasMeterIds.meterId, currDate = currentDateTime
+                ),
+                MeterValueEntity.gasMeterValue3(
+                    meterId = gasMeterIds.meterId, currDate = currentDateTime
+                ),
+                // Cold Water
+                MeterValueEntity.coldWaterMeterValue1(
+                    meterId = coldWaterMeterIds.meterId, currDate = currentDateTime
+                ),
+                MeterValueEntity.coldWaterMeterValue2(
+                    meterId = coldWaterMeterIds.meterId, currDate = currentDateTime
+                ),
+                MeterValueEntity.coldWaterMeterValue3(
+                    meterId = coldWaterMeterIds.meterId, currDate = currentDateTime
+                ),
+                // Heating
+                MeterValueEntity.heatingMeterValue1(
+                    meterId = heatingMeterIds.meterId, currDate = currentDateTime
+                ),
+                MeterValueEntity.heatingMeterValue2(
+                    meterId = heatingMeterIds.meterId, currDate = currentDateTime
+                ),
+                MeterValueEntity.heatingMeterValue3(
+                    meterId = heatingMeterIds.meterId, currDate = currentDateTime
                 ),
                 // Hot Water
-                MeterValueEntity.defaultMeterValue(
-                    meterId = hotWaterMeterIds.meterId,
-                    valueDate = currentDateTime.minusMonths(1).withDayOfMonth(1),
-                    meterValue = BigDecimal.valueOf(2150.124)
-                ),
-                MeterValueEntity.defaultMeterValue(
-                    meterId = hotWaterMeterIds.meterId,
-                    valueDate = currentDateTime.withDayOfMonth(1),
-                    meterValue = BigDecimal.valueOf(2154.987)
-                )
             )
             // ASSERT
             meterDao.findDistinctPrevMetersValuesByPayerId(actualPayerId).test {
                 val prevMeterValues = awaitItem()
-                prevMeterValues.forEach {
+                /*prevMeterValues.forEach {
                     println("prevMeterValue: %s".format(it.serviceType))
-                }
-                assertThat(prevMeterValues).hasSize(3)
+                }*/
+                assertThat(prevMeterValues).hasSize(5)
+
                 assertThat(prevMeterValues[0].serviceId).isEqualTo(electricityIds.serviceId)
-                assertThat(prevMeterValues[0].prevValue).isEqualTo(BigDecimal.valueOf(9642))
+                assertThat(prevMeterValues[0].prevValue).isEqualTo(MeterValueEntity.DEF_ELECTRO_VAL4)
                 assertThat(prevMeterValues[0].prevLastDate).isEqualTo(expectedPrevMonth)
                 assertThat(prevMeterValues[0].currentValue).isNull()
 
                 assertThat(prevMeterValues[1].serviceId).isEqualTo(gasIds.serviceId)
-                assertThat(prevMeterValues[1].prevValue).isEqualTo(MeterEntity.DEF_GAS_INIT_VAL)
+                assertThat(prevMeterValues[1].prevValue).isEqualTo(MeterValueEntity.DEF_GAS_VAL3)
                 assertThat(prevMeterValues[1].prevLastDate).isEqualTo(expectedPrevMonth)
-                assertThat(prevMeterValues[1].currentValue).isEqualTo(BigDecimal.valueOf(2154.987))
+                assertThat(prevMeterValues[1].currentValue).isNull()
 
-                assertThat(prevMeterValues[2].serviceId).isEqualTo(hotWaterIds.serviceId)
-                assertThat(prevMeterValues[2].prevValue).isEqualTo(BigDecimal.valueOf(2150.124))
+                assertThat(prevMeterValues[2].serviceId).isEqualTo(coldWaterIds.serviceId)
+                assertThat(prevMeterValues[2].prevValue).isEqualTo(MeterValueEntity.DEF_COLD_WATER_VAL2)
                 assertThat(prevMeterValues[2].prevLastDate).isEqualTo(expectedPrevMonth)
-                assertThat(prevMeterValues[2].currentValue).isEqualTo(BigDecimal.valueOf(2154.987))
+                assertThat(prevMeterValues[2].currentValue).isEqualTo(MeterValueEntity.DEF_COLD_WATER_VAL3)
+
+                assertThat(prevMeterValues[3].serviceId).isEqualTo(heatingIds.serviceId)
+                assertThat(prevMeterValues[3].prevValue).isEqualTo(MeterValueEntity.DEF_HEATING_VAL2)
+                assertThat(prevMeterValues[3].prevLastDate).isEqualTo(expectedPrevMonth)
+                assertThat(prevMeterValues[3].currentValue).isEqualTo(MeterValueEntity.DEF_HEATING_VAL3)
+
+                assertThat(prevMeterValues[4].serviceId).isEqualTo(hotWaterIds.serviceId)
+                assertThat(prevMeterValues[4].prevValue).isEqualTo(MeterEntity.DEF_HOT_WATER_INIT_VAL)
+                assertThat(prevMeterValues[4].prevLastDate).isEqualTo(expectedPassportDate)
+                assertThat(prevMeterValues[4].currentValue).isNull()
+
                 cancel()
             }
         }

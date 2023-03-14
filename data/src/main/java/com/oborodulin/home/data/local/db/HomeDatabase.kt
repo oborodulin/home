@@ -187,23 +187,23 @@ abstract class HomeDatabase : RoomDatabase() {
             try {
                 // Default payers:
                 // 1
-                val payer1Entity = PayerEntity.payerWithTwoPersons(context)
+                val payer1 = PayerEntity.payerWithTwoPersons(context)
                 db.insert(
                     PayerEntity.TABLE_NAME,
                     SQLiteDatabase.CONFLICT_REPLACE,
-                    Mapper.toContentValues(payer1Entity)
+                    Mapper.toContentValues(payer1)
                 )
                 Timber.tag(TAG)
-                    .i("Default 1 PayerEntity imported: {%s}", jsonLogger?.toJson(payer1Entity))
+                    .i("Default 1 PayerEntity imported: {%s}", jsonLogger?.toJson(payer1))
                 // 2
-                val payer2Entity = PayerEntity.favoritePayer(context)
+                val payer2 = PayerEntity.favoritePayer(context)
                 db.insert(
                     PayerEntity.TABLE_NAME,
                     SQLiteDatabase.CONFLICT_REPLACE,
-                    Mapper.toContentValues(payer2Entity)
+                    Mapper.toContentValues(payer2)
                 )
                 Timber.tag(TAG)
-                    .i("Default 2 PayerEntity imported: {%s}", jsonLogger?.toJson(payer2Entity))
+                    .i("Default 2 PayerEntity imported: {%s}", jsonLogger?.toJson(payer2))
                 // Default services:
                 // rent
                 val rentService = ServiceEntity.rent1Service(); insertDefService(db, rentService)
@@ -230,11 +230,15 @@ abstract class HomeDatabase : RoomDatabase() {
                 val doorphoneService = ServiceEntity.doorphone9Service()
                 insertDefService(db, doorphoneService)
                 // phone
-                val phoneService = ServiceEntity.phone10Service()
-                insertDefService(db, phoneService)
+                val phoneService = ServiceEntity.phone10Service(); insertDefService(
+                    db,
+                    phoneService
+                )
                 // ugso
-                val ugsoService = ServiceEntity.ugso11Service()
-                insertDefService(db, ugsoService)
+                val ugsoService = ServiceEntity.ugso11Service(); insertDefService(db, ugsoService)
+                // internet
+                val internetService = ServiceEntity.internet12Service()
+                insertDefService(db, internetService)
 
                 // Default rates:
                 // electricity
@@ -262,120 +266,129 @@ abstract class HomeDatabase : RoomDatabase() {
                 // ==============================
                 // FOR Payer 1:
                 val rentPayer1ServiceId =
-                    insertPayerService(db, payer = payer1Entity, serviceId = rentService.serviceId)
+                    insertPayerService(db, payer = payer1, serviceId = rentService.serviceId)
                 val electricityPayer1ServiceId =
                     insertPayerService(
-                        db, payer = payer1Entity,
+                        db, payer = payer1,
                         serviceId = electricityService.serviceId,
                         isMeterOwner = true, isAllocateRate = true
                     )
                 val gasPayer1ServiceId =
                     insertPayerService(
-                        db, payer = payer1Entity, serviceId = gasService.serviceId,
+                        db, payer = payer1, serviceId = gasService.serviceId,
                         isMeterOwner = true
                     )
                 val coldWaterPayer1ServiceId =
                     insertPayerService(
-                        db, payer = payer1Entity, serviceId = coldWaterService.serviceId,
+                        db, payer = payer1, serviceId = coldWaterService.serviceId,
                         isMeterOwner = true
                     )
                 val wastePayer1ServiceId =
-                    insertPayerService(db, payer = payer1Entity, serviceId = wasteService.serviceId)
+                    insertPayerService(db, payer = payer1, serviceId = wasteService.serviceId)
                 val heatingPayer1ServiceId =
                     insertPayerService(
-                        db, payer = payer1Entity, serviceId = heatingService.serviceId,
+                        db, payer = payer1, serviceId = heatingService.serviceId,
                         isMeterOwner = true
                     )
                 val hotWaterPayer1ServiceId =
                     insertPayerService(
-                        db, payer = payer1Entity, serviceId = hotWaterService.serviceId,
+                        db, payer = payer1, serviceId = hotWaterService.serviceId,
                         isMeterOwner = true
                     )
                 val garbagePayer1ServiceId =
                     insertPayerService(
-                        db, payer = payer1Entity, serviceId = garbageService.serviceId
+                        db, payer = payer1, serviceId = garbageService.serviceId
                     )
                 val doorphonePayer1ServiceId =
                     insertPayerService(
-                        db, payer = payer1Entity, serviceId = doorphoneService.serviceId
+                        db, payer = payer1, serviceId = doorphoneService.serviceId
                     )
                 val phonePayer1ServiceId =
-                    insertPayerService(db, payer = payer1Entity, serviceId = phoneService.serviceId)
+                    insertPayerService(db, payer = payer1, serviceId = phoneService.serviceId)
                 val ugsoPayer1ServiceId =
-                    insertPayerService(db, payer = payer1Entity, serviceId = ugsoService.serviceId)
+                    insertPayerService(db, payer = payer1, serviceId = ugsoService.serviceId)
                 // Meters:
                 Timber.tag(TAG).i("Meters:")
                 // Electricity
                 val electricityPayer1Meter =
-                    MeterEntity.electricityMeter(context, payer1Entity.payerId)
+                    MeterEntity.electricityMeter(context, payer1.payerId)
                 insertDefMeter(db, electricityPayer1Meter)
                 // values:
                 insertDefMeterValue(
                     db, MeterValueEntity.electricityMeterValue1(
-                        electricityPayer1Meter.meterId,
-                        currentDateTime.minusMonths(2).withDayOfMonth(1)
+                        electricityPayer1Meter.meterId, currentDateTime
                     )
                 )
                 insertDefMeterValue(
                     db, MeterValueEntity.electricityMeterValue2(
-                        electricityPayer1Meter.meterId,
-                        currentDateTime.minusMonths(1).withDayOfMonth(1)
+                        electricityPayer1Meter.meterId, currentDateTime
                     )
                 )
                 insertDefMeterValue(
                     db, MeterValueEntity.electricityMeterValue3(
-                        electricityPayer1Meter.meterId,
-                        currentDateTime.withDayOfMonth(1)
+                        electricityPayer1Meter.meterId, currentDateTime
                     )
+                )
+                insertDefMeterValue(
+                    db, MeterValueEntity.electricityMeterValue4(
+                        electricityPayer1Meter.meterId, currentDateTime
+                    )
+                )
+                // Gas
+                val gasPayer1Meter = MeterEntity.gasMeter(context, payer1.payerId)
+                insertDefMeter(db, gasPayer1Meter)
+                // values:
+                insertDefMeterValue(
+                    db, MeterValueEntity.gasMeterValue1(gasPayer1Meter.meterId, currentDateTime)
+                )
+                insertDefMeterValue(
+                    db, MeterValueEntity.gasMeterValue2(gasPayer1Meter.meterId, currentDateTime)
+                )
+                insertDefMeterValue(
+                    db, MeterValueEntity.gasMeterValue3(gasPayer1Meter.meterId, currentDateTime)
                 )
                 // Cold water
                 val coldWaterPayer1Meter =
-                    MeterEntity.coldWaterMeter(context, payer1Entity.payerId)
+                    MeterEntity.coldWaterMeter(context, payer1.payerId)
                 insertDefMeter(db, coldWaterPayer1Meter)
                 // values:
                 insertDefMeterValue(
                     db, MeterValueEntity.coldWaterMeterValue1(
-                        coldWaterPayer1Meter.meterId,
-                        currentDateTime.minusMonths(2).withDayOfMonth(1)
+                        coldWaterPayer1Meter.meterId, currentDateTime
                     )
                 )
                 insertDefMeterValue(
                     db, MeterValueEntity.coldWaterMeterValue2(
-                        coldWaterPayer1Meter.meterId,
-                        currentDateTime.minusMonths(1).withDayOfMonth(1)
+                        coldWaterPayer1Meter.meterId, currentDateTime
                     )
                 )
                 insertDefMeterValue(
                     db, MeterValueEntity.coldWaterMeterValue3(
-                        coldWaterPayer1Meter.meterId,
-                        currentDateTime.withDayOfMonth(1)
+                        coldWaterPayer1Meter.meterId, currentDateTime
                     )
                 )
                 // Hot water
                 val hotWaterPayer1Meter =
-                    MeterEntity.hotWaterMeter(context, payer1Entity.payerId)
+                    MeterEntity.hotWaterMeter(context, payer1.payerId)
                 insertDefMeter(db, hotWaterPayer1Meter)
                 // Heating
                 val heatingPayer1Meter =
-                    MeterEntity.heatingMeter(context, payer1Entity.payerId)
+                    MeterEntity.heatingMeter(context, payer1.payerId)
                 insertDefMeter(db, heatingPayer1Meter)
                 // values:
                 insertDefMeterValue(
                     db, MeterValueEntity.heatingMeterValue1(
-                        heatingPayer1Meter.meterId,
-                        currentDateTime.minusMonths(2).withDayOfMonth(1)
+                        heatingPayer1Meter.meterId, currentDateTime
                     )
                 )
                 insertDefMeterValue(
                     db, MeterValueEntity.heatingMeterValue2(
-                        heatingPayer1Meter.meterId,
-                        currentDateTime.minusMonths(1).withDayOfMonth(1)
+                        heatingPayer1Meter.meterId, currentDateTime
                     )
                 )
                 insertDefMeterValue(
                     db, MeterValueEntity.heatingMeterValue3(
-                        heatingPayer1Meter.meterId,
-                        currentDateTime.withDayOfMonth(1)
+                        heatingPayer1Meter.meterId, currentDateTime
                     )
                 )
                 // Payer 1 rates:
@@ -420,115 +433,106 @@ abstract class HomeDatabase : RoomDatabase() {
                 // ==============================
                 // FOR Payer 2:
                 val rentPayer2ServiceId =
-                    insertPayerService(db, payer = payer2Entity, serviceId = rentService.serviceId)
+                    insertPayerService(db, payer = payer2, serviceId = rentService.serviceId)
                 val electricityPayer2ServiceId =
                     insertPayerService(
-                        db, payer = payer2Entity,
+                        db, payer = payer2,
                         serviceId = electricityService.serviceId,
                         isMeterOwner = true, isPrivilege = true
                     )
                 val gasPayer2ServiceId =
                     insertPayerService(
-                        db, payer = payer2Entity, serviceId = gasService.serviceId,
+                        db, payer = payer2, serviceId = gasService.serviceId,
                         isMeterOwner = true
                     )
                 val coldWaterPayer2ServiceId =
                     insertPayerService(
-                        db, payer = payer2Entity, serviceId = coldWaterService.serviceId,
+                        db, payer = payer2, serviceId = coldWaterService.serviceId,
                         isMeterOwner = true
                     )
                 val wastePayer2ServiceId =
-                    insertPayerService(db, payer = payer2Entity, serviceId = wasteService.serviceId)
+                    insertPayerService(db, payer = payer2, serviceId = wasteService.serviceId)
                 val heatingPayer2ServiceId =
                     insertPayerService(
-                        db, payer = payer2Entity, serviceId = heatingService.serviceId,
+                        db, payer = payer2, serviceId = heatingService.serviceId,
                         isMeterOwner = true
                     )
                 val hotWaterPayer2ServiceId =
                     insertPayerService(
-                        db, payer = payer2Entity, serviceId = hotWaterService.serviceId,
+                        db, payer = payer2, serviceId = hotWaterService.serviceId,
                         isMeterOwner = true
                     )
                 val garbagePayer2ServiceId =
                     insertPayerService(
-                        db, payer = payer2Entity, serviceId = garbageService.serviceId
+                        db, payer = payer2, serviceId = garbageService.serviceId
                     )
                 val doorphonePayer2ServiceId =
                     insertPayerService(
-                        db, payer = payer2Entity, serviceId = doorphoneService.serviceId
+                        db, payer = payer2, serviceId = doorphoneService.serviceId
                     )
                 val phonePayer2ServiceId =
-                    insertPayerService(db, payer = payer2Entity, serviceId = phoneService.serviceId)
+                    insertPayerService(db, payer = payer2, serviceId = phoneService.serviceId)
                 val ugsoPayer2ServiceId =
-                    insertPayerService(db, payer = payer2Entity, serviceId = ugsoService.serviceId)
+                    insertPayerService(db, payer = payer2, serviceId = ugsoService.serviceId)
                 // Meters:
                 // Electricity
                 val electricityPayer2Meter =
-                    MeterEntity.electricityMeter(context, payer2Entity.payerId)
+                    MeterEntity.electricityMeter(context, payer2.payerId)
                 insertDefMeter(db, electricityPayer2Meter)
                 // values:
                 insertDefMeterValue(
                     db, MeterValueEntity.electricityMeterValue1(
-                        electricityPayer2Meter.meterId,
-                        currentDateTime.minusMonths(2).withDayOfMonth(1)
+                        electricityPayer2Meter.meterId, currentDateTime
                     )
                 )
                 insertDefMeterValue(
                     db, MeterValueEntity.electricityMeterValue2(
-                        electricityPayer2Meter.meterId,
-                        currentDateTime.minusMonths(1).withDayOfMonth(1)
+                        electricityPayer2Meter.meterId, currentDateTime
                     )
                 )
                 insertDefMeterValue(
                     db, MeterValueEntity.electricityMeterValue3(
-                        electricityPayer2Meter.meterId,
-                        currentDateTime.withDayOfMonth(1)
+                        electricityPayer2Meter.meterId, currentDateTime
                     )
                 )
                 // Cold water
                 val coldWaterPayer2Meter =
-                    MeterEntity.coldWaterMeter(context, payer2Entity.payerId)
+                    MeterEntity.coldWaterMeter(context, payer2.payerId)
                 insertDefMeter(db, coldWaterPayer2Meter)
                 // values:
                 insertDefMeterValue(
                     db, MeterValueEntity.coldWaterMeterValue1(
-                        coldWaterPayer2Meter.meterId,
-                        currentDateTime.minusMonths(2).withDayOfMonth(1)
+                        coldWaterPayer2Meter.meterId, currentDateTime
                     )
                 )
                 insertDefMeterValue(
                     db, MeterValueEntity.coldWaterMeterValue2(
-                        coldWaterPayer2Meter.meterId,
-                        currentDateTime.minusMonths(1).withDayOfMonth(1)
+                        coldWaterPayer2Meter.meterId, currentDateTime
                     )
                 )
                 insertDefMeterValue(
                     db, MeterValueEntity.coldWaterMeterValue3(
-                        coldWaterPayer2Meter.meterId,
-                        currentDateTime.withDayOfMonth(1)
+                        coldWaterPayer2Meter.meterId, currentDateTime
                     )
                 )
                 // Hot water
                 val hotWaterPayer2Meter =
-                    MeterEntity.hotWaterMeter(context, payer2Entity.payerId)
+                    MeterEntity.hotWaterMeter(context, payer2.payerId)
                 insertDefMeter(db, hotWaterPayer2Meter)
                 // values:
                 insertDefMeterValue(
                     db, MeterValueEntity.hotWaterMeterValue1(
-                        hotWaterPayer2Meter.meterId,
-                        currentDateTime.minusMonths(2).withDayOfMonth(1)
+                        hotWaterPayer2Meter.meterId, currentDateTime
                     )
                 )
                 insertDefMeterValue(
                     db, MeterValueEntity.hotWaterMeterValue2(
-                        hotWaterPayer2Meter.meterId,
-                        currentDateTime.minusMonths(1).withDayOfMonth(1)
+                        hotWaterPayer2Meter.meterId, currentDateTime
                     )
                 )
                 insertDefMeterValue(
                     db, MeterValueEntity.hotWaterMeterValue3(
-                        hotWaterPayer2Meter.meterId,
-                        currentDateTime.withDayOfMonth(1)
+                        hotWaterPayer2Meter.meterId, currentDateTime
                     )
                 )
                 // Payer 2 rates:
@@ -539,22 +543,19 @@ abstract class HomeDatabase : RoomDatabase() {
                 // heating
                 insertDefRate(
                     db, RateEntity.heatingRateForPayer(
-                        heatingService.serviceId,
-                        heatingPayer2ServiceId
+                        heatingService.serviceId, heatingPayer2ServiceId
                     )
                 )
                 // garbage
                 insertDefRate(
                     db, RateEntity.garbageRateForPayer(
-                        garbageService.serviceId,
-                        garbagePayer2ServiceId
+                        garbageService.serviceId, garbagePayer2ServiceId
                     )
                 )
                 // doorphone
                 insertDefRate(
                     db, RateEntity.doorphoneRateForPayer(
-                        doorphoneService.serviceId,
-                        doorphonePayer2ServiceId
+                        doorphoneService.serviceId, doorphonePayer2ServiceId
                     )
                 )
                 // phone

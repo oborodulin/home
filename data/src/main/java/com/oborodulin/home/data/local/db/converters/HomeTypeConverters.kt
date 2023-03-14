@@ -13,10 +13,11 @@ import java.time.format.DateTimeFormatter
 import java.util.*
 
 object HomeTypeConverters {
-    private val formatter = DateTimeFormatter.ofPattern(Constants.APP_OFFSET_DATE_TIME)//.ISO_OFFSET_DATE_TIME
+    private val formatter =
+        DateTimeFormatter.ofPattern(Constants.APP_OFFSET_DATE_TIME)//.ISO_OFFSET_DATE_TIME
 
     @TypeConverter
-    fun toUUID(uuid: String?): UUID? = UUID.fromString(uuid)
+    fun toUUID(uuid: String?): UUID? = uuid?.let { UUID.fromString(it) }
 
     @TypeConverter
     fun fromUUID(uuid: UUID?): String? = uuid?.toString()

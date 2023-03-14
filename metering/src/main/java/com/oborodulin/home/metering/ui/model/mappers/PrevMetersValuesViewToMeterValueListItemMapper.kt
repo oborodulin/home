@@ -6,7 +6,7 @@ import com.oborodulin.home.metering.ui.model.MeterValueListItem
 
 //private const val TAG = "Metering.ui.PrevMetersValuesViewToMeterValueModelMapper"
 
-class PrevMetersValuesViewToMeterValueModelMapper :
+class PrevMetersValuesViewToMeterValueListItemMapper :
     Mapper<MeterValuePrevPeriodView, MeterValueListItem> {
     override fun map(input: MeterValuePrevPeriodView): MeterValueListItem {
 /*        val decimalSeparator = DecimalFormat().decimalFormatSymbols.decimalSeparator

@@ -38,6 +38,23 @@ class RateEntity(
     companion object {
         const val TABLE_NAME = "rates"
 
+        val DEF_ELECTRO_RANGE1: BigDecimal = BigDecimal.ZERO
+        val DEF_ELECTRO_RANGE2: BigDecimal = BigDecimal("150")
+        val DEF_ELECTRO_RANGE3: BigDecimal = BigDecimal("800")
+        val DEF_ELECTRO_RANGE1_RATE: BigDecimal = BigDecimal("1.56")
+        val DEF_ELECTRO_RANGE2_RATE: BigDecimal = BigDecimal("2.12")
+        val DEF_ELECTRO_RANGE3_RATE: BigDecimal = BigDecimal("3.21")
+        val DEF_ELECTRO_PRIV_RATE: BigDecimal = BigDecimal("0.92")
+        val DEF_GAS_RATE: BigDecimal = BigDecimal("18.05")
+        val DEF_COLD_WATER_RATE: BigDecimal = BigDecimal("25.02")
+        val DEF_WASTE_RATE: BigDecimal = BigDecimal("11.61")
+        val DEF_HEATING_RATE: BigDecimal = BigDecimal("1160.33")
+        val DEF_HEATING_PAYER_RATE: BigDecimal = BigDecimal("14.76")
+        val DEF_HOT_WATER_RATE: BigDecimal = BigDecimal("77.67")
+        val DEF_RENT_PAYER_RATE : BigDecimal = BigDecimal("4.62")
+        val DEF_GARBAGE_PAYER_RATE : BigDecimal = BigDecimal("15.73")
+        val DEF_DOORPHONE_PAYER_RATE : BigDecimal = BigDecimal("35.00")
+
         fun defaultRate(
             serviceId: UUID, payerServiceId: UUID? = null, rateId: UUID = UUID.randomUUID(),
             startDate: OffsetDateTime = OffsetDateTime.now(),
@@ -59,66 +76,66 @@ class RateEntity(
 
         fun electricityRateFrom0To150(serviceId: UUID) = defaultRate(
             serviceId = serviceId,
-            fromMeterValue = BigDecimal.ZERO, toMeterValue = BigDecimal.valueOf(150),
-            rateValue = BigDecimal.valueOf(1.56)
+            fromMeterValue = DEF_ELECTRO_RANGE1, toMeterValue = DEF_ELECTRO_RANGE3,
+            rateValue = DEF_ELECTRO_RANGE1_RATE
         )
 
         fun electricityRateFrom150To800(serviceId: UUID) = defaultRate(
-            serviceId = serviceId, fromMeterValue = BigDecimal.valueOf(150),
-            toMeterValue = BigDecimal.valueOf(800),
-            rateValue = BigDecimal.valueOf(2.12)
+            serviceId = serviceId, fromMeterValue = DEF_ELECTRO_RANGE2,
+            toMeterValue = DEF_ELECTRO_RANGE3,
+            rateValue = DEF_ELECTRO_RANGE2_RATE
         )
 
         fun electricityRateFrom800(serviceId: UUID) = defaultRate(
-            serviceId = serviceId, fromMeterValue = BigDecimal.valueOf(800),
-            rateValue = BigDecimal.valueOf(3.21)
+            serviceId = serviceId, fromMeterValue = DEF_ELECTRO_RANGE3,
+            rateValue = DEF_ELECTRO_RANGE3_RATE
         )
 
         fun electricityPrivilegesRate(serviceId: UUID) = defaultRate(
-            serviceId = serviceId, isPrivileges = true, rateValue = BigDecimal.valueOf(0.92)
+            serviceId = serviceId, isPrivileges = true, rateValue = DEF_ELECTRO_PRIV_RATE
         )
 
         fun gasRate(serviceId: UUID) = defaultRate(
-            serviceId = serviceId, isPerPerson = true, rateValue = BigDecimal.valueOf(18.05)
+            serviceId = serviceId, isPerPerson = true, rateValue = DEF_GAS_RATE
         )
 
         fun coldWaterRate(serviceId: UUID) = defaultRate(
-            serviceId = serviceId, rateValue = BigDecimal.valueOf(25.02)
+            serviceId = serviceId, rateValue = DEF_COLD_WATER_RATE
         )
 
         fun wasteRate(serviceId: UUID) = defaultRate(
-            serviceId = serviceId, rateValue = BigDecimal.valueOf(11.61)
+            serviceId = serviceId, rateValue = DEF_WASTE_RATE
         )
 
         fun heatingRate(serviceId: UUID) = defaultRate(
-            serviceId = serviceId, rateValue = BigDecimal.valueOf(1160.33)
+            serviceId = serviceId, rateValue = DEF_HEATING_RATE
         )
 
         fun heatingRateForPayer(serviceId: UUID, payerServiceId: UUID) =
             defaultRate(
                 serviceId = serviceId, payerServiceId = payerServiceId,
-                rateValue = BigDecimal.valueOf(14.76)
+                rateValue = DEF_HEATING_PAYER_RATE
             )
 
         fun hotWaterRate(serviceId: UUID) = defaultRate(
-            serviceId = serviceId, rateValue = BigDecimal.valueOf(77.67)
+            serviceId = serviceId, rateValue = DEF_HOT_WATER_RATE
         )
 
         fun rentRateForPayer(serviceId: UUID, payerServiceId: UUID) = defaultRate(
             serviceId = serviceId, payerServiceId = payerServiceId,
-            rateValue = BigDecimal.valueOf(4.62)
+            rateValue = DEF_RENT_PAYER_RATE
         )
 
         fun garbageRateForPayer(serviceId: UUID, payerServiceId: UUID) =
             defaultRate(
                 serviceId = serviceId, payerServiceId = payerServiceId,
-                isPerPerson = true, rateValue = BigDecimal.valueOf(15.73)
+                isPerPerson = true, rateValue = DEF_GARBAGE_PAYER_RATE
             )
 
         fun doorphoneRateForPayer(serviceId: UUID, payerServiceId: UUID) =
             defaultRate(
                 serviceId = serviceId, payerServiceId = payerServiceId,
-                isPerPerson = true, rateValue = BigDecimal.valueOf(15.73)
+                isPerPerson = true, rateValue = DEF_DOORPHONE_PAYER_RATE
             )
 
         fun perPersonRate(

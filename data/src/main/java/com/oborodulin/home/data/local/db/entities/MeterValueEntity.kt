@@ -27,136 +27,176 @@ data class MeterValueEntity(
     companion object {
         const val TABLE_NAME = "meter_values"
 
+        // Electricity
+        val DEF_ELECTRO_VAL1: BigDecimal = when (MeterEntity.DEF_ELECTRO_INIT_VAL) {
+            null -> BigDecimal("9532")
+            else -> MeterEntity.DEF_ELECTRO_INIT_VAL.add(
+                RateEntity.DEF_ELECTRO_RANGE2.subtract(BigDecimal.ONE)
+            )
+        }
+        val DEF_ELECTRO_VAL2: BigDecimal =
+            DEF_ELECTRO_VAL1.add(RateEntity.DEF_ELECTRO_RANGE2.subtract(BigDecimal.ONE))
+        val DEF_ELECTRO_VAL3: BigDecimal =
+            DEF_ELECTRO_VAL2.add(RateEntity.DEF_ELECTRO_RANGE3.subtract(BigDecimal.ONE))
+        val DEF_ELECTRO_VAL4: BigDecimal =
+            DEF_ELECTRO_VAL3.add(RateEntity.DEF_ELECTRO_RANGE3.add(BigDecimal.ONE))
+
+        // Gas
+        val DEF_GAS_VAL1: BigDecimal = when (MeterEntity.DEF_GAS_INIT_VAL) {
+            null -> BigDecimal("0.695")
+            else -> MeterEntity.DEF_GAS_INIT_VAL.add(BigDecimal("0.1"))
+        }
+        val DEF_GAS_VAL2: BigDecimal = DEF_GAS_VAL1.add(BigDecimal("0.15"))
+        val DEF_GAS_VAL3: BigDecimal = DEF_GAS_VAL2.add(BigDecimal("0.2"))
+
+        // Cold water
+        val DEF_COLD_WATER_VAL1: BigDecimal = when (MeterEntity.DEF_COLD_WATER_INIT_VAL) {
+            null -> BigDecimal("1523.125")
+            else -> MeterEntity.DEF_COLD_WATER_INIT_VAL.add(BigDecimal("5.132"))
+        }
+        val DEF_COLD_WATER_VAL2: BigDecimal = DEF_COLD_WATER_VAL1.add(BigDecimal("4.154"))
+        val DEF_COLD_WATER_VAL3: BigDecimal = DEF_COLD_WATER_VAL2.add(BigDecimal("3.912"))
+
+        // Hot water
+        val DEF_HOT_WATER_VAL1: BigDecimal = when (MeterEntity.DEF_HOT_WATER_INIT_VAL) {
+            null -> BigDecimal("2145.755")
+            else -> MeterEntity.DEF_HOT_WATER_INIT_VAL.add(BigDecimal("3.132"))
+        }
+        val DEF_HOT_WATER_VAL2: BigDecimal = DEF_HOT_WATER_VAL1.add(BigDecimal("2.154"))
+        val DEF_HOT_WATER_VAL3: BigDecimal = DEF_HOT_WATER_VAL2.add(BigDecimal("1.912"))
+
+        // Heating
+        val DEF_HEATING_VAL1: BigDecimal = when (MeterEntity.DEF_HEATING_INIT_VAL) {
+            null -> BigDecimal("0.02113")
+            else -> MeterEntity.DEF_HEATING_INIT_VAL.add(BigDecimal("0.01325"))
+        }
+        val DEF_HEATING_VAL2: BigDecimal = DEF_HEATING_VAL1.add(BigDecimal("0.00957"))
+        val DEF_HEATING_VAL3: BigDecimal = DEF_HEATING_VAL2.add(BigDecimal("0.02004"))
+
         fun defaultMeterValue(
-            meterId: UUID,
-            meterValueId: UUID = UUID.randomUUID(),
-            valueDate: OffsetDateTime = OffsetDateTime.now(),
-            meterValue: BigDecimal? = null
+            meterId: UUID, meterValueId: UUID = UUID.randomUUID(),
+            valueDate: OffsetDateTime = OffsetDateTime.now(), meterValue: BigDecimal? = null
         ) = MeterValueEntity(
-            metersId = meterId,
-            meterValueId = meterValueId,
-            valueDate = valueDate,
-            meterValue = meterValue
+            metersId = meterId, meterValueId = meterValueId,
+            valueDate = valueDate, meterValue = meterValue
         )
 
         fun electricityMeterValue1(
-            meterId: UUID,
-            valueDate: OffsetDateTime,
-            meterValue: BigDecimal? = null
+            meterId: UUID, currDate: OffsetDateTime, meterValue: BigDecimal? = DEF_ELECTRO_VAL1
         ) = defaultMeterValue(
             meterId = meterId,
-            valueDate = valueDate,
-            meterValue = meterValue ?: BigDecimal.valueOf(9532)
+            valueDate = currDate.minusMonths(4).withDayOfMonth(1),
+            meterValue = meterValue
         )
 
         fun electricityMeterValue2(
-            meterId: UUID,
-            valueDate: OffsetDateTime,
-            meterValue: BigDecimal? = null
+            meterId: UUID, currDate: OffsetDateTime, meterValue: BigDecimal? = DEF_ELECTRO_VAL2
         ) = defaultMeterValue(
             meterId = meterId,
-            valueDate = valueDate,
-            meterValue = meterValue ?: BigDecimal.valueOf(9558)
+            valueDate = currDate.minusMonths(3).withDayOfMonth(1),
+            meterValue = meterValue
         )
 
         fun electricityMeterValue3(
-            meterId: UUID,
-            valueDate: OffsetDateTime,
-            meterValue: BigDecimal? = null
+            meterId: UUID, currDate: OffsetDateTime, meterValue: BigDecimal? = DEF_ELECTRO_VAL3
         ) = defaultMeterValue(
             meterId = meterId,
-            valueDate = valueDate,
-            meterValue = meterValue ?: BigDecimal.valueOf(9628)
+            valueDate = currDate.minusMonths(2).withDayOfMonth(1),
+            meterValue = meterValue
+        )
+
+        fun electricityMeterValue4(
+            meterId: UUID, currDate: OffsetDateTime, meterValue: BigDecimal? = DEF_ELECTRO_VAL4
+        ) = defaultMeterValue(
+            meterId = meterId,
+            valueDate = currDate.minusMonths(1).withDayOfMonth(1),
+            meterValue = meterValue
+        )
+
+        fun gasMeterValue1(
+            meterId: UUID, currDate: OffsetDateTime, meterValue: BigDecimal? = DEF_GAS_VAL1
+        ) = defaultMeterValue(
+            meterId = meterId,
+            valueDate = currDate.minusMonths(3).withDayOfMonth(1),
+            meterValue = meterValue
+        )
+
+        fun gasMeterValue2(
+            meterId: UUID, currDate: OffsetDateTime, meterValue: BigDecimal? = DEF_GAS_VAL2
+        ) = defaultMeterValue(
+            meterId = meterId,
+            valueDate = currDate.minusMonths(2).withDayOfMonth(1),
+            meterValue = meterValue
+        )
+
+        fun gasMeterValue3(
+            meterId: UUID, currDate: OffsetDateTime, meterValue: BigDecimal? = DEF_GAS_VAL3
+        ) = defaultMeterValue(
+            meterId = meterId,
+            valueDate = currDate.minusMonths(1).withDayOfMonth(1),
+            meterValue = meterValue
         )
 
         fun coldWaterMeterValue1(
-            meterId: UUID,
-            valueDate: OffsetDateTime,
-            meterValue: BigDecimal? = null
+            meterId: UUID, currDate: OffsetDateTime, meterValue: BigDecimal? = DEF_COLD_WATER_VAL1
         ) = defaultMeterValue(
             meterId = meterId,
-            valueDate = valueDate,
-            meterValue = meterValue ?: BigDecimal.valueOf(1538)
+            valueDate = currDate.minusMonths(2).withDayOfMonth(1),
+            meterValue = meterValue
         )
 
         fun coldWaterMeterValue2(
-            meterId: UUID,
-            valueDate: OffsetDateTime,
-            meterValue: BigDecimal? = null
+            meterId: UUID, currDate: OffsetDateTime, meterValue: BigDecimal? = DEF_COLD_WATER_VAL2
         ) = defaultMeterValue(
             meterId = meterId,
-            valueDate = valueDate,
-            meterValue = meterValue ?: BigDecimal.valueOf(1542)
+            valueDate = currDate.minusMonths(1).withDayOfMonth(1),
+            meterValue = meterValue
         )
 
         fun coldWaterMeterValue3(
-            meterId: UUID,
-            valueDate: OffsetDateTime,
-            meterValue: BigDecimal? = null
+            meterId: UUID, currDate: OffsetDateTime, meterValue: BigDecimal? = DEF_COLD_WATER_VAL3
         ) = defaultMeterValue(
-            meterId = meterId,
-            valueDate = valueDate,
-            meterValue = meterValue ?: BigDecimal.valueOf(1553)
+            meterId = meterId, valueDate = currDate.withDayOfMonth(1), meterValue = meterValue
         )
 
         fun hotWaterMeterValue1(
-            meterId: UUID,
-            valueDate: OffsetDateTime,
-            meterValue: BigDecimal? = null
+            meterId: UUID, currDate: OffsetDateTime, meterValue: BigDecimal? = DEF_HOT_WATER_VAL1
         ) = defaultMeterValue(
             meterId = meterId,
-            valueDate = valueDate,
-            meterValue = meterValue ?: BigDecimal.valueOf(2156)
+            valueDate = currDate.minusMonths(2).withDayOfMonth(1), meterValue = meterValue
         )
 
         fun hotWaterMeterValue2(
-            meterId: UUID,
-            valueDate: OffsetDateTime,
-            meterValue: BigDecimal? = null
+            meterId: UUID, currDate: OffsetDateTime, meterValue: BigDecimal? = DEF_HOT_WATER_VAL2
         ) = defaultMeterValue(
             meterId = meterId,
-            valueDate = valueDate,
-            meterValue = meterValue ?: BigDecimal.valueOf(2160)
+            valueDate = currDate.minusMonths(1).withDayOfMonth(1), meterValue = meterValue
         )
 
         fun hotWaterMeterValue3(
-            meterId: UUID,
-            valueDate: OffsetDateTime,
-            meterValue: BigDecimal? = null
+            meterId: UUID, currDate: OffsetDateTime, meterValue: BigDecimal? = DEF_HOT_WATER_VAL3
         ) = defaultMeterValue(
-            meterId = meterId,
-            valueDate = valueDate,
-            meterValue = meterValue ?: BigDecimal.valueOf(2166)
+            meterId = meterId, valueDate = currDate.withDayOfMonth(1), meterValue = meterValue
         )
 
         fun heatingMeterValue1(
-            meterId: UUID,
-            valueDate: OffsetDateTime,
-            meterValue: BigDecimal? = null
+            meterId: UUID, currDate: OffsetDateTime, meterValue: BigDecimal? = DEF_HEATING_VAL1
         ) = defaultMeterValue(
             meterId = meterId,
-            valueDate = valueDate,
-            meterValue = meterValue ?: BigDecimal.valueOf(0.02185)
+            valueDate = currDate.minusMonths(2).withDayOfMonth(1), meterValue = meterValue
         )
 
         fun heatingMeterValue2(
-            meterId: UUID,
-            valueDate: OffsetDateTime,
-            meterValue: BigDecimal? = null
+            meterId: UUID, currDate: OffsetDateTime, meterValue: BigDecimal? = DEF_HEATING_VAL2
         ) = defaultMeterValue(
             meterId = meterId,
-            valueDate = valueDate,
-            meterValue = meterValue ?: BigDecimal.valueOf(0.02254)
+            valueDate = currDate.minusMonths(1).withDayOfMonth(1), meterValue = meterValue
         )
 
         fun heatingMeterValue3(
-            meterId: UUID,
-            valueDate: OffsetDateTime,
-            meterValue: BigDecimal? = null
+            meterId: UUID, currDate: OffsetDateTime, meterValue: BigDecimal? = DEF_HEATING_VAL3
         ) = defaultMeterValue(
-            meterId = meterId,
-            valueDate = valueDate,
-            meterValue = meterValue ?: BigDecimal.valueOf(0.02394)
+            meterId = meterId, valueDate = currDate.withDayOfMonth(1), meterValue = meterValue
         )
     }
 

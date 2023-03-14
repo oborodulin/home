@@ -47,7 +47,7 @@ interface MeterDao : BaseDao<MeterEntity> {
     @Query(
         """
 SELECT * FROM ${MeterValuePrevPeriodView.VIEW_NAME}  
-WHERE payerId = :payerId AND meterLocCode = :locale AND serviceLocCode = :locale 
+WHERE payerId = :payerId AND meterLocCode = serviceLocCode AND serviceLocCode = :locale 
 ORDER BY servicePos
 """
     )
