@@ -1,6 +1,9 @@
 package com.oborodulin.home.data.local.db.views
 
 import androidx.room.DatabaseView
+import com.oborodulin.home.data.local.db.entities.MeterEntity
+import com.oborodulin.home.data.local.db.entities.MeterValueEntity
+import com.oborodulin.home.data.local.db.entities.PayerEntity
 import com.oborodulin.home.data.util.Constants
 import java.time.OffsetDateTime
 import java.util.*
@@ -11,9 +14,10 @@ import java.util.*
 SELECT mv.meterId, MAX(mv.valueDate) AS maxValueDate 
 FROM (SELECT m.meterId, m.payersId, 
             IFNULL(strftime(${Constants.DB_FRACT_SEC_TIME}, v.valueDate), 
-                    strftime(${Constants.DB_FRACT_SEC_TIME}, m.passportDate, 'start of month', '-1 days')) valueDate 
-        FROM meters m LEFT JOIN meter_values v ON v.metersId = m.meterId) mv 
-    JOIN payers p ON p.payerId = mv.payersId
+                    IFNULL(strftime(${Constants.DB_FRACT_SEC_TIME}, m.passportDate), 
+                            strftime(${Constants.DB_FRACT_SEC_TIME}, 'now', 'localtime', 'start of month', '-1 days'))) AS valueDate 
+        FROM ${MeterEntity.TABLE_NAME} m LEFT JOIN ${MeterValueEntity.TABLE_NAME} v ON v.metersId = m.meterId) mv 
+    JOIN ${PayerEntity.TABLE_NAME} p ON p.payerId = mv.payersId
  WHERE mv.valueDate <= 
     CASE WHEN p.isAlignByPaymentDay = 0 
         THEN strftime(${Constants.DB_FRACT_SEC_TIME}, 'now', 'localtime', 'start of month', '-1 days')

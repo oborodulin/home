@@ -308,7 +308,6 @@ abstract class HomeDatabase : RoomDatabase() {
                 val ugsoPayer1ServiceId =
                     insertPayerService(db, payer = payer1, serviceId = ugsoService.serviceId)
                 // Meters:
-                Timber.tag(TAG).i("Meters:")
                 // Electricity
                 val electricityPayer1Meter =
                     MeterEntity.electricityMeter(context, payer1.payerId)
@@ -335,7 +334,7 @@ abstract class HomeDatabase : RoomDatabase() {
                     )
                 )
                 // Gas
-                val gasPayer1Meter = MeterEntity.gasMeter(context, payer1.payerId)
+                val gasPayer1Meter = MeterEntity.gasMeter(context, payer1.payerId, currentDateTime)
                 insertDefMeter(db, gasPayer1Meter)
                 // values:
                 insertDefMeterValue(
@@ -349,7 +348,7 @@ abstract class HomeDatabase : RoomDatabase() {
                 )
                 // Cold water
                 val coldWaterPayer1Meter =
-                    MeterEntity.coldWaterMeter(context, payer1.payerId)
+                    MeterEntity.coldWaterMeter(context, payer1.payerId, currentDateTime)
                 insertDefMeter(db, coldWaterPayer1Meter)
                 // values:
                 insertDefMeterValue(
@@ -369,11 +368,11 @@ abstract class HomeDatabase : RoomDatabase() {
                 )
                 // Hot water
                 val hotWaterPayer1Meter =
-                    MeterEntity.hotWaterMeter(context, payer1.payerId)
+                    MeterEntity.hotWaterMeter(context, payer1.payerId, currentDateTime)
                 insertDefMeter(db, hotWaterPayer1Meter)
                 // Heating
                 val heatingPayer1Meter =
-                    MeterEntity.heatingMeter(context, payer1.payerId)
+                    MeterEntity.heatingMeter(context, payer1.payerId, currentDateTime)
                 insertDefMeter(db, heatingPayer1Meter)
                 // values:
                 insertDefMeterValue(

@@ -3,6 +3,7 @@ package com.oborodulin.home.data.local.db.dao
 import androidx.room.*
 import com.oborodulin.home.data.local.db.entities.*
 import com.oborodulin.home.data.local.db.views.MeterPayerServiceView
+import com.oborodulin.home.data.local.db.views.MeterValueMaxPrevDateView
 import com.oborodulin.home.data.local.db.views.MeterValuePrevPeriodView
 import com.oborodulin.home.data.local.db.views.MeterView
 import com.oborodulin.home.data.util.Constants
@@ -70,7 +71,7 @@ ORDER BY servicePos
     fun findDistinctPrevMetersValuesByPayerId(payerId: UUID) =
         findPrevMetersValuesByPayerId(payerId).distinctUntilChanged()
 
-    @Query("SELECT * FROM meter_values WHERE metersId = :meterId")
+    @Query("SELECT * FROM ${MeterValueEntity.TABLE_NAME} WHERE metersId = :meterId")
     fun findValuesByMeterId(meterId: UUID): Flow<List<MeterValueEntity>>
 
     @ExperimentalCoroutinesApi
@@ -82,7 +83,7 @@ ORDER BY servicePos
 
     @ExperimentalCoroutinesApi
     fun findDistinctVerificationsByMeterId(meterId: UUID) =
-        findValuesByMeterId(meterId).distinctUntilChanged()
+        findVerificationsByMeterId(meterId).distinctUntilChanged()
 
     // INSERTS:
     @Insert(onConflict = OnConflictStrategy.REPLACE)
@@ -122,13 +123,14 @@ ORDER BY servicePos
 
     @Query(
         """
-        DELETE FROM meter_values WHERE metersId = :meterId 
+        DELETE FROM ${MeterValueEntity.TABLE_NAME} WHERE metersId = :meterId 
             AND strftime(${Constants.DB_FRACT_SEC_TIME}, valueDate) = 
-                (SELECT MAX(strftime(${Constants.DB_FRACT_SEC_TIME}, v.valueDate)) FROM meter_values v 
+                (SELECT MAX(strftime(${Constants.DB_FRACT_SEC_TIME}, v.valueDate)) 
+                    FROM ${MeterValueEntity.TABLE_NAME} v 
                 WHERE v.metersId = :meterId 
-                AND strftime(${Constants.DB_FRACT_SEC_TIME}, v.valueDate) > 
+                    AND strftime(${Constants.DB_FRACT_SEC_TIME}, v.valueDate) > 
                                         (SELECT mpd.maxValueDate 
-                                               FROM meter_value_max_prev_dates_view mpd 
+                                               FROM ${MeterValueMaxPrevDateView.VIEW_NAME} mpd 
                                            WHERE mpd.meterId = :meterId))
 """
     )

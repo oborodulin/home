@@ -33,7 +33,8 @@ SELECT mvf.meterValueId, p.payerId, sv.serviceId, sv.serviceType, sv.serviceName
     mvf.meterLocCode, sv.serviceLocCode, mvf.valueFormat
 FROM (SELECT mvl.meterValueId, mv.payersId, mv.servicesId, mv.meterId, mv.meterType, mv.meterMeasureUnit, 
         IFNULL(strftime(${DB_FRACT_SEC_TIME}, mvl.valueDate), 
-                strftime(${DB_FRACT_SEC_TIME}, mv.passportDate, 'start of month', '-1 days')) AS prevLastDate, 
+                IFNULL(strftime(${DB_FRACT_SEC_TIME}, mv.passportDate),
+                    strftime(${DB_FRACT_SEC_TIME}, 'now', 'localtime', 'start of month', '-1 days'))) AS prevLastDate, 
         IFNULL(mvl.meterValue, mv.initValue) AS prevValue, mv.meterLocCode,
         substr('#0.' || '0000000000', 1, 3 + (length(cast(mv.maxValue / ${Constants.CONV_COEFF_BIGDECIMAL}.0 as text)) - 
             CASE WHEN instr(cast(mv.maxValue / ${Constants.CONV_COEFF_BIGDECIMAL}.0 as text), '.') = 

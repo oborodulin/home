@@ -32,8 +32,6 @@ data class MeterEntity(
     companion object {
         const val TABLE_NAME = "meters"
 
-        val DEF_PASSPORT_DATE: OffsetDateTime = OffsetDateTime.now().minusMonths(7)
-
         //Utils.toOffsetDateTime("2022-06-19T14:29:10.212+03:00")
         val DEF_ELECTRO_INIT_VAL: BigDecimal? = null
         val DEF_GAS_INIT_VAL: BigDecimal = BigDecimal("0.695")
@@ -73,7 +71,7 @@ data class MeterEntity(
         )
 
         fun gasMeter(
-            ctx: Context, payerId: UUID, currDate: OffsetDateTime? = DEF_PASSPORT_DATE,
+            ctx: Context, payerId: UUID, currDate: OffsetDateTime? = null,
             initValue: BigDecimal? = DEF_GAS_INIT_VAL
         ) = defaultMeter(
             meterNum = ctx.resources.getString(R.string.def_meter_num),
@@ -85,7 +83,7 @@ data class MeterEntity(
         )
 
         fun coldWaterMeter(
-            ctx: Context, payerId: UUID, currDate: OffsetDateTime? = DEF_PASSPORT_DATE,
+            ctx: Context, payerId: UUID, currDate: OffsetDateTime? = null,
             initValue: BigDecimal? = DEF_COLD_WATER_INIT_VAL
         ) = defaultMeter(
             meterNum = ctx.resources.getString(R.string.def_meter_num),
@@ -96,8 +94,20 @@ data class MeterEntity(
             initValue = initValue
         )
 
+        fun heatingMeter(
+            ctx: Context, payerId: UUID, currDate: OffsetDateTime? = null,
+            initValue: BigDecimal? = DEF_HEATING_INIT_VAL
+        ) = defaultMeter(
+            meterNum = ctx.resources.getString(R.string.def_meter_num),
+            payerId = payerId,
+            meterType = MeterType.HEATING,
+            maxValue = BigDecimal("9.99999"),
+            passportDate = currDate?.minusMonths(7),
+            initValue = initValue
+        )
+
         fun hotWaterMeter(
-            ctx: Context, payerId: UUID, currDate: OffsetDateTime? = DEF_PASSPORT_DATE,
+            ctx: Context, payerId: UUID, currDate: OffsetDateTime? = null,
             initValue: BigDecimal? = DEF_HOT_WATER_INIT_VAL
         ) = defaultMeter(
             meterNum = ctx.resources.getString(R.string.def_meter_num),
@@ -108,17 +118,6 @@ data class MeterEntity(
             initValue = initValue
         )
 
-        fun heatingMeter(
-            ctx: Context, payerId: UUID, currDate: OffsetDateTime? = DEF_PASSPORT_DATE,
-            initValue: BigDecimal? = DEF_HEATING_INIT_VAL
-        ) = defaultMeter(
-            meterNum = ctx.resources.getString(R.string.def_meter_num),
-            payerId = payerId,
-            meterType = MeterType.HEATING,
-            maxValue = BigDecimal("9.99999"),
-            passportDate = currDate?.minusMonths(7),
-            initValue = initValue
-        )
     }
 
     override fun equals(other: Any?): Boolean {

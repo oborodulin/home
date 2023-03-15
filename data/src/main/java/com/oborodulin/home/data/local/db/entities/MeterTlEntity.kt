@@ -71,7 +71,6 @@ data class MeterTlEntity(
                 MeterType.HOT_WATER -> hotWaterMeterTl(ctx, meterId)
                 MeterType.NONE -> defaultMeterTl(meterId = UUID.randomUUID(), measureUnit = "")
             }
-
     }
 
     override fun equals(other: Any?): Boolean {
