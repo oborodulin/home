@@ -129,26 +129,26 @@ class PayersListViewModelImp @Inject constructor(
                 id = UUID.randomUUID(),
                 fullName = ctx.resources.getString(com.oborodulin.home.data.R.string.def_payer1_full_name),
                 address = ctx.resources.getString(com.oborodulin.home.data.R.string.def_payer1_address),
-                totalArea = BigDecimal.valueOf(61),
-                livingSpace = BigDecimal.valueOf(59),
+                totalArea = BigDecimal("61"),
+                livingSpace = BigDecimal("59"),
                 paymentDay = 20,
                 personsNum = 2,
                 isFavorite = true,
                 fromPaymentDate = Utils.toOffsetDateTime("2022-08-01T14:29:10.212+03:00"),
                 toPaymentDate = Utils.toOffsetDateTime("2022-09-01T14:29:10.212+03:00"),
-                totalDebt = BigDecimal.valueOf(123456.78)
+                totalDebt = BigDecimal("123456.78")
             ),
             PayerListItem(
                 id = UUID.randomUUID(),
                 fullName = ctx.resources.getString(com.oborodulin.home.data.R.string.def_payer2_full_name),
                 address = ctx.resources.getString(com.oborodulin.home.data.R.string.def_payer2_address),
-                totalArea = BigDecimal.valueOf(89),
-                livingSpace = BigDecimal.valueOf(76),
+                totalArea = BigDecimal("89"),
+                livingSpace = BigDecimal("76"),
                 paymentDay = 20,
                 personsNum = 1,
                 fromPaymentDate = Utils.toOffsetDateTime("2022-08-01T14:29:10.212+03:00"),
                 toPaymentDate = Utils.toOffsetDateTime("2022-09-01T14:29:10.212+03:00"),
-                totalDebt = BigDecimal.valueOf(876543.21)
+                totalDebt = BigDecimal("876543.21")
             )
         )
     }

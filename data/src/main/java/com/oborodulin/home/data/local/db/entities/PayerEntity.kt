@@ -5,7 +5,7 @@ import androidx.room.Entity
 import androidx.room.Index
 import androidx.room.PrimaryKey
 import com.oborodulin.home.data.R
-import com.oborodulin.home.data.util.Constants.DEF_PAYMENT_DAY
+import com.oborodulin.home.data.util.Constants
 import java.math.BigDecimal
 import java.util.*
 
@@ -18,8 +18,8 @@ class PayerEntity(
     val totalArea: BigDecimal? = null,
     val livingSpace: BigDecimal? = null,
     val heatedVolume: BigDecimal? = null,
-    val paymentDay: Int = DEF_PAYMENT_DAY,
-    val personsNum: Int = 1,
+    val paymentDay: Int = Constants.DEF_PAYMENT_DAY,
+    val personsNum: Int = Constants.DEF_PERSON_NUM,
     val isAlignByPaymentDay: Boolean = false,
     val isFavorite: Boolean = false,
 ) {
@@ -34,8 +34,8 @@ class PayerEntity(
             totalArea: BigDecimal? = null,
             livingSpace: BigDecimal? = null,
             heatedVolume: BigDecimal? = null,
-            paymentDay: Int = DEF_PAYMENT_DAY,
-            personsNum: Int = 1,
+            paymentDay: Int = Constants.DEF_PAYMENT_DAY,
+            personsNum: Int = Constants.DEF_PERSON_NUM,
             isAlignByPaymentDay: Boolean = false,
             isFavorite: Boolean = false
         ) = PayerEntity(
@@ -59,10 +59,10 @@ class PayerEntity(
                 fullName = ctx.resources.getString(R.string.def_payer1_full_name),
                 address = ctx.resources.getString(R.string.def_payer1_address),
                 paymentDay = 20,
-                totalArea = BigDecimal.valueOf(53.5),
-                livingSpace = BigDecimal.valueOf(49.7),
-                heatedVolume = BigDecimal.valueOf(122.75),
-                personsNum = 2
+                totalArea = BigDecimal("53.5"),
+                livingSpace = BigDecimal("49.7"),
+                heatedVolume = BigDecimal("122.75"),
+                personsNum = Constants.DEF_TWO_PERSON_NUM
             )
 
         fun favoritePayer(ctx: Context, payerId: UUID = UUID.randomUUID()) =
@@ -71,10 +71,10 @@ class PayerEntity(
                 ercCode = ctx.resources.getString(R.string.def_payer2_erc_code),
                 fullName = ctx.resources.getString(R.string.def_payer2_full_name),
                 address = ctx.resources.getString(R.string.def_payer2_address),
-                totalArea = BigDecimal.valueOf(52.5),
-                livingSpace = BigDecimal.valueOf(48.7),
-                heatedVolume = BigDecimal.valueOf(121.75),
-                personsNum = 1,
+                totalArea = BigDecimal("52.5"),
+                livingSpace = BigDecimal("48.7"),
+                heatedVolume = BigDecimal("121.75"),
+                personsNum = Constants.DEF_PAYMENT_DAY,
                 isFavorite = true
             )
 
@@ -84,9 +84,9 @@ class PayerEntity(
                 ercCode = ctx.resources.getString(R.string.def_payer3_erc_code),
                 fullName = ctx.resources.getString(R.string.def_payer3_full_name),
                 address = ctx.resources.getString(R.string.def_payer3_address),
-                totalArea = BigDecimal.valueOf(51.5),
-                livingSpace = BigDecimal.valueOf(47.7),
-                heatedVolume = BigDecimal.valueOf(120.75),
+                totalArea = BigDecimal("51.5"),
+                livingSpace = BigDecimal("47.7"),
+                heatedVolume = BigDecimal("120.75"),
                 isAlignByPaymentDay = true
             )
     }

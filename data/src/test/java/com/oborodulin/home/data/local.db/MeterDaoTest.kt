@@ -27,13 +27,12 @@ import java.util.*
  *
  * See [testing documentation](http://d.android.com/tools/testing).
  */
-private const val TAG = "Testing.local.db"
+private const val TAG = "Testing.db.MeterDaoTest"
 
 @RunWith(RobolectricTestRunner::class)
 @Config(sdk = [Build.VERSION_CODES.P])
 @MediumTest
 class MeterDaoTest : HomeDatabaseTest() {
-    val currentDateTime: OffsetDateTime = OffsetDateTime.now()
     private lateinit var meterDao: MeterDao
     private lateinit var payerDao: PayerDao
 
@@ -74,7 +73,7 @@ class MeterDaoTest : HomeDatabaseTest() {
         val updatedMeter = MeterEntity.defaultMeter(
             payerId = actualPayerId, meterId = actualMeterIds.meterId,
             meterType = MeterType.COLD_WATER,
-            maxValue = BigDecimal.valueOf(9999.999)
+            maxValue = BigDecimal("9999.999")
         )
         val updatedMeterTl = MeterTlEntity.defaultMeterTl(
             meterTlId = actualMeterIds.meterTlId, meterId = actualMeterIds.meterId, measureUnit = ""
@@ -136,66 +135,22 @@ class MeterDaoTest : HomeDatabaseTest() {
             PayerDaoTest.insertPayerService(db, actualPayerId, heatingIds.serviceId, true)
             PayerDaoTest.insertPayerService(db, actualPayerId, hotWaterIds.serviceId, true)
             // Meters:
-            val electricityMeterIds =
-                insertMeter(ctx, db, MeterEntity.electricityMeter(ctx, actualPayerId))
-            val gasMeterIds =
-                insertMeter(ctx, db, MeterEntity.gasMeter(ctx, actualPayerId, currentDateTime))
-            val coldWaterMeterIds =
-                insertMeter(
-                    ctx, db, MeterEntity.coldWaterMeter(ctx, actualPayerId, currentDateTime)
-                )
-            val heatingMeterIds =
-                insertMeter(ctx, db, MeterEntity.heatingMeter(ctx, actualPayerId, currentDateTime))
-            val hotWaterMeterIds =
-                insertMeter(ctx, db, MeterEntity.hotWaterMeter(ctx, actualPayerId, currentDateTime))
+            val electricityMeter = MeterEntity.electricityMeter(ctx, actualPayerId)
+            insertMeter(ctx, db, electricityMeter)
+            val gasMeter = MeterEntity.gasMeter(ctx, actualPayerId, currentDateTime)
+            insertMeter(ctx, db, gasMeter)
+            val coldWaterMeter = MeterEntity.coldWaterMeter(ctx, actualPayerId, currentDateTime)
+            insertMeter(ctx, db, coldWaterMeter)
+            val heatingMeter = MeterEntity.heatingMeter(ctx, actualPayerId, currentDateTime)
+            insertMeter(ctx, db, heatingMeter)
+            val hotWaterMeter = MeterEntity.hotWaterMeter(ctx, actualPayerId, currentDateTime)
+            insertMeter(ctx, db, hotWaterMeter)
 
             // ACT
-            meterDao.insert(
-                // Electricity
-                MeterValueEntity.electricityMeterValue1(
-                    meterId = electricityMeterIds.meterId, currDate = currentDateTime
-                ),
-                MeterValueEntity.electricityMeterValue2(
-                    meterId = electricityMeterIds.meterId, currDate = currentDateTime
-                ),
-                MeterValueEntity.electricityMeterValue3(
-                    meterId = electricityMeterIds.meterId, currDate = currentDateTime
-                ),
-                MeterValueEntity.electricityMeterValue4(
-                    meterId = electricityMeterIds.meterId, currDate = currentDateTime
-                ),
-                // Gas
-                MeterValueEntity.gasMeterValue1(
-                    meterId = gasMeterIds.meterId, currDate = currentDateTime
-                ),
-                MeterValueEntity.gasMeterValue2(
-                    meterId = gasMeterIds.meterId, currDate = currentDateTime
-                ),
-                MeterValueEntity.gasMeterValue3(
-                    meterId = gasMeterIds.meterId, currDate = currentDateTime
-                ),
-                // Cold Water
-                MeterValueEntity.coldWaterMeterValue1(
-                    meterId = coldWaterMeterIds.meterId, currDate = currentDateTime
-                ),
-                MeterValueEntity.coldWaterMeterValue2(
-                    meterId = coldWaterMeterIds.meterId, currDate = currentDateTime
-                ),
-                MeterValueEntity.coldWaterMeterValue3(
-                    meterId = coldWaterMeterIds.meterId, currDate = currentDateTime
-                ),
-                // Heating
-                MeterValueEntity.heatingMeterValue1(
-                    meterId = heatingMeterIds.meterId, currDate = currentDateTime
-                ),
-                MeterValueEntity.heatingMeterValue2(
-                    meterId = heatingMeterIds.meterId, currDate = currentDateTime
-                ),
-                MeterValueEntity.heatingMeterValue3(
-                    meterId = heatingMeterIds.meterId, currDate = currentDateTime
-                ),
-                // Hot Water
-            )
+            insertMeterValues(db, electricityMeter, currentDateTime)
+            insertMeterValues(db, gasMeter, currentDateTime)
+            insertMeterValues(db, coldWaterMeter, currentDateTime)
+            insertMeterValues(db, heatingMeter, currentDateTime)
             // ASSERT
             meterDao.findDistinctPrevMetersValuesByPayerId(actualPayerId).test {
                 val prevMeterValues = awaitItem()
@@ -266,229 +221,6 @@ class MeterDaoTest : HomeDatabaseTest() {
             }
         }
 
-    /*
-            @OptIn(ExperimentalCoroutinesApi::class)
-            @Test
-            fun updatePayersAndFindAll_shouldReturn_theUpdatedPayers_inFlow() = runTest {
-                // 1. ARRANGE
-                val twoPersonsPayer = PayerEntity.payerWithTwoPersons(ctx)
-                val favoritePayer = PayerEntity.favoritePayer(ctx)
-                // 1. ACT
-                meterDao.insert(twoPersonsPayer, favoritePayer)
-                // 1. ASSERT
-                meterDao.findDistinctAll().test {
-                    assertThat(awaitItem()).containsExactly(favoritePayer, twoPersonsPayer)
-                    cancel()
-                }
-
-                // 2. ARRANGE
-                val expectedByPaymentDayPayer =
-                    PayerEntity.payerWithAlignByPaymentDay(ctx, favoritePayer.payerId)
-                val expectedFavoritePayer =
-                    PayerEntity.favoritePayer(ctx, twoPersonsPayer.payerId)
-
-                // 2. ACT
-                meterDao.update(expectedByPaymentDayPayer, expectedFavoritePayer)
-                // 2. ASSERT
-                meterDao.findDistinctById(favoritePayer.payerId).test {
-                    assertThat(awaitItem()).isEqualTo(expectedByPaymentDayPayer)
-                    cancel()
-                }
-                meterDao.findDistinctById(twoPersonsPayer.payerId).test {
-                    assertThat(awaitItem()).isEqualTo(expectedFavoritePayer)
-                    cancel()
-                }
-            }
-
-            @Test
-            fun deleteInsertedPayerAndFindById_shouldReturn_IsNull() = runBlocking {
-                // ARRANGE
-                val actualPayer = PayerEntity.payerWithTwoPersons(ctx)
-                // 1. ACT
-                meterDao.insert(actualPayer)
-                // 1. ASSERT
-                val latch1 = CountDownLatch(1)
-                val job1 = async(Dispatchers.IO) {
-                    meterDao.findDistinctById(actualPayer.payerId).collect {
-                        assertThat(it).isEqualTo(actualPayer)
-                        latch1.countDown()
-                    }
-                }
-                latch1.await()
-                job1.cancelAndJoin()
-                // 2. ACT
-                meterDao.delete(actualPayer)
-                // 2. ASSERT
-                val latch2 = CountDownLatch(1)
-                val job2 = async(Dispatchers.IO) {
-                    meterDao.findDistinctById(actualPayer.payerId).collect {
-                        assertThat(it).isNull()
-                        latch2.countDown()
-                    }
-                }
-                latch2.await()
-                job2.cancelAndJoin()
-            }
-
-            @OptIn(ExperimentalCoroutinesApi::class)
-            @Test
-            fun deletePayerByIdAndFindById_shouldReturn_IsNull() = runTest {
-                // ARRANGE
-                val actualPayerId = insertPayer(db, PayerEntity.payerWithTwoPersons(ctx))
-                // ACT
-                meterDao.deleteById(actualPayerId)
-                // ASSERT
-                meterDao.findDistinctById(actualPayerId).test {
-                    assertThat(awaitItem()).isNull()
-                    cancel()
-                }
-            }
-
-            @OptIn(ExperimentalCoroutinesApi::class)
-            @Test
-            fun deleteInsertedPayersListAndFindAll_shouldReturn_IsEmptyList() = runTest {
-                // ARRANGE
-                val actualTwoPersonsPayer = PayerEntity.payerWithTwoPersons(ctx)
-                val actualFavoritePayer = PayerEntity.favoritePayer(ctx)
-                meterDao.insert(actualTwoPersonsPayer, actualFavoritePayer)
-                // ACT
-                meterDao.delete(listOf(actualTwoPersonsPayer, actualFavoritePayer))
-                // ASSERT
-                meterDao.findDistinctAll().test {
-                    assertThat(awaitItem()).isEmpty()
-                    cancel()
-                }
-            }
-
-            @OptIn(ExperimentalCoroutinesApi::class)
-            @Test
-            fun deleteAllInsertedPayersAndFindAll_shouldReturn_IsEmptyList() = runTest {
-                // ARRANGE
-                val actualTwoPersonsPayer = PayerEntity.payerWithTwoPersons(ctx)
-                val actualFavoritePayer = PayerEntity.favoritePayer(ctx)
-                // 1. ACT
-                meterDao.insert(actualTwoPersonsPayer, actualFavoritePayer)
-                // 1. ASSERT
-                meterDao.findDistinctAll().test {
-                    assertThat(awaitItem()).containsExactly(actualFavoritePayer, actualTwoPersonsPayer)
-                    cancel()
-                }
-                // 2. ACT
-                meterDao.deleteAll()
-                // 2. ASSERT
-                meterDao.findDistinctAll().test {
-                    assertThat(awaitItem()).isEmpty()
-                    cancel()
-                }
-            }
-
-            @OptIn(ExperimentalCoroutinesApi::class)
-            @Test
-            fun findFavorite_return_theFavoritePayer_inFlow() = runTest {
-                // ARRANGE
-                val twoPersonsPayer = PayerEntity.payerWithTwoPersons(ctx)
-                val expectedFavoritePayer = PayerEntity.favoritePayer(ctx)
-                meterDao.insert(twoPersonsPayer, expectedFavoritePayer)
-                // ACT & ASSERT
-                meterDao.findDistinctFavorite().test {
-                    assertThat(awaitItem()).isEqualTo(expectedFavoritePayer)
-                    cancel()
-                }
-            }
-
-            @OptIn(ExperimentalCoroutinesApi::class)
-            @Test
-            fun favoriteById_return_theChangedFavoritePayer_inFlow() = runTest {
-                // ARRANGE
-                val expectedTwoPersonsPayer = PayerEntity.payerWithTwoPersons(ctx)
-                val favoritePayer = PayerEntity.favoritePayer(ctx)
-                meterDao.insert(expectedTwoPersonsPayer, favoritePayer)
-                // ACT
-                meterDao.setFavoriteById(expectedTwoPersonsPayer.payerId)
-                // ASSERT
-                meterDao.findDistinctFavorite().test {
-                    assertThat(awaitItem()).isEqualTo(expectedTwoPersonsPayer)
-                    cancel()
-                }
-            }
-
-            @OptIn(ExperimentalCoroutinesApi::class)
-            @Test(expected = SQLiteConstraintException::class)
-            fun duplicatePayerErcCode_ExceptionThrown() = runTest {
-                // ARRANGE
-                val twoPersonsPayer = PayerEntity.payerWithTwoPersons(ctx)
-                val anotherTwoPersonsPayer = PayerEntity.payerWithTwoPersons(ctx)
-                // ACT
-                meterDao.insert(twoPersonsPayer, anotherTwoPersonsPayer)
-            }
-
-            @OptIn(ExperimentalCoroutinesApi::class)
-            @Test
-            fun insertPayerServicesAndFindPayersWithServices_returnsPayersWithServices_inFlow() = runTest {
-                // ARRANGE
-                val actualPayerId = insertPayer(db, PayerEntity.payerWithTwoPersons(ctx))
-                val rentService = ServiceEntity.rentService()
-                val rentServiceTl = ServiceTlEntity.rentServiceTl(ctx, rentService.serviceId)
-                payerDao.insert(rentService, rentServiceTl)
-                val electricityService = ServiceEntity.electricityService()
-                val electricityServiceTl =
-                    ServiceTlEntity.electricityServiceTl(ctx, electricityService.serviceId)
-                payerDao.insert(electricityService, electricityServiceTl)
-                // ACT
-                meterDao.insert(
-                    PayerServiceCrossRefEntity.populatePrivilegesPayerService(
-                        payerId = actualPayerId, serviceId = rentService.serviceId
-                    ),
-                    PayerServiceCrossRefEntity.populateAllocateRatePayerService(
-                        payerId = actualPayerId, serviceId = electricityService.serviceId
-                    )
-                )
-                // ASSERT
-                meterDao.findPayersWithServices().test {
-                    val payerServices = awaitItem()
-                    assertThat(payerServices).isNotEmpty()
-                    assertThat(payerServices[0].payer.payerId).isEqualTo(actualPayerId)
-                    assertThat(payerServices[0].services).hasSize(2)
-                    assertThat(payerServices[0].services).containsAtLeast(rentService, electricityService)
-                    cancel()
-                }
-            }
-
-            @OptIn(ExperimentalCoroutinesApi::class)
-            @Test
-            fun deletePayerServiceAndFindPayersWithServices_returnsPayerWithService_inFlow() = runTest {
-                // ARRANGE
-                val actualPayerId = insertPayer(db, PayerEntity.payerWithTwoPersons(ctx))
-                val rentService = ServiceEntity.rentService()
-                val rentServiceTl = ServiceTlEntity.rentServiceTl(ctx, rentService.serviceId)
-                payerDao.insert(rentService, rentServiceTl)
-                val electricityServiceId =
-                    ServiceDaoTest.insertService(ctx, db, ServiceEntity.electricityService())
-                val payerRentService =
-                    PayerServiceCrossRefEntity.defaultPayerService(actualPayerId, rentService.serviceId)
-                val payerElectricityService = PayerServiceCrossRefEntity.defaultPayerService(
-                    actualPayerId, electricityServiceId
-                )
-                meterDao.insert(payerRentService, payerElectricityService)
-                // ACT
-                meterDao.deleteServiceById(payerElectricityService.payerServiceId)
-                // ASSERT
-                meterDao.findPayersWithServices().test {
-                    val payerServices = awaitItem()
-                    assertThat(payerServices).isNotEmpty()
-                    assertThat(payerServices[0].payer.payerId).isEqualTo(actualPayerId)
-                    assertThat(payerServices[0].services).hasSize(1)
-                    assertThat(payerServices[0].services).containsExactly(rentService)
-                    cancel()
-                }
-            }
-
-            @Test
-            fun useAppContext() {
-                // Context of the app under test.
-                assertEquals("com.oborodulin.home.data.test", this.ctx.packageName)
-            }
-        */
     companion object {
         suspend fun insertMeter(
             ctx: Context, db: HomeDatabase, meter: MeterEntity = MeterEntity.defaultMeter()

@@ -37,23 +37,13 @@ SELECT r.* FROM ${RateEntity.TABLE_NAME} r JOIN ${PayerServiceCrossRefEntity.TAB
     @ExperimentalCoroutinesApi
     fun findDistinctByPayerId(payerId: UUID) = findByPayerId(payerId).distinctUntilChanged()
 
-    @Query(
-        """
-SELECT r.* FROM ${RateEntity.TABLE_NAME} r JOIN ${PayerServiceCrossRefEntity.TABLE_NAME} ps 
-            ON ps.servicesId = :serviceId AND ps.payerServiceId IS NULL
-"""
-    )
+    @Query("SELECT * FROM ${RateEntity.TABLE_NAME} WHERE servicesId = :serviceId AND payersServicesId IS NULL")
     fun findByServiceId(serviceId: UUID): Flow<List<RateEntity>>
 
     @ExperimentalCoroutinesApi
     fun findDistinctByServiceId(serviceId: UUID) = findByServiceId(serviceId).distinctUntilChanged()
 
-    @Query(
-        """
-SELECT r.* FROM ${RateEntity.TABLE_NAME} r JOIN ${PayerServiceCrossRefEntity.TABLE_NAME} ps 
-            ON ps.payerServiceId = :payerServiceId
-"""
-    )
+    @Query("SELECT * FROM ${RateEntity.TABLE_NAME} WHERE payersServicesId = :payerServiceId")
     fun findByPayerServiceId(payerServiceId: UUID): Flow<List<RateEntity>>
 
     @ExperimentalCoroutinesApi

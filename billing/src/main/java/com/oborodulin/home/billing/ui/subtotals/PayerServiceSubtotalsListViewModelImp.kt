@@ -89,8 +89,8 @@ class PayerServiceSubtotalsListViewModelImp @Inject constructor(
                 isAllocateRate = false,
                 fromPaymentDate = Utils.toOffsetDateTime("2023-01-01T00:00:00.000+03:00"),
                 toPaymentDate = Utils.toOffsetDateTime("2023-02-01T00:00:00.000+03:00"),
-                rateValue = BigDecimal.valueOf(46.2),
-                serviceDebt = BigDecimal.valueOf(485.1)
+                rateValue = BigDecimal("46.2"),
+                serviceDebt = BigDecimal("485.1")
             ),
             ServiceSubtotalListItem(
                 id = UUID.randomUUID(),
@@ -102,9 +102,9 @@ class PayerServiceSubtotalsListViewModelImp @Inject constructor(
                 isAllocateRate = true,
                 fromPaymentDate = Utils.toOffsetDateTime("2023-01-01T00:00:00.000+03:00"),
                 toPaymentDate = Utils.toOffsetDateTime("2023-02-01T00:00:00.000+03:00"),
-                rateValue = BigDecimal.valueOf(0.92),
-                diffMeterValue = BigDecimal.valueOf(96),
-                serviceDebt = BigDecimal.valueOf(883.2)
+                rateValue = BigDecimal("0.92"),
+                diffMeterValue = BigDecimal("96"),
+                serviceDebt = BigDecimal("883.2")
             ),
             ServiceSubtotalListItem(
                 id = UUID.randomUUID(),
@@ -114,8 +114,8 @@ class PayerServiceSubtotalsListViewModelImp @Inject constructor(
                 isAllocateRate = false,
                 fromPaymentDate = Utils.toOffsetDateTime("2023-01-01T00:00:00.000+03:00"),
                 toPaymentDate = Utils.toOffsetDateTime("2023-02-01T00:00:00.000+03:00"),
-                rateValue = BigDecimal.valueOf(18.05),
-                serviceDebt = BigDecimal.valueOf(36.1)
+                rateValue = BigDecimal("18.05"),
+                serviceDebt = BigDecimal("36.1")
             ),
             ServiceSubtotalListItem(
                 id = UUID.randomUUID(),
@@ -126,9 +126,9 @@ class PayerServiceSubtotalsListViewModelImp @Inject constructor(
                 isAllocateRate = false,
                 fromPaymentDate = Utils.toOffsetDateTime("2023-01-01T00:00:00.000+03:00"),
                 toPaymentDate = Utils.toOffsetDateTime("2023-02-01T00:00:00.000+03:00"),
-                rateValue = BigDecimal.valueOf(25.02),
-                diffMeterValue = BigDecimal.valueOf(15),
-                serviceDebt = BigDecimal.valueOf(375.3)
+                rateValue = BigDecimal("25.02"),
+                diffMeterValue = BigDecimal("15"),
+                serviceDebt = BigDecimal("375.3")
             ),
             ServiceSubtotalListItem(
                 id = UUID.randomUUID(),
@@ -139,9 +139,9 @@ class PayerServiceSubtotalsListViewModelImp @Inject constructor(
                 isAllocateRate = false,
                 fromPaymentDate = Utils.toOffsetDateTime("2023-01-01T00:00:00.000+03:00"),
                 toPaymentDate = Utils.toOffsetDateTime("2023-02-01T00:00:00.000+03:00"),
-                rateValue = BigDecimal.valueOf(25.02),
-                diffMeterValue = BigDecimal.valueOf(15),
-                serviceDebt = BigDecimal.valueOf(375.3)
+                rateValue = BigDecimal("25.02"),
+                diffMeterValue = BigDecimal("15"),
+                serviceDebt = BigDecimal("375.3")
             )
         )
     }

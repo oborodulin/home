@@ -13,7 +13,7 @@ import java.util.*
 @DatabaseView(
     viewName = RatePayerServiceView.VIEW_NAME,
     value = """
-SELECT rps.*, (CASE WHEN EXISTS(SELECT m.meterId 
+SELECT rps.*, (CASE WHEN EXISTS (SELECT m.meterId 
                                 FROM ${MeterEntity.TABLE_NAME} m JOIN ${ServiceEntity.TABLE_NAME} s 
                                     ON s.serviceMeterType = m.meterType AND m.payersId = rps.payerId 
                                         AND s.serviceId = rps.serviceId)

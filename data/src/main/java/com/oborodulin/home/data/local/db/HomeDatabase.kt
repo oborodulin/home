@@ -230,17 +230,15 @@ abstract class HomeDatabase : RoomDatabase() {
                 val doorphoneService = ServiceEntity.doorphone9Service()
                 insertDefService(db, doorphoneService)
                 // phone
-                val phoneService = ServiceEntity.phone10Service(); insertDefService(
-                    db,
-                    phoneService
-                )
+                val phoneService = ServiceEntity.phone10Service()
+                insertDefService(db, phoneService)
                 // ugso
                 val ugsoService = ServiceEntity.ugso11Service(); insertDefService(db, ugsoService)
                 // internet
                 val internetService = ServiceEntity.internet12Service()
                 insertDefService(db, internetService)
 
-                // Default rates:
+                // Service rates:
                 // electricity
                 insertDefRate(
                     db, RateEntity.electricityRateFrom0To150(electricityService.serviceId)
@@ -256,10 +254,10 @@ abstract class HomeDatabase : RoomDatabase() {
                 insertDefRate(db, RateEntity.gasRate(gasService.serviceId))
                 // cold water
                 insertDefRate(db, RateEntity.coldWaterRate(coldWaterService.serviceId))
-                // heating
-                insertDefRate(db, RateEntity.heatingRate(heatingService.serviceId))
                 // waste
                 insertDefRate(db, RateEntity.wasteRate(wasteService.serviceId))
+                // heating
+                insertDefRate(db, RateEntity.heatingRate(heatingService.serviceId))
                 // hot water
                 insertDefRate(db, RateEntity.hotWaterRate(hotWaterService.serviceId))
 
@@ -399,7 +397,7 @@ abstract class HomeDatabase : RoomDatabase() {
                 // garbage
                 insertDefRate(
                     db, RateEntity.garbageRateForPayer(
-                        garbageService.serviceId, garbagePayer1ServiceId
+                        garbageService.serviceId, garbagePayer1ServiceId, true
                     )
                 )
                 // doorphone

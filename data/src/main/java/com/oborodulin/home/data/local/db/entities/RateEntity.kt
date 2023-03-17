@@ -51,16 +51,19 @@ class RateEntity(
         val DEF_HEATING_RATE: BigDecimal = BigDecimal("1160.33")
         val DEF_HEATING_PAYER_RATE: BigDecimal = BigDecimal("14.76")
         val DEF_HOT_WATER_RATE: BigDecimal = BigDecimal("77.67")
-        val DEF_RENT_PAYER_RATE : BigDecimal = BigDecimal("4.62")
-        val DEF_GARBAGE_PAYER_RATE : BigDecimal = BigDecimal("15.73")
-        val DEF_DOORPHONE_PAYER_RATE : BigDecimal = BigDecimal("35.00")
+        val DEF_RENT_PAYER_RATE: BigDecimal = BigDecimal("4.62")
+        val DEF_GARBAGE_PAYER_RATE: BigDecimal = BigDecimal("15.73")
+        val DEF_DOORPHONE_PAYER_RATE: BigDecimal = BigDecimal("35.00")
+        val DEF_PHONE_PAYER_RATE: BigDecimal = BigDecimal("280")
+        val DEF_INTERNET_PAYER_RATE: BigDecimal = BigDecimal("450")
 
         fun defaultRate(
-            serviceId: UUID, payerServiceId: UUID? = null, rateId: UUID = UUID.randomUUID(),
+            serviceId: UUID = UUID.randomUUID(), payerServiceId: UUID? = null,
+            rateId: UUID = UUID.randomUUID(),
             startDate: OffsetDateTime = OffsetDateTime.now(),
             fromMeterValue: BigDecimal? = null,
             toMeterValue: BigDecimal? = null,
-            rateValue: BigDecimal,
+            rateValue: BigDecimal = BigDecimal.ZERO,
             isPerPerson: Boolean = false,
             isPrivileges: Boolean = false
         ) = RateEntity(
@@ -74,69 +77,118 @@ class RateEntity(
             isPrivileges = isPrivileges
         )
 
-        fun electricityRateFrom0To150(serviceId: UUID) = defaultRate(
-            serviceId = serviceId,
-            fromMeterValue = DEF_ELECTRO_RANGE1, toMeterValue = DEF_ELECTRO_RANGE3,
+        fun electricityRateFrom0To150(serviceId: UUID, payerServiceId: UUID? = null) = defaultRate(
+            serviceId = serviceId, payerServiceId = payerServiceId,
+            fromMeterValue = DEF_ELECTRO_RANGE1, toMeterValue = DEF_ELECTRO_RANGE2,
             rateValue = DEF_ELECTRO_RANGE1_RATE
         )
 
-        fun electricityRateFrom150To800(serviceId: UUID) = defaultRate(
-            serviceId = serviceId, fromMeterValue = DEF_ELECTRO_RANGE2,
-            toMeterValue = DEF_ELECTRO_RANGE3,
-            rateValue = DEF_ELECTRO_RANGE2_RATE
-        )
+        fun electricityRateFrom150To800(serviceId: UUID, payerServiceId: UUID? = null) =
+            defaultRate(
+                serviceId = serviceId, payerServiceId = payerServiceId,
+                fromMeterValue = DEF_ELECTRO_RANGE2, toMeterValue = DEF_ELECTRO_RANGE3,
+                rateValue = DEF_ELECTRO_RANGE2_RATE
+            )
 
-        fun electricityRateFrom800(serviceId: UUID) = defaultRate(
-            serviceId = serviceId, fromMeterValue = DEF_ELECTRO_RANGE3,
+        fun electricityRateFrom800(serviceId: UUID, payerServiceId: UUID? = null) = defaultRate(
+            serviceId = serviceId, payerServiceId = payerServiceId,
+            fromMeterValue = DEF_ELECTRO_RANGE3,
             rateValue = DEF_ELECTRO_RANGE3_RATE
         )
 
-        fun electricityPrivilegesRate(serviceId: UUID) = defaultRate(
-            serviceId = serviceId, isPrivileges = true, rateValue = DEF_ELECTRO_PRIV_RATE
-        )
-
-        fun gasRate(serviceId: UUID) = defaultRate(
-            serviceId = serviceId, isPerPerson = true, rateValue = DEF_GAS_RATE
-        )
-
-        fun coldWaterRate(serviceId: UUID) = defaultRate(
-            serviceId = serviceId, rateValue = DEF_COLD_WATER_RATE
-        )
-
-        fun wasteRate(serviceId: UUID) = defaultRate(
-            serviceId = serviceId, rateValue = DEF_WASTE_RATE
-        )
-
-        fun heatingRate(serviceId: UUID) = defaultRate(
-            serviceId = serviceId, rateValue = DEF_HEATING_RATE
-        )
-
-        fun heatingRateForPayer(serviceId: UUID, payerServiceId: UUID) =
-            defaultRate(
-                serviceId = serviceId, payerServiceId = payerServiceId,
-                rateValue = DEF_HEATING_PAYER_RATE
-            )
-
-        fun hotWaterRate(serviceId: UUID) = defaultRate(
-            serviceId = serviceId, rateValue = DEF_HOT_WATER_RATE
-        )
-
-        fun rentRateForPayer(serviceId: UUID, payerServiceId: UUID) = defaultRate(
+        fun electricityPrivilegesRate(serviceId: UUID, payerServiceId: UUID? = null) = defaultRate(
             serviceId = serviceId, payerServiceId = payerServiceId,
+            isPrivileges = true, rateValue = DEF_ELECTRO_PRIV_RATE
+        )
+
+        fun gasRate(
+            serviceId: UUID, isPerPerson: Boolean = true, isPrivileges: Boolean = false
+        ) = defaultRate(
+            serviceId = serviceId, isPerPerson = isPerPerson, isPrivileges = isPrivileges,
+            rateValue = DEF_GAS_RATE
+        )
+
+        fun coldWaterRate(
+            serviceId: UUID, isPerPerson: Boolean = false, isPrivileges: Boolean = false
+        ) = defaultRate(
+            serviceId = serviceId, isPerPerson = isPerPerson, isPrivileges = isPrivileges,
+            rateValue = DEF_COLD_WATER_RATE
+        )
+
+        fun wasteRate(
+            serviceId: UUID, isPerPerson: Boolean = false, isPrivileges: Boolean = false
+        ) = defaultRate(
+            serviceId = serviceId, isPerPerson = isPerPerson, isPrivileges = isPrivileges,
+            rateValue = DEF_WASTE_RATE
+        )
+
+        fun heatingRate(
+            serviceId: UUID, isPerPerson: Boolean = false, isPrivileges: Boolean = false
+        ) = defaultRate(
+            serviceId = serviceId, isPerPerson = isPerPerson, isPrivileges = isPrivileges,
+            rateValue = DEF_HEATING_RATE
+        )
+
+        fun heatingRateForPayer(
+            serviceId: UUID, payerServiceId: UUID,
+            isPerPerson: Boolean = false, isPrivileges: Boolean = false
+        ) = defaultRate(
+            serviceId = serviceId, payerServiceId = payerServiceId,
+            isPerPerson = isPerPerson, isPrivileges = isPrivileges,
+            rateValue = DEF_HEATING_PAYER_RATE
+        )
+
+        fun hotWaterRate(
+            serviceId: UUID, isPerPerson: Boolean = false, isPrivileges: Boolean = false
+        ) = defaultRate(
+            serviceId = serviceId, isPerPerson = isPerPerson, isPrivileges = isPrivileges,
+            rateValue = DEF_HOT_WATER_RATE
+        )
+
+        fun rentRateForPayer(
+            serviceId: UUID, payerServiceId: UUID,
+            isPerPerson: Boolean = false, isPrivileges: Boolean = false
+        ) = defaultRate(
+            serviceId = serviceId, payerServiceId = payerServiceId,
+            isPerPerson = isPerPerson, isPrivileges = isPrivileges,
             rateValue = DEF_RENT_PAYER_RATE
         )
 
-        fun garbageRateForPayer(serviceId: UUID, payerServiceId: UUID) =
-            defaultRate(
-                serviceId = serviceId, payerServiceId = payerServiceId,
-                isPerPerson = true, rateValue = DEF_GARBAGE_PAYER_RATE
-            )
+        fun garbageRateForPayer(
+            serviceId: UUID, payerServiceId: UUID,
+            isPerPerson: Boolean = true, isPrivileges: Boolean = false
+        ) = defaultRate(
+            serviceId = serviceId, payerServiceId = payerServiceId,
+            isPerPerson = isPerPerson, isPrivileges = isPrivileges,
+            rateValue = DEF_GARBAGE_PAYER_RATE
+        )
 
-        fun doorphoneRateForPayer(serviceId: UUID, payerServiceId: UUID) =
-            defaultRate(
-                serviceId = serviceId, payerServiceId = payerServiceId,
-                isPerPerson = true, rateValue = DEF_DOORPHONE_PAYER_RATE
-            )
+        fun doorphoneRateForPayer(
+            serviceId: UUID, payerServiceId: UUID,
+            isPerPerson: Boolean = false, isPrivileges: Boolean = false
+        ) = defaultRate(
+            serviceId = serviceId, payerServiceId = payerServiceId,
+            isPerPerson = isPerPerson, isPrivileges = isPrivileges,
+            rateValue = DEF_DOORPHONE_PAYER_RATE
+        )
+
+        fun phoneRateForPayer(
+            serviceId: UUID, payerServiceId: UUID,
+            isPerPerson: Boolean = false, isPrivileges: Boolean = false
+        ) = defaultRate(
+            serviceId = serviceId, payerServiceId = payerServiceId,
+            isPerPerson = isPerPerson, isPrivileges = isPrivileges,
+            rateValue = DEF_PHONE_PAYER_RATE
+        )
+
+        fun internetRateForPayer(
+            serviceId: UUID, payerServiceId: UUID,
+            isPerPerson: Boolean = false, isPrivileges: Boolean = false
+        ) = defaultRate(
+            serviceId = serviceId, payerServiceId = payerServiceId,
+            isPerPerson = isPerPerson, isPrivileges = isPrivileges,
+            rateValue = DEF_INTERNET_PAYER_RATE
+        )
 
         fun perPersonRate(
             serviceId: UUID, payerServiceId: UUID, rateId: UUID = UUID.randomUUID(),

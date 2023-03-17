@@ -5,12 +5,14 @@ import androidx.test.core.app.ApplicationProvider
 import org.junit.After
 import org.junit.Before
 import java.io.IOException
+import java.time.OffsetDateTime
 
 open class HomeDatabaseTest {
     protected val ctx: Context = ApplicationProvider.getApplicationContext()
 
     //getApplicationContext<App>()//: Context// = InstrumentationRegistry.getInstrumentation().targetContext
     protected lateinit var db: HomeDatabase
+    protected val currentDateTime: OffsetDateTime = OffsetDateTime.now()
 
     @Before
     open fun setUp() {

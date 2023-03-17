@@ -20,8 +20,8 @@ SELECT rps.payerId, rps.personsNum, rps.totalArea, rps.livingSpace,
         (CASE WHEN rps.isPerPerson = 1
             -- GAS, GARBAGE
             THEN rps.rateValue * rps.personsNum
-            ELSE CASE WHEN rps.serviceType IN (${Constants.SRV_RENT_VAL}) THEN rps.rateValue * ifnull(rps.totalArea, 1)
-                    WHEN rps.serviceType IN (${Constants.SRV_HEATING_VAL}) THEN rps.rateValue * ifnull(rps.livingSpace, 1)
+            ELSE CASE WHEN rps.serviceType IN (${Constants.SRV_RENT_VAL}) THEN rps.rateValue * ifnull(rps.totalArea / ${CONV_COEFF_BIGDECIMAL}.0, 1)
+                    WHEN rps.serviceType IN (${Constants.SRV_HEATING_VAL}) THEN rps.rateValue * ifnull(rps.livingSpace / ${CONV_COEFF_BIGDECIMAL}.0, 1)
                     -- DOORPHONE, PHONE, INTERNET, USGO
                     ELSE rps.rateValue
                 END
@@ -59,9 +59,8 @@ SELECT rps.payerId, rps.personsNum, rps.totalArea, rps.livingSpace,
         (CASE WHEN mvp.isDerivedUnit = 0 
             THEN rps.rateValue * mvp.diffMeterValue / ${CONV_COEFF_BIGDECIMAL}.0
             ELSE CASE rps.serviceType 
-                    WHEN ${Constants.SRV_HEATING_VAL} 
-                        THEN rps.rateValue * rps.livingSpace
-                        ELSE rps.rateValue
+                    WHEN ${Constants.SRV_HEATING_VAL} THEN rps.rateValue * ifnull(rps.livingSpace / ${CONV_COEFF_BIGDECIMAL}.0, 1)
+                    ELSE rps.rateValue
                 END
         END) serviceDebt,
         rps.isMeterUses
