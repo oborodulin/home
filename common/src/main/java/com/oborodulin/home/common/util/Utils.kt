@@ -17,11 +17,35 @@ import java.time.OffsetDateTime
 import java.time.ZoneId
 import java.time.ZoneOffset
 import java.time.format.DateTimeFormatter
+import java.util.*
 
 private const val TAG = "Common.Utils"
 
 class Utils {
     companion object {
+        var currencyLocaleMap: SortedMap<Currency, Locale> =
+            sortedMapOf(compareBy { it.currencyCode })
+
+        init {
+            for (locale in Locale.getAvailableLocales()) {
+                try {
+                    val currency = Currency.getInstance(locale)
+                    currencyLocaleMap[currency] = locale
+                } catch (e: Exception) {
+                    Timber.tag(TAG).e(e)
+                }
+            }
+        }
+
+        fun currencySymbol(currencyCode: String = Currency.getInstance(Locale.getDefault()).currencyCode): String? {
+            val currency: Currency = Currency.getInstance(currencyCode)
+            Timber.tag(TAG).d(
+                "currencySymbol(): %s:- %s",
+                currencyCode, currency.getSymbol(currencyLocaleMap[currency])
+            )
+            return currency.getSymbol(currencyLocaleMap[currency])
+        }
+
         fun superscriptText(@StringRes resId: Int, s: String): CharSequence {
             val resString = ""//resources.getString(resId)
             val strSpan = SpannableStringBuilder(resString)

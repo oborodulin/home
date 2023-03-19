@@ -58,7 +58,7 @@ class PayerEntity(
                 ercCode = ctx.resources.getString(R.string.def_payer1_erc_code),
                 fullName = ctx.resources.getString(R.string.def_payer1_full_name),
                 address = ctx.resources.getString(R.string.def_payer1_address),
-                paymentDay = 20,
+                paymentDay = Constants.DEF_PAYMENT_DAY,
                 totalArea = BigDecimal("53.5"),
                 livingSpace = BigDecimal("49.7"),
                 heatedVolume = BigDecimal("122.75"),
@@ -74,7 +74,7 @@ class PayerEntity(
                 totalArea = BigDecimal("52.5"),
                 livingSpace = BigDecimal("48.7"),
                 heatedVolume = BigDecimal("121.75"),
-                personsNum = Constants.DEF_PAYMENT_DAY,
+                personsNum = Constants.DEF_PERSON_NUM,
                 isFavorite = true
             )
 

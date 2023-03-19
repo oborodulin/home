@@ -54,7 +54,7 @@ private val MIGRATION_4_5 = object : Migration(4, 5) {
 }
 
 @Database(
-    entities = [PayerEntity::class, ServiceEntity::class, ServiceTlEntity::class,
+    entities = [AppSettingEntity::class, PayerEntity::class, ServiceEntity::class, ServiceTlEntity::class,
         PayerServiceCrossRefEntity::class,
         RateEntity::class, ServiceActivityEntity::class, ServicePromotionEntity::class,
         MeterEntity::class, MeterTlEntity::class, MeterValueEntity::class, MeterVerificationEntity::class,
@@ -185,12 +185,37 @@ abstract class HomeDatabase : RoomDatabase() {
             Timber.tag(TAG).i("prePopulateDb(...) called")
             db.beginTransaction()
             try {
+                // Default settings:
+                // Lang
+                db.insert(
+                    AppSettingEntity.TABLE_NAME, SQLiteDatabase.CONFLICT_REPLACE,
+                    Mapper.toContentValues(AppSettingEntity.langParam())
+                )
+                // Currency
+                db.insert(
+                    AppSettingEntity.TABLE_NAME, SQLiteDatabase.CONFLICT_REPLACE,
+                    Mapper.toContentValues(AppSettingEntity.currencyParam())
+                )
+                // Total Area MU
+                db.insert(
+                    AppSettingEntity.TABLE_NAME, SQLiteDatabase.CONFLICT_REPLACE,
+                    Mapper.toContentValues(AppSettingEntity.totalAreaMuParam(context))
+                )
+                // Living Space MU
+                db.insert(
+                    AppSettingEntity.TABLE_NAME, SQLiteDatabase.CONFLICT_REPLACE,
+                    Mapper.toContentValues(AppSettingEntity.livingSpaceMuParam(context))
+                )
+                // Heated Volume MU
+                db.insert(
+                    AppSettingEntity.TABLE_NAME, SQLiteDatabase.CONFLICT_REPLACE,
+                    Mapper.toContentValues(AppSettingEntity.heatedVolumeMuParam(context))
+                )
                 // Default payers:
                 // 1
                 val payer1 = PayerEntity.payerWithTwoPersons(context)
                 db.insert(
-                    PayerEntity.TABLE_NAME,
-                    SQLiteDatabase.CONFLICT_REPLACE,
+                    PayerEntity.TABLE_NAME, SQLiteDatabase.CONFLICT_REPLACE,
                     Mapper.toContentValues(payer1)
                 )
                 Timber.tag(TAG)
@@ -198,8 +223,7 @@ abstract class HomeDatabase : RoomDatabase() {
                 // 2
                 val payer2 = PayerEntity.favoritePayer(context)
                 db.insert(
-                    PayerEntity.TABLE_NAME,
-                    SQLiteDatabase.CONFLICT_REPLACE,
+                    PayerEntity.TABLE_NAME, SQLiteDatabase.CONFLICT_REPLACE,
                     Mapper.toContentValues(payer2)
                 )
                 Timber.tag(TAG)
@@ -579,20 +603,17 @@ abstract class HomeDatabase : RoomDatabase() {
             val textContent =
                 ServiceTlEntity.serviceTl(context, service.serviceType, service.serviceId)
             db.insert(
-                ServiceEntity.TABLE_NAME,
-                SQLiteDatabase.CONFLICT_REPLACE,
+                ServiceEntity.TABLE_NAME, SQLiteDatabase.CONFLICT_REPLACE,
                 Mapper.toContentValues(service)
             )
             db.insert(
-                ServiceTlEntity.TABLE_NAME,
-                SQLiteDatabase.CONFLICT_REPLACE,
+                ServiceTlEntity.TABLE_NAME, SQLiteDatabase.CONFLICT_REPLACE,
                 Mapper.toContentValues(textContent)
             )
             Timber.tag(TAG)
                 .i(
                     "Default service imported: {\"service\": {%s}, \"tl\": {%s}}",
-                    jsonLogger?.toJson(service),
-                    jsonLogger?.toJson(textContent)
+                    jsonLogger?.toJson(service), jsonLogger?.toJson(textContent)
                 )
         }
 
@@ -608,8 +629,7 @@ abstract class HomeDatabase : RoomDatabase() {
                     isAllocateRate = isAllocateRate
                 )
             db.insert(
-                PayerServiceCrossRefEntity.TABLE_NAME,
-                SQLiteDatabase.CONFLICT_REPLACE,
+                PayerServiceCrossRefEntity.TABLE_NAME, SQLiteDatabase.CONFLICT_REPLACE,
                 Mapper.toContentValues(payerService)
             )
             Timber.tag(TAG)
@@ -623,19 +643,16 @@ abstract class HomeDatabase : RoomDatabase() {
         private fun insertDefMeter(db: SupportSQLiteDatabase, meter: MeterEntity) {
             val textContent = MeterTlEntity.meterTl(context, meter.meterType, meter.meterId)
             db.insert(
-                MeterEntity.TABLE_NAME,
-                SQLiteDatabase.CONFLICT_REPLACE,
+                MeterEntity.TABLE_NAME, SQLiteDatabase.CONFLICT_REPLACE,
                 Mapper.toContentValues(meter)
             )
             db.insert(
-                MeterTlEntity.TABLE_NAME,
-                SQLiteDatabase.CONFLICT_REPLACE,
+                MeterTlEntity.TABLE_NAME, SQLiteDatabase.CONFLICT_REPLACE,
                 Mapper.toContentValues(textContent)
             )
             Timber.tag(TAG).i(
                 "Default meter imported: {\"meter\": {%s}, \"tl\": {%s}}",
-                jsonLogger?.toJson(meter),
-                jsonLogger?.toJson(textContent)
+                jsonLogger?.toJson(meter), jsonLogger?.toJson(textContent)
             )
         }
 
@@ -644,8 +661,7 @@ abstract class HomeDatabase : RoomDatabase() {
             meterValue: MeterValueEntity
         ) {
             db.insert(
-                MeterValueEntity.TABLE_NAME,
-                SQLiteDatabase.CONFLICT_REPLACE,
+                MeterValueEntity.TABLE_NAME, SQLiteDatabase.CONFLICT_REPLACE,
                 Mapper.toContentValues(meterValue)
             )
             Timber.tag(TAG).i("Default meter value imported: {%s}", jsonLogger?.toJson(meterValue))
@@ -653,8 +669,7 @@ abstract class HomeDatabase : RoomDatabase() {
 
         private fun insertDefRate(db: SupportSQLiteDatabase, rate: RateEntity): UUID {
             db.insert(
-                RateEntity.TABLE_NAME,
-                SQLiteDatabase.CONFLICT_REPLACE,
+                RateEntity.TABLE_NAME, SQLiteDatabase.CONFLICT_REPLACE,
                 Mapper.toContentValues(rate)
             )
             Timber.tag(TAG).i("Default rate imported: {%s}", jsonLogger?.toJson(rate))

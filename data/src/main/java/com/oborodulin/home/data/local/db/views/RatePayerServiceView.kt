@@ -20,7 +20,8 @@ SELECT rps.*, (CASE WHEN EXISTS (SELECT m.meterId
                     THEN 1 
                     ELSE 0 
                 END) isMeterUses
-FROM (SELECT p.payerId, p.personsNum, p.totalArea, p.livingSpace, p.heatedVolume, psv.payerServiceId, psv.isAllocateRate, 
+FROM (-- Services rates
+    SELECT p.payerId, p.personsNum, p.totalArea, p.livingSpace, p.heatedVolume, psv.payerServiceId, psv.isAllocateRate, 
         psv.serviceId, psv.serviceName, psv.servicePos, psv.serviceType, psv.serviceLocCode, psv.serviceMeasureUnit, 
         r.startDate, r.fromMeterValue, r.toMeterValue, r.rateValue, r.isPerPerson, r.isPrivileges
     FROM ${PayerEntity.TABLE_NAME} p JOIN ${PayerServiceView.VIEW_NAME} psv ON psv.payersId = p.payerId 
@@ -28,6 +29,7 @@ FROM (SELECT p.payerId, p.personsNum, p.totalArea, p.livingSpace, p.heatedVolume
         JOIN (SELECT * FROM ${RateEntity.TABLE_NAME} WHERE payersServicesId IS NULL) r ON r.servicesId = psv.servicesId 
                                                                     AND r.isPrivileges = psv.isPrivileges
     UNION ALL
+    -- Payer services rates
     SELECT p.payerId, p.personsNum, p.totalArea, p.livingSpace, p.heatedVolume, psv.payerServiceId, psv.isAllocateRate, 
         psv.serviceId, psv.serviceName, psv.servicePos, psv.serviceType, psv.serviceLocCode, psv.serviceMeasureUnit, 
         r.startDate, r.fromMeterValue, r.toMeterValue, r.rateValue, r.isPerPerson, r.isPrivileges

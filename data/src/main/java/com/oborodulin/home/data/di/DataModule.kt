@@ -1,13 +1,11 @@
 package com.oborodulin.home.data.di
 
 import com.oborodulin.home.common.di.IoDispatcher
+import com.oborodulin.home.data.local.db.dao.AppSettingDao
 import com.oborodulin.home.data.local.db.dao.PayerDao
-import com.oborodulin.home.data.local.db.mappers.PayerEntityListToPayerListMapper
-import com.oborodulin.home.data.local.db.mappers.PayerEntityToPayerMapper
-import com.oborodulin.home.data.local.db.mappers.PayerToPayerEntityMapper
-import com.oborodulin.home.data.local.db.repositories.PayerDataSource
-import com.oborodulin.home.data.local.db.repositories.PayerDataSourceImp
-import com.oborodulin.home.data.local.db.repositories.PayersRepositoryImp
+import com.oborodulin.home.data.local.db.mappers.*
+import com.oborodulin.home.data.local.db.repositories.*
+import com.oborodulin.home.domain.repositories.AppSettingsRepository
 import com.oborodulin.home.domain.repositories.PayersRepository
 import com.oborodulin.home.domain.usecases.*
 import dagger.Module
@@ -23,6 +21,21 @@ object DataModule {
     // MAPPERS:
     @Singleton
     @Provides
+    fun provideAppSettingEntityToAppSettingMapper(): AppSettingEntityToAppSettingMapper =
+        AppSettingEntityToAppSettingMapper()
+
+    @Singleton
+    @Provides
+    fun provideAppSettingToAppSettingEntityMapper(): AppSettingToAppSettingEntityMapper =
+        AppSettingToAppSettingEntityMapper()
+
+    @Singleton
+    @Provides
+    fun provideAppSettingEntityListToAppSettingListMapper(mapper: AppSettingEntityToAppSettingMapper): AppSettingEntityListToAppSettingListMapper =
+        AppSettingEntityListToAppSettingListMapper(mapper = mapper)
+
+    @Singleton
+    @Provides
     fun providePayerToPayerEntityMapper(): PayerToPayerEntityMapper = PayerToPayerEntityMapper()
 
     @Singleton
@@ -35,6 +48,22 @@ object DataModule {
         PayerEntityListToPayerListMapper(mapper = mapper)
 
     // DATA SOURCES:
+    @Singleton
+    @Provides
+    fun provideAppSettingDataSource(
+        appSettingDao: AppSettingDao,
+        @IoDispatcher dispatcher: CoroutineDispatcher,
+        appSettingEntityListToAppSettingListMapper: AppSettingEntityListToAppSettingListMapper,
+        appSettingEntityToAppSettingMapper: AppSettingEntityToAppSettingMapper,
+        appSettingToAppSettingEntityMapper: AppSettingToAppSettingEntityMapper
+    ): AppSettingDataSource =
+        AppSettingDataSourceImp(
+            appSettingDao, dispatcher,
+            appSettingEntityListToAppSettingListMapper,
+            appSettingEntityToAppSettingMapper,
+            appSettingToAppSettingEntityMapper
+        )
+
     @Singleton
     @Provides
     fun providePayerDataSource(
@@ -52,6 +81,11 @@ object DataModule {
         )
 
     // REPOSITORIES:
+    @Singleton
+    @Provides
+    fun provideAppSettingsRepository(appSettingDataSource: AppSettingDataSource): AppSettingsRepository =
+        AppSettingsRepositoryImp(appSettingDataSource)
+
     @Singleton
     @Provides
     fun providePayersRepository(payerDataSource: PayerDataSource): PayersRepository =
