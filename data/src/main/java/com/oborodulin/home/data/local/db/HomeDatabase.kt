@@ -186,31 +186,7 @@ abstract class HomeDatabase : RoomDatabase() {
             db.beginTransaction()
             try {
                 // Default settings:
-                // Lang
-                db.insert(
-                    AppSettingEntity.TABLE_NAME, SQLiteDatabase.CONFLICT_REPLACE,
-                    Mapper.toContentValues(AppSettingEntity.langParam())
-                )
-                // Currency
-                db.insert(
-                    AppSettingEntity.TABLE_NAME, SQLiteDatabase.CONFLICT_REPLACE,
-                    Mapper.toContentValues(AppSettingEntity.currencyParam())
-                )
-                // Total Area MU
-                db.insert(
-                    AppSettingEntity.TABLE_NAME, SQLiteDatabase.CONFLICT_REPLACE,
-                    Mapper.toContentValues(AppSettingEntity.totalAreaMuParam(context))
-                )
-                // Living Space MU
-                db.insert(
-                    AppSettingEntity.TABLE_NAME, SQLiteDatabase.CONFLICT_REPLACE,
-                    Mapper.toContentValues(AppSettingEntity.livingSpaceMuParam(context))
-                )
-                // Heated Volume MU
-                db.insert(
-                    AppSettingEntity.TABLE_NAME, SQLiteDatabase.CONFLICT_REPLACE,
-                    Mapper.toContentValues(AppSettingEntity.heatedVolumeMuParam(context))
-                )
+                insertDefAppSettings(db)
                 // Default payers:
                 // 1
                 val payer1 = PayerEntity.payerWithTwoPersons(context)
@@ -421,7 +397,8 @@ abstract class HomeDatabase : RoomDatabase() {
                 // garbage
                 insertDefRate(
                     db, RateEntity.garbageRateForPayer(
-                        garbageService.serviceId, garbagePayer1ServiceId, true
+                        garbageService.serviceId, garbagePayer1ServiceId,
+                        currentDateTime.minusMonths(5), true
                     )
                 )
                 // doorphone
@@ -597,6 +574,52 @@ abstract class HomeDatabase : RoomDatabase() {
                 db.endTransaction()
                 isImportExecute = false
             }
+        }
+
+        private fun insertDefAppSettings(db: SupportSQLiteDatabase) {
+            // Lang
+            val lang = AppSettingEntity.langParam()
+            db.insert(
+                AppSettingEntity.TABLE_NAME, SQLiteDatabase.CONFLICT_REPLACE,
+                Mapper.toContentValues(lang)
+            )
+            // Currency Code
+            val currencyCode = AppSettingEntity.currencyCodeParam()
+            db.insert(
+                AppSettingEntity.TABLE_NAME, SQLiteDatabase.CONFLICT_REPLACE,
+                Mapper.toContentValues(currencyCode)
+            )
+            // Person Num MU
+            val personNumMu = AppSettingEntity.personNumMuParam(context)
+            db.insert(
+                AppSettingEntity.TABLE_NAME, SQLiteDatabase.CONFLICT_REPLACE,
+                Mapper.toContentValues(personNumMu)
+            )
+            // Total Area MU
+            val totalAreaMu = AppSettingEntity.totalAreaMuParam(context)
+            db.insert(
+                AppSettingEntity.TABLE_NAME, SQLiteDatabase.CONFLICT_REPLACE,
+                Mapper.toContentValues(totalAreaMu)
+            )
+            // Living Space MU
+            val livingSpaceMu = AppSettingEntity.livingSpaceMuParam(context)
+            db.insert(
+                AppSettingEntity.TABLE_NAME, SQLiteDatabase.CONFLICT_REPLACE,
+                Mapper.toContentValues(livingSpaceMu)
+            )
+            // Heated Volume MU
+            val heatedVolumeMu = AppSettingEntity.heatedVolumeMuParam(context)
+            db.insert(
+                AppSettingEntity.TABLE_NAME, SQLiteDatabase.CONFLICT_REPLACE,
+                Mapper.toContentValues(heatedVolumeMu)
+            )
+            Timber.tag(TAG)
+                .i(
+                    "Default service imported: {\"params\": {\"lang\": {%s}, \"currencyCode\": {%s}, \"personNumMu\": {%s}, \"totalAreaMu\": {%s}, \"livingSpaceMu\": {%s}, \"heatedVolumeMu\": {%s}}",
+                    jsonLogger?.toJson(lang), jsonLogger?.toJson(currencyCode),
+                    jsonLogger?.toJson(personNumMu), jsonLogger?.toJson(totalAreaMu),
+                    jsonLogger?.toJson(livingSpaceMu), jsonLogger?.toJson(heatedVolumeMu)
+                )
         }
 
         private fun insertDefService(db: SupportSQLiteDatabase, service: ServiceEntity) {

@@ -69,7 +69,7 @@ class RateEntity(
         ) = RateEntity(
             servicesId = serviceId, payersServicesId = payerServiceId,
             rateId = rateId,
-            startDate = startDate,
+            startDate = startDate.minusMonths(5).withDayOfMonth(1),
             fromMeterValue = fromMeterValue,
             toMeterValue = toMeterValue,
             rateValue = rateValue,
@@ -77,117 +77,199 @@ class RateEntity(
             isPrivileges = isPrivileges
         )
 
-        fun electricityRateFrom0To150(serviceId: UUID, payerServiceId: UUID? = null) = defaultRate(
-            serviceId = serviceId, payerServiceId = payerServiceId,
+        fun electricityRateFrom0To150(
+            serviceId: UUID, payerServiceId: UUID? = null,
+            startDate: OffsetDateTime = OffsetDateTime.now(),
+            rateValue: BigDecimal = BigDecimal.ZERO
+        ) = defaultRate(
+            serviceId = serviceId, payerServiceId = payerServiceId, startDate = startDate,
             fromMeterValue = DEF_ELECTRO_RANGE1, toMeterValue = DEF_ELECTRO_RANGE2,
-            rateValue = DEF_ELECTRO_RANGE1_RATE
+            rateValue = when (rateValue) {
+                BigDecimal.ZERO -> DEF_ELECTRO_RANGE1_RATE
+                else -> rateValue
+            }
         )
 
-        fun electricityRateFrom150To800(serviceId: UUID, payerServiceId: UUID? = null) =
-            defaultRate(
-                serviceId = serviceId, payerServiceId = payerServiceId,
-                fromMeterValue = DEF_ELECTRO_RANGE2, toMeterValue = DEF_ELECTRO_RANGE3,
-                rateValue = DEF_ELECTRO_RANGE2_RATE
-            )
+        fun electricityRateFrom150To800(
+            serviceId: UUID, payerServiceId: UUID? = null,
+            startDate: OffsetDateTime = OffsetDateTime.now(),
+            rateValue: BigDecimal = BigDecimal.ZERO
+        ) = defaultRate(
+            serviceId = serviceId, payerServiceId = payerServiceId, startDate = startDate,
+            fromMeterValue = DEF_ELECTRO_RANGE2, toMeterValue = DEF_ELECTRO_RANGE3,
+            rateValue = when (rateValue) {
+                BigDecimal.ZERO -> DEF_ELECTRO_RANGE2_RATE
+                else -> rateValue
+            }
+        )
 
-        fun electricityRateFrom800(serviceId: UUID, payerServiceId: UUID? = null) = defaultRate(
-            serviceId = serviceId, payerServiceId = payerServiceId,
+        fun electricityRateFrom800(
+            serviceId: UUID, payerServiceId: UUID? = null,
+            startDate: OffsetDateTime = OffsetDateTime.now(),
+            rateValue: BigDecimal = BigDecimal.ZERO
+        ) = defaultRate(
+            serviceId = serviceId, payerServiceId = payerServiceId, startDate = startDate,
             fromMeterValue = DEF_ELECTRO_RANGE3,
-            rateValue = DEF_ELECTRO_RANGE3_RATE
+            rateValue = when (rateValue) {
+                BigDecimal.ZERO -> DEF_ELECTRO_RANGE3_RATE
+                else -> rateValue
+            }
         )
 
-        fun electricityPrivilegesRate(serviceId: UUID, payerServiceId: UUID? = null) = defaultRate(
-            serviceId = serviceId, payerServiceId = payerServiceId,
-            isPrivileges = true, rateValue = DEF_ELECTRO_PRIV_RATE
+        fun electricityPrivilegesRate(
+            serviceId: UUID, payerServiceId: UUID? = null,
+            startDate: OffsetDateTime = OffsetDateTime.now(),
+            rateValue: BigDecimal = BigDecimal.ZERO
+        ) = defaultRate(
+            serviceId = serviceId, payerServiceId = payerServiceId, startDate = startDate,
+            isPrivileges = true,
+            rateValue = when (rateValue) {
+                BigDecimal.ZERO -> DEF_ELECTRO_PRIV_RATE
+                else -> rateValue
+            }
         )
 
         fun gasRate(
-            serviceId: UUID, isPerPerson: Boolean = true, isPrivileges: Boolean = false
+            serviceId: UUID, startDate: OffsetDateTime = OffsetDateTime.now(),
+            isPerPerson: Boolean = true, isPrivileges: Boolean = false,
+            rateValue: BigDecimal = BigDecimal.ZERO
         ) = defaultRate(
-            serviceId = serviceId, isPerPerson = isPerPerson, isPrivileges = isPrivileges,
-            rateValue = DEF_GAS_RATE
+            serviceId = serviceId, startDate = startDate,
+            isPerPerson = isPerPerson, isPrivileges = isPrivileges,
+            rateValue = when (rateValue) {
+                BigDecimal.ZERO -> DEF_GAS_RATE
+                else -> rateValue
+            }
         )
 
         fun coldWaterRate(
-            serviceId: UUID, isPerPerson: Boolean = false, isPrivileges: Boolean = false
+            serviceId: UUID, startDate: OffsetDateTime = OffsetDateTime.now(),
+            isPerPerson: Boolean = false, isPrivileges: Boolean = false,
+            rateValue: BigDecimal = BigDecimal.ZERO
         ) = defaultRate(
-            serviceId = serviceId, isPerPerson = isPerPerson, isPrivileges = isPrivileges,
-            rateValue = DEF_COLD_WATER_RATE
+            serviceId = serviceId, startDate = startDate,
+            isPerPerson = isPerPerson, isPrivileges = isPrivileges,
+            rateValue = when (rateValue) {
+                BigDecimal.ZERO -> DEF_COLD_WATER_RATE
+                else -> rateValue
+            }
         )
 
         fun wasteRate(
-            serviceId: UUID, isPerPerson: Boolean = false, isPrivileges: Boolean = false
+            serviceId: UUID, startDate: OffsetDateTime = OffsetDateTime.now(),
+            isPerPerson: Boolean = false, isPrivileges: Boolean = false,
+            rateValue: BigDecimal = BigDecimal.ZERO
         ) = defaultRate(
-            serviceId = serviceId, isPerPerson = isPerPerson, isPrivileges = isPrivileges,
-            rateValue = DEF_WASTE_RATE
+            serviceId = serviceId, startDate = startDate,
+            isPerPerson = isPerPerson, isPrivileges = isPrivileges,
+            rateValue = when (rateValue) {
+                BigDecimal.ZERO -> DEF_WASTE_RATE
+                else -> rateValue
+            }
         )
 
         fun heatingRate(
-            serviceId: UUID, isPerPerson: Boolean = false, isPrivileges: Boolean = false
+            serviceId: UUID, startDate: OffsetDateTime = OffsetDateTime.now(),
+            isPerPerson: Boolean = false, isPrivileges: Boolean = false,
+            rateValue: BigDecimal = BigDecimal.ZERO
         ) = defaultRate(
-            serviceId = serviceId, isPerPerson = isPerPerson, isPrivileges = isPrivileges,
-            rateValue = DEF_HEATING_RATE
+            serviceId = serviceId, startDate = startDate,
+            isPerPerson = isPerPerson, isPrivileges = isPrivileges,
+            rateValue = when (rateValue) {
+                BigDecimal.ZERO -> DEF_HEATING_RATE
+                else -> rateValue
+            }
         )
 
         fun heatingRateForPayer(
-            serviceId: UUID, payerServiceId: UUID,
-            isPerPerson: Boolean = false, isPrivileges: Boolean = false
+            serviceId: UUID, payerServiceId: UUID, startDate: OffsetDateTime = OffsetDateTime.now(),
+            isPerPerson: Boolean = false, isPrivileges: Boolean = false,
+            rateValue: BigDecimal = BigDecimal.ZERO
         ) = defaultRate(
-            serviceId = serviceId, payerServiceId = payerServiceId,
+            serviceId = serviceId, payerServiceId = payerServiceId, startDate = startDate,
             isPerPerson = isPerPerson, isPrivileges = isPrivileges,
-            rateValue = DEF_HEATING_PAYER_RATE
+            rateValue = when (rateValue) {
+                BigDecimal.ZERO -> DEF_HEATING_PAYER_RATE
+                else -> rateValue
+            }
         )
 
         fun hotWaterRate(
-            serviceId: UUID, isPerPerson: Boolean = false, isPrivileges: Boolean = false
+            serviceId: UUID, startDate: OffsetDateTime = OffsetDateTime.now(),
+            isPerPerson: Boolean = false, isPrivileges: Boolean = false,
+            rateValue: BigDecimal = BigDecimal.ZERO
         ) = defaultRate(
-            serviceId = serviceId, isPerPerson = isPerPerson, isPrivileges = isPrivileges,
-            rateValue = DEF_HOT_WATER_RATE
+            serviceId = serviceId, startDate = startDate,
+            isPerPerson = isPerPerson, isPrivileges = isPrivileges,
+            rateValue = when (rateValue) {
+                BigDecimal.ZERO -> DEF_HOT_WATER_RATE
+                else -> rateValue
+            }
         )
 
         fun rentRateForPayer(
-            serviceId: UUID, payerServiceId: UUID,
-            isPerPerson: Boolean = false, isPrivileges: Boolean = false
+            serviceId: UUID, payerServiceId: UUID, startDate: OffsetDateTime = OffsetDateTime.now(),
+            isPerPerson: Boolean = false, isPrivileges: Boolean = false,
+            rateValue: BigDecimal = BigDecimal.ZERO
         ) = defaultRate(
-            serviceId = serviceId, payerServiceId = payerServiceId,
+            serviceId = serviceId, payerServiceId = payerServiceId, startDate = startDate,
             isPerPerson = isPerPerson, isPrivileges = isPrivileges,
-            rateValue = DEF_RENT_PAYER_RATE
+            rateValue = when (rateValue) {
+                BigDecimal.ZERO -> DEF_RENT_PAYER_RATE
+                else -> rateValue
+            }
         )
 
         fun garbageRateForPayer(
-            serviceId: UUID, payerServiceId: UUID,
-            isPerPerson: Boolean = true, isPrivileges: Boolean = false
+            serviceId: UUID, payerServiceId: UUID, startDate: OffsetDateTime = OffsetDateTime.now(),
+            isPerPerson: Boolean = true, isPrivileges: Boolean = false,
+            rateValue: BigDecimal = BigDecimal.ZERO
         ) = defaultRate(
-            serviceId = serviceId, payerServiceId = payerServiceId,
+            serviceId = serviceId, payerServiceId = payerServiceId, startDate = startDate,
             isPerPerson = isPerPerson, isPrivileges = isPrivileges,
-            rateValue = DEF_GARBAGE_PAYER_RATE
+            rateValue = when (rateValue) {
+                BigDecimal.ZERO -> DEF_GARBAGE_PAYER_RATE
+                else -> rateValue
+            }
         )
 
         fun doorphoneRateForPayer(
-            serviceId: UUID, payerServiceId: UUID,
-            isPerPerson: Boolean = false, isPrivileges: Boolean = false
+            serviceId: UUID, payerServiceId: UUID, startDate: OffsetDateTime = OffsetDateTime.now(),
+            isPerPerson: Boolean = false, isPrivileges: Boolean = false,
+            rateValue: BigDecimal = BigDecimal.ZERO
         ) = defaultRate(
-            serviceId = serviceId, payerServiceId = payerServiceId,
+            serviceId = serviceId, payerServiceId = payerServiceId, startDate = startDate,
             isPerPerson = isPerPerson, isPrivileges = isPrivileges,
-            rateValue = DEF_DOORPHONE_PAYER_RATE
+            rateValue = when (rateValue) {
+                BigDecimal.ZERO -> DEF_DOORPHONE_PAYER_RATE
+                else -> rateValue
+            }
         )
 
         fun phoneRateForPayer(
-            serviceId: UUID, payerServiceId: UUID,
-            isPerPerson: Boolean = false, isPrivileges: Boolean = false
+            serviceId: UUID, payerServiceId: UUID, startDate: OffsetDateTime = OffsetDateTime.now(),
+            isPerPerson: Boolean = false, isPrivileges: Boolean = false,
+            rateValue: BigDecimal = BigDecimal.ZERO
         ) = defaultRate(
-            serviceId = serviceId, payerServiceId = payerServiceId,
+            serviceId = serviceId, payerServiceId = payerServiceId, startDate = startDate,
             isPerPerson = isPerPerson, isPrivileges = isPrivileges,
-            rateValue = DEF_PHONE_PAYER_RATE
+            rateValue = when (rateValue) {
+                BigDecimal.ZERO -> DEF_PHONE_PAYER_RATE
+                else -> rateValue
+            }
         )
 
         fun internetRateForPayer(
-            serviceId: UUID, payerServiceId: UUID,
-            isPerPerson: Boolean = false, isPrivileges: Boolean = false
+            serviceId: UUID, payerServiceId: UUID, startDate: OffsetDateTime = OffsetDateTime.now(),
+            isPerPerson: Boolean = false, isPrivileges: Boolean = false,
+            rateValue: BigDecimal = BigDecimal.ZERO
         ) = defaultRate(
-            serviceId = serviceId, payerServiceId = payerServiceId,
+            serviceId = serviceId, payerServiceId = payerServiceId, startDate = startDate,
             isPerPerson = isPerPerson, isPrivileges = isPrivileges,
-            rateValue = DEF_INTERNET_PAYER_RATE
+            rateValue = when (rateValue) {
+                BigDecimal.ZERO -> DEF_INTERNET_PAYER_RATE
+                else -> rateValue
+            }
         )
 
         fun perPersonRate(

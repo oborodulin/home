@@ -12,62 +12,91 @@ import java.util.*
 @DatabaseView(
     viewName = PayerServiceDebtView.VIEW_NAME,
     value = """
-SELECT rps.payerId, rps.personsNum, rps.totalArea, rps.livingSpace, 
+SELECT psd.*, 
+    printf('%02d.%d: ', psd.paymentMonth, psd.paymentYear) ||
+    (CASE WHEN psd.isPerPerson = 1
+            -- GAS, GARBAGE
+            THEN printf(${Constants.FMT_IS_PER_PERSON_EXPR}, psd.personsNum, psd.personMu, 
+                            psd.rateValue / ${CONV_COEFF_BIGDECIMAL}.0, psd.currency, psd.serviceDebt / ${CONV_COEFF_BIGDECIMAL}.0, psd.currency)
+            ELSE CASE 0
+                    WHEN psd.serviceType IN (${Constants.SRV_RENT_VAL}) THEN 
+                        (CASE WHEN psd.totalArea IS NOT NULL    
+                            THEN printf('%.2f %s x ', psd.totalArea / ${CONV_COEFF_BIGDECIMAL}.0, psd.totalAreaMu) 
+                            ELSE '' 
+                        END) || 
+                            printf('%.2f %s = %.2f %s', psd.rateValue / ${CONV_COEFF_BIGDECIMAL}.0, psd.currency, 
+                                                            psd.serviceDebt / ${CONV_COEFF_BIGDECIMAL}.0, psd.currency)                        
+                    WHEN psd.serviceType IN (${Constants.SRV_HEATING_VAL}) THEN 
+                        (CASE WHEN psd.livingSpace IS NOT NULL 
+                            THEN printf('%.2f %s x ', psd.livingSpace / ${CONV_COEFF_BIGDECIMAL}.0, psd.livingSpaceMu) 
+                            ELSE '' 
+                        END) || 
+                            printf('%.2f %s = %.2f %s', psd.rateValue / ${CONV_COEFF_BIGDECIMAL}.0, psd.currency, 
+                                                            psd.serviceDebt / ${CONV_COEFF_BIGDECIMAL}.0, psd.currency)                        
+                    -- DOORPHONE, PHONE, INTERNET, USGO
+                    ELSE printf(${Constants.FMT_DEBT_EXPR}, psd.serviceDebt / ${CONV_COEFF_BIGDECIMAL}.0, psd.currency)
+                END
+    END) serviceDebtExpr
+FROM (SELECT rps.payerId, rps.personsNum, rps.totalArea, rps.livingSpace, 
         mrv.paymentDate, 
         mrv.paymentMonth, mrv.paymentYear, rps.isPerPerson, rps.servicePos, rps.serviceType, rps.serviceName, 
-        rps.serviceLocCode, rps.rateValue, rps.fromMeterValue, rps.toMeterValue, 
+        rps.serviceLocCode, rps.rateValue, rps.fromMeterValue, rps.toMeterValue, NULL AS rateMeterValue,
         NULL AS diffMeterValue, rps.serviceMeasureUnit AS measureUnit, 0 AS isDerivedUnit, rps.serviceId, 
         rps.payerServiceId,
         (CASE WHEN rps.isPerPerson = 1
             -- GAS, GARBAGE
-            THEN rps.rateValue * rps.personsNum
-            ELSE CASE WHEN rps.serviceType IN (${Constants.SRV_RENT_VAL}) THEN rps.rateValue * ifnull(rps.totalArea / ${CONV_COEFF_BIGDECIMAL}.0, 1)
-                    WHEN rps.serviceType IN (${Constants.SRV_HEATING_VAL}) THEN rps.rateValue * ifnull(rps.livingSpace / ${CONV_COEFF_BIGDECIMAL}.0, 1)
+            THEN rps.personsNum * rps.rateValue
+            ELSE CASE WHEN rps.serviceType IN (${Constants.SRV_RENT_VAL}) THEN ifnull(rps.totalArea / ${CONV_COEFF_BIGDECIMAL}.0, 1) * rps.rateValue
+                    WHEN rps.serviceType IN (${Constants.SRV_HEATING_VAL}) THEN ifnull(rps.livingSpace / ${CONV_COEFF_BIGDECIMAL}.0, 1) * rps.rateValue
                     -- DOORPHONE, PHONE, INTERNET, USGO
                     ELSE rps.rateValue
                 END
         END) serviceDebt,
-        rps.isMeterUses
-FROM ${RatePayerServiceView.VIEW_NAME} rps JOIN 
-        (SELECT rv.receiptId, rv.payersId, rv.payersServicesId, rv.isLinePaid, 
-                mvp.paymentDate, mvp.paymentMonth, mvp.paymentYear, mvp.meterLocCode
-            FROM ${MeterValuePaymentView.VIEW_NAME} mvp LEFT JOIN receipts_view rv 
-                ON rv.payersId = mvp.payerId 
-                AND rv.receiptMonth = mvp.paymentMonth 
-                AND rv.receiptYear = mvp.paymentYear
-                AND rv.payersServicesId <> mvp.payerServiceId
-        GROUP BY rv.receiptId, rv.payersId, rv.payersServicesId, rv.isLinePaid, 
-                mvp.paymentDate, mvp.paymentMonth, mvp.paymentYear, mvp.meterLocCode) mrv
-            ON ifnull(mrv.payersServicesId, rps.payerServiceId) = rps.payerServiceId
-                AND mrv.meterLocCode = rps.serviceLocCode
-WHERE rps.isMeterUses = 0 -- тарифы по услугам без счётчиков
-    AND strftime(${Constants.DB_FRACT_SEC_TIME}, rps.startDate) = ifnull(
+        rps.isMeterUses,
+        (SELECT paramValue FROM ${AppSettingEntity.TABLE_NAME} WHERE paramName = ${Constants.PRM_PERSON_NUM_MU_VAL}) AS personMu,
+        (SELECT paramValue FROM ${AppSettingEntity.TABLE_NAME} WHERE paramName = ${Constants.PRM_CURRENCY_VAL}) AS currency,
+        (SELECT paramValue FROM ${AppSettingEntity.TABLE_NAME} WHERE paramName = ${Constants.PRM_TOTAL_AREA_MU_VAL}) AS totalAreaMu,
+        (SELECT paramValue FROM ${AppSettingEntity.TABLE_NAME} WHERE paramName = ${Constants.PRM_LIVING_SPACE_MU_VAL}) AS livingSpaceMu
+    FROM ${RatePayerServiceView.VIEW_NAME} rps LEFT JOIN 
+            (SELECT rv.receiptId, rv.payersId, rv.payersServicesId, rv.isLinePaid, 
+                    mvp.paymentDate, mvp.paymentMonth, mvp.paymentYear, mvp.meterLocCode
+                FROM ${MeterValuePaymentView.VIEW_NAME} mvp LEFT JOIN ${ReceiptView.VIEW_NAME} rv 
+                    ON rv.payersId = mvp.payerId 
+                    AND rv.receiptMonth = mvp.paymentMonth 
+                    AND rv.receiptYear = mvp.paymentYear
+                    AND rv.payersServicesId <> mvp.payerServiceId
+            GROUP BY rv.receiptId, rv.payersId, rv.payersServicesId, rv.isLinePaid, 
+                    mvp.paymentDate, mvp.paymentMonth, mvp.paymentYear, mvp.meterLocCode) mrv
+                ON ifnull(mrv.payersServicesId, rps.payerServiceId) = rps.payerServiceId
+                    AND ifnull(mrv.isLinePaid, 0) = 0 AND mrv.meterLocCode = rps.serviceLocCode
+    WHERE rps.isMeterUses = 0                                                           -- rates for services without meters
+        AND strftime(${Constants.DB_FRACT_SEC_TIME}, rps.startDate) = ifnull(
                                                     (SELECT MAX(strftime(${Constants.DB_FRACT_SEC_TIME}, rsv.startDate)) 
                                                     FROM ${RatePayerServiceView.VIEW_NAME} rsv 
                                                     WHERE rsv.payerId = rps.payerId 
                                                         AND rsv.payerServiceId = rps.payerServiceId
                                                         AND rsv.serviceLocCode = rps.serviceLocCode
                                                         AND rsv.isMeterUses = 0
-                                                        AND rsv.startDate <= mrv.paymentDate),
-                                                    strftime(${Constants.DB_FRACT_SEC_TIME}, rps.startDate))
-    AND ifnull(mrv.isLinePaid, 0) = 0
+                                                        AND strftime(${Constants.DB_FRACT_SEC_TIME}, rsv.startDate) <= ifnull(strftime(${Constants.DB_FRACT_SEC_TIME}, rps.fromServiceDate), 
+                                                                                                                            strftime(${Constants.DB_FRACT_SEC_TIME}, mrv.paymentDate))),
+                                                    strftime(${Constants.DB_FRACT_SEC_TIME}, rps.startDate))) psd
 UNION ALL
 SELECT psd.*, 
-    printf('%02d', psd.paymentMonth) || '.' || CAST(psd.paymentYear AS TEXT) || ': ' ||
+    printf('%02d.%d: ', psd.paymentMonth, psd.paymentYear) ||
     (CASE WHEN psd.isDerivedUnit = 0
-            THEN CAST(psd.rateMeterValue / ${CONV_COEFF_BIGDECIMAL}.0 AS TEXT) || ' ' || psd.measureUnit || ' x ' || 
-                CAST(psd.rateValue / ${CONV_COEFF_BIGDECIMAL}.0 AS TEXT) || ' ' || asr.currency || ' = ' || 
-                printf('%.2f', psd.serviceDebt / ${CONV_COEFF_BIGDECIMAL}.0) || ' ' || asr.currency
+            THEN printf(${Constants.FMT_METER_VAL_EXPR}, psd.rateMeterValue / ${CONV_COEFF_BIGDECIMAL}.0, psd.measureUnit,
+                                                        psd.rateValue / ${CONV_COEFF_BIGDECIMAL}.0, psd.currency, 
+                                                        psd.serviceDebt / ${CONV_COEFF_BIGDECIMAL}.0, psd.currency)                        
             ELSE CASE psd.serviceType 
                     WHEN ${Constants.SRV_HEATING_VAL} THEN 
-                        CAST(psd.rateMeterValue / ${CONV_COEFF_BIGDECIMAL}.0 AS TEXT) || ' ' || psd.measureUnit || ' x ' || 
-                        (CASE WHEN psd.livingSpace IS NOT NULL THEN CAST(psd.livingSpace / ${CONV_COEFF_BIGDECIMAL}.0 AS TEXT) || 
-                            ' ' || asl.livingSpaceMu || ' x ' 
+                        printf('%.5f %s x ', psd.rateMeterValue / ${CONV_COEFF_BIGDECIMAL}.0, psd.measureUnit) || 
+                        (CASE WHEN psd.livingSpace IS NOT NULL 
+                            THEN printf('%.2f %s x ', psd.livingSpace / ${CONV_COEFF_BIGDECIMAL}.0,  psd.livingSpaceMu) 
                             ELSE '' 
                         END) || 
-                            CAST(psd.rateValue / ${CONV_COEFF_BIGDECIMAL}.0 AS TEXT) || ' ' || asr.currency || ' = ' || 
-                            printf('%.2f', psd.serviceDebt / ${CONV_COEFF_BIGDECIMAL}.0) || ' ' || asr.currency
-                    ELSE CAST(psd.rateValue / ${CONV_COEFF_BIGDECIMAL}.0 AS TEXT)
+                            printf('%.2f %s = %.2f %s', psd.rateValue / ${CONV_COEFF_BIGDECIMAL}.0, psd.currency, 
+                                                        psd.serviceDebt / ${CONV_COEFF_BIGDECIMAL}.0, psd.currency)                        
+                    ELSE printf(${Constants.FMT_DEBT_EXPR}, psd.serviceDebt / ${CONV_COEFF_BIGDECIMAL}.0, psd.currency)
                 END
     END) serviceDebtExpr
 FROM (SELECT rps.payerId, rps.personsNum, rps.totalArea, rps.livingSpace, 
@@ -92,7 +121,11 @@ FROM (SELECT rps.payerId, rps.personsNum, rps.totalArea, rps.livingSpace,
                     ELSE rps.rateValue
                 END
         END) AS serviceDebt,
-        rps.isMeterUses
+        rps.isMeterUses,
+        NULL AS personMu,
+        (SELECT paramValue FROM ${AppSettingEntity.TABLE_NAME} WHERE paramName = ${Constants.PRM_CURRENCY_VAL}) AS currency,
+        NULL AS totalAreaMu,
+        (SELECT paramValue FROM ${AppSettingEntity.TABLE_NAME} WHERE paramName = ${Constants.PRM_LIVING_SPACE_MU_VAL}) AS livingSpaceMu        
     FROM ${RatePayerServiceView.VIEW_NAME} rps JOIN ${MeterValuePaymentView.VIEW_NAME} mvp 
         ON mvp.payerId = rps.payerId AND mvp.payerServiceId = rps.payerServiceId
             AND mvp.meterLocCode = rps.serviceLocCode
@@ -103,14 +136,12 @@ FROM (SELECT rps.payerId, rps.personsNum, rps.totalArea, rps.livingSpace,
                                                         AND rsv.payerServiceId = rps.payerServiceId
                                                         AND rsv.serviceLocCode = rps.serviceLocCode
                                                         AND rsv.isMeterUses = 1                 -- meters service rates
-                                                        AND rsv.startDate <= mvp.paymentDate),
+                                                        AND strftime(${Constants.DB_FRACT_SEC_TIME}, rsv.startDate) <= strftime(${Constants.DB_FRACT_SEC_TIME}, mvp.paymentDate)),
                                                     strftime(${Constants.DB_FRACT_SEC_TIME}, rps.startDate))
             AND mvp.diffMeterValue >= ifnull(rps.fromMeterValue, mvp.diffMeterValue)
         LEFT JOIN ${ReceiptView.VIEW_NAME} rv ON rv.receiptMonth = mvp.paymentMonth AND rv.receiptYear = mvp.paymentYear
                                 AND rv.meterValuesId = mvp.meterValueId
-    WHERE rps.isMeterUses = 1 AND ifnull(rv.isLinePaid, 0) = 0) psd,
-    (SELECT paramValue AS currency FROM ${AppSettingEntity.TABLE_NAME} WHERE paramName = 'CURRENCY') asr
-    (SELECT paramValue AS livingSpaceMu FROM ${AppSettingEntity.TABLE_NAME} WHERE paramName = 'LIVING_SPACE_MU') asl
+    WHERE rps.isMeterUses = 1 AND ifnull(rv.isLinePaid, 0) = 0) psd
 """
 )
 class PayerServiceDebtView(
@@ -136,6 +167,10 @@ class PayerServiceDebtView(
     val payerServiceId: UUID,
     val serviceDebt: BigDecimal,
     val isMeterUses: Boolean,
+    val personMu: String?,
+    val currency: String?,
+    val totalAreaMu: String?,
+    val livingSpaceMu: String?,
     val serviceDebtExpr: String?
 ) {
     companion object {

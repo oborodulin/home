@@ -122,7 +122,9 @@ class ServiceDaoTest : HomeDatabaseTest() {
         // ACT
         val payerRentId = PayerDaoTest.insertPayerService(db, actualPayerId, rentIds.serviceId)
         val payerHeatingId =
-            PayerDaoTest.insertPayerService(db, actualPayerId, heatingIds.serviceId, true)
+            PayerDaoTest.insertPayerService(
+                db, actualPayerId, heatingIds.serviceId, isMeterOwner = true
+            )
         // ASSERT
         serviceDao.findDistinctByPayerId(actualPayerId).test {
             val payerServices = awaitItem()
@@ -157,7 +159,9 @@ class ServiceDaoTest : HomeDatabaseTest() {
         val actualPayerId = PayerDaoTest.insertPayer(db, PayerEntity.payerWithTwoPersons(ctx))
         val electricityIds = insertService(ctx, db, ServiceEntity.electricity2Service())
         val payerElectricityId =
-            PayerDaoTest.insertPayerService(db, actualPayerId, electricityIds.serviceId, true)
+            PayerDaoTest.insertPayerService(
+                db, actualPayerId, electricityIds.serviceId, isMeterOwner = true
+            )
         // ACT
         val electricityMeterIds =
             MeterDaoTest.insertMeter(ctx, db, MeterEntity.electricityMeter(ctx, actualPayerId))
@@ -285,9 +289,13 @@ class ServiceDaoTest : HomeDatabaseTest() {
             val wasteIds = insertService(ctx, db, ServiceEntity.waste5Service())
             val hotWaterIds = insertService(ctx, db, ServiceEntity.hotWater7Service())
             val payerWasteId =
-                PayerDaoTest.insertPayerService(db, actualPayerId, wasteIds.serviceId, true)
+                PayerDaoTest.insertPayerService(
+                    db, actualPayerId, wasteIds.serviceId, isMeterOwner = true
+                )
             val payerHotWaterId =
-                PayerDaoTest.insertPayerService(db, actualPayerId, hotWaterIds.serviceId, false)
+                PayerDaoTest.insertPayerService(
+                    db, actualPayerId, hotWaterIds.serviceId, isMeterOwner = false
+                )
             // ACT
             serviceDao.payerServiceMeterOwnerById(payerHotWaterId)
             // ASSERT

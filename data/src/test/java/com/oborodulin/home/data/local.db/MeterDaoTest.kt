@@ -128,12 +128,22 @@ class MeterDaoTest : HomeDatabaseTest() {
             val hotWaterIds =
                 ServiceDaoTest.insertService(ctx, db, ServiceEntity.hotWater7Service())
             // Payer services:
-            PayerDaoTest.insertPayerService(db, actualPayerId, electricityIds.serviceId, true)
-            PayerDaoTest.insertPayerService(db, actualPayerId, gasIds.serviceId, true)
-            PayerDaoTest.insertPayerService(db, actualPayerId, coldWaterIds.serviceId, true)
+            PayerDaoTest.insertPayerService(
+                db, actualPayerId, electricityIds.serviceId, isMeterOwner = true
+            )
+            PayerDaoTest.insertPayerService(
+                db, actualPayerId, gasIds.serviceId, isMeterOwner = true
+            )
+            PayerDaoTest.insertPayerService(
+                db, actualPayerId, coldWaterIds.serviceId, isMeterOwner = true
+            )
             PayerDaoTest.insertPayerService(db, actualPayerId, wasteIds.serviceId)
-            PayerDaoTest.insertPayerService(db, actualPayerId, heatingIds.serviceId, true)
-            PayerDaoTest.insertPayerService(db, actualPayerId, hotWaterIds.serviceId, true)
+            PayerDaoTest.insertPayerService(
+                db, actualPayerId, heatingIds.serviceId, isMeterOwner = true
+            )
+            PayerDaoTest.insertPayerService(
+                db, actualPayerId, hotWaterIds.serviceId, isMeterOwner = true
+            )
             // Meters:
             val electricityMeter = MeterEntity.electricityMeter(ctx, actualPayerId)
             insertMeter(ctx, db, electricityMeter)
@@ -196,7 +206,9 @@ class MeterDaoTest : HomeDatabaseTest() {
             val actualPayerId = PayerDaoTest.insertPayer(db, PayerEntity.payerWithTwoPersons(ctx))
             val coldWaterIds =
                 ServiceDaoTest.insertService(ctx, db, ServiceEntity.coldWater4Service())
-            PayerDaoTest.insertPayerService(db, actualPayerId, coldWaterIds.serviceId, true)
+            PayerDaoTest.insertPayerService(
+                db, actualPayerId, coldWaterIds.serviceId, isMeterOwner = true
+            )
             val coldWaterMeter = MeterEntity.coldWaterMeter(ctx, actualPayerId)
             val coldWaterMeterIds = insertMeter(ctx, db, coldWaterMeter)
             insertMeterValues(db, coldWaterMeter, currentDateTime)

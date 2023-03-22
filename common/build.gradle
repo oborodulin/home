@@ -71,6 +71,8 @@ dependencies {
     implementation deps.lottie.compose
     // Desugaring
     //coreLibraryDesugaring deps.tools.desugar
+    // i18n
+    implementation deps.i18n.nv
 
     implementation deps.lifecycle.viewmodel
 

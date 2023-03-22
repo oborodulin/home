@@ -23,6 +23,7 @@ SELECT rps.*, (CASE WHEN EXISTS (SELECT m.meterId
 FROM (-- Services rates
     SELECT p.payerId, p.personsNum, p.totalArea, p.livingSpace, p.heatedVolume, psv.payerServiceId, psv.isAllocateRate, 
         psv.serviceId, psv.serviceName, psv.servicePos, psv.serviceType, psv.serviceLocCode, psv.serviceMeasureUnit, 
+        psv.fromServiceDate,
         r.startDate, r.fromMeterValue, r.toMeterValue, r.rateValue, r.isPerPerson, r.isPrivileges
     FROM ${PayerEntity.TABLE_NAME} p JOIN ${PayerServiceView.VIEW_NAME} psv ON psv.payersId = p.payerId 
                                         AND NOT EXISTS(SELECT rateId FROM ${RateEntity.TABLE_NAME} WHERE payersServicesId = psv.payerServiceId)
@@ -32,6 +33,7 @@ FROM (-- Services rates
     -- Payer services rates
     SELECT p.payerId, p.personsNum, p.totalArea, p.livingSpace, p.heatedVolume, psv.payerServiceId, psv.isAllocateRate, 
         psv.serviceId, psv.serviceName, psv.servicePos, psv.serviceType, psv.serviceLocCode, psv.serviceMeasureUnit, 
+        psv.fromServiceDate,
         r.startDate, r.fromMeterValue, r.toMeterValue, r.rateValue, r.isPerPerson, r.isPrivileges
     FROM ${PayerEntity.TABLE_NAME} p JOIN ${PayerServiceView.VIEW_NAME} psv ON psv.payersId = p.payerId
         JOIN ${RateEntity.TABLE_NAME} r ON r.payersServicesId = psv.payerServiceId AND r.isPrivileges = psv.isPrivileges) rps
@@ -51,6 +53,7 @@ class RatePayerServiceView(
     val serviceType: ServiceType,
     val serviceLocCode: String,
     val serviceMeasureUnit: String?,
+    val fromServiceDate: OffsetDateTime?,
     val startDate: OffsetDateTime,
     val fromMeterValue: BigDecimal?,
     val toMeterValue: BigDecimal?,

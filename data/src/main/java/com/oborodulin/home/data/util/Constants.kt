@@ -12,6 +12,10 @@ object Constants {
     const val DB_FRACT_SEC_TIME = "'%Y-%m-%dT%H:%M:%f'"
     const val TZ_TIME = "STRFTIME('%Y-%m-%dT%H:%M:%S', DATETIME('now', 'localtime')) || PRINTF('%+.2d:%.2d', ROUND((JULIANDAY('now', 'localtime') - JULIANDAY('now')) * 24), ABS(ROUND((JULIANDAY('now', 'localtime') - JULIANDAY('now')) * 24 * 60) % 60))"
 
+    const val FMT_IS_PER_PERSON_EXPR = "'%d %s x %.2f %s = %.2f %s'"
+    const val FMT_METER_VAL_EXPR = "'%.2f %s x %.2f %s = %.2f %s'"
+    const val FMT_DEBT_EXPR = "'%.2f %s'"
+
     const val SRV_RENT_VAL = "'RENT'"
     const val SRV_ELECTRICITY_VAL = "'ELECTRICITY'"
     const val SRV_GAS_VAL = "'GAS'"
@@ -32,6 +36,13 @@ object Constants {
     const val MTR_HOT_WATER_VAL = "'HOT_WATER'"
     const val MTR_NONE_VAL = "'NONE'"
 
+    const val PRM_LANG_VAL = "'LANG'"
+    const val PRM_CURRENCY_VAL = "'CURRENCY'"
+    const val PRM_PERSON_NUM_MU_VAL = "'PERSON_NUM_MU'"
+    const val PRM_TOTAL_AREA_MU_VAL = "'TOTAL_AREA_MU'"
+    const val PRM_LIVING_SPACE_MU_VAL = "'LIVING_SPACE_MU'"
+    const val PRM_HEATED_VOLUME_MU_VAL = "'HEATED_VOLUME_MU'"
+    
 /*
     const val SQL_PREV_METERS_VALUES_SUBQUERY = """
 SELECT v.metersId, MAX(datetime(v.valueDate)) maxValueDate 

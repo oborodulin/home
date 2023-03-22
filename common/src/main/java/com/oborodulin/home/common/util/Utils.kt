@@ -11,6 +11,7 @@ import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.style.BaselineShift
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.sp
+import com.neovisionaries.i18n.CountryCode
 import timber.log.Timber
 import java.time.LocalDateTime
 import java.time.OffsetDateTime
@@ -29,21 +30,35 @@ class Utils {
         init {
             for (locale in Locale.getAvailableLocales()) {
                 try {
-                    val currency = Currency.getInstance(locale)
-                    currencyLocaleMap[currency] = locale
+                    val cc: CountryCode? = CountryCode.getByCode(locale.country)
+                    cc?.let {
+                        val currency = it.currency
+                        Timber.tag(TAG).d(
+                            "init(): language: %s, country: %s; alpha2: %s; currency code: %s; currency symbol: %s",
+                            locale.language, locale.country,
+                            it.alpha2, it.currency.currencyCode, it.currency.symbol
+                        )
+                        // val currency = Currency.getInstance(Locale(locale.language, it.alpha2))
+                        // Locale locale = code . toLocale ();
+                        // code = CountryCode.getByLocale(locale);
+                        currencyLocaleMap[currency] = locale
+                    }
                 } catch (e: Exception) {
                     Timber.tag(TAG).e(e)
                 }
             }
         }
 
-        fun currencySymbol(currencyCode: String = Currency.getInstance(Locale.getDefault()).currencyCode): String? {
-            val currency: Currency = Currency.getInstance(currencyCode)
+        fun currencyCode(locale: Locale = Locale.getDefault()): String {
+/*          val currency: Currency = Currency.getInstance(currencyCode)
             Timber.tag(TAG).d(
                 "currencySymbol(): %s:- %s",
                 currencyCode, currency.getSymbol(currencyLocaleMap[currency])
             )
             return currency.getSymbol(currencyLocaleMap[currency])
+            CountryCode.getByCode(locale.country).currency.currencyCode
+ */
+            return "руб."
         }
 
         fun superscriptText(@StringRes resId: Int, s: String): CharSequence {

@@ -4,7 +4,7 @@ import android.content.Context
 import androidx.room.Entity
 import androidx.room.Index
 import androidx.room.PrimaryKey
-import com.oborodulin.home.common.util.Utils.Companion.currencySymbol
+import com.oborodulin.home.common.util.Utils.Companion.currencyCode
 import java.util.*
 
 @Entity(
@@ -20,7 +20,8 @@ class AppSettingEntity(
         const val TABLE_NAME = "app_settings"
 
         const val PARAM_LANG = "LANG"
-        const val PARAM_CURRENCY = "CURRENCY"
+        const val PARAM_CURRENCY_CODE = "CURRENCY_CODE"
+        const val PARAM_PERSON_NUM_MU = "PERSON_NUM_MU"
         const val PARAM_TOTAL_AREA_MU = "TOTAL_AREA_MU"
         const val PARAM_LIVING_SPACE_MU = "LIVING_SPACE_MU"
         const val PARAM_HEATED_VOLUME_MU = "HEATED_VOLUME_MU"
@@ -36,9 +37,14 @@ class AppSettingEntity(
             paramValue = Locale.getDefault().language
         )
 
-        fun currencyParam() = defaultParam(
-            paramName = PARAM_CURRENCY,
-            paramValue = currencySymbol()!!
+        fun currencyCodeParam() = defaultParam(
+            paramName = PARAM_CURRENCY_CODE,
+            paramValue = currencyCode()!!
+        )
+
+        fun personNumMuParam(ctx: Context) = defaultParam(
+            paramName = PARAM_PERSON_NUM_MU,
+            paramValue = ctx.resources.getString(com.oborodulin.home.common.R.string.person_unit)
         )
 
         fun totalAreaMuParam(ctx: Context) = defaultParam(

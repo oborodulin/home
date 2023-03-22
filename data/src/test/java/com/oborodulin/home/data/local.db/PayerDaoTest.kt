@@ -21,6 +21,7 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
 import org.robolectric.annotation.Config
+import java.time.OffsetDateTime
 import java.util.*
 import java.util.concurrent.CountDownLatch
 
@@ -328,12 +329,15 @@ class PayerDaoTest : HomeDatabaseTest() {
 
         suspend fun insertPayerService(
             db: HomeDatabase, payerId: UUID, serviceId: UUID,
+            fromServiceDate: OffsetDateTime? = OffsetDateTime.now(),
             isMeterOwner: Boolean = false,
             isPrivileges: Boolean = false, isAllocateRate: Boolean = false
         ): UUID {
             val payerService =
                 PayerServiceCrossRefEntity.defaultPayerService(
-                    payerId, serviceId, isMeterOwner, isPrivileges, isAllocateRate
+                    payerId, serviceId,
+                    fromServiceDate?.monthValue, fromServiceDate?.year,
+                    isMeterOwner, isPrivileges, isAllocateRate
                 )
             db.payerDao().insert(payerService)
             return payerService.payerServiceId

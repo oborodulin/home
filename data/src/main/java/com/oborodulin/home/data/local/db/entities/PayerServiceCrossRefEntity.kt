@@ -1,6 +1,7 @@
 package com.oborodulin.home.data.local.db.entities
 
 import androidx.room.*
+import java.time.OffsetDateTime
 import java.util.*
 
 @Entity(
@@ -22,6 +23,8 @@ import java.util.*
 )
 data class PayerServiceCrossRefEntity(
     @PrimaryKey val payerServiceId: UUID = UUID.randomUUID(),
+    val fromMonth: Int? = null, // if null then from meters data values
+    val fromYear: Int? = null,
     val isMeterOwner: Boolean = false,
     val isPrivileges: Boolean = false,
     val isAllocateRate: Boolean = false,
@@ -34,28 +37,35 @@ data class PayerServiceCrossRefEntity(
         const val TABLE_NAME = "payers_services"
 
         fun defaultPayerService(
-            payerId: UUID, serviceId: UUID, isMeterOwner: Boolean = false,
-            isPrivileges: Boolean = false, isAllocateRate: Boolean = false
+            payerId: UUID, serviceId: UUID,
+            fromMonth: Int? = null, fromYear: Int? = null,
+            isMeterOwner: Boolean = false, isPrivileges: Boolean = false,
+            isAllocateRate: Boolean = false
         ) = PayerServiceCrossRefEntity(
             payersId = payerId, servicesId = serviceId,
+            fromMonth = fromMonth, fromYear = fromYear,
             isMeterOwner = isMeterOwner, isPrivileges = isPrivileges,
             isAllocateRate = isAllocateRate
         )
 
         fun privilegesPayerService(
             payerId: UUID, serviceId: UUID,
+            fromMonth: Int? = null, fromYear: Int? = null,
             isMeterOwner: Boolean = false, isAllocateRate: Boolean = false
         ) = defaultPayerService(
             payerId = payerId, serviceId = serviceId,
+            fromMonth = fromMonth, fromYear = fromYear,
             isMeterOwner = isMeterOwner,
             isPrivileges = true, isAllocateRate = isAllocateRate
         )
 
         fun allocateRatePayerService(
             payerId: UUID, serviceId: UUID,
+            fromMonth: Int? = null, fromYear: Int? = null,
             isMeterOwner: Boolean = false, isPrivileges: Boolean = false
         ) = defaultPayerService(
             payerId = payerId, serviceId = serviceId,
+            fromMonth = fromMonth, fromYear = fromYear,
             isMeterOwner = isMeterOwner,
             isPrivileges = isPrivileges, isAllocateRate = true
         )
