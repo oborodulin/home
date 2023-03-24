@@ -5,6 +5,7 @@ import androidx.room.Entity
 import androidx.room.Index
 import androidx.room.PrimaryKey
 import com.oborodulin.home.common.util.Utils.Companion.currencyCode
+import com.oborodulin.home.domain.util.AppSettingParam
 import java.util.*
 
 @Entity(
@@ -13,52 +14,45 @@ import java.util.*
 )
 class AppSettingEntity(
     @PrimaryKey val settingId: UUID = UUID.randomUUID(),
-    val paramName: String = "",
+    val paramName: AppSettingParam,
     val paramValue: String = ""
 ) {
     companion object {
         const val TABLE_NAME = "app_settings"
 
-        const val PARAM_LANG = "LANG"
-        const val PARAM_CURRENCY_CODE = "CURRENCY_CODE"
-        const val PARAM_PERSON_NUM_MU = "PERSON_NUM_MU"
-        const val PARAM_TOTAL_AREA_MU = "TOTAL_AREA_MU"
-        const val PARAM_LIVING_SPACE_MU = "LIVING_SPACE_MU"
-        const val PARAM_HEATED_VOLUME_MU = "HEATED_VOLUME_MU"
-
         fun defaultParam(
             settingId: UUID = UUID.randomUUID(),
-            paramName: String = "",
+            paramName: AppSettingParam,
             paramValue: String = ""
         ) = AppSettingEntity(settingId = settingId, paramName = paramName, paramValue = paramValue)
 
         fun langParam() = defaultParam(
-            paramName = PARAM_LANG,
+            paramName = AppSettingParam.LANG,
             paramValue = Locale.getDefault().language
         )
 
         fun currencyCodeParam() = defaultParam(
-            paramName = PARAM_CURRENCY_CODE,
-            paramValue = currencyCode()!!
+            paramName = AppSettingParam.CURRENCY_CODE,
+            paramValue = currencyCode()
         )
 
         fun personNumMuParam(ctx: Context) = defaultParam(
-            paramName = PARAM_PERSON_NUM_MU,
+            paramName = AppSettingParam.PERSON_NUM_MU,
             paramValue = ctx.resources.getString(com.oborodulin.home.common.R.string.person_unit)
         )
 
         fun totalAreaMuParam(ctx: Context) = defaultParam(
-            paramName = PARAM_TOTAL_AREA_MU,
+            paramName = AppSettingParam.TOTAL_AREA_MU,
             paramValue = ctx.resources.getString(com.oborodulin.home.common.R.string.m2_unit)
         )
 
         fun livingSpaceMuParam(ctx: Context) = defaultParam(
-            paramName = PARAM_LIVING_SPACE_MU,
+            paramName = AppSettingParam.LIVING_SPACE_MU,
             paramValue = ctx.resources.getString(com.oborodulin.home.common.R.string.m2_unit)
         )
 
         fun heatedVolumeMuParam(ctx: Context) = defaultParam(
-            paramName = PARAM_HEATED_VOLUME_MU,
+            paramName = AppSettingParam.HEATED_VOLUME_MU,
             paramValue = ctx.resources.getString(com.oborodulin.home.common.R.string.m3_unit)
         )
     }

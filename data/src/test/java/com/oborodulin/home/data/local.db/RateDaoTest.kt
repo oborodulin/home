@@ -131,14 +131,14 @@ class RateDaoTest : HomeDatabaseTest() {
             val rentIds = ServiceDaoTest.insertService(ctx, db, rent)
             // Payer service:
             val payerRentId = PayerDaoTest.insertPayerService(
-                db, actualPayerId, rentIds.serviceId, currentDateTime.minusMonths(2)
+                db, actualPayerId, rentIds.serviceId, currentDateTime.minusMonths(3)
             )
 
             // ACT
             // Payer service rates:
-            insertRate(db, rent, payerRentId, currentDateTime.minusMonths(3))
+            insertRate(db, rent, payerRentId, currentDateTime.minusMonths(6))
             insertRate(
-                db, rent, payerRentId, currentDateTime.minusMonths(1),
+                db, rent, payerRentId, currentDateTime.minusMonths(2),
                 RateEntity.DEF_RENT_PAYER_RATE.add(BigDecimal.ONE)
             )
 
@@ -146,9 +146,17 @@ class RateDaoTest : HomeDatabaseTest() {
             rateDao.findSubtotalDebtsByPayerId(actualPayerId).test {
                 val subtotals = awaitItem()
                 subtotals.forEach {
-                    println("subtotals: '%s' = %s".format(it.serviceType, it.serviceDebt))
+                    println(
+                        "subtotals: %02d.%02d.%d - %02d.%02d.%d: '%s' = %d x %.2f [rate = %.2f]".format(
+                            it.fromPaymentDate.dayOfMonth, it.fromPaymentDate.monthValue,
+                            it.fromPaymentDate.year,
+                            it.toPaymentDate.dayOfMonth, it.toPaymentDate.monthValue, it.toPaymentDate.year,
+                            it.serviceType, it.fullMonths,
+                            it.serviceDebt, it.rateValue
+                        )
+                    )
                 }
-                assertThat(subtotals).hasSize(9)
+                assertThat(subtotals).hasSize(3)
                 cancel()
             }
         }
@@ -401,13 +409,10 @@ class RateDaoTest : HomeDatabaseTest() {
             */
     companion object {
         suspend fun insertRate(
-            db: HomeDatabase,
-            service: ServiceEntity,
-            payerServiceId: UUID? = null,
+            db: HomeDatabase, service: ServiceEntity, payerServiceId: UUID? = null,
             startDate: OffsetDateTime = OffsetDateTime.now(),
             rateValue: BigDecimal = BigDecimal.ZERO,
-            isPerPerson: Boolean = false,
-            isPrivileges: Boolean = false
+            isPerPerson: Boolean = false, isPrivileges: Boolean = false
         ): UUID {
             val rates: MutableList<RateEntity> = mutableListOf()
             var rate: RateEntity = RateEntity.defaultRate()

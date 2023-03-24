@@ -69,7 +69,7 @@ class RateEntity(
         ) = RateEntity(
             servicesId = serviceId, payersServicesId = payerServiceId,
             rateId = rateId,
-            startDate = startDate.minusMonths(5).withDayOfMonth(1),
+            startDate = startDate.withDayOfMonth(1),
             fromMeterValue = fromMeterValue,
             toMeterValue = toMeterValue,
             rateValue = rateValue,

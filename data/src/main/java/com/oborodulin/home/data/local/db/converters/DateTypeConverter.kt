@@ -3,18 +3,16 @@ package com.oborodulin.home.data.local.db.converters
 import androidx.room.TypeConverter
 import com.oborodulin.home.common.util.Constants
 import java.text.SimpleDateFormat
-import java.time.LocalDateTime
 import java.time.OffsetDateTime
-import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 import java.util.*
 
 object DateTypeConverter {
-    private val formatter = SimpleDateFormat("dd.MM.yyyy")
+    private val simpleFormatter = SimpleDateFormat("dd.MM.yyyy")
     private val offsetFormatter = DateTimeFormatter.ofPattern(Constants.APP_OFFSET_DATE_TIME)
 
     @TypeConverter
-    fun fromDate(date: Date?): Long? = date?.let { formatter.format(it).toLong() }
+    fun fromDate(date: Date?): Long? = date?.let { simpleFormatter.format(it).toLong() }
 
     @TypeConverter
     fun toDate(millisSinceEpoch: Long?): Date? = millisSinceEpoch?.let { Date(it) }

@@ -5,6 +5,7 @@ import androidx.annotation.RequiresApi
 import androidx.room.TypeConverter
 import com.oborodulin.home.common.util.Constants
 import com.oborodulin.home.common.util.Constants.CONV_COEFF_BIGDECIMAL
+import com.oborodulin.home.domain.util.AppSettingParam
 import com.oborodulin.home.data.util.MeterType
 import com.oborodulin.home.data.util.ServiceType
 import java.math.BigDecimal
@@ -83,4 +84,10 @@ object HomeTypeConverters {
 
     @TypeConverter
     fun fromMeterType(value: MeterType) = value.name
+
+    @TypeConverter
+    fun toAppSettingParam(value: String) = enumValueOf<AppSettingParam>(value)
+
+    @TypeConverter
+    fun fromAppSettingParam(value: AppSettingParam) = value.name
 }

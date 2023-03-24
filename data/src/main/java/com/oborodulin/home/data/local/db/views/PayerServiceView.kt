@@ -2,6 +2,8 @@ package com.oborodulin.home.data.local.db.views
 
 import androidx.room.DatabaseView
 import androidx.room.Embedded
+import androidx.room.TypeConverters
+import com.oborodulin.home.data.local.db.converters.DateTypeConverter
 import com.oborodulin.home.data.local.db.entities.PayerServiceCrossRefEntity
 import com.oborodulin.home.data.util.Constants
 import java.time.OffsetDateTime
@@ -28,6 +30,8 @@ class PayerServiceView(
     val payersId: UUID,
     val fromMonth: Int? = null,
     val fromYear: Int? = null,
+    @field:TypeConverters(DateTypeConverter::class)
+    val fromDate: OffsetDateTime? = null,
     val isMeterOwner: Boolean,
     val isPrivileges: Boolean,
     val isAllocateRate: Boolean,
