@@ -32,14 +32,17 @@ data class MeterValueEntity(
             null -> BigDecimal("9532")
             else -> MeterEntity.DEF_ELECTRO_INIT_VAL.add(
                 RateEntity.DEF_ELECTRO_RANGE2.subtract(BigDecimal.ONE)
-            )
+            ).remainder(MeterEntity.DEF_ELECTRO_MAX_VAL)
         }
         val DEF_ELECTRO_VAL2: BigDecimal =
             DEF_ELECTRO_VAL1.add(RateEntity.DEF_ELECTRO_RANGE2.subtract(BigDecimal.ONE))
+                .remainder(MeterEntity.DEF_ELECTRO_MAX_VAL)
         val DEF_ELECTRO_VAL3: BigDecimal =
             DEF_ELECTRO_VAL2.add(RateEntity.DEF_ELECTRO_RANGE3.subtract(BigDecimal.ONE))
+                .remainder(MeterEntity.DEF_ELECTRO_MAX_VAL)
         val DEF_ELECTRO_VAL4: BigDecimal =
             DEF_ELECTRO_VAL3.add(RateEntity.DEF_ELECTRO_RANGE3.add(BigDecimal.ONE))
+                .remainder(MeterEntity.DEF_ELECTRO_MAX_VAL)
 
         // Gas
         val DEF_GAS_VAL1: BigDecimal = when (MeterEntity.DEF_GAS_INIT_VAL) {

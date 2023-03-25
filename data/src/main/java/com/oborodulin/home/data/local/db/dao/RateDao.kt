@@ -3,6 +3,7 @@ package com.oborodulin.home.data.local.db.dao
 import androidx.room.*
 import com.oborodulin.home.data.local.db.entities.PayerServiceCrossRefEntity
 import com.oborodulin.home.data.local.db.entities.RateEntity
+import com.oborodulin.home.data.local.db.views.PayerServiceDebtView
 import com.oborodulin.home.data.local.db.views.PayerServiceSubtotalDebtView
 import com.oborodulin.home.data.local.db.views.PayerTotalDebtView
 import com.oborodulin.home.data.local.db.views.RatePayerServiceView
@@ -53,6 +54,16 @@ SELECT r.* FROM ${RateEntity.TABLE_NAME} r JOIN ${PayerServiceCrossRefEntity.TAB
     @Query("SELECT * FROM ${RatePayerServiceView.VIEW_NAME} WHERE payerId = :payerId AND serviceLocCode = :locale ORDER BY servicePos")
     fun findRatesByPayerServices(payerId: UUID, locale: String? = Locale.getDefault().language):
             Flow<List<RatePayerServiceView>>
+
+    @Query(
+        """
+SELECT * FROM ${PayerServiceDebtView.VIEW_NAME} WHERE payerId = :payerId AND serviceLocCode = :locale
+ORDER BY servicePos, fromPaymentDate, fromMeterValue            
+"""
+    )
+    fun findServiceDebtsByPayerId(
+        payerId: UUID, locale: String? = Locale.getDefault().language
+    ): Flow<List<PayerServiceDebtView>>
 
     @Query(
         """

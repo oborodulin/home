@@ -117,6 +117,7 @@ class PayerDaoTest : HomeDatabaseTest() {
         }
     }
 
+    @OptIn(ExperimentalCoroutinesApi::class)
     @Test
     fun deleteInsertedPayerAndFindById_shouldReturn_IsNull() = runBlocking {
         // ARRANGE

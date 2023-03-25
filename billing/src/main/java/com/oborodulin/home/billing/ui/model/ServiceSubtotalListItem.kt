@@ -16,7 +16,6 @@ data class ServiceSubtotalListItem(
     var isAllocateRate: Boolean? = null,
     val fromPaymentDate: OffsetDateTime? = null,
     val toPaymentDate: OffsetDateTime? = null,
-    val rateValue: BigDecimal? = null,
     val diffMeterValue: BigDecimal? = null,
     val serviceDebt: BigDecimal? = null
 ) : ListItemModel(

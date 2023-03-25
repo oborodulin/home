@@ -243,75 +243,78 @@ class MeterDaoTest : HomeDatabaseTest() {
         }
 
         suspend fun insertMeterValues(
-            db: HomeDatabase,
-            meter: MeterEntity = MeterEntity.defaultMeter(),
-            currDate: OffsetDateTime
+            db: HomeDatabase, meter: MeterEntity = MeterEntity.defaultMeter(),
+            currDate: OffsetDateTime, meterValues: List<MeterValueEntity> = emptyList()
         ) {
-            when (meter.meterType) {
-                MeterType.ELECTRICITY ->
-                    db.meterDao().insert(
-                        MeterValueEntity.electricityMeterValue1(
-                            meterId = meter.meterId, currDate = currDate
-                        ),
-                        MeterValueEntity.electricityMeterValue2(
-                            meterId = meter.meterId, currDate = currDate
-                        ),
-                        MeterValueEntity.electricityMeterValue3(
-                            meterId = meter.meterId, currDate = currDate
-                        ),
-                        MeterValueEntity.electricityMeterValue4(
-                            meterId = meter.meterId, currDate = currDate
+            if (meterValues.isNotEmpty()) {
+                meterValues.forEach { db.meterDao().insert(it) }
+            } else {
+                when (meter.meterType) {
+                    MeterType.ELECTRICITY ->
+                        db.meterDao().insert(
+                            MeterValueEntity.electricityMeterValue1(
+                                meterId = meter.meterId, currDate = currDate
+                            ),
+                            MeterValueEntity.electricityMeterValue2(
+                                meterId = meter.meterId, currDate = currDate
+                            ),
+                            MeterValueEntity.electricityMeterValue3(
+                                meterId = meter.meterId, currDate = currDate
+                            ),
+                            MeterValueEntity.electricityMeterValue4(
+                                meterId = meter.meterId, currDate = currDate
+                            )
                         )
-                    )
-                MeterType.GAS ->
-                    db.meterDao().insert(
-                        MeterValueEntity.gasMeterValue1(
-                            meterId = meter.meterId, currDate = currDate
-                        ),
-                        MeterValueEntity.gasMeterValue2(
-                            meterId = meter.meterId, currDate = currDate
-                        ),
-                        MeterValueEntity.gasMeterValue3(
-                            meterId = meter.meterId, currDate = currDate
+                    MeterType.GAS ->
+                        db.meterDao().insert(
+                            MeterValueEntity.gasMeterValue1(
+                                meterId = meter.meterId, currDate = currDate
+                            ),
+                            MeterValueEntity.gasMeterValue2(
+                                meterId = meter.meterId, currDate = currDate
+                            ),
+                            MeterValueEntity.gasMeterValue3(
+                                meterId = meter.meterId, currDate = currDate
+                            )
                         )
-                    )
-                MeterType.COLD_WATER ->
-                    db.meterDao().insert(
-                        MeterValueEntity.coldWaterMeterValue1(
-                            meterId = meter.meterId, currDate = currDate
-                        ),
-                        MeterValueEntity.coldWaterMeterValue2(
-                            meterId = meter.meterId, currDate = currDate
-                        ),
-                        MeterValueEntity.coldWaterMeterValue3(
-                            meterId = meter.meterId, currDate = currDate
+                    MeterType.COLD_WATER ->
+                        db.meterDao().insert(
+                            MeterValueEntity.coldWaterMeterValue1(
+                                meterId = meter.meterId, currDate = currDate
+                            ),
+                            MeterValueEntity.coldWaterMeterValue2(
+                                meterId = meter.meterId, currDate = currDate
+                            ),
+                            MeterValueEntity.coldWaterMeterValue3(
+                                meterId = meter.meterId, currDate = currDate
+                            )
                         )
-                    )
-                MeterType.HEATING ->
-                    db.meterDao().insert(
-                        MeterValueEntity.heatingMeterValue1(
-                            meterId = meter.meterId, currDate = currDate
-                        ),
-                        MeterValueEntity.heatingMeterValue2(
-                            meterId = meter.meterId, currDate = currDate
-                        ),
-                        MeterValueEntity.heatingMeterValue3(
-                            meterId = meter.meterId, currDate = currDate
+                    MeterType.HEATING ->
+                        db.meterDao().insert(
+                            MeterValueEntity.heatingMeterValue1(
+                                meterId = meter.meterId, currDate = currDate
+                            ),
+                            MeterValueEntity.heatingMeterValue2(
+                                meterId = meter.meterId, currDate = currDate
+                            ),
+                            MeterValueEntity.heatingMeterValue3(
+                                meterId = meter.meterId, currDate = currDate
+                            )
                         )
-                    )
-                MeterType.HOT_WATER ->
-                    db.meterDao().insert(
-                        MeterValueEntity.hotWaterMeterValue1(
-                            meterId = meter.meterId, currDate = currDate
-                        ),
-                        MeterValueEntity.hotWaterMeterValue2(
-                            meterId = meter.meterId, currDate = currDate
-                        ),
-                        MeterValueEntity.hotWaterMeterValue3(
-                            meterId = meter.meterId, currDate = currDate
+                    MeterType.HOT_WATER ->
+                        db.meterDao().insert(
+                            MeterValueEntity.hotWaterMeterValue1(
+                                meterId = meter.meterId, currDate = currDate
+                            ),
+                            MeterValueEntity.hotWaterMeterValue2(
+                                meterId = meter.meterId, currDate = currDate
+                            ),
+                            MeterValueEntity.hotWaterMeterValue3(
+                                meterId = meter.meterId, currDate = currDate
+                            )
                         )
-                    )
-                MeterType.NONE -> {}
+                    MeterType.NONE -> {}
+                }
             }
         }
     }

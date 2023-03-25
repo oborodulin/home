@@ -14,7 +14,6 @@ class PayerServiceSubtotalDebtViewToServiceMapper : Mapper<PayerServiceSubtotalD
             payerServiceId = input.payerServiceId,
             fromPaymentDate = input.fromPaymentDate,
             toPaymentDate = input.toPaymentDate,
-            rateValue = input.rateValue,
             diffMeterValue = input.diffMeterValue,
             serviceDebt = input.serviceDebt
         )

@@ -34,10 +34,12 @@ data class MeterEntity(
 
         //Utils.toOffsetDateTime("2022-06-19T14:29:10.212+03:00")
         val DEF_ELECTRO_INIT_VAL: BigDecimal? = null
-        val DEF_GAS_INIT_VAL: BigDecimal = BigDecimal("0.695")
-        val DEF_COLD_WATER_INIT_VAL: BigDecimal = BigDecimal("1523.125")
-        val DEF_HOT_WATER_INIT_VAL: BigDecimal = BigDecimal("2145.755")
-        val DEF_HEATING_INIT_VAL: BigDecimal = BigDecimal("0.02113")
+        val DEF_GAS_INIT_VAL: BigDecimal? = BigDecimal("0.695")
+        val DEF_COLD_WATER_INIT_VAL: BigDecimal? = BigDecimal("1523.125")
+        val DEF_HOT_WATER_INIT_VAL: BigDecimal? = BigDecimal("2145.755")
+        val DEF_HEATING_INIT_VAL: BigDecimal? = BigDecimal("0.02113")
+
+        val DEF_ELECTRO_MAX_VAL: BigDecimal = BigDecimal("9999")
 
         fun defaultMeter(
             payerId: UUID = UUID.randomUUID(), meterId: UUID = UUID.randomUUID(),
@@ -65,7 +67,7 @@ data class MeterEntity(
             meterNum = ctx.resources.getString(R.string.def_meter_num),
             payerId = payerId,
             meterType = MeterType.ELECTRICITY,
-            maxValue = BigDecimal("9999"),
+            maxValue = DEF_ELECTRO_MAX_VAL,
             passportDate = currDate?.minusMonths(7),
             initValue = initValue
         )

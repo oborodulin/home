@@ -98,7 +98,7 @@ class ServiceDaoTest : HomeDatabaseTest() {
     @Test
     fun findMeterAllowedServices_shouldReturn_theOrderedMeterAllowedServices_inFlow() = runTest {
         // ARRANGE
-        val rentId = insertService(ctx, db, ServiceEntity.rent1Service())
+        insertService(ctx, db, ServiceEntity.rent1Service())
         // ACT
         val wasteIds = insertService(ctx, db, ServiceEntity.waste5Service())
         val hotWaterIds = insertService(ctx, db, ServiceEntity.hotWater7Service())

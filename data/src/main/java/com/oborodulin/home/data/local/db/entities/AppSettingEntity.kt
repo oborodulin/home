@@ -36,6 +36,16 @@ class AppSettingEntity(
             paramValue = currencyCode()
         )
 
+        fun dayMuParam(ctx: Context) = defaultParam(
+            paramName = AppSettingParam.DAY_MU,
+            paramValue = ctx.resources.getString(com.oborodulin.home.common.R.string.day_unit)
+        )
+
+        fun monthMuParam(ctx: Context) = defaultParam(
+            paramName = AppSettingParam.MONTH_MU,
+            paramValue = ctx.resources.getString(com.oborodulin.home.common.R.string.month_unit)
+        )
+
         fun personNumMuParam(ctx: Context) = defaultParam(
             paramName = AppSettingParam.PERSON_NUM_MU,
             paramValue = ctx.resources.getString(com.oborodulin.home.common.R.string.person_unit)

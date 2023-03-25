@@ -589,6 +589,18 @@ abstract class HomeDatabase : RoomDatabase() {
                 AppSettingEntity.TABLE_NAME, SQLiteDatabase.CONFLICT_REPLACE,
                 Mapper.toContentValues(currencyCode)
             )
+            // Day Mu
+            val dayMu = AppSettingEntity.dayMuParam(context)
+            db.insert(
+                AppSettingEntity.TABLE_NAME, SQLiteDatabase.CONFLICT_REPLACE,
+                Mapper.toContentValues(dayMu)
+            )
+            // Month Mu
+            val monthMu = AppSettingEntity.monthMuParam(context)
+            db.insert(
+                AppSettingEntity.TABLE_NAME, SQLiteDatabase.CONFLICT_REPLACE,
+                Mapper.toContentValues(monthMu)
+            )
             // Person Num MU
             val personNumMu = AppSettingEntity.personNumMuParam(context)
             db.insert(
@@ -615,8 +627,9 @@ abstract class HomeDatabase : RoomDatabase() {
             )
             Timber.tag(TAG)
                 .i(
-                    "Default service imported: {\"params\": {\"lang\": {%s}, \"currencyCode\": {%s}, \"personNumMu\": {%s}, \"totalAreaMu\": {%s}, \"livingSpaceMu\": {%s}, \"heatedVolumeMu\": {%s}}",
+                    "Default app parameters imported: {\"params\": {\"lang\": {%s}, \"currencyCode\": {%s}, \"dayMu\": {%s}, \"monthMu\": {%s}, \"personNumMu\": {%s}, \"totalAreaMu\": {%s}, \"livingSpaceMu\": {%s}, \"heatedVolumeMu\": {%s}}",
                     jsonLogger?.toJson(lang), jsonLogger?.toJson(currencyCode),
+                    jsonLogger?.toJson(dayMu), jsonLogger?.toJson(monthMu),
                     jsonLogger?.toJson(personNumMu), jsonLogger?.toJson(totalAreaMu),
                     jsonLogger?.toJson(livingSpaceMu), jsonLogger?.toJson(heatedVolumeMu)
                 )

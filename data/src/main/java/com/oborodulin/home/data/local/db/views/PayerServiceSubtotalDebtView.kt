@@ -20,62 +20,21 @@ SELECT ps.payerId,
             PRINTF('%+.2d:%.2d', ROUND((JULIANDAY(ps.toPaymentDate, 'localtime') - JULIANDAY(ps.toPaymentDate)) * 24), 
                 ABS(ROUND((JULIANDAY(ps.toPaymentDate, 'localtime') - JULIANDAY(ps.toPaymentDate)) * 24 * 60) % 60)) AS toPaymentDate, 
         ps.serviceId, ps.payerServiceId, ps.fullMonths,
-        ps.servicePos, ps.serviceType, ps.serviceName, ps.serviceLocCode, ps.rateValue, 
+        ps.servicePos, ps.serviceType, ps.serviceName, ps.serviceLocCode,
         ps.fromMeterValue, ps.toMeterValue, ps.diffMeterValue, ps.measureUnit, 
-        ps.serviceDebt, ps.isMeterUses
+        ps.serviceDebt
 FROM (SELECT psc.payerId, 
-        (CASE WHEN psc.isMeterUses = 0 AND psc.fromServiceDate IS NOT NULL 
-            THEN CASE WHEN julianday(psc.fromServiceDate) - julianday(psc.rateStartDate) > 0
-                    THEN psc.fromServiceDate
-                    ELSE psc.rateStartDate
-                END
-            ELSE MIN(strftime(${Constants.DB_FRACT_SEC_TIME}, psc.paymentDate))
-        END) AS fromPaymentDate, 
-        (CASE WHEN psc.isMeterUses = 0 AND psc.fromServiceDate IS NOT NULL 
-            THEN ifnull(psl.rateStartDate, datetime('now', 'local'))
-            ELSE MAX(strftime(${Constants.DB_FRACT_SEC_TIME}, psc.paymentDate))
-        END) AS toPaymentDate, 
-        psc.serviceId, psc.payerServiceId, psc.fromServiceDate, 
-        (CASE WHEN psc.isMeterUses = 0 AND psc.fromServiceDate IS NOT NULL 
-            THEN (CASE 
-                    WHEN julianday(psc.fromServiceDate) - julianday(psc.rateStartDate) > 0
-                    THEN strftime('%Y', ifnull(psl.rateStartDate, datetime('now', 'local')), 'start of month', '-1 day') * 12 + 
-                                strftime('%m', ifnull(psl.rateStartDate, datetime('now', 'local')), 'start of month', '-1 day') -
-                            strftime('%Y', psc.fromServiceDate) * 12 - strftime('%m', psc.fromServiceDate) +
-                                (strftime('%d', ifnull(psl.rateStartDate, datetime('now', 'local')), '+1 day') = '01' OR 
-                                strftime('%d', ifnull(psl.rateStartDate, datetime('now', 'local'))) >= strftime('%d', psc.fromServiceDate))
-                    ELSE strftime('%Y', ifnull(psl.rateStartDate, datetime('now', 'local')), 'start of month', '-1 day') * 12 + 
-                                strftime('%m', ifnull(psl.rateStartDate, datetime('now', 'local')), 'start of month', '-1 day') -
-                            strftime('%Y', psc.rateStartDate) * 12 - strftime('%m', psc.rateStartDate) +
-                                (strftime('%d', ifnull(psl.rateStartDate, datetime('now', 'local')), '+1 day') = '01' OR 
-                                strftime('%d', ifnull(psl.rateStartDate, datetime('now', 'local'))) >= strftime('%d', psc.rateStartDate))
-                END)
-            ELSE COUNT(psc.payerServiceId)
-        END) AS fullMonths, 
-        psc.servicePos, psc.serviceType, psc.serviceName, psc.serviceLocCode, psc.rateValue, 
-        psc.fromMeterValue, psc.toMeterValue, SUM(psc.diffMeterValue) AS diffMeterValue, psc.measureUnit, 
-        SUM(psc.serviceDebt) AS serviceDebt, 
-        psc.isMeterUses 
-    FROM ${PayerServiceDebtView.VIEW_NAME} psc LEFT JOIN ${PayerServiceDebtView.VIEW_NAME} psl ON psl.isMeterUses = 0  
-    -- Payer services without meters and with fromServiceDate for correct: from... toPaymentDate and debt factor (full months)
-        AND psl.fromServiceDate = psc.fromServiceDate
-        AND psl.payerId = psc.payerId 
-        AND psl.payerServiceId = psc.payerServiceId
-        AND psl.serviceLocCode = psc.serviceLocCode
-        AND strftime(${Constants.DB_FRACT_SEC_TIME}, psl.rateStartDate) = 
-            (SELECT MIN(strftime(${Constants.DB_FRACT_SEC_TIME}, psd.rateStartDate)) 
-            FROM ${PayerServiceDebtView.VIEW_NAME} psd
-            WHERE psd.isMeterUses = psl.isMeterUses
-                AND psd.fromServiceDate = psl.fromServiceDate
-                AND psd.payerId = psl.payerId 
-                AND psd.payerServiceId = psl.payerServiceId
-                AND psd.serviceLocCode = psl.serviceLocCode
-                AND strftime(${Constants.DB_FRACT_SEC_TIME}, psd.rateStartDate) >= strftime(${Constants.DB_FRACT_SEC_TIME}, psl.fromServiceDate)
-                AND strftime(${Constants.DB_FRACT_SEC_TIME}, psd.rateStartDate) >= strftime(${Constants.DB_FRACT_SEC_TIME}, psl.rateStartDate))
+        MIN(strftime(${Constants.DB_FRACT_SEC_TIME}, psc.fromPaymentDate)) AS fromPaymentDate, 
+        MAX(strftime(${Constants.DB_FRACT_SEC_TIME}, psc.toPaymentDate)) AS toPaymentDate, 
+        psc.serviceId, psc.payerServiceId, SUM(psc.fullMonths) AS fullMonths, 
+        psc.servicePos, psc.serviceType, psc.serviceName, psc.serviceLocCode,
+        MIN(psc.fromMeterValue) AS fromMeterValue, MAX(psc.toMeterValue) AS toMeterValue, 
+        SUM(psc.diffMeterValue) AS diffMeterValue, psc.measureUnit, 
+        SUM(psc.serviceDebt) AS serviceDebt
+    FROM ${PayerServiceDebtView.VIEW_NAME} psc
     GROUP BY psc.payerId, psc.serviceId, psc.payerServiceId, 
-        psc.fromServiceDate, psc.servicePos, psc.serviceType, psc.serviceName, psc.serviceLocCode, psc.rateValue, 
-        psc.rateStartDate, psl.rateStartDate, 
-        psc.fromMeterValue, psc.toMeterValue, psc.measureUnit, psc.isMeterUses) ps
+        psc.servicePos, psc.serviceType, psc.serviceName, psc.serviceLocCode, 
+        psc.measureUnit) ps
 ORDER BY payerId, servicePos, fromPaymentDate, fromMeterValue
 """
 )
@@ -92,13 +51,11 @@ class PayerServiceSubtotalDebtView(
     val serviceType: ServiceType,
     val serviceName: String,
     val serviceLocCode: String,
-    val rateValue: BigDecimal,
     val fromMeterValue: BigDecimal?,
     val toMeterValue: BigDecimal?,
     val diffMeterValue: BigDecimal?,
     val measureUnit: String?,
-    val serviceDebt: BigDecimal,
-    val isMeterUses: Boolean
+    val serviceDebt: BigDecimal
 ) {
     companion object {
         const val VIEW_NAME = "payer_service_subtotal_debts_view"

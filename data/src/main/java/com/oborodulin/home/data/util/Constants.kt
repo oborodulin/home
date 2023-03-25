@@ -18,6 +18,7 @@ object Constants {
     const val FMT_RATE_DEBT_EXPR = "'%.2f %s = %.2f %s'"
     const val FMT_OPT_FACTOR_EXPR = "'%.2f %s x '"
     const val FMT_PAYMENT_PERIOD_EXPR = "'%02d.%d: '"
+    const val FMT_HEATING_METER_EXPR = "'%.5f %s x '"
 
     const val SRV_RENT_VAL = "'RENT'"
     const val SRV_ELECTRICITY_VAL = "'ELECTRICITY'"
@@ -41,6 +42,8 @@ object Constants {
 
     const val PRM_LANG_VAL = "'LANG'"
     const val PRM_CURRENCY_CODE_VAL = "'CURRENCY_CODE'"
+    const val PRM_DAY_MU_VAL = "'DAY_MU'"
+    const val PRM_MONTH_MU_VAL = "'MONTH_MU'"
     const val PRM_PERSON_NUM_MU_VAL = "'PERSON_NUM_MU'"
     const val PRM_TOTAL_AREA_MU_VAL = "'TOTAL_AREA_MU'"
     const val PRM_LIVING_SPACE_MU_VAL = "'LIVING_SPACE_MU'"

@@ -20,6 +20,11 @@ android {
                 arg("room.schemaLocation", "$projectDir/schemas")
             }
         }
+        javaCompileOptions {
+            annotationProcessorOptions {
+                arguments = ["room.schemaLocation": "$projectDir/schemas".toString()]
+            }
+        }
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         testInstrumentationRunnerArguments clearPackageData: 'true'
         testInstrumentationRunnerArguments useTestStorageService: 'true'
@@ -47,6 +52,9 @@ android {
     }
     kotlinOptions {
         jvmTarget = cfg.jvm.target
+    }
+    sourceSets {
+        androidTest.assets.srcDirs += files("$projectDir/schemas".toString())
     }
     testOptions {
         unitTests {
