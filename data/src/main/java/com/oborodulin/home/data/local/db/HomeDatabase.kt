@@ -9,10 +9,7 @@ import androidx.sqlite.db.SupportSQLiteDatabase
 import com.google.gson.Gson
 import com.oborodulin.home.common.util.Mapper
 import com.oborodulin.home.data.local.db.converters.HomeTypeConverters
-import com.oborodulin.home.data.local.db.dao.MeterDao
-import com.oborodulin.home.data.local.db.dao.PayerDao
-import com.oborodulin.home.data.local.db.dao.RateDao
-import com.oborodulin.home.data.local.db.dao.ServiceDao
+import com.oborodulin.home.data.local.db.dao.*
 import com.oborodulin.home.data.local.db.entities.*
 import com.oborodulin.home.data.local.db.views.*
 import com.oborodulin.home.data.util.Constants
@@ -72,6 +69,7 @@ abstract class HomeDatabase : RoomDatabase() {
     abstract fun serviceDao(): ServiceDao
     abstract fun meterDao(): MeterDao
     abstract fun rateDao(): RateDao
+    abstract fun receiptDao(): ReceiptDao
 
     companion object {
         var isImportDone: Deferred<Boolean>? = null

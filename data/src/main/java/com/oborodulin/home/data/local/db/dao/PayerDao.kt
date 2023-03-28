@@ -1,7 +1,10 @@
 package com.oborodulin.home.data.local.db.dao
 
 import androidx.room.*
+import com.oborodulin.home.common.util.Constants
 import com.oborodulin.home.data.local.db.entities.*
+import com.oborodulin.home.data.util.Constants.DB_FALSE
+import com.oborodulin.home.data.util.Constants.DB_TRUE
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.distinctUntilChanged
@@ -22,7 +25,7 @@ interface PayerDao : BaseDao<PayerEntity> {
     @ExperimentalCoroutinesApi
     fun findDistinctById(id: UUID) = findById(id).distinctUntilChanged()
 
-    @Query("SELECT * FROM ${PayerEntity.TABLE_NAME} WHERE isFavorite = 1")
+    @Query("SELECT * FROM ${PayerEntity.TABLE_NAME} WHERE isFavorite = $DB_TRUE")
     fun findFavorite(): Flow<PayerEntity>
 
     @ExperimentalCoroutinesApi
@@ -62,10 +65,10 @@ interface PayerDao : BaseDao<PayerEntity> {
     suspend fun deleteAll()
 
     // API:
-    @Query("UPDATE ${PayerEntity.TABLE_NAME} SET isFavorite = 1 WHERE payerId = :payerId AND isFavorite = 0")
+    @Query("UPDATE ${PayerEntity.TABLE_NAME} SET isFavorite = $DB_TRUE WHERE payerId = :payerId AND isFavorite = $DB_FALSE")
     suspend fun setFavoriteById(payerId: UUID)
 
-    @Query("UPDATE ${PayerEntity.TABLE_NAME} SET isFavorite = 0 WHERE payerId <> :payerId AND isFavorite = 1")
+    @Query("UPDATE ${PayerEntity.TABLE_NAME} SET isFavorite = $DB_FALSE WHERE payerId <> :payerId AND isFavorite = $DB_TRUE")
     suspend fun clearFavoritesById(payerId: UUID)
 
     @Transaction

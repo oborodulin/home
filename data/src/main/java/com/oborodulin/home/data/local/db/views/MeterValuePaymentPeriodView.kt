@@ -15,26 +15,26 @@ import java.util.*
     value = """
 SELECT mvl.*, lv.measureUnit, lv.isDerivedUnit, lv.derivedUnit, lv.meterLocCode, lv.maxValue,
     lv.payerId, lv.payerServiceId, 
-    STRFTIME(${Constants.DB_FRACT_SEC_TIME}, DATETIME(lv.paymentDate, 'localtime')) || 
-        PRINTF('%+.2d:%.2d', ROUND((JULIANDAY(lv.paymentDate, 'localtime') - JULIANDAY(lv.paymentDate)) * 24), 
-            ABS(ROUND((JULIANDAY(lv.paymentDate, 'localtime') - JULIANDAY(lv.paymentDate)) * 24 * 60) % 60)) AS paymentDate, 
+    strftime(${Constants.DB_FRACT_SEC_TIME}, datetime(lv.paymentDate, 'localtime')) || 
+        printf('%+.2d:%.2d', ROUND((julianday(lv.paymentDate, 'localtime') - julianday(lv.paymentDate)) * 24), 
+            ABS(ROUND((julianday(lv.paymentDate, 'localtime') - julianday(lv.paymentDate)) * 24 * 60) % 60)) AS paymentDate, 
     CAST(strftime('%m', lv.paymentDate) AS INTEGER) AS paymentMonth, 
     CAST(strftime('%Y', lv.paymentDate) AS INTEGER) AS paymentYear
 FROM ${MeterValueEntity.TABLE_NAME} mvl JOIN 
     (SELECT mvp.payerId, ps.payerServiceId, mvp.meterId, MAX(strftime(${Constants.DB_FRACT_SEC_TIME}, mvp.valueDate)) maxValueDate, 
-        mvp.paymentDate, IFNULL(sv.serviceMeasureUnit, mvp.meterMeasureUnit) AS measureUnit, 
+        mvp.paymentDate, ifnull(sv.serviceMeasureUnit, mvp.meterMeasureUnit) AS measureUnit, 
         mvp.isDerivedUnit, mvp.derivedUnit, mvp.meterLocCode, mvp.maxValue
     FROM (SELECT mv.meterId, p.payerId, mv.meterType, v.valueDate, mv.meterMeasureUnit, mv.isDerivedUnit, 
             mv.derivedUnit, mv.meterLocCode, mv.maxValue,
             (CASE WHEN p.isAlignByPaymentDay = 0
-                THEN strftime(${Constants.DB_FRACT_SEC_TIME}, v.valueDate, 'start of month')
+                THEN strftime(${Constants.DB_FRACT_SEC_TIME}, v.valueDate, 'start of month', '+1 months')
                 ELSE
                     CASE WHEN datetime(v.valueDate) 
                             BETWEEN datetime(v.valueDate, 'start of month') 
-                                AND datetime(v.valueDate, 'start of month', '+' || (IFNULL(p.paymentDay, ${Constants.DEF_PAYMENT_DAY}) - 1) || ' days') 
+                                AND datetime(v.valueDate, 'start of month', '+' || (ifnull(p.paymentDay, ${Constants.DEF_PAYMENT_DAY}) - 1) || ' days') 
                         THEN strftime(${Constants.DB_FRACT_SEC_TIME}, v.valueDate, 'start of month')
                         WHEN datetime(v.valueDate) 
-                            BETWEEN datetime(v.valueDate, 'start of month', '+' || IFNULL(p.paymentDay, ${Constants.DEF_PAYMENT_DAY}) || ' days') 
+                            BETWEEN datetime(v.valueDate, 'start of month', '+' || ifnull(p.paymentDay, ${Constants.DEF_PAYMENT_DAY}) || ' days') 
                                 AND datetime(v.valueDate, '+1 months', 'start of month') 
                         THEN strftime(${Constants.DB_FRACT_SEC_TIME}, v.valueDate, '+1 months', 'start of month') 
                     END

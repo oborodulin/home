@@ -9,8 +9,11 @@ object Constants {
     const val DEF_PAYMENT_DAY = 20
     const val DEF_PERSON_NUM = 1
     const val DEF_TWO_PERSON_NUM = 2
+
+    const val DB_TRUE = 1
+    const val DB_FALSE = 0
     const val DB_FRACT_SEC_TIME = "'%Y-%m-%dT%H:%M:%f'"
-    const val TZ_TIME = "STRFTIME('%Y-%m-%dT%H:%M:%S', DATETIME('now', 'localtime')) || PRINTF('%+.2d:%.2d', ROUND((JULIANDAY('now', 'localtime') - JULIANDAY('now')) * 24), ABS(ROUND((JULIANDAY('now', 'localtime') - JULIANDAY('now')) * 24 * 60) % 60))"
+    const val TZ_TIME = "strftime('%Y-%m-%dT%H:%M:%S', datetime('now', 'localtime')) || printf('%+.2d:%.2d', ROUND((julianday('now', 'localtime') - julianday('now')) * 24), ABS(ROUND((julianday('now', 'localtime') - julianday('now')) * 24 * 60) % 60))"
 
     const val FMT_IS_PER_PERSON_EXPR = "'%d %s x %.2f %s = %.2f %s'"
     const val FMT_METER_VAL_EXPR = "'%.2f %s x %.2f %s = %.2f %s'"
@@ -55,9 +58,9 @@ SELECT v.metersId, MAX(datetime(v.valueDate)) maxValueDate
     FROM meter_values v JOIN meters m ON m.meterId = v.metersId
         JOIN payers_services AS ps ON ps.payerServiceId = m.payersServicesId
         JOIN payers AS p ON p.payerId = ps.payersId
-    WHERE datetime(v.valueDate) <= CASE WHEN datetime('now') > datetime('now', 'start of month', '+' || (IFNULL(p.paymentDay, ${DEF_PAYMENT_DAY}) - 1) || ' days')
-            THEN datetime('now', 'start of month', '+' || (IFNULL(p.paymentDay, ${DEF_PAYMENT_DAY}) - 1) || ' days')
-            ELSE datetime('now', '-1 months', 'start of month', '+' || (IFNULL(p.paymentDay, ${DEF_PAYMENT_DAY}) - 1) || ' days') END
+    WHERE datetime(v.valueDate) <= CASE WHEN datetime('now') > datetime('now', 'start of month', '+' || (ifnull(p.paymentDay, ${DEF_PAYMENT_DAY}) - 1) || ' days')
+            THEN datetime('now', 'start of month', '+' || (ifnull(p.paymentDay, ${DEF_PAYMENT_DAY}) - 1) || ' days')
+            ELSE datetime('now', '-1 months', 'start of month', '+' || (ifnull(p.paymentDay, ${DEF_PAYMENT_DAY}) - 1) || ' days') END
 GROUP BY v.metersId
 """
 //.trimIndent()

@@ -244,7 +244,8 @@ class MeterDaoTest : HomeDatabaseTest() {
 
         suspend fun insertMeterValues(
             db: HomeDatabase, meter: MeterEntity = MeterEntity.defaultMeter(),
-            currDate: OffsetDateTime, meterValues: List<MeterValueEntity> = emptyList()
+            currDate: OffsetDateTime = OffsetDateTime.now(),
+            meterValues: List<MeterValueEntity> = emptyList()
         ) {
             if (meterValues.isNotEmpty()) {
                 meterValues.forEach { db.meterDao().insert(it) }

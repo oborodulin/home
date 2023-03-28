@@ -33,5 +33,5 @@ open class HomeDatabaseTest {
     fun serviceDao() = db.serviceDao()
     fun meterDao() = db.meterDao()
     fun rateDao() = db.rateDao()
-
+    fun receiptDao() = db.receiptDao()
 }

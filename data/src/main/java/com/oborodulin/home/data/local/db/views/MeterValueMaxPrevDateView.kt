@@ -13,17 +13,17 @@ import java.util.*
     value = """
 SELECT mv.meterId, MAX(mv.valueDate) AS maxValueDate 
 FROM (SELECT m.meterId, m.payersId, 
-            IFNULL(strftime(${Constants.DB_FRACT_SEC_TIME}, v.valueDate), 
-                    IFNULL(strftime(${Constants.DB_FRACT_SEC_TIME}, m.passportDate), 
+            ifnull(strftime(${Constants.DB_FRACT_SEC_TIME}, v.valueDate), 
+                    ifnull(strftime(${Constants.DB_FRACT_SEC_TIME}, m.passportDate), 
                             strftime(${Constants.DB_FRACT_SEC_TIME}, 'now', 'localtime', 'start of month', '-1 days'))) AS valueDate 
         FROM ${MeterEntity.TABLE_NAME} m LEFT JOIN ${MeterValueEntity.TABLE_NAME} v ON v.metersId = m.meterId) mv 
     JOIN ${PayerEntity.TABLE_NAME} p ON p.payerId = mv.payersId
  WHERE mv.valueDate <= 
     CASE WHEN p.isAlignByPaymentDay = 0 
         THEN strftime(${Constants.DB_FRACT_SEC_TIME}, 'now', 'localtime', 'start of month', '-1 days')
-        ELSE CASE WHEN datetime('now', 'localtime') > datetime('now', 'localtime', 'start of month', '+' || (IFNULL(p.paymentDay, ${Constants.DEF_PAYMENT_DAY}) - 1) || ' days')
-                THEN strftime(${Constants.DB_FRACT_SEC_TIME}, 'now', 'localtime', 'start of month', '+' || (IFNULL(p.paymentDay, ${Constants.DEF_PAYMENT_DAY}) - 1) || ' days')
-                ELSE strftime(${Constants.DB_FRACT_SEC_TIME}, 'now', 'localtime', '-1 months', 'start of month', '+' || (IFNULL(p.paymentDay, ${Constants.DEF_PAYMENT_DAY}) - 1) || ' days')
+        ELSE CASE WHEN datetime('now', 'localtime') > datetime('now', 'localtime', 'start of month', '+' || (ifnull(p.paymentDay, ${Constants.DEF_PAYMENT_DAY}) - 1) || ' days')
+                THEN strftime(${Constants.DB_FRACT_SEC_TIME}, 'now', 'localtime', 'start of month', '+' || (ifnull(p.paymentDay, ${Constants.DEF_PAYMENT_DAY}) - 1) || ' days')
+                ELSE strftime(${Constants.DB_FRACT_SEC_TIME}, 'now', 'localtime', '-1 months', 'start of month', '+' || (ifnull(p.paymentDay, ${Constants.DEF_PAYMENT_DAY}) - 1) || ' days')
             END
     END
 GROUP BY mv.meterId

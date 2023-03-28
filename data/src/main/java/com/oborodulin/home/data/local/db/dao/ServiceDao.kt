@@ -92,21 +92,22 @@ interface ServiceDao : BaseDao<ServiceEntity> {
     suspend fun deleteAll()
 
     // API:
-    @Query("SELECT IFNULL(MAX(servicePos), 0) FROM ${ServiceEntity.TABLE_NAME}")
+    @Query("SELECT ifnull(MAX(servicePos), 0) FROM ${ServiceEntity.TABLE_NAME}")
     fun maxPos(): Int
 
-    @Query("SELECT IFNULL(MAX(servicePos), 0) + 1 FROM ${ServiceEntity.TABLE_NAME}")
+    @Query("SELECT ifnull(MAX(servicePos), 0) + 1 FROM ${ServiceEntity.TABLE_NAME}")
     fun nextPos(): Int
 
     @Query("UPDATE ${ServiceEntity.TABLE_NAME} SET servicePos = servicePos + 1 WHERE servicePos >= :pos")
     suspend fun updatePos(pos: Int)
 
-    @Query("UPDATE ${PayerServiceCrossRefEntity.TABLE_NAME} SET isMeterOwner = 1 WHERE payerServiceId = :payerServiceId AND isMeterOwner = 0")
+    @Query("UPDATE ${PayerServiceCrossRefEntity.TABLE_NAME} SET isMeterOwner = ${Constants.DB_TRUE} " +
+            "WHERE payerServiceId = :payerServiceId AND isMeterOwner = ${Constants.DB_FALSE}")
     suspend fun setPayerServiceMeterOwnerById(payerServiceId: UUID)
 
     @Query(
         """
-UPDATE ${PayerServiceCrossRefEntity.TABLE_NAME} SET isMeterOwner = 0 
+UPDATE ${PayerServiceCrossRefEntity.TABLE_NAME} SET isMeterOwner = ${Constants.DB_FALSE} 
 WHERE payerServiceId <> :payerServiceId 
     AND payersId = (SELECT ps.payersId FROM ${PayerServiceCrossRefEntity.TABLE_NAME} ps WHERE ps.payerServiceId = :payerServiceId)
     AND servicesId IN (SELECT serviceId FROM ${ServiceEntity.TABLE_NAME}

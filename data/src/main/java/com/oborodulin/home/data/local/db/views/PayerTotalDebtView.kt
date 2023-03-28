@@ -12,12 +12,12 @@ import java.util.*
     viewName = PayerTotalDebtView.VIEW_NAME,
     value = """
 SELECT ptb.payerId, 
-        STRFTIME(${Constants.DB_FRACT_SEC_TIME}, DATETIME(ptb.fromPaymentDate, 'localtime')) || 
-            PRINTF('%+.2d:%.2d', ROUND((JULIANDAY(ptb.fromPaymentDate, 'localtime') - JULIANDAY(ptb.fromPaymentDate)) * 24), 
-                ABS(ROUND((JULIANDAY(ptb.fromPaymentDate, 'localtime') - JULIANDAY(ptb.fromPaymentDate)) * 24 * 60) % 60)) AS fromPaymentDate, 
-        STRFTIME(${Constants.DB_FRACT_SEC_TIME}, DATETIME(ptb.toPaymentDate, 'localtime')) || 
-            PRINTF('%+.2d:%.2d', ROUND((JULIANDAY(ptb.toPaymentDate, 'localtime') - JULIANDAY(ptb.toPaymentDate)) * 24), 
-                ABS(ROUND((JULIANDAY(ptb.toPaymentDate, 'localtime') - JULIANDAY(ptb.toPaymentDate)) * 24 * 60) % 60)) AS toPaymentDate, 
+        strftime(${Constants.DB_FRACT_SEC_TIME}, datetime(ptb.fromPaymentDate, 'localtime')) || 
+            printf('%+.2d:%.2d', ROUND((julianday(ptb.fromPaymentDate, 'localtime') - julianday(ptb.fromPaymentDate)) * 24), 
+                ABS(ROUND((julianday(ptb.fromPaymentDate, 'localtime') - julianday(ptb.fromPaymentDate)) * 24 * 60) % 60)) AS fromPaymentDate, 
+        strftime(${Constants.DB_FRACT_SEC_TIME}, datetime(ptb.toPaymentDate, 'localtime')) || 
+            printf('%+.2d:%.2d', ROUND((julianday(ptb.toPaymentDate, 'localtime') - julianday(ptb.toPaymentDate)) * 24), 
+                ABS(ROUND((julianday(ptb.toPaymentDate, 'localtime') - julianday(ptb.toPaymentDate)) * 24 * 60) % 60)) AS toPaymentDate, 
         ptb.serviceLocCode, ptb.totalDebt
 FROM (SELECT payerId, 
         MIN(strftime(${Constants.DB_FRACT_SEC_TIME}, fromPaymentDate)) AS fromPaymentDate, 

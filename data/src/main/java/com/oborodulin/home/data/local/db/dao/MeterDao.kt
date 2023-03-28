@@ -59,7 +59,7 @@ ORDER BY servicePos
     @Query(
         """
 SELECT * FROM ${MeterValuePrevPeriodView.VIEW_NAME} 
-WHERE isFavorite = 1 AND meterLocCode = :locale AND serviceLocCode = :locale
+WHERE isFavorite = ${Constants.DB_TRUE} AND meterLocCode = :locale AND serviceLocCode = :locale
 ORDER BY servicePos
 """
     )

@@ -7,7 +7,7 @@ data class ReceiptWithLines(
     @Embedded
     val receipt: ReceiptEntity,
     @Relation(parentColumn = "receiptId", entityColumn = "receiptsId")
-    val lines: List<ReceiptLineEntity>
+    val lines: List<ReceiptLineEntity> = emptyList()
 ) {
     override fun equals(other: Any?): Boolean {
         if (this === other) return true

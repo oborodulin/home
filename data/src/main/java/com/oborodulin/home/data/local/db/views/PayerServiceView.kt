@@ -13,9 +13,9 @@ import java.util.*
     viewName = PayerServiceView.VIEW_NAME,
     value = """
 SELECT psv.*,
-        STRFTIME(${Constants.DB_FRACT_SEC_TIME}, DATETIME(psv.fromDate, 'localtime')) || 
-            PRINTF('%+.2d:%.2d', ROUND((JULIANDAY(psv.fromDate, 'localtime') - JULIANDAY(psv.fromDate)) * 24), 
-                ABS(ROUND((JULIANDAY(psv.fromDate, 'localtime') - JULIANDAY(psv.fromDate)) * 24 * 60) % 60)) AS fromServiceDate 
+        strftime(${Constants.DB_FRACT_SEC_TIME}, datetime(psv.fromDate, 'localtime')) || 
+            printf('%+.2d:%.2d', ROUND((julianday(psv.fromDate, 'localtime') - julianday(psv.fromDate)) * 24), 
+                ABS(ROUND((julianday(psv.fromDate, 'localtime') - julianday(psv.fromDate)) * 24 * 60) % 60)) AS fromServiceDate 
 FROM (SELECT sv.*, ps.payerServiceId, ps.payersId, ps.fromMonth, ps.fromYear, 
         strftime(${Constants.DB_FRACT_SEC_TIME}, printf('%d-%02d-01T00:00:00.000', ps.fromYear, ps.fromMonth)) AS fromDate,
         ps.isMeterOwner, ps.isPrivileges, ps.isAllocateRate 
