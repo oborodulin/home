@@ -60,7 +60,8 @@ private val MIGRATION_4_5 = object : Migration(4, 5) {
         MeterValueMaxPrevDateView::class, MeterValuePrevPeriodView::class,
         MeterValuePaymentPeriodView::class, MeterValuePaymentView::class,
         PayerServiceView::class, RatePayerServiceView::class,
-        PayerServiceDebtView::class, PayerServiceSubtotalDebtView::class, PayerTotalDebtView::class],
+        PayerMeterServiceDebtView::class, PayerServiceDebtView::class,
+        PayerServiceSubtotalDebtView::class, PayerTotalDebtView::class],
     version = 5
 )
 @TypeConverters(HomeTypeConverters::class)

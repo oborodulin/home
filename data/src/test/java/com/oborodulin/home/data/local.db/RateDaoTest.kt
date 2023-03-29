@@ -22,6 +22,7 @@ import java.math.BigDecimal
 import java.time.OffsetDateTime
 import java.time.temporal.ChronoUnit
 import java.util.*
+import kotlin.time.Duration.Companion.milliseconds
 
 /**
  * Example local unit test, which will execute on the development machine (host).
@@ -548,8 +549,8 @@ class RateDaoTest : HomeDatabaseTest() {
             insertRate(db, electricity, startDate = rate2StartDate, rateValue = rate23)
 
             // ASSERT findServiceDebtsByPayerId
-            rateDao.findSubtotalDebtsByPayerId(payerId).test {
-//            rateDao.findServiceDebtsByPayerId(payerId).test {
+            //rateDao.findSubtotalDebtsByPayerId(payerId).test {
+            rateDao.findServiceDebtsByPayerId(payerId).test(timeout = 5000.milliseconds) {
                 val subtotals = awaitItem()
                 subtotals.forEach {
                     println(

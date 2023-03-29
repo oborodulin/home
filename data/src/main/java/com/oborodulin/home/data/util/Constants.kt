@@ -13,6 +13,7 @@ object Constants {
     const val DB_TRUE = 1
     const val DB_FALSE = 0
     const val DB_FRACT_SEC_TIME = "'%Y-%m-%dT%H:%M:%f'"
+    const val DB_DAY_TIME = "'%Y-%m-%d'"
     const val TZ_TIME = "strftime('%Y-%m-%dT%H:%M:%S', datetime('now', 'localtime')) || printf('%+.2d:%.2d', ROUND((julianday('now', 'localtime') - julianday('now')) * 24), ABS(ROUND((julianday('now', 'localtime') - julianday('now')) * 24 * 60) % 60))"
 
     const val FMT_IS_PER_PERSON_EXPR = "'%d %s x %.2f %s = %.2f %s'"
