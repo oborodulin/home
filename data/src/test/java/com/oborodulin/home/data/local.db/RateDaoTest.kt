@@ -549,8 +549,7 @@ class RateDaoTest : HomeDatabaseTest() {
             insertRate(db, electricity, startDate = rate2StartDate, rateValue = rate23)
 
             // ASSERT findServiceDebtsByPayerId
-            //rateDao.findSubtotalDebtsByPayerId(payerId).test {
-            rateDao.findServiceDebtsByPayerId(payerId).test(timeout = 5000.milliseconds) {
+            rateDao.findSubtotalDebtsByPayerId(payerId).test(timeout = 5000.milliseconds) {
                 val subtotals = awaitItem()
                 subtotals.forEach {
                     println(

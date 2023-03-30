@@ -16,8 +16,8 @@ import java.util.*
 SELECT mvl.*, lv.measureUnit, lv.isDerivedUnit, lv.derivedUnit, lv.meterLocCode, lv.maxValue,
     lv.payerId, lv.payerServiceId, 
     strftime(${Constants.DB_FRACT_SEC_TIME}, datetime(lv.paymentDate, 'localtime')) || 
-        printf('%+.2d:%.2d', ROUND((julianday(lv.paymentDate, 'localtime') - julianday(lv.paymentDate)) * 24), 
-            ABS(ROUND((julianday(lv.paymentDate, 'localtime') - julianday(lv.paymentDate)) * 24 * 60) % 60)) AS paymentDate, 
+        printf('%+.2d:%.2d', round((julianday(lv.paymentDate, 'localtime') - julianday(lv.paymentDate)) * 24), 
+            abs(round((julianday(lv.paymentDate, 'localtime') - julianday(lv.paymentDate)) * 24 * 60) % 60)) AS paymentDate, 
     CAST(strftime('%m', lv.paymentDate) AS INTEGER) AS paymentMonth, 
     CAST(strftime('%Y', lv.paymentDate) AS INTEGER) AS paymentYear
 FROM ${MeterValueEntity.TABLE_NAME} mvl JOIN 
@@ -46,7 +46,7 @@ FROM ${MeterValueEntity.TABLE_NAME} mvl JOIN
     GROUP BY mvp.payerId, ps.payerServiceId, mvp.meterId, mvp.paymentDate, sv.serviceMeasureUnit, mvp.meterMeasureUnit,
             mvp.isDerivedUnit, mvp.derivedUnit, mvp.meterLocCode, mvp.maxValue) lv 
         ON mvl.metersId = lv.meterId 
-        AND strftime(${Constants.DB_FRACT_SEC_TIME}, mvl.valueDate) = lv.maxValueDate
+            AND strftime(${Constants.DB_FRACT_SEC_TIME}, mvl.valueDate) = lv.maxValueDate
 """
 )
 class MeterValuePaymentPeriodView(

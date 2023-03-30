@@ -14,11 +14,11 @@ import java.util.*
     value = """
 SELECT ps.payerId, 
         strftime(${Constants.DB_FRACT_SEC_TIME}, datetime(ps.fromPaymentDate, 'localtime')) || 
-            printf('%+.2d:%.2d', ROUND((julianday(ps.fromPaymentDate, 'localtime') - julianday(ps.fromPaymentDate)) * 24), 
-                ABS(ROUND((julianday(ps.fromPaymentDate, 'localtime') - julianday(ps.fromPaymentDate)) * 24 * 60) % 60)) AS fromPaymentDate, 
+            printf('%+.2d:%.2d', round((julianday(ps.fromPaymentDate, 'localtime') - julianday(ps.fromPaymentDate)) * 24), 
+                abs(round((julianday(ps.fromPaymentDate, 'localtime') - julianday(ps.fromPaymentDate)) * 24 * 60) % 60)) AS fromPaymentDate, 
         strftime(${Constants.DB_FRACT_SEC_TIME}, datetime(ps.toPaymentDate, 'localtime')) || 
-            printf('%+.2d:%.2d', ROUND((julianday(ps.toPaymentDate, 'localtime') - julianday(ps.toPaymentDate)) * 24), 
-                ABS(ROUND((julianday(ps.toPaymentDate, 'localtime') - julianday(ps.toPaymentDate)) * 24 * 60) % 60)) AS toPaymentDate, 
+            printf('%+.2d:%.2d', round((julianday(ps.toPaymentDate, 'localtime') - julianday(ps.toPaymentDate)) * 24), 
+                abs(round((julianday(ps.toPaymentDate, 'localtime') - julianday(ps.toPaymentDate)) * 24 * 60) % 60)) AS toPaymentDate, 
         ps.serviceId, ps.payerServiceId, ps.fullMonths,
         ps.servicePos, ps.serviceType, ps.serviceName, ps.serviceLocCode,
         ps.fromMeterValue, ps.toMeterValue, ps.diffMeterValue, ps.measureUnit, 

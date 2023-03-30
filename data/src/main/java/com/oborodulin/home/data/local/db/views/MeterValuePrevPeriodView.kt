@@ -21,8 +21,8 @@ import java.util.*
 SELECT mvf.meterValueId, p.payerId, sv.serviceId, sv.serviceType, sv.serviceName, sv.servicePos, 
     mvf.meterId, mvf.meterType, ifnull(mvf.meterMeasureUnit, sv.serviceMeasureUnit) AS measureUnit,
     strftime(${DB_FRACT_SEC_TIME}, datetime(mvf.prevLastDate, 'localtime')) || 
-        printf('%+.2d:%.2d', ROUND((julianday(mvf.prevLastDate, 'localtime') - julianday(mvf.prevLastDate)) * 24), 
-            ABS(ROUND((julianday(mvf.prevLastDate, 'localtime') - julianday(mvf.prevLastDate)) * 24 * 60) % 60)) AS prevLastDate, 
+        printf('%+.2d:%.2d', round((julianday(mvf.prevLastDate, 'localtime') - julianday(mvf.prevLastDate)) * 24), 
+            abs(round((julianday(mvf.prevLastDate, 'localtime') - julianday(mvf.prevLastDate)) * 24 * 60) % 60)) AS prevLastDate, 
     mvf.prevValue, p.isFavorite, 
     (SELECT vl.meterValue FROM meter_values vl
         WHERE vl.metersId = mvf.meterId
