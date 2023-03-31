@@ -318,5 +318,22 @@ class MeterDaoTest : HomeDatabaseTest() {
                 }
             }
         }
+
+        fun logMeterValue(
+            value: MeterValueEntity, prevValue: MeterValueEntity? = null,
+            meterMaxValue: BigDecimal? = null
+        ) {
+            val str = StringBuffer()
+            str.append("Meter value [").append(value.valueDate.dayOfMonth).append(".")
+                .append(value.valueDate.monthValue).append(".").append(value.valueDate.year)
+                .append("]: ").append(value.meterValue)
+            prevValue?.let {
+                str.append(" [diff = ").append(
+                    if (value.meterValue!! > it.meterValue) value.meterValue!!.subtract(it.meterValue)
+                    else meterMaxValue?.subtract(it.meterValue)?.add(value.meterValue)
+                ).append("]")
+            }
+            println(str.toString())
+        }
     }
 }

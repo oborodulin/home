@@ -4,6 +4,7 @@ import android.os.Build
 import androidx.test.filters.MediumTest
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
+import com.oborodulin.home.common.util.Constants
 import com.oborodulin.home.data.local.db.dao.PayerDao
 import com.oborodulin.home.data.local.db.dao.RateDao
 import com.oborodulin.home.data.local.db.dao.ReceiptDao
@@ -20,6 +21,7 @@ import org.robolectric.RobolectricTestRunner
 import org.robolectric.annotation.Config
 import java.math.BigDecimal
 import java.time.OffsetDateTime
+import java.time.format.DateTimeFormatter
 import java.time.temporal.ChronoUnit
 import java.util.*
 import kotlin.time.Duration.Companion.milliseconds
@@ -353,8 +355,6 @@ class RateDaoTest : HomeDatabaseTest() {
             val meterValue2Date = startMeterValueDate.plusMonths(1)
             val meterValue21Date = meterValue2Date.plusDays(15)
             val meterValue3Date = startMeterValueDate.plusMonths(2)
-            //val meterValue4Date = startMeterValueDate.plusMonths(3)
-            //val meterValue5Date = startMeterValueDate.plusMonths(4)
             val meterValue6Date = startMeterValueDate.plusMonths(6)
             val meterValue7Date = startMeterValueDate.plusMonths(7)
             val meterValue71Date = meterValue7Date.plusDays(23)
@@ -367,9 +367,6 @@ class RateDaoTest : HomeDatabaseTest() {
                 RateEntity.DEF_ELECTRO_RANGE2.divide(BigDecimal("2"))
             ).remainder(MeterEntity.DEF_ELECTRO_MAX_VAL)
             val meterVal3 = MeterValueEntity.DEF_ELECTRO_VAL3
-            //val meterVal4 = MeterValueEntity.DEF_ELECTRO_VAL4
-            //val meterVal5 = MeterValueEntity.DEF_ELECTRO_VAL4.add(RateEntity.DEF_ELECTRO_RANGE2.subtract(BigDecimal.ONE))
-            //    .remainder(MeterEntity.DEF_ELECTRO_MAX_VAL)
             val meterVal6 =
                 MeterValueEntity.DEF_ELECTRO_VAL4.add(RateEntity.DEF_ELECTRO_RANGE3.add(BigDecimal.ONE))
                     .remainder(MeterEntity.DEF_ELECTRO_MAX_VAL)
@@ -382,112 +379,9 @@ class RateDaoTest : HomeDatabaseTest() {
             val meterVal9 = meterVal8.add(RateEntity.DEF_ELECTRO_RANGE3.add(BigDecimal.ONE))
                 .remainder(MeterEntity.DEF_ELECTRO_MAX_VAL)
 
-            val expectedRate1Months = ChronoUnit.MONTHS.between(startMeterValueDate, rate2StartDate)
-            val expectedRate2Months = ChronoUnit.MONTHS.between(rate2StartDate, currentDateTime)
-
-            println(
-                "Rate 1 [%02d.%d] (%d mon): %.0f - %.0f = %.2f; %.0f - %.0f = %.2f; %.0f - ... = %.2f".format(
-                    rate1StartDate.monthValue, rate1StartDate.year, expectedRate1Months,
-                    RateEntity.DEF_ELECTRO_RANGE1, RateEntity.DEF_ELECTRO_RANGE2, rate11,
-                    RateEntity.DEF_ELECTRO_RANGE2, RateEntity.DEF_ELECTRO_RANGE3, rate12,
-                    RateEntity.DEF_ELECTRO_RANGE3, rate13
-                )
-            )
-            println(
-                "Rate 2 [%02d.%d] (%d mon): %.0f - %.0f = %.2f; %.0f - %.0f = %.2f; %.0f - ... = %.2f".format(
-                    rate2StartDate.monthValue, rate2StartDate.year, expectedRate2Months,
-                    RateEntity.DEF_ELECTRO_RANGE1, RateEntity.DEF_ELECTRO_RANGE2, rate21,
-                    RateEntity.DEF_ELECTRO_RANGE2, RateEntity.DEF_ELECTRO_RANGE3, rate22,
-                    RateEntity.DEF_ELECTRO_RANGE3, rate23
-                )
-            )
-            println(
-                "Meter value 1 [%02d.%02d.%d]: %.2f".format(
-                    startMeterValueDate.dayOfMonth, startMeterValueDate.monthValue,
-                    startMeterValueDate.year, meterVal1
-                )
-            )
-            println(
-                "Meter value 2 [%02d.%02d.%d]: %.2f [diff = %.2f]".format(
-                    meterValue2Date.dayOfMonth, meterValue2Date.monthValue, meterValue2Date.year,
-                    meterVal2,
-                    if (meterVal2 > meterVal1) meterVal2.subtract(meterVal1)
-                    else MeterEntity.DEF_ELECTRO_MAX_VAL.subtract(meterVal1).add(meterVal2)
-                )
-            )
-            println(
-                "Meter value 21 [%02d.%02d.%d]: %.2f".format(
-                    meterValue21Date.dayOfMonth, meterValue21Date.monthValue, meterValue21Date.year,
-                    meterVal21
-                )
-            )
-            println(
-                "Meter value 3 [%02d.%02d.%d]: %.2f [diff = %.2f]".format(
-                    meterValue3Date.dayOfMonth, meterValue3Date.monthValue, meterValue3Date.year,
-                    meterVal3,
-                    if (meterVal3 > meterVal2) meterVal3.subtract(meterVal2)
-                    else MeterEntity.DEF_ELECTRO_MAX_VAL.subtract(meterVal2).add(meterVal3)
-                )
-            )
-/*            println(
-                "Meter value 4 [%02d.%02d.%d]: %.2f [diff = %.2f]".format(
-                    meterValue4Date.dayOfMonth, meterValue4Date.monthValue, meterValue4Date.year,
-                    meterVal4,
-                    if (meterVal4.compareTo(meterVal3) > 0) meterVal4.subtract(meterVal3)
-                    else MeterEntity.DEF_ELECTRO_MAX_VAL.subtract(meterVal3).add(meterVal4)
-                )
-            )
-            println(
-                "Meter value 5 [%02d.%02d.%d]: %.2f [diff = %.2f]".format(
-                    meterValue5Date.dayOfMonth, meterValue5Date.monthValue, meterValue5Date.year,
-                    meterVal5,
-                    if (meterVal5 > meterVal3) meterVal5.subtract(meterVal3)
-                    else MeterEntity.DEF_ELECTRO_MAX_VAL.subtract(meterVal3).add(meterVal5)
-                )
-            )*/
-            println(
-                "Meter value 6 [%02d.%02d.%d]: %.2f [diff = %.2f]".format(
-                    meterValue6Date.dayOfMonth, meterValue6Date.monthValue, meterValue6Date.year,
-                    meterVal6,
-                    if (meterVal6 > meterVal3) meterVal6.subtract(meterVal3)
-                    else MeterEntity.DEF_ELECTRO_MAX_VAL.subtract(meterVal3).add(meterVal6)
-                )
-            )
-            println(
-                "Meter value 7 [%02d.%02d.%d]: %.2f [diff = %.2f]".format(
-                    meterValue7Date.dayOfMonth, meterValue7Date.monthValue, meterValue7Date.year,
-                    meterVal7,
-                    if (meterVal7 > meterVal6) meterVal7.subtract(meterVal6)
-                    else MeterEntity.DEF_ELECTRO_MAX_VAL.subtract(meterVal6).add(meterVal7)
-                )
-            )
-            println(
-                "Meter value 71 [%02d.%02d.%d]: %.2f".format(
-                    meterValue71Date.dayOfMonth, meterValue71Date.monthValue, meterValue71Date.year,
-                    meterVal71
-                )
-            )
-            println(
-                "Meter value 8 [%02d.%02d.%d]: %.2f [diff = %.2f]".format(
-                    meterValue8Date.dayOfMonth, meterValue8Date.monthValue, meterValue8Date.year,
-                    meterVal8,
-                    if (meterVal8 > meterVal7) meterVal8.subtract(meterVal7)
-                    else MeterEntity.DEF_ELECTRO_MAX_VAL.subtract(meterVal7).add(meterVal8)
-                )
-            )
-            println(
-                "Meter value 9 [%02d.%02d.%d]: %.2f [diff = %.2f]".format(
-                    meterValue9Date.dayOfMonth, meterValue9Date.monthValue, meterValue9Date.year,
-                    meterVal9,
-                    if (meterVal9 > meterVal8) meterVal9.subtract(meterVal8)
-                    else MeterEntity.DEF_ELECTRO_MAX_VAL.subtract(meterVal8).add(meterVal9)
-                )
-            )
             val payer = PayerEntity.payerWithTwoPersons(ctx)
             val payerId = PayerDaoTest.insertPayer(db, payer)
 
-            val expectedServiceDebt = rate11.multiply(BigDecimal.valueOf(expectedRate1Months))
-                .add(rate22.multiply(BigDecimal.valueOf(expectedRate2Months)))
             // Service:
             val electricity = ServiceEntity.electricity2Service()
             val electricityIds = ServiceDaoTest.insertService(ctx, db, electricity)
@@ -514,12 +408,6 @@ class RateDaoTest : HomeDatabaseTest() {
                 MeterValueEntity.defaultMeterValue(
                     meterId = meterIds.meterId, valueDate = meterValue3Date, meterValue = meterVal3
                 ),
-/*                MeterValueEntity.defaultMeterValue(
-                    meterId = meterIds.meterId, valueDate = meterValue4Date, meterValue = meterVal4
-                ),
-                MeterValueEntity.defaultMeterValue(
-                    meterId = meterIds.meterId, valueDate = meterValue5Date, meterValue = meterVal5
-                ),*/
                 MeterValueEntity.defaultMeterValue(
                     meterId = meterIds.meterId, valueDate = meterValue6Date, meterValue = meterVal6
                 ),
@@ -539,14 +427,69 @@ class RateDaoTest : HomeDatabaseTest() {
             )
             MeterDaoTest.insertMeterValues(db, electricityMeter, meterValues = meterValues)
 
+            // LOGGING
+            logRate(electricity, rate1StartDate, rate11, rate12, rate13)
+            logRate(electricity, rate2StartDate, rate21, rate22, rate23)
+            var prevValue: MeterValueEntity? = null
+            meterValues.forEach {
+                MeterDaoTest.logMeterValue(it, prevValue, MeterEntity.DEF_ELECTRO_MAX_VAL)
+                if (prevValue == null || prevValue != it) prevValue = it
+            }
+            // EXPECTED:
+            val missedMonths =
+                BigDecimal.valueOf(ChronoUnit.MONTHS.between(meterValue3Date, meterValue6Date) + 1)
+            val diff21 = meterVal2.subtract(meterVal1)
+            val diff32 = MeterEntity.DEF_ELECTRO_MAX_VAL.subtract(meterVal2).add(meterVal3)
+            val diff63 = meterVal6.subtract(meterVal3).divide(missedMonths)
+            val diff76 = meterVal7.subtract(meterVal6)
+            val diff87 = meterVal8.subtract(meterVal7)
+            val diff98 = meterVal9.subtract(meterVal8)
+            val expectedServiceDebt = diff21.multiply(rate11)
+                .add(
+                    RateEntity.DEF_ELECTRO_RANGE2.multiply(rate11)
+                        .add(diff32.subtract(RateEntity.DEF_ELECTRO_RANGE2).multiply(rate12))
+                )
+                .add(
+                    RateEntity.DEF_ELECTRO_RANGE2.multiply(rate11)
+                        .add(diff63.subtract(RateEntity.DEF_ELECTRO_RANGE2).multiply(rate12))
+                )
+                .add(
+                    missedMonths.subtract(BigDecimal.ONE).multiply(
+                        RateEntity.DEF_ELECTRO_RANGE2.multiply(rate21)
+                            .add(diff63.subtract(RateEntity.DEF_ELECTRO_RANGE2).multiply(rate22))
+                    )
+                )
+                .add(
+                    RateEntity.DEF_ELECTRO_RANGE2.multiply(rate21)
+                        .add(diff76.subtract(RateEntity.DEF_ELECTRO_RANGE2).multiply(rate22))
+                )
+                .add(
+                    RateEntity.DEF_ELECTRO_RANGE2.multiply(rate21)
+                        .add(
+                            RateEntity.DEF_ELECTRO_RANGE3.subtract(RateEntity.DEF_ELECTRO_RANGE2)
+                                .multiply(rate22)
+                        )
+                        .add(diff87.subtract(RateEntity.DEF_ELECTRO_RANGE3).multiply(rate23))
+                )
+                .add(
+                    RateEntity.DEF_ELECTRO_RANGE2.multiply(rate21)
+                        .add(
+                            RateEntity.DEF_ELECTRO_RANGE3.subtract(RateEntity.DEF_ELECTRO_RANGE2)
+                                .multiply(rate22)
+                        )
+                        .add(diff98.subtract(RateEntity.DEF_ELECTRO_RANGE3).multiply(rate23))
+                )
+
             // ACT
             // Service rates:
-            insertRate(db, electricity, startDate = rate1StartDate, rateValue = rate11)
-            insertRate(db, electricity, startDate = rate1StartDate, rateValue = rate12)
-            insertRate(db, electricity, startDate = rate1StartDate, rateValue = rate13)
-            insertRate(db, electricity, startDate = rate2StartDate, rateValue = rate21)
-            insertRate(db, electricity, startDate = rate2StartDate, rateValue = rate22)
-            insertRate(db, electricity, startDate = rate2StartDate, rateValue = rate23)
+            insertRate(
+                db, electricity, startDate = rate1StartDate,
+                rateValue = rate11, rateValue2 = rate12, rateValue3 = rate13
+            )
+            insertRate(
+                db, electricity, startDate = rate2StartDate,
+                rateValue = rate21, rateValue2 = rate22, rateValue3 = rate23
+            )
 
             // ASSERT findServiceDebtsByPayerId
             rateDao.findSubtotalDebtsByPayerId(payerId).test(timeout = 5000.milliseconds) {
@@ -562,15 +505,10 @@ class RateDaoTest : HomeDatabaseTest() {
                         )
                     )
                 }
-
                 assertThat(subtotals).hasSize(1)
-                assertThat(subtotals[0].fullMonths).isEqualTo(
-                    expectedRate1Months + expectedRate2Months
-                )
                 assertThat(subtotals[0].serviceDebt).isEquivalentAccordingToCompareTo(
                     expectedServiceDebt
                 )
-                assertThat(subtotals[0].serviceDebt.compareTo(expectedServiceDebt) == 0).isTrue()
                 cancel()
             }
         }
@@ -909,6 +847,29 @@ class RateDaoTest : HomeDatabaseTest() {
             if (rates.isNotEmpty()) db.rateDao().insert(rates)
             db.rateDao().insert(rate)
             return rate.rateId
+        }
+
+        fun logRate(
+            service: ServiceEntity, rateStartDate: OffsetDateTime, rateValue: BigDecimal,
+            rateValue2: BigDecimal = BigDecimal.ZERO, rateValue3: BigDecimal = BigDecimal.ZERO
+        ) {
+            val str = StringBuffer()
+            str.append("Rate from ")
+                .append(rateStartDate.format(DateTimeFormatter.ofPattern(Constants.APP_DAY_DATE_TIME)))
+                .append(": ")
+                .append(rateValue)
+            when (service.serviceType) {
+                ServiceType.ELECTRICITY -> {
+                    str.append(RateEntity.DEF_ELECTRO_RANGE1).append(" - ")
+                        .append(RateEntity.DEF_ELECTRO_RANGE2).append(" = ").append(rateValue)
+                        .append("; ").append(RateEntity.DEF_ELECTRO_RANGE2)
+                        .append(" - ").append(RateEntity.DEF_ELECTRO_RANGE3).append(" = ")
+                        .append(rateValue2).append("; ")
+                        .append(RateEntity.DEF_ELECTRO_RANGE3).append(" - ... = ").append(rateValue3)
+                }
+                else -> {}
+            }
+            println(str.toString())
         }
     }
 }

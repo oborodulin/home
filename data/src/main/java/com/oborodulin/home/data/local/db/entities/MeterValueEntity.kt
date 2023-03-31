@@ -4,8 +4,10 @@ import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.PrimaryKey
+import com.oborodulin.home.common.util.Constants
 import java.math.BigDecimal
 import java.time.OffsetDateTime
+import java.time.format.DateTimeFormatter
 import java.util.*
 
 @Entity(
@@ -215,5 +217,14 @@ data class MeterValueEntity(
 
     override fun hashCode(): Int {
         return meterValueId.hashCode()
+    }
+
+    override fun toString(): String {
+        val str = StringBuffer()
+        str.append("Meter value at %s")
+            .append(valueDate.format(DateTimeFormatter.ofPattern(Constants.APP_OFFSET_DATE_TIME)))
+            .append(": ").append(meterValue).append(" for  metersId = ").append(metersId)
+            .append(" meterValueId = ").append(meterValueId)
+        return str.toString()
     }
 }
