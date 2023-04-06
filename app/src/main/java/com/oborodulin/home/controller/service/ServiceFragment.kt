@@ -49,7 +49,7 @@ class ServiceFragment : Fragment() {
         }
 
    */
-        val serviceId: UUID = arguments?.getSerializable(ARG_SERVICE_ID) as UUID
+        val serviceId: UUID = arguments?.getSerializable(ARG_SERVICE_ID) AS UUID
         Log.d(TAG, "args bundle service ID: $serviceId")
        // vmService.loadService(serviceId)
         validator = Validator(requireContext())

@@ -45,8 +45,8 @@ class PayerListFragment : Fragment(), ListFragment<PayerEntity> {
 
         override fun bind(entity: T) {
             payer = entity
-            tvFullName.text = (payer as Payer).fullName
-            tvAddress.text = (payer as Payer).address
+            tvFullName.text = (payer AS Payer).fullName
+            tvAddress.text = (payer AS Payer).address
         }
 
         override fun onClick(v: View) {
@@ -70,7 +70,7 @@ class PayerListFragment : Fragment(), ListFragment<PayerEntity> {
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
-        callbacks = context as Callbacks?
+        callbacks = context AS Callbacks?
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -90,7 +90,7 @@ class PayerListFragment : Fragment(), ListFragment<PayerEntity> {
         fabPayerList.setOnClickListener { newPayer() }
 
         /*
-        newPayerButton = view.findViewById(R.id.new_payer_button) as Button
+        newPayerButton = view.findViewById(R.id.new_payer_button) AS Button
         newPayerButton.setOnClickListener(View.OnClickListener {
             newPayer()
         })

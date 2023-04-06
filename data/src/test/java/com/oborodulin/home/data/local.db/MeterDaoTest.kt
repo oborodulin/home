@@ -92,7 +92,7 @@ class MeterDaoTest : HomeDatabaseTest() {
 
     @OptIn(ExperimentalCoroutinesApi::class)
     @Test
-    fun insertMetersAndFindByPayerId_shouldReturn_theMeter_inFlow() = runTest {
+    fun insertMetersAndFindByPayerId_shouldReturn_theMeters_inFlow() = runTest {
         // ARRANGE
         val actualPayerId = PayerDaoTest.insertPayer(db, PayerEntity.payerWithTwoPersons(ctx))
         // ACT
@@ -104,6 +104,94 @@ class MeterDaoTest : HomeDatabaseTest() {
             cancel()
         }
     }
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    @Test
+    fun insertMeterInitValueWithMeterValuesAndFindMeterValuePaymentByPayerId_return_correctMeterValuePayments_inFlow() =
+        runTest {
+            // ARRANGE
+            // Payer:
+            val actualPayerId = PayerDaoTest.insertPayer(db, PayerEntity.payerWithTwoPersons(ctx))
+            // Services:
+            val electricityIds =
+                ServiceDaoTest.insertService(ctx, db, ServiceEntity.electricity2Service())
+            val coldWaterIds =
+                ServiceDaoTest.insertService(ctx, db, ServiceEntity.coldWater4Service())
+            // Payer services:
+            PayerDaoTest.insertPayerService(
+                db, actualPayerId, electricityIds.serviceId, isMeterOwner = true
+            )
+            PayerDaoTest.insertPayerService(
+                db, actualPayerId, coldWaterIds.serviceId, isMeterOwner = true
+            )
+            // Meters:
+            val electricityMeter = MeterEntity.electricityMeter(ctx, actualPayerId)
+            insertMeter(ctx, db, electricityMeter)
+            val coldWaterMeter = MeterEntity.coldWaterMeter(
+                ctx, actualPayerId, currentDateTime, MeterEntity.DEF_COLD_WATER_INIT_VAL
+            )
+            insertMeter(ctx, db, coldWaterMeter)
+
+            // ACT
+            insertMeterValues(db, electricityMeter, currentDateTime)
+            val coldWaterMeterValue = insertMeterValues(db, coldWaterMeter, currentDateTime)
+            // Expected:
+            // https://stackoverflow.com/questions/50890562/java-8-chronounit-months-betweenfromdate-todate-not-working-as-expected
+            val coldWaterDiffMonths = ChronoUnit.MONTHS.between(
+                coldWaterMeter.passportDate,
+                coldWaterMeterValue[0].valueDate
+            ) + 1 // Half-Open
+
+            // ASSERT
+            meterDao.findDistinctMeterValuePaymentByPayerId(actualPayerId).test {
+                val meterValuePayments = awaitItem()
+                meterValuePayments.forEach {
+                    println("meterValuePayments: %s".format(it))
+                }
+                assertThat(meterValuePayments).hasSize(8)
+                // Electricity Meter:
+                assertThat(meterValuePayments[0].meterId).isEqualTo(electricityMeter.meterId)
+                assertThat(meterValuePayments[0].meterValueId).isNotNull()
+                assertThat(meterValuePayments[0].startMeterValue).isEqualTo(MeterValueEntity.DEF_ELECTRO_VAL1)
+                assertThat(meterValuePayments[0].endMeterValue).isEqualTo(MeterValueEntity.DEF_ELECTRO_VAL2)
+                assertThat(meterValuePayments[0].diffMeterValue).isEqualTo(
+                    MeterValueEntity.DEF_ELECTRO_VAL2.subtract(MeterValueEntity.DEF_ELECTRO_VAL1)
+                )
+                assertThat(meterValuePayments[0].diffMonths).isEqualTo(1)
+                assertThat(meterValuePayments[1].startMeterValue).isEqualTo(MeterValueEntity.DEF_ELECTRO_VAL2)
+                assertThat(meterValuePayments[1].endMeterValue).isEqualTo(MeterValueEntity.DEF_ELECTRO_VAL3)
+                assertThat(meterValuePayments[1].diffMonths).isEqualTo(1)
+                assertThat(meterValuePayments[2].startMeterValue).isEqualTo(MeterValueEntity.DEF_ELECTRO_VAL3)
+                assertThat(meterValuePayments[2].endMeterValue).isEqualTo(MeterValueEntity.DEF_ELECTRO_VAL4)
+                assertThat(meterValuePayments[2].diffMonths).isEqualTo(1)
+                assertThat(meterValuePayments[3].startMeterValue).isEqualTo(MeterValueEntity.DEF_ELECTRO_VAL4)
+                assertThat(meterValuePayments[3].endMeterValue).isNull()
+                assertThat(meterValuePayments[3].diffMonths).isEqualTo(0)
+                assertThat(meterValuePayments[3].meterValueId).isNull()
+                // Cold Water Meter:
+                assertThat(meterValuePayments[4].meterId).isEqualTo(coldWaterMeter.meterId)
+                assertThat(meterValuePayments[4].meterValueId).isNotNull()
+                assertThat(meterValuePayments[4].startMeterValue).isEqualTo(MeterEntity.DEF_COLD_WATER_INIT_VAL)
+                assertThat(meterValuePayments[4].endMeterValue).isEqualTo(MeterValueEntity.DEF_COLD_WATER_VAL1)
+                assertThat(meterValuePayments[4].diffMeterValue).isEqualTo(
+                    MeterValueEntity.DEF_COLD_WATER_VAL1.subtract(MeterEntity.DEF_COLD_WATER_INIT_VAL)
+                        .divide(BigDecimal.valueOf(coldWaterDiffMonths))
+                )
+                assertThat(meterValuePayments[4].diffMonths).isEqualTo(coldWaterDiffMonths)
+                assertThat(meterValuePayments[5].startMeterValue).isEqualTo(MeterValueEntity.DEF_COLD_WATER_VAL1)
+                assertThat(meterValuePayments[5].endMeterValue).isEqualTo(MeterValueEntity.DEF_COLD_WATER_VAL2)
+                assertThat(meterValuePayments[5].diffMonths).isEqualTo(1)
+                assertThat(meterValuePayments[6].startMeterValue).isEqualTo(MeterValueEntity.DEF_COLD_WATER_VAL2)
+                assertThat(meterValuePayments[6].endMeterValue).isEqualTo(MeterValueEntity.DEF_COLD_WATER_VAL3)
+                assertThat(meterValuePayments[6].diffMonths).isEqualTo(1)
+                assertThat(meterValuePayments[7].startMeterValue).isEqualTo(MeterValueEntity.DEF_COLD_WATER_VAL3)
+                assertThat(meterValuePayments[7].endMeterValue).isNull()
+                assertThat(meterValuePayments[7].diffMonths).isEqualTo(-1)
+                assertThat(meterValuePayments[7].meterValueId).isNull()
+
+                cancel()
+            }
+        }
 
     @OptIn(ExperimentalCoroutinesApi::class)
     @Test
@@ -164,9 +252,7 @@ class MeterDaoTest : HomeDatabaseTest() {
             // ASSERT
             meterDao.findDistinctPrevMetersValuesByPayerId(actualPayerId).test {
                 val prevMeterValues = awaitItem()
-                /*prevMeterValues.forEach {
-                    println("prevMeterValue: %s".format(it.serviceType))
-                }*/
+                //prevMeterValues.forEach { println(it) }
                 assertThat(prevMeterValues).hasSize(5)
 
                 assertThat(prevMeterValues[0].serviceId).isEqualTo(electricityIds.serviceId)
@@ -239,6 +325,7 @@ class MeterDaoTest : HomeDatabaseTest() {
         ): MeterIds {
             val meterTl = MeterTlEntity.meterTl(ctx, meter.meterType, meter.meterId)
             db.meterDao().insert(meter, meterTl)
+            println(meter)
             return MeterIds(meterId = meter.meterId, meterTlId = meterTl.meterTlId)
         }
 
@@ -246,87 +333,93 @@ class MeterDaoTest : HomeDatabaseTest() {
             db: HomeDatabase, meter: MeterEntity = MeterEntity.defaultMeter(),
             currDate: OffsetDateTime = OffsetDateTime.now(),
             meterValues: List<MeterValueEntity> = emptyList()
-        ) {
+        ): List<MeterValueEntity> {
             if (meterValues.isNotEmpty()) {
                 meterValues.forEach { db.meterDao().insert(it) }
-            } else {
-                when (meter.meterType) {
-                    MeterType.ELECTRICITY ->
-                        db.meterDao().insert(
-                            MeterValueEntity.electricityMeterValue1(
-                                meterId = meter.meterId, currDate = currDate
-                            ),
-                            MeterValueEntity.electricityMeterValue2(
-                                meterId = meter.meterId, currDate = currDate
-                            ),
-                            MeterValueEntity.electricityMeterValue3(
-                                meterId = meter.meterId, currDate = currDate
-                            ),
-                            MeterValueEntity.electricityMeterValue4(
-                                meterId = meter.meterId, currDate = currDate
-                            )
-                        )
-                    MeterType.GAS ->
-                        db.meterDao().insert(
-                            MeterValueEntity.gasMeterValue1(
-                                meterId = meter.meterId, currDate = currDate
-                            ),
-                            MeterValueEntity.gasMeterValue2(
-                                meterId = meter.meterId, currDate = currDate
-                            ),
-                            MeterValueEntity.gasMeterValue3(
-                                meterId = meter.meterId, currDate = currDate
-                            )
-                        )
-                    MeterType.COLD_WATER ->
-                        db.meterDao().insert(
-                            MeterValueEntity.coldWaterMeterValue1(
-                                meterId = meter.meterId, currDate = currDate
-                            ),
-                            MeterValueEntity.coldWaterMeterValue2(
-                                meterId = meter.meterId, currDate = currDate
-                            ),
-                            MeterValueEntity.coldWaterMeterValue3(
-                                meterId = meter.meterId, currDate = currDate
-                            )
-                        )
-                    MeterType.HEATING ->
-                        db.meterDao().insert(
-                            MeterValueEntity.heatingMeterValue1(
-                                meterId = meter.meterId, currDate = currDate
-                            ),
-                            MeterValueEntity.heatingMeterValue2(
-                                meterId = meter.meterId, currDate = currDate
-                            ),
-                            MeterValueEntity.heatingMeterValue3(
-                                meterId = meter.meterId, currDate = currDate
-                            )
-                        )
-                    MeterType.HOT_WATER ->
-                        db.meterDao().insert(
-                            MeterValueEntity.hotWaterMeterValue1(
-                                meterId = meter.meterId, currDate = currDate
-                            ),
-                            MeterValueEntity.hotWaterMeterValue2(
-                                meterId = meter.meterId, currDate = currDate
-                            ),
-                            MeterValueEntity.hotWaterMeterValue3(
-                                meterId = meter.meterId, currDate = currDate
-                            )
-                        )
-                    MeterType.NONE -> {}
-                }
+                return meterValues
             }
+            var values: List<MeterValueEntity> = emptyList()
+            when (meter.meterType) {
+                MeterType.ELECTRICITY -> {
+                    values = listOf(
+                        MeterValueEntity.electricityMeterValue1(
+                            meterId = meter.meterId, currDate = currDate
+                        ),
+                        MeterValueEntity.electricityMeterValue2(
+                            meterId = meter.meterId, currDate = currDate
+                        ),
+                        MeterValueEntity.electricityMeterValue3(
+                            meterId = meter.meterId, currDate = currDate
+                        ),
+                        MeterValueEntity.electricityMeterValue4(
+                            meterId = meter.meterId, currDate = currDate
+                        ),
+                    )
+                    db.meterDao().insert(values[0], values[1], values[2], values[3])
+                }
+                MeterType.GAS -> {
+                    values = listOf(
+                        MeterValueEntity.gasMeterValue1(
+                            meterId = meter.meterId, currDate = currDate
+                        ), MeterValueEntity.gasMeterValue2(
+                            meterId = meter.meterId, currDate = currDate
+                        ), MeterValueEntity.gasMeterValue3(
+                            meterId = meter.meterId, currDate = currDate
+                        )
+                    )
+                    db.meterDao().insert(values[0], values[1], values[2])
+                }
+                MeterType.COLD_WATER -> {
+                    values = listOf(
+                        MeterValueEntity.coldWaterMeterValue1(
+                            meterId = meter.meterId, currDate = currDate
+                        ), MeterValueEntity.coldWaterMeterValue2(
+                            meterId = meter.meterId, currDate = currDate
+                        ), MeterValueEntity.coldWaterMeterValue3(
+                            meterId = meter.meterId, currDate = currDate
+                        )
+                    )
+                    db.meterDao().insert(values[0], values[1], values[2])
+                }
+                MeterType.HEATING -> {
+                    values = listOf(
+                        MeterValueEntity.heatingMeterValue1(
+                            meterId = meter.meterId, currDate = currDate
+                        ), MeterValueEntity.heatingMeterValue2(
+                            meterId = meter.meterId, currDate = currDate
+                        ),
+                        MeterValueEntity.heatingMeterValue3(
+                            meterId = meter.meterId, currDate = currDate
+                        )
+                    )
+                    db.meterDao().insert(values[0], values[1], values[2])
+                }
+                MeterType.HOT_WATER -> {
+                    values = listOf(
+                        MeterValueEntity.hotWaterMeterValue1(
+                            meterId = meter.meterId, currDate = currDate
+                        ), MeterValueEntity.hotWaterMeterValue2(
+                            meterId = meter.meterId, currDate = currDate
+                        ),
+                        MeterValueEntity.hotWaterMeterValue3(
+                            meterId = meter.meterId, currDate = currDate
+                        )
+                    )
+                    db.meterDao().insert(values[0], values[1], values[2])
+                }
+                MeterType.NONE -> {}
+            }
+            return values
         }
 
-        fun logMeterValue(
+        fun logMeterValueDiff(
             value: MeterValueEntity, prevValue: MeterValueEntity? = null,
             meterMaxValue: BigDecimal? = null
         ) {
             val str = StringBuffer()
-            str.append("Meter value [").append(value.valueDate.dayOfMonth).append(".")
-                .append(value.valueDate.monthValue).append(".").append(value.valueDate.year)
-                .append("]: ").append(value.meterValue)
+            str.append("Meter value at ").append(value.valueDate.year).append("-")
+                .append(value.valueDate.monthValue).append("-").append(value.valueDate.dayOfMonth)
+                .append(": ").append(value.meterValue)
             prevValue?.let {
                 str.append(" [diff = ").append(
                     if (value.meterValue!! > it.meterValue) value.meterValue!!.subtract(it.meterValue)

@@ -15,7 +15,7 @@ fun ShimmerAnimation(isRowShimmer: Boolean = true) {
     /*
      Create InfiniteTransition
      which holds child animation like [Transition]
-     animations start running as soon as they enter
+     animations start running AS soon AS they enter
      the composition and do not stop unless they are removed
     */
     val transition = rememberInfiniteTransition()

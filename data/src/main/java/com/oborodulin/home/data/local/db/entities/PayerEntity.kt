@@ -6,6 +6,7 @@ import androidx.room.Index
 import androidx.room.PrimaryKey
 import com.oborodulin.home.data.R
 import com.oborodulin.home.data.util.Constants
+import com.oborodulin.home.data.util.MeterType
 import java.math.BigDecimal
 import java.util.*
 
@@ -103,5 +104,20 @@ class PayerEntity(
 
     override fun hashCode(): Int {
         return payerId.hashCode()
+    }
+
+    override fun toString(): String {
+        val str = StringBuffer()
+        str.append("Payer ").append(ercCode).append(" '").append(fullName)
+            .append("' at address '").append(address).append("' for ").append(personsNum)
+            .append(" person:")
+        totalArea?.let { str.append(" totalArea: ").append(it).append(";") }
+        livingSpace?.let { str.append(" livingSpace: ").append(it).append(";") }
+        heatedVolume?.let { str.append(" heatedVolume: ").append(it) }
+        str.append(" [paymentDay = ").append(paymentDay)
+            .append("; isFavorite = ").append(isFavorite)
+            .append("; isAlignByPaymentDay = ").append(isAlignByPaymentDay)
+            .append("] payerId = ").append(payerId)
+        return str.toString()
     }
 }

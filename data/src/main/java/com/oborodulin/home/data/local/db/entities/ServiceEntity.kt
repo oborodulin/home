@@ -120,4 +120,14 @@ data class ServiceEntity(
     override fun hashCode(): Int {
         return serviceId.hashCode()
     }
+
+    override fun toString(): String {
+        val str = StringBuffer()
+        str.append("Service '").append(serviceType).append("' №").append(servicePos)
+        if (serviceMeterType != MeterType.NONE) {
+            str.append(" for Meter '").append(serviceMeterType).append("'")
+        }
+        str.append(" serviceId = ").append(serviceId)
+        return str.toString()
+    }
 }

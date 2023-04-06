@@ -4,7 +4,6 @@ import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.PrimaryKey
-import com.oborodulin.home.common.util.Constants
 import java.math.BigDecimal
 import java.time.OffsetDateTime
 import java.time.format.DateTimeFormatter
@@ -58,25 +57,34 @@ data class MeterValueEntity(
         val DEF_COLD_WATER_VAL1: BigDecimal = when (MeterEntity.DEF_COLD_WATER_INIT_VAL) {
             null -> BigDecimal("1523.125")
             else -> MeterEntity.DEF_COLD_WATER_INIT_VAL.add(BigDecimal("5.132"))
+                .remainder(MeterEntity.DEF_WATER_MAX_VAL)
         }
-        val DEF_COLD_WATER_VAL2: BigDecimal = DEF_COLD_WATER_VAL1.add(BigDecimal("4.154"))
-        val DEF_COLD_WATER_VAL3: BigDecimal = DEF_COLD_WATER_VAL2.add(BigDecimal("3.912"))
+        val DEF_COLD_WATER_VAL2: BigDecimal =
+            DEF_COLD_WATER_VAL1.add(BigDecimal("4.154")).remainder(MeterEntity.DEF_WATER_MAX_VAL)
+        val DEF_COLD_WATER_VAL3: BigDecimal =
+            DEF_COLD_WATER_VAL2.add(BigDecimal("3.912")).remainder(MeterEntity.DEF_WATER_MAX_VAL)
 
         // Hot water
         val DEF_HOT_WATER_VAL1: BigDecimal = when (MeterEntity.DEF_HOT_WATER_INIT_VAL) {
             null -> BigDecimal("2145.755")
             else -> MeterEntity.DEF_HOT_WATER_INIT_VAL.add(BigDecimal("3.132"))
+                .remainder(MeterEntity.DEF_WATER_MAX_VAL)
         }
-        val DEF_HOT_WATER_VAL2: BigDecimal = DEF_HOT_WATER_VAL1.add(BigDecimal("2.154"))
-        val DEF_HOT_WATER_VAL3: BigDecimal = DEF_HOT_WATER_VAL2.add(BigDecimal("1.912"))
+        val DEF_HOT_WATER_VAL2: BigDecimal =
+            DEF_HOT_WATER_VAL1.add(BigDecimal("2.154")).remainder(MeterEntity.DEF_WATER_MAX_VAL)
+        val DEF_HOT_WATER_VAL3: BigDecimal =
+            DEF_HOT_WATER_VAL2.add(BigDecimal("1.912")).remainder(MeterEntity.DEF_WATER_MAX_VAL)
 
         // Heating
         val DEF_HEATING_VAL1: BigDecimal = when (MeterEntity.DEF_HEATING_INIT_VAL) {
             null -> BigDecimal("0.02113")
             else -> MeterEntity.DEF_HEATING_INIT_VAL.add(BigDecimal("0.01325"))
+                .remainder(MeterEntity.DEF_HEATING_MAX_VAL)
         }
-        val DEF_HEATING_VAL2: BigDecimal = DEF_HEATING_VAL1.add(BigDecimal("0.00957"))
-        val DEF_HEATING_VAL3: BigDecimal = DEF_HEATING_VAL2.add(BigDecimal("0.02004"))
+        val DEF_HEATING_VAL2: BigDecimal =
+            DEF_HEATING_VAL1.add(BigDecimal("0.00957")).remainder(MeterEntity.DEF_HEATING_MAX_VAL)
+        val DEF_HEATING_VAL3: BigDecimal =
+            DEF_HEATING_VAL2.add(BigDecimal("0.02004")).remainder(MeterEntity.DEF_HEATING_MAX_VAL)
 
         fun defaultMeterValue(
             meterId: UUID, meterValueId: UUID = UUID.randomUUID(),
@@ -221,10 +229,10 @@ data class MeterValueEntity(
 
     override fun toString(): String {
         val str = StringBuffer()
-        str.append("Meter value at %s")
-            .append(valueDate.format(DateTimeFormatter.ofPattern(Constants.APP_OFFSET_DATE_TIME)))
-            .append(": ").append(meterValue).append(" for  metersId = ").append(metersId)
-            .append(" meterValueId = ").append(meterValueId)
+        str.append("Meter value at ")
+            .append(DateTimeFormatter.ISO_LOCAL_DATE.format(valueDate))
+            .append(": ").append(meterValue).append(" for  [metersId = ").append(metersId)
+            .append("] meterValueId = ").append(meterValueId)
         return str.toString()
     }
 }

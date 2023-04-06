@@ -2,6 +2,7 @@ package com.oborodulin.home.data.local.db
 
 import android.content.Context
 import androidx.test.core.app.ApplicationProvider
+import com.oborodulin.home.common.util.Utils
 import org.junit.After
 import org.junit.Before
 import java.io.IOException
@@ -13,6 +14,7 @@ open class HomeDatabaseTest {
     //getApplicationContext<App>()//: Context// = InstrumentationRegistry.getInstrumentation().targetContext
     protected lateinit var db: HomeDatabase
     protected val currentDateTime: OffsetDateTime = OffsetDateTime.now()
+    protected val fixCurrDateTime = Utils.toOffsetDateTime("2023-03-26T03:00:00.000+03:00")
 
     @Before
     open fun setUp() {

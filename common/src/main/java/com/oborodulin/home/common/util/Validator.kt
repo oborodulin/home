@@ -150,7 +150,7 @@ class Validator(private val context: Context) {
         }
 
         /**
-         * Checks if the password is valid as per the following password policy.
+         * Checks if the password is valid AS per the following password policy.
          * Password should be minimum minimum 8 characters long.
          * Password should contain at least one number.
          * Password should contain at least one capital letter.
@@ -160,7 +160,7 @@ class Validator(private val context: Context) {
          *
          * @param data - can be EditText or String
          * @param updateUI - if true and if data is EditText, the function sets error to the EditText or its TextInputLayout
-         * @return - true if the password is valid as per the password policy.
+         * @return - true if the password is valid AS per the password policy.
          */
         fun isValidPassword(data: Any, updateUI: Boolean = true): Boolean {
             val str = getText(data)
@@ -216,7 +216,7 @@ class Validator(private val context: Context) {
         /**
          * Sets error on EditText or TextInputLayout of the EditText.
          * @param data - Should be EditText
-         * @param error - Message to be shown as error, can be null if no error is to be set
+         * @param error - Message to be shown AS error, can be null if no error is to be set
          */
         private fun setError(data: Any, error: String?) {
             if (data is EditText) {

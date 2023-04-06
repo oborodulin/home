@@ -2,7 +2,6 @@ package com.oborodulin.home.data.local.db.entities
 
 import androidx.room.*
 import androidx.room.ForeignKey.CASCADE
-import com.oborodulin.home.common.util.Constants
 import java.math.BigDecimal
 import java.time.OffsetDateTime
 import java.time.format.DateTimeFormatter
@@ -327,8 +326,10 @@ class RateEntity(
 
     override fun toString(): String {
         val str = StringBuffer()
-        str.append("Rate from ")
-            .append(startDate.format(DateTimeFormatter.ofPattern(Constants.APP_DAY_DATE_TIME)))
+        if (payersServicesId != null) str.append("Payer Service")
+        else str.append("Service")
+        str.append(" Rate from ")
+            .append(DateTimeFormatter.ISO_LOCAL_DATE.format(startDate))
             .append(": ").append(rateValue)
         fromMeterValue?.let {
             str.append(" for ").append(it).append(" - ").append(toMeterValue ?: "...")

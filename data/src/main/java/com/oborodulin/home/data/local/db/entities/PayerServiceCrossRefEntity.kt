@@ -2,6 +2,7 @@ package com.oborodulin.home.data.local.db.entities
 
 import androidx.room.*
 import java.time.OffsetDateTime
+import java.time.format.DateTimeFormatter
 import java.util.*
 
 @Entity(
@@ -79,5 +80,18 @@ data class PayerServiceCrossRefEntity(
 
     override fun hashCode(): Int {
         return payerServiceId.hashCode()
+    }
+
+    override fun toString(): String {
+        val str = StringBuffer()
+        str.append("Payer Service")
+        fromYear?.let {
+            str.append(" from Date: ").append(it).append("-").append(fromMonth).append("-1")
+        }
+        str.append(" [isMeterOwner = ").append(isMeterOwner)
+            .append("; isPrivileges = ").append(isPrivileges)
+            .append("; isAllocateRate = ").append(isAllocateRate)
+            .append("] payerServiceId = ").append(payerServiceId)
+        return str.toString()
     }
 }

@@ -58,7 +58,7 @@ SELECT r.* FROM ${RateEntity.TABLE_NAME} r JOIN ${PayerServiceCrossRefEntity.TAB
     @Query(
         """
 SELECT * FROM ${PayerServiceDebtView.VIEW_NAME} WHERE payerId = :payerId AND serviceLocCode = :locale
-ORDER BY servicePos, fromPaymentDate, fromMeterValue            
+ORDER BY servicePos, fromPaymentDate, startMeterValue            
 """
     )
     fun findServiceDebtsByPayerId(

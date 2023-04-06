@@ -312,6 +312,7 @@ class PayerDaoTest : HomeDatabaseTest() {
             db: HomeDatabase, payer: PayerEntity = PayerEntity.defaultPayer()
         ): UUID {
             db.payerDao().insert(payer)
+            println(payer)
             return payer.payerId
         }
 
@@ -341,6 +342,7 @@ class PayerDaoTest : HomeDatabaseTest() {
                     isMeterOwner, isPrivileges, isAllocateRate
                 )
             db.payerDao().insert(payerService)
+            println(payerService)
             return payerService.payerServiceId
         }
     }

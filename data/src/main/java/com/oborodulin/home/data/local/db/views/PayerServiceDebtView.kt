@@ -1,9 +1,7 @@
 package com.oborodulin.home.data.local.db.views
 
 import androidx.room.DatabaseView
-import androidx.room.TypeConverters
 import com.oborodulin.home.common.util.Constants.CONV_COEFF_BIGDECIMAL
-import com.oborodulin.home.data.local.db.converters.DateTypeConverter
 import com.oborodulin.home.data.local.db.entities.AppSettingEntity
 import com.oborodulin.home.data.util.Constants
 import com.oborodulin.home.data.util.Constants.DB_FALSE
@@ -11,6 +9,7 @@ import com.oborodulin.home.data.util.Constants.DB_TRUE
 import com.oborodulin.home.data.util.ServiceType
 import java.math.BigDecimal
 import java.time.OffsetDateTime
+import java.time.format.DateTimeFormatter
 import java.util.*
 
 @DatabaseView(
@@ -18,8 +17,8 @@ import java.util.*
     value = """
 SELECT psd.payerId, psd.fromPaymentDate, psd.toPaymentDate, psd.fullMonths, 
     psd.serviceId, psd.payerServiceId, psd.servicePos, psd.serviceType, psd.serviceName, psd.serviceLocCode, 
-    psd.fromMeterValue, psd.toMeterValue, psd.diffMeterValue, psd.measureUnit, psd.isMeterUses, 
-    (ifnull(psd.fullMonths, 1) * psd.debt) AS serviceDebt,
+    psd.startMeterValue, psd.endMeterValue, psd.diffMeterValue, psd.measureUnit, psd.isMeterUses, 
+    (ifnull(psd.fullMonths, 1) * ifnull(psd.debt, 0)) AS serviceDebt,
     printf(${Constants.FMT_PAYMENT_PERIOD_EXPR}, psd.paymentMonth, psd.paymentYear) ||
     (CASE WHEN ifnull(psd.fullMonths, 1) > 1 THEN printf('%d %s x ', psd.fullMonths, psd.monthMu) ELSE '' END) ||
     (CASE WHEN psd.isPerPerson = $DB_TRUE
@@ -63,7 +62,7 @@ FROM (SELECT rps.payerId, rps.personsNum, rps.totalArea, rps.livingSpace,
         ifnull(rps.fromServiceYear, ifnull(mrv.paymentYear, CAST(strftime('%Y', strftime(${Constants.DB_FRACT_SEC_TIME}, 'now', 'localtime', 'start of month')) AS INTEGER))) AS paymentYear, 
         rps.isPerPerson, rps.servicePos, rps.serviceType, rps.serviceName, rps.fromServiceDate,
         rps.serviceLocCode, rps.rateValue, psl.startDate AS nextRateStartDate, 
-        rps.fromMeterValue, rps.toMeterValue, NULL AS rateMeterValue, NULL AS diffMeterValue, 
+        NULL AS startMeterValue, NULL AS endMeterValue, NULL AS rateMeterValue, NULL AS diffMeterValue, 
         rps.serviceMeasureUnit AS measureUnit, 0 AS isDerivedUnit, rps.serviceId, rps.payerServiceId,
         (CASE WHEN rps.isPerPerson = $DB_TRUE
             --! GAS, GARBAGE
@@ -156,8 +155,8 @@ class PayerServiceDebtView(
     val serviceType: ServiceType,
     val serviceName: String,
     val serviceLocCode: String,
-    val fromMeterValue: BigDecimal?,
-    val toMeterValue: BigDecimal?,
+    val startMeterValue: BigDecimal?,
+    val endMeterValue: BigDecimal?,
     val diffMeterValue: BigDecimal?,
     val measureUnit: String?,
     val isMeterUses: Boolean,
@@ -167,4 +166,22 @@ class PayerServiceDebtView(
     companion object {
         const val VIEW_NAME = "payer_service_debts_view"
     }
+
+    override fun toString(): String {
+        val str = StringBuffer()
+        str.append("Payer Service '").append(serviceName).append("' Debt from ")
+            .append(DateTimeFormatter.ISO_LOCAL_DATE.format(fromPaymentDate))
+            .append(" to ")
+            .append(DateTimeFormatter.ISO_LOCAL_DATE.format(toPaymentDate))
+            .append(" (").append(fullMonths).append(" months)")
+            .append(": ").append(serviceDebt)
+        startMeterValue?.let {
+            str.append(" for ").append(it).append(" - ").append(endMeterValue ?: "...")
+                .append(" [diffMeterValue = ").append(diffMeterValue).append("]")
+        }
+        str.append(" payerId = ").append(payerId).append("; payerServiceId = ")
+            .append(payerServiceId)
+        return str.toString()
+    }
+
 }

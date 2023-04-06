@@ -102,7 +102,7 @@ class AppState(
             this.navBarNavController.navigate(route) {
                 // Pop up to the start destination of the graph to
                 // avoid building up a large stack of destinations
-                // on the back stack as users select items
+                // on the back stack AS users select items
                 //Возвращаем выбранный экран,
                 //иначе если backstack не пустой то показываем ранее открытое состяние
                 navBarNavController.graph.startDestinationRoute?.let { route ->
@@ -115,7 +115,7 @@ class AppState(
                  * As per https://developer.android.com/jetpack/compose/navigation#bottom-nav
                  * By using the saveState and restoreState flags,
                  * the state and back stack of that item is correctly saved
-                 * and restored as you swap between bottom navigation items.
+                 * and restored AS you swap between bottom navigation items.
                  */
                 // Avoid multiple copies of the same destination when
                 // reselecting the same item

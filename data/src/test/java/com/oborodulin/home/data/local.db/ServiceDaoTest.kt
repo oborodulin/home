@@ -331,6 +331,7 @@ class ServiceDaoTest : HomeDatabaseTest() {
         ): ServiceIds {
             val serviceTl = ServiceTlEntity.serviceTl(ctx, service.serviceType, service.serviceId)
             db.serviceDao().insert(service, serviceTl)
+            println(service)
             return ServiceIds(serviceId = service.serviceId, serviceTlId = serviceTl.serviceTlId)
         }
     }

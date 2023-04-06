@@ -46,8 +46,8 @@ class ServiceListFragment : Fragment(), ListFragment<ServiceEntity> {
 
         override fun bind(entity: T) {
             service = entity
-          //  displayNameTextView.text = (service as ServiceEntity).name
-          //  serviceDescrTextView.text = (service as ServiceEntity).descr
+          //  displayNameTextView.text = (service AS ServiceEntity).name
+          //  serviceDescrTextView.text = (service AS ServiceEntity).descr
         }
 
         override fun onClick(v: View) {
@@ -70,7 +70,7 @@ class ServiceListFragment : Fragment(), ListFragment<ServiceEntity> {
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
-        callbacks = context as Callbacks?
+        callbacks = context AS Callbacks?
     }
 
     override fun onCreateView(
@@ -79,9 +79,9 @@ class ServiceListFragment : Fragment(), ListFragment<ServiceEntity> {
         savedInstanceState: Bundle?
     ): View? {
         val view = inflater.inflate(R.layout.fragment_service_list, container, false)
-        serviceRecyclerView = view.findViewById(R.id.rv_service) as RecyclerView
-        serviceListEmptyText = view.findViewById(R.id.tv_service_list_empty) as TextView
-        serviceListFab = view.findViewById(R.id.fab_service_list) as FloatingActionButton
+        serviceRecyclerView = view.findViewById(R.id.rv_service) AS RecyclerView
+        serviceListEmptyText = view.findViewById(R.id.tv_service_list_empty) AS TextView
+        serviceListFab = view.findViewById(R.id.fab_service_list) AS FloatingActionButton
         serviceListFab.setOnClickListener { newService() }
 
         serviceRecyclerView.layoutManager = LinearLayoutManager(context)

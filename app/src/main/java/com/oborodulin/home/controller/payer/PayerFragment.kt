@@ -37,7 +37,7 @@ class PayerFragment : Fragment() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         payer = Payer()
-        val payerId: UUID = arguments?.getSerializable(ARG_PAYER_ID) as UUID
+        val payerId: UUID = arguments?.getSerializable(ARG_PAYER_ID) AS UUID
         Log.d(LOGTAG, "args bundle payer ID: $payerId")
         //vmPayer.loadPayer(payerId)
         validator = Validator(requireContext())

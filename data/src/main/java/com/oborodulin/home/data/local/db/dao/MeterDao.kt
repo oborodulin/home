@@ -2,10 +2,7 @@ package com.oborodulin.home.data.local.db.dao
 
 import androidx.room.*
 import com.oborodulin.home.data.local.db.entities.*
-import com.oborodulin.home.data.local.db.views.MeterPayerServiceView
-import com.oborodulin.home.data.local.db.views.MeterValueMaxPrevDateView
-import com.oborodulin.home.data.local.db.views.MeterValuePrevPeriodView
-import com.oborodulin.home.data.local.db.views.MeterView
+import com.oborodulin.home.data.local.db.views.*
 import com.oborodulin.home.data.util.Constants
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
@@ -78,12 +75,24 @@ ORDER BY servicePos
     fun findDistinctValuesByMeterId(meterId: UUID) =
         findValuesByMeterId(meterId).distinctUntilChanged()
 
-    @Query("SELECT * FROM meter_verifications WHERE metersId = :meterId")
+    @Query("SELECT * FROM ${MeterVerificationEntity.TABLE_NAME} WHERE metersId = :meterId")
     fun findVerificationsByMeterId(meterId: UUID): Flow<List<MeterVerificationEntity>>
 
     @ExperimentalCoroutinesApi
     fun findDistinctVerificationsByMeterId(meterId: UUID) =
         findVerificationsByMeterId(meterId).distinctUntilChanged()
+
+    @Query(
+        """
+SELECT * FROM ${MeterValuePaymentView.VIEW_NAME} WHERE payerId = :payerId
+ORDER BY servicePos, meterId, strftime(${Constants.DB_FRACT_SEC_TIME}, startMeterValue)
+"""
+    )
+    fun findMeterValuePaymentByPayerId(payerId: UUID): Flow<List<MeterValuePaymentView>>
+
+    @ExperimentalCoroutinesApi
+    fun findDistinctMeterValuePaymentByPayerId(payerId: UUID) =
+        findMeterValuePaymentByPayerId(payerId).distinctUntilChanged()
 
     // INSERTS:
     @Insert(onConflict = OnConflictStrategy.REPLACE)

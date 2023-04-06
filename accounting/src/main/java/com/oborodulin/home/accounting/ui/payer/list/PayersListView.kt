@@ -135,16 +135,16 @@ fun PayersList(
 /*
         list.apply {
             val error = when {
-                loadState.prepend is LoadState.Error -> loadState.prepend as LoadState.Error
-                loadState.append is LoadState.Error -> loadState.append as LoadState.Error
-                loadState.refresh is LoadState.Error -> loadState.refresh as LoadState.Error
+                loadState.prepend is LoadState.Error -> loadState.prepend AS LoadState.Error
+                loadState.append is LoadState.Error -> loadState.append AS LoadState.Error
+                loadState.refresh is LoadState.Error -> loadState.refresh AS LoadState.Error
                 else -> null
             }
 
             val loading = when {
-                loadState.prepend is LoadState.Loading -> loadState.prepend as LoadState.Loading
-                loadState.append is LoadState.Loading -> loadState.append as LoadState.Loading
-                loadState.refresh is LoadState.Loading -> loadState.refresh as LoadState.Loading
+                loadState.prepend is LoadState.Loading -> loadState.prepend AS LoadState.Loading
+                loadState.append is LoadState.Loading -> loadState.append AS LoadState.Loading
+                loadState.refresh is LoadState.Loading -> loadState.refresh AS LoadState.Loading
                 else -> null
             }
 

@@ -16,7 +16,7 @@ import java.util.*
     value = """
 SELECT pms.payerId, pms.fromPaymentDate, pms.toPaymentDate, pms.fullMonths, 
     pms.serviceId, pms.payerServiceId, pms.servicePos, pms.serviceType, pms.serviceName, pms.serviceLocCode,  
-    pms.fromMeterValue, pms.toMeterValue, pms.diffMeterValue, pms.measureUnit, pms.isMeterUses, 
+    pms.startMeterValue, pms.endMeterValue, pms.diffMeterValue, pms.measureUnit, pms.isMeterUses, 
     pms.debt AS serviceDebt, 
     printf(${Constants.FMT_PAYMENT_PERIOD_EXPR}, pms.paymentMonth, pms.paymentYear) ||
     (CASE WHEN pms.isDerivedUnit = $DB_FALSE
@@ -34,23 +34,23 @@ SELECT pms.payerId, pms.fromPaymentDate, pms.toPaymentDate, pms.fullMonths,
                     ELSE printf(${Constants.FMT_DEBT_EXPR}, pms.debt / ${CONV_COEFF_BIGDECIMAL}.0, pms.currencyCode)
                 END
     END) serviceDebtExpr
-FROM (SELECT psd.payerId, psd.metersId, psd.fromPaymentDate, psd.toPaymentDate, psd.fullMonths, 
+FROM (SELECT psd.payerId, psd.meterId, psd.fromPaymentDate, psd.toPaymentDate, psd.fullMonths, 
         psd.paymentMonth, psd.paymentYear, psd.livingSpace,
         psd.serviceId, psd.payerServiceId, psd.servicePos, psd.serviceType, psd.serviceName, psd.serviceLocCode, 
-        psd.fromMeterValue, psd.toMeterValue, psd.diffMeterValue, psd.measureUnit, psd.isDerivedUnit, psd.isMeterUses,        
+        psd.startMeterValue, psd.endMeterValue, psd.diffMeterValue, psd.measureUnit, psd.isDerivedUnit, psd.isMeterUses,        
         psd.currRateMonths, psd.currRateStartDate, psd.rateValue, 
         psd.prevRateMonths, psd.prevRateStartDate, psd.prevRateValue,
         psd.rateMeterValue,
-        (CASE WHEN psd.prevRateMonths > 0 
-            THEN (psd.prevRateMonths - 1) * psd.rateMeterValue / ${CONV_COEFF_BIGDECIMAL}.0 * psd.prevRateValue + 
-                 (psd.currRateMonths + 1) * psd.rateMeterValue / ${CONV_COEFF_BIGDECIMAL}.0 * psd.rateValue
-            ELSE psd.debt 
-        END) AS debt,
+        ifnull(CASE WHEN psd.prevRateMonths > 0 
+                    THEN (psd.prevRateMonths - 1) * psd.rateMeterValue / ${CONV_COEFF_BIGDECIMAL}.0 * psd.prevRateValue + 
+                    (psd.currRateMonths + 1) * psd.rateMeterValue / ${CONV_COEFF_BIGDECIMAL}.0 * psd.rateValue
+                    ELSE psd.debt 
+                END, 0) AS debt,
         psd.currencyCode, psd.livingSpaceMu
-    FROM (SELECT mvp.payerId, mvp.metersId, crp.livingSpace, mvp.fromPaymentDate, mvp.toPaymentDate, mvp.paymentMonth, mvp.paymentYear,
+    FROM (SELECT mvp.payerId, mvp.meterId, crp.livingSpace, mvp.fromPaymentDate, mvp.toPaymentDate, mvp.paymentMonth, mvp.paymentYear,
             crp.serviceId, crp.payerServiceId, crp.servicePos, crp.serviceType, crp.serviceName, crp.serviceLocCode, 
             crp.startDate AS currRateStartDate, crp.rateValue, NULL AS nextRateStartDate,
-            crp.fromMeterValue, crp.toMeterValue, 
+            mvp.startMeterValue, mvp.endMeterValue, 
             (CASE WHEN mvp.diffMeterValue <= ifnull(crp.toMeterValue, mvp.diffMeterValue)
                     THEN mvp.diffMeterValue - ifnull(crp.fromMeterValue, 0)
                 ELSE ifnull(crp.toMeterValue, 0) - ifnull(crp.fromMeterValue, 0)
@@ -129,8 +129,8 @@ class PayerMeterServiceDebtView(
     val serviceType: ServiceType,
     val serviceName: String,
     val serviceLocCode: String,
-    val fromMeterValue: BigDecimal?,
-    val toMeterValue: BigDecimal?,
+    val startMeterValue: BigDecimal?,
+    val endMeterValue: BigDecimal?,
     val diffMeterValue: BigDecimal?,
     val measureUnit: String?,
     val isMeterUses: Boolean,

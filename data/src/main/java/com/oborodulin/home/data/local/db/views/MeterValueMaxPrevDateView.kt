@@ -14,9 +14,11 @@ import java.util.*
 SELECT mv.meterId, MAX(mv.valueDate) AS maxValueDate 
 FROM (SELECT m.meterId, m.payersId, 
             ifnull(strftime(${Constants.DB_FRACT_SEC_TIME}, v.valueDate), 
-                    ifnull(strftime(${Constants.DB_FRACT_SEC_TIME}, m.passportDate), 
-                            strftime(${Constants.DB_FRACT_SEC_TIME}, 'now', 'localtime', 'start of month', '-1 days'))) AS valueDate 
-        FROM ${MeterEntity.TABLE_NAME} m LEFT JOIN ${MeterValueEntity.TABLE_NAME} v ON v.metersId = m.meterId) mv 
+                   strftime(${Constants.DB_FRACT_SEC_TIME}, 'now', 'localtime', 'start of month', '-1 days')) AS valueDate 
+        FROM ${MeterEntity.TABLE_NAME} m JOIN ${MeterValueEntity.TABLE_NAME} v ON v.metersId = m.meterId
+        UNION ALL
+        SELECT m.meterId, m.payersId, strftime(${Constants.DB_FRACT_SEC_TIME}, m.passportDate) AS valueDate FROM ${MeterView.VIEW_NAME} m
+        WHERE m.passportDate IS NOT NULL AND m.initValue IS NOT NULL) mv 
     JOIN ${PayerEntity.TABLE_NAME} p ON p.payerId = mv.payersId
  WHERE mv.valueDate <= 
     CASE WHEN p.isAlignByPaymentDay = 0 
