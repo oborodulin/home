@@ -66,14 +66,17 @@ class PayerEntity(
                 personsNum = Constants.DEF_TWO_PERSON_NUM
             )
 
-        fun favoritePayer(ctx: Context, payerId: UUID = UUID.randomUUID()) =
+        fun favoritePayer(
+            ctx: Context, payerId: UUID = UUID.randomUUID(),
+            livingSpace: BigDecimal? = BigDecimal("48.7")
+        ) =
             defaultPayer(
                 payerId = payerId,
                 ercCode = ctx.resources.getString(R.string.def_payer2_erc_code),
                 fullName = ctx.resources.getString(R.string.def_payer2_full_name),
                 address = ctx.resources.getString(R.string.def_payer2_address),
                 totalArea = BigDecimal("52.5"),
-                livingSpace = BigDecimal("48.7"),
+                livingSpace = livingSpace,
                 heatedVolume = BigDecimal("121.75"),
                 personsNum = Constants.DEF_PERSON_NUM,
                 isFavorite = true

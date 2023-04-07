@@ -15,7 +15,14 @@ import java.util.*
 @DatabaseView(
     viewName = PayerServiceDebtView.VIEW_NAME,
     value = """
-SELECT psd.payerId, psd.fromPaymentDate, psd.toPaymentDate, psd.fullMonths, 
+SELECT psd.payerId, 
+    strftime(${Constants.DB_FRACT_SEC_TIME}, datetime(psd.fromPaymentDate, 'localtime')) || 
+        printf('%+.2d:%.2d', round((julianday(psd.fromPaymentDate, 'localtime') - julianday(psd.fromPaymentDate)) * 24), 
+            abs(round((julianday(psd.fromPaymentDate, 'localtime') - julianday(psd.fromPaymentDate)) * 24 * 60) % 60)) AS fromPaymentDate,
+    strftime(${Constants.DB_FRACT_SEC_TIME}, datetime(psd.toPaymentDate, 'localtime')) || 
+        printf('%+.2d:%.2d', round((julianday(psd.toPaymentDate, 'localtime') - julianday(psd.toPaymentDate)) * 24), 
+            abs(round((julianday(psd.toPaymentDate, 'localtime') - julianday(psd.toPaymentDate)) * 24 * 60) % 60)) AS toPaymentDate, 
+    psd.fullMonths, 
     psd.serviceId, psd.payerServiceId, psd.servicePos, psd.serviceType, psd.serviceName, psd.serviceLocCode, 
     psd.startMeterValue, psd.endMeterValue, psd.diffMeterValue, psd.measureUnit, psd.isMeterUses, 
     (ifnull(psd.fullMonths, 1) * ifnull(psd.debt, 0)) AS serviceDebt,
@@ -55,7 +62,7 @@ FROM (SELECT rps.payerId, rps.personsNum, rps.totalArea, rps.livingSpace,
             ELSE ifnull(mrv.fromPaymentDate, strftime(${Constants.DB_FRACT_SEC_TIME}, 'now', 'localtime', 'start of month'))
         END) AS fromPaymentDate, 
         (CASE WHEN rps.isMeterUses = $DB_FALSE AND rps.fromServiceDate IS NOT NULL 
-            THEN ifnull(psl.startDate, datetime('now', 'localtime'))
+            THEN ifnull(psl.startDate, strftime(${Constants.DB_FRACT_SEC_TIME}, 'now', 'localtime'))
             ELSE ifnull(mrv.toPaymentDate, strftime(${Constants.DB_FRACT_SEC_TIME}, 'now', 'localtime', 'start of month'))
         END) AS toPaymentDate, 
         ifnull(rps.fromServiceMonth, ifnull(mrv.paymentMonth, CAST(strftime('%m', strftime(${Constants.DB_FRACT_SEC_TIME}, 'now', 'localtime', 'start of month')) AS INTEGER))) AS paymentMonth, 
