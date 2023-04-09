@@ -26,6 +26,8 @@ data class PayerServiceCrossRefEntity(
     @PrimaryKey val payerServiceId: UUID = UUID.randomUUID(),
     val fromMonth: Int? = null, // if null then from meters data values
     val fromYear: Int? = null,
+    val periodFromDate: OffsetDateTime? = null, // period in year for heating
+    val periodToDate: OffsetDateTime? = null,
     val isMeterOwner: Boolean = false,
     val isPrivileges: Boolean = false,
     val isAllocateRate: Boolean = false,
@@ -86,7 +88,13 @@ data class PayerServiceCrossRefEntity(
         val str = StringBuffer()
         str.append("Payer Service")
         fromYear?.let {
-            str.append(" from Date: ").append(it).append("-").append(fromMonth).append("-1")
+            str.append(" from Date: ").append(it).append("-").append(fromMonth).append("-01")
+        }
+        periodFromDate?.let {
+            str.append(" for period ").append(DateTimeFormatter.ISO_LOCAL_DATE.format(it))
+                .append(" - ").append(
+                    if (periodToDate != null) DateTimeFormatter.ISO_LOCAL_DATE.format(periodToDate) else "..."
+                )
         }
         str.append(" [isMeterOwner = ").append(isMeterOwner)
             .append("; isPrivileges = ").append(isPrivileges)

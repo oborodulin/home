@@ -25,7 +25,7 @@ FROM (SELECT cmv.payerId, cmv.payerServiceId, cmv.meterId, nmv.meterValueId,
                     THEN nmv.meterValue - cmv.meterValue
                     ELSE (cmv.maxValue - cmv.meterValue) + nmv.meterValue
                 END 
-            ELSE nmv.meterValue 
+            ELSE nmv.meterValue
         END) AS diffMeterValue, 
         cmv.isDerivedUnit, cmv.derivedUnit, cmv.measureUnit, 
         cmv.paymentDate AS fromPaymentDate, nmv.paymentDate AS toPaymentDate, 

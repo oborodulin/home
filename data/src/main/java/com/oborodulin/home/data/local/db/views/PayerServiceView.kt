@@ -18,7 +18,7 @@ SELECT psv.*,
                 abs(round((julianday(psv.fromDate, 'localtime') - julianday(psv.fromDate)) * 24 * 60) % 60)) AS fromServiceDate 
 FROM (SELECT sv.*, ps.payerServiceId, ps.payersId, ps.fromMonth, ps.fromYear, 
         printf('%d-%02d-01T00:00:00.000', ps.fromYear, ps.fromMonth) AS fromDate,
-        ps.isMeterOwner, ps.isPrivileges, ps.isAllocateRate 
+        ps.periodFromDate, ps.periodToDate, ps.isMeterOwner, ps.isPrivileges, ps.isAllocateRate 
     FROM ${ServiceView.VIEW_NAME} sv JOIN ${PayerServiceCrossRefEntity.TABLE_NAME} ps ON ps.servicesId = sv.serviceId) psv
 ORDER BY psv.servicePos
 """
@@ -31,6 +31,8 @@ class PayerServiceView(
     val fromMonth: Int? = null,
     val fromYear: Int? = null,
     val fromDate: String? = null,
+    val periodFromDate: OffsetDateTime?,
+    val periodToDate: OffsetDateTime?,
     val isMeterOwner: Boolean,
     val isPrivileges: Boolean,
     val isAllocateRate: Boolean,

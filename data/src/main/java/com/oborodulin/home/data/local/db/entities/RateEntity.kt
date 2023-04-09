@@ -170,11 +170,12 @@ class RateEntity(
         )
 
         fun heatingRate(
-            serviceId: UUID, startDate: OffsetDateTime = OffsetDateTime.now(),
+            serviceId: UUID, payerServiceId: UUID? = null,
+            startDate: OffsetDateTime = OffsetDateTime.now(),
             isPerPerson: Boolean = false, isPrivileges: Boolean = false,
             rateValue: BigDecimal = BigDecimal.ZERO
         ) = defaultRate(
-            serviceId = serviceId, startDate = startDate,
+            serviceId = serviceId, payerServiceId = payerServiceId, startDate = startDate,
             isPerPerson = isPerPerson, isPrivileges = isPrivileges,
             rateValue = when (rateValue) {
                 BigDecimal.ZERO -> DEF_HEATING_RATE
@@ -335,6 +336,8 @@ class RateEntity(
             str.append(" for ").append(it).append(" - ").append(toMeterValue ?: "...")
         }
         str.append(" [per person:").append(isPerPerson).append("; privileges:").append(isPrivileges)
+            .append("; servicesId:").append(servicesId)
+            .append("; payersServicesId:").append(payersServicesId)
             .append("]").append(" rateId = ").append(rateId)
         return str.toString()
     }

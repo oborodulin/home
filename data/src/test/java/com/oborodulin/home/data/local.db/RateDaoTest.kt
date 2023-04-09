@@ -190,7 +190,7 @@ class RateDaoTest : HomeDatabaseTest() {
             // rates
             val rate1 = RateEntity.DEF_HEATING_RATE
             val rate2 = RateEntity.DEF_HEATING_RATE.add(BigDecimal.ONE)
-            val payerRate = RateEntity.DEF_HEATING_PAYER_RATE
+            val meterPayerRate = RateEntity.DEF_HEATING_PAYER_RATE
             // service from date
             val fromServiceDate = fixCurrDateTime.minusMonths(6)
             // rate start dates
@@ -209,16 +209,16 @@ class RateDaoTest : HomeDatabaseTest() {
             // meter values
             val meterVal1 = MeterValueEntity.DEF_HEATING_VAL1
             val meterVal2 = MeterValueEntity.DEF_HEATING_VAL2
-            val meterVal21 = MeterValueEntity.DEF_HEATING_VAL3.add(BigDecimal.TEN)
+            val meterVal21 = MeterValueEntity.DEF_HEATING_VAL3.add(BigDecimal.ONE)
             val meterVal3 = meterVal21.add(meterVal21.subtract(meterVal1))
                 .remainder(MeterEntity.DEF_HEATING_MAX_VAL)
-            val meterVal6 = meterVal3.add(BigDecimal.TEN).remainder(MeterEntity.DEF_HEATING_MAX_VAL)
-            val meterVal7 = meterVal6.add(BigDecimal.TEN).remainder(MeterEntity.DEF_HEATING_MAX_VAL)
+            val meterVal6 = meterVal3.add(BigDecimal.ONE).remainder(MeterEntity.DEF_HEATING_MAX_VAL)
+            val meterVal7 = meterVal6.add(BigDecimal.ONE).remainder(MeterEntity.DEF_HEATING_MAX_VAL)
             val meterVal71 =
-                meterVal7.add(BigDecimal.TEN).remainder(MeterEntity.DEF_HEATING_MAX_VAL)
+                meterVal7.add(BigDecimal.ONE).remainder(MeterEntity.DEF_HEATING_MAX_VAL)
             val meterVal8 =
-                meterVal71.add(BigDecimal.TEN).remainder(MeterEntity.DEF_HEATING_MAX_VAL)
-            val meterVal9 = meterVal8.add(BigDecimal.TEN).remainder(MeterEntity.DEF_HEATING_MAX_VAL)
+                meterVal71.add(BigDecimal.ONE).remainder(MeterEntity.DEF_HEATING_MAX_VAL)
+            val meterVal9 = meterVal8.add(BigDecimal.ONE).remainder(MeterEntity.DEF_HEATING_MAX_VAL)
             // Payers:
             val payer = PayerEntity.favoritePayer(ctx, livingSpace = null)
             val payerId = PayerDaoTest.insertPayer(db, payer)
@@ -276,7 +276,8 @@ class RateDaoTest : HomeDatabaseTest() {
 
             // EXPECTED:
             val expectedRate1Months = ChronoUnit.MONTHS.between(fromServiceDate, rate2StartDate)
-            val expectedRate2Months = ChronoUnit.MONTHS.between(rate2StartDate, fixCurrDateTime)
+            val expectedRate2Months =
+                ChronoUnit.MONTHS.between(rate2StartDate, currentDateTime) + 1 // O
             val expectedServiceDebt = rate1.multiply(BigDecimal.valueOf(expectedRate1Months))
                 .add(rate2.multiply(BigDecimal.valueOf(expectedRate2Months)))
                 .multiply(payer.livingSpace ?: BigDecimal.ONE)
@@ -287,15 +288,16 @@ class RateDaoTest : HomeDatabaseTest() {
             insertRate(db, heating, startDate = rate2StartDate, rateValue = rate2)
             // Payer Service rate:
             insertRate(
-                db, heating, meterPayerServiceId, startDate = rate1StartDate, rateValue = payerRate
+                db, heating, meterPayerServiceId,
+                startDate = rate1StartDate, rateValue = meterPayerRate
             )
             // LOGGING
             logRate(heating, rate1StartDate, rate1)
             logRate(heating, rate2StartDate, rate2)
-            logRate(heating, rate1StartDate, payerRate)
+            logRate(heating, rate1StartDate, meterPayerRate)
 
-            // 1. ASSERT findServiceDebtsByPayerId findSubtotalDebtsByPayerId
-            rateDao.findServiceDebtsByPayerId(payerId).test {
+            // 1. ASSERT findServiceDebtsByPayerId
+            rateDao.findSubtotalDebtsByPayerId(payerId).test {
                 val subtotals = awaitItem()
                 subtotals.forEach { println(it) }
                 assertThat(subtotals).hasSize(1)
@@ -319,24 +321,26 @@ class RateDaoTest : HomeDatabaseTest() {
                 BigDecimal.valueOf(ChronoUnit.MONTHS.between(meterValue3Date, meterValue6Date))
             println("Missed months: %.2f".format(missedMonths))
             val diff21 = meterVal2.subtract(meterVal1)
-            val diff32 = MeterEntity.DEF_HEATING_MAX_VAL.subtract(meterVal2).add(meterVal3)
+            val diff32 = meterVal3.subtract(meterVal2)
             val diff63 = meterVal6.subtract(meterVal3).divide(missedMonths)
             val diff76 = meterVal7.subtract(meterVal6)
             val diff87 = meterVal8.subtract(meterVal7)
             val diff98 = meterVal9.subtract(meterVal8)
+            val livingSpace: BigDecimal = meterPayer.livingSpace!!
             val serviceDebts = listOf(
-                diff21.multiply(rate1), diff32.multiply(rate1),
-                diff63.multiply(rate1),
-                missedMonths.subtract(BigDecimal.ONE).multiply(diff63.multiply(rate2)),
-                diff76.multiply(rate2), diff87.multiply(rate2),
-                diff98.multiply(rate2)
+                livingSpace.multiply(diff21.multiply(meterPayerRate)),
+                livingSpace.multiply(diff32.multiply(meterPayerRate)),
+                missedMonths.multiply(livingSpace.multiply(diff63.multiply(meterPayerRate))),
+                livingSpace.multiply(diff76.multiply(meterPayerRate)),
+                livingSpace.multiply(diff87.multiply(meterPayerRate)),
+                livingSpace.multiply(diff98.multiply(meterPayerRate))
             )
             val expectedMeterServiceDebt = serviceDebts.sumOf { it }
             serviceDebts.forEach { println(it) }
-            // 2. ASSERT
-            rateDao.findSubtotalDebtsByPayerId(meterPayerId).test {
+            // 2. ASSERT findSubtotalDebtsByPayerId
+            rateDao.findServiceDebtsByPayerId(meterPayerId).test {
                 val subtotals = awaitItem()
-                println(subtotals)
+                subtotals.forEach { println(it) }
                 assertThat(subtotals).hasSize(1)
                 assertThat(subtotals[0].serviceDebt).isEquivalentAccordingToCompareTo(
                     expectedMeterServiceDebt
@@ -1198,7 +1202,12 @@ class RateDaoTest : HomeDatabaseTest() {
                     )
                 ServiceType.HEATING ->
                     rate = RateEntity.heatingRate(
-                        service.serviceId, startDate, isPerPerson, isPrivileges, rateValue
+                        service.serviceId,
+                        payerServiceId,
+                        startDate,
+                        isPerPerson,
+                        isPrivileges,
+                        rateValue
                     )
                 ServiceType.HOT_WATER ->
                     rate = RateEntity.hotWaterRate(
@@ -1237,8 +1246,13 @@ class RateDaoTest : HomeDatabaseTest() {
                     }
                 ServiceType.USGO -> {}
             }
-            if (rates.isNotEmpty()) db.rateDao().insert(rates)
+            if (rates.isNotEmpty()) {
+                db.rateDao().insert(rates)
+                rates.forEach { println(it) }
+                //return rates[0].rateId
+            }
             db.rateDao().insert(rate)
+            println(rate)
             return rate.rateId
         }
 

@@ -63,7 +63,7 @@ FROM (SELECT psd.payerId, psd.meterId, psd.fromPaymentDate, psd.toPaymentDate, p
                     END) / ${CONV_COEFF_BIGDECIMAL}.0 * crp.rateValue
                 ELSE CASE crp.serviceType 
                         WHEN ${Constants.SRV_HEATING_VAL} 
-                            THEN ifnull(crp.livingSpace / ${CONV_COEFF_BIGDECIMAL}.0, 1) * mvp.diffMeterValue / ${CONV_COEFF_BIGDECIMAL}.0 * crp.rateValue
+                            THEN ifnull(crp.livingSpace / ${CONV_COEFF_BIGDECIMAL}.0, 1) * mvp.diffMeterValue / ${CONV_COEFF_BIGDECIMAL}.0 * crp.rateValue + 100000000
                         ELSE crp.rateValue
                     END
             END) AS debt,

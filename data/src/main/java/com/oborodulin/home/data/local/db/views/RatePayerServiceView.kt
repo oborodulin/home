@@ -21,18 +21,18 @@ SELECT rps.*, (CASE WHEN EXISTS (SELECT m.meterId
                     THEN 1 
                     ELSE 0 
                 END) isMeterUses
-FROM (
-    -- Services rates for payer services
+FROM (-- Services rates for payer services
     SELECT p.payerId, p.personsNum, p.totalArea, p.livingSpace, p.heatedVolume, psv.payerServiceId, psv.isAllocateRate, 
         psv.serviceId, psv.serviceName, psv.servicePos, psv.serviceType, psv.serviceLocCode, psv.serviceMeasureUnit, 
         psv.fromServiceDate,
         CAST(strftime('%m', psv.fromServiceDate) AS INTEGER) AS fromServiceMonth,
         CAST(strftime('%Y', psv.fromServiceDate) AS INTEGER) AS fromServiceYear,
         r.startDate, r.fromMeterValue, r.toMeterValue, r.rateValue, r.isPerPerson, r.isPrivileges
-    FROM ${PayerEntity.TABLE_NAME} p JOIN ${PayerServiceView.VIEW_NAME} psv ON psv.payersId = p.payerId 
-                                        AND NOT EXISTS(SELECT rateId FROM ${RateEntity.TABLE_NAME} WHERE payersServicesId = psv.payerServiceId)
-        JOIN (SELECT * FROM ${RateEntity.TABLE_NAME} WHERE payersServicesId IS NULL) r ON r.servicesId = psv.servicesId 
-                                                                    AND r.isPrivileges = psv.isPrivileges
+    FROM ${RateEntity.TABLE_NAME} r JOIN ${PayerServiceView.VIEW_NAME} psv ON psv.servicesId = r.servicesId  
+            AND psv.isPrivileges = r.isPrivileges
+            AND NOT EXISTS(SELECT rateId FROM ${RateEntity.TABLE_NAME} WHERE payersServicesId = psv.payerServiceId)
+        JOIN ${PayerEntity.TABLE_NAME} p ON p.payerId = psv.payersId 
+    WHERE r.payersServicesId IS NULL
     UNION ALL
     -- Payer services rates
     SELECT p.payerId, p.personsNum, p.totalArea, p.livingSpace, p.heatedVolume, psv.payerServiceId, psv.isAllocateRate, 
