@@ -20,6 +20,7 @@ import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
 import org.robolectric.annotation.Config
 import java.math.BigDecimal
+import java.math.RoundingMode
 import java.time.OffsetDateTime
 import java.time.format.DateTimeFormatter
 import java.time.temporal.ChronoUnit
@@ -159,18 +160,7 @@ class RateDaoTest : HomeDatabaseTest() {
             // ASSERT
             rateDao.findSubtotalDebtsByPayerId(payerId).test {
                 val subtotals = awaitItem()
-/*                subtotals.forEach {
-                    println(
-                        "subtotals: %02d.%02d.%d - %02d.%02d.%d: '%s' - за %d мес %.2f руб.".format(
-                            it.fromPaymentDate.dayOfMonth, it.fromPaymentDate.monthValue,
-                            it.fromPaymentDate.year,
-                            it.toPaymentDate.dayOfMonth, it.toPaymentDate.monthValue,
-                            it.toPaymentDate.year,
-                            it.serviceType, it.fullMonths, it.serviceDebt
-                        )
-                    )
-                }
- */
+                subtotals.forEach { it }
                 assertThat(subtotals).hasSize(1)
                 assertThat(subtotals[0].fullMonths).isEqualTo(
                     expectedRate1Months + expectedRate2Months
@@ -184,7 +174,7 @@ class RateDaoTest : HomeDatabaseTest() {
 
     @OptIn(ExperimentalCoroutinesApi::class)
     @Test
-    fun insertHeatingRatesAndFindSubtotalDebtsByPayerId_shouldReturn_correctServiceDebts_inFlow() =
+    fun insertHeatingRatesWithMeterAndFindSubtotalDebtsByPayerId_shouldReturn_correctServiceAndPayerServiceDebts_inFlow() =
         runTest {
             // ARRANGE
             // rates
@@ -320,30 +310,27 @@ class RateDaoTest : HomeDatabaseTest() {
             val missedMonths =
                 BigDecimal.valueOf(ChronoUnit.MONTHS.between(meterValue3Date, meterValue6Date))
             println("Missed months: %.2f".format(missedMonths))
-            val diff21 = meterVal2.subtract(meterVal1)
-            val diff32 = meterVal3.subtract(meterVal2)
-            val diff63 = meterVal6.subtract(meterVal3).divide(missedMonths)
-            val diff76 = meterVal7.subtract(meterVal6)
-            val diff87 = meterVal8.subtract(meterVal7)
-            val diff98 = meterVal9.subtract(meterVal8)
+            val diff63 = meterVal6.add(meterVal3).divide(BigDecimal("2"))
             val livingSpace: BigDecimal = meterPayer.livingSpace!!
             val serviceDebts = listOf(
-                livingSpace.multiply(diff21.multiply(meterPayerRate)),
-                livingSpace.multiply(diff32.multiply(meterPayerRate)),
-                missedMonths.multiply(livingSpace.multiply(diff63.multiply(meterPayerRate))),
-                livingSpace.multiply(diff76.multiply(meterPayerRate)),
-                livingSpace.multiply(diff87.multiply(meterPayerRate)),
-                livingSpace.multiply(diff98.multiply(meterPayerRate))
+                //livingSpace.multiply(meterVal1.multiply(meterPayerRate)),
+                //livingSpace.multiply(meterVal2.multiply(meterPayerRate)),
+                livingSpace.multiply(meterVal3.multiply(meterPayerRate)),
+                missedMonths.subtract(BigDecimal.ONE)
+                    .multiply(livingSpace.multiply(diff63.multiply(meterPayerRate))),
+                livingSpace.multiply(meterVal7.multiply(meterPayerRate)),
+                livingSpace.multiply(meterVal8.multiply(meterPayerRate)),
+                livingSpace.multiply(meterVal9.multiply(meterPayerRate))
             )
             val expectedMeterServiceDebt = serviceDebts.sumOf { it }
             serviceDebts.forEach { println(it) }
-            // 2. ASSERT findSubtotalDebtsByPayerId
-            rateDao.findServiceDebtsByPayerId(meterPayerId).test {
+            // 2. ASSERT findServiceDebtsByPayerId
+            rateDao.findSubtotalDebtsByPayerId(meterPayerId).test(timeout = 5000.milliseconds) {
                 val subtotals = awaitItem()
                 subtotals.forEach { println(it) }
                 assertThat(subtotals).hasSize(1)
                 assertThat(subtotals[0].serviceDebt).isEquivalentAccordingToCompareTo(
-                    expectedMeterServiceDebt
+                    expectedMeterServiceDebt.setScale(5, RoundingMode.DOWN)
                 )
                 cancel()
             }

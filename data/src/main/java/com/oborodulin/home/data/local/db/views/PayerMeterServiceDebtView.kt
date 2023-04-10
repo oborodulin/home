@@ -41,10 +41,13 @@ FROM (SELECT psd.payerId, psd.meterId, psd.fromPaymentDate, psd.toPaymentDate, p
         psd.currRateMonths, psd.currRateStartDate, psd.rateValue, 
         psd.prevRateMonths, psd.prevRateStartDate, psd.prevRateValue,
         psd.rateMeterValue,
-        ifnull(CASE WHEN psd.prevRateMonths > 0 
+        ifnull(CASE WHEN ifnull(psd.prevRateMonths, 0) > 0 
                     THEN (psd.prevRateMonths - 1) * psd.rateMeterValue / ${CONV_COEFF_BIGDECIMAL}.0 * psd.prevRateValue + 
-                    (psd.currRateMonths + 1) * psd.rateMeterValue / ${CONV_COEFF_BIGDECIMAL}.0 * psd.rateValue
-                    ELSE psd.debt 
+                        (psd.currRateMonths + 1) * psd.rateMeterValue / ${CONV_COEFF_BIGDECIMAL}.0 * psd.rateValue
+                    ELSE CASE WHEN ifnull(psd.fullMonths, 1) > 1
+                            THEN (psd.fullMonths - 1) * psd.debt
+                            ELSE psd.debt
+                        END
                 END, 0) AS debt,
         psd.currencyCode, psd.livingSpaceMu
     FROM (SELECT mvp.payerId, mvp.meterId, crp.livingSpace, mvp.fromPaymentDate, mvp.toPaymentDate, mvp.paymentMonth, mvp.paymentYear,
@@ -60,11 +63,11 @@ FROM (SELECT psd.payerId, psd.meterId, psd.fromPaymentDate, psd.toPaymentDate, p
                 THEN (CASE WHEN mvp.diffMeterValue <= ifnull(crp.toMeterValue, mvp.diffMeterValue)
                             THEN mvp.diffMeterValue - ifnull(crp.fromMeterValue, 0)
                         ELSE ifnull(crp.toMeterValue, 0) - ifnull(crp.fromMeterValue, 0)
-                    END) / ${CONV_COEFF_BIGDECIMAL}.0 * crp.rateValue
-                ELSE CASE crp.serviceType 
+                    END) / ${CONV_COEFF_BIGDECIMAL}.0 * ifnull(crp.rateValue, 0) -- ifnull(rateValue...) if startDate > toPaymentDate
+                ELSE CASE ifnull(crp.serviceType, "") 
                         WHEN ${Constants.SRV_HEATING_VAL} 
-                            THEN ifnull(crp.livingSpace / ${CONV_COEFF_BIGDECIMAL}.0, 1) * mvp.diffMeterValue / ${CONV_COEFF_BIGDECIMAL}.0 * crp.rateValue + 100000000
-                        ELSE crp.rateValue
+                            THEN ifnull(crp.livingSpace / ${CONV_COEFF_BIGDECIMAL}.0, 1) * mvp.diffMeterValue / ${CONV_COEFF_BIGDECIMAL}.0 * ifnull(crp.rateValue, 0)
+                        ELSE ifnull(crp.rateValue, 0)
                     END
             END) AS debt,
             mvp.diffMonths AS fullMonths, crp.isMeterUses,

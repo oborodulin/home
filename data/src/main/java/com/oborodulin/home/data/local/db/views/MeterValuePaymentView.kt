@@ -14,7 +14,13 @@ import java.util.*
     value = """
 SELECT mv.payerId, mv.payerServiceId, mv.meterId, mv.meterValueId, 
         mv.startMeterValue, mv.endMeterValue, 
-        (mv.diffMeterValue / (CASE WHEN mv.diffMonths > 0 THEN mv.diffMonths ELSE 1 END)) AS diffMeterValue, 
+        (CASE WHEN mv.diffMonths > 1 
+            THEN CASE WHEN mv.isDerivedUnit = $DB_FALSE 
+                    THEN mv.diffMeterValue / mv.diffMonths
+                    ELSE (mv.endMeterValue + mv.startMeterValue) / 2.0 
+                END 
+            ELSE mv.diffMeterValue
+        END) AS diffMeterValue, 
         mv.isDerivedUnit, mv.derivedUnit, mv.measureUnit, 
         mv.fromPaymentDate, mv.toPaymentDate, 
         mv.diffMonths, mv.paymentMonth, mv.paymentYear, mv.meterLocCode, mv.servicePos
