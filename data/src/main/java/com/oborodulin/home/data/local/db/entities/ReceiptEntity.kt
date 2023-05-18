@@ -17,7 +17,7 @@ import java.util.*
         deferred = true
     )]
 )
-class ReceiptEntity(
+data class ReceiptEntity(
     @PrimaryKey val receiptId: UUID = UUID.randomUUID(),
     val receiptMonth: Int,
     val receiptYear: Int,
@@ -27,7 +27,10 @@ class ReceiptEntity(
     val personsNum: Int = DEF_PERSON_NUM,
     val isReceiptPaid: Boolean = false,
     @ColumnInfo(index = true) val payersId: UUID,
-) {
+) : BaseEntity() {
+
+    override fun id() = this.receiptId
+
     companion object {
         const val TABLE_NAME = "receipts"
 
@@ -79,9 +82,5 @@ class ReceiptEntity(
         if (receiptId != other.receiptId) return false
 
         return true
-    }
-
-    override fun hashCode(): Int {
-        return receiptId.hashCode()
     }
 }

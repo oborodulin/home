@@ -30,13 +30,13 @@ import com.oborodulin.home.billing.ui.subtotals.PayerServiceSubtotalsListView
 import com.oborodulin.home.billing.ui.subtotals.PayerServiceSubtotalsListViewModel
 import com.oborodulin.home.billing.ui.subtotals.PayerServiceSubtotalsListViewModelImp
 import com.oborodulin.home.common.ui.ComponentUiAction
-import com.oborodulin.home.common.ui.components.items.ListItemComponent
 import com.oborodulin.home.common.ui.state.CommonScreen
 import com.oborodulin.home.metering.ui.value.MeterValuesListUiAction
 import com.oborodulin.home.metering.ui.value.MeterValuesListView
 import com.oborodulin.home.metering.ui.value.MeterValuesListViewModel
 import com.oborodulin.home.metering.ui.value.MeterValuesListViewModelImp
 import com.oborodulin.home.presentation.AppState
+import com.oborodulin.home.presentation.components.PayerListItemComponent
 import com.oborodulin.home.presentation.navigation.PayerInput
 import kotlinx.coroutines.flow.collectLatest
 import timber.log.Timber
@@ -109,7 +109,7 @@ fun PayersList(
                 payers[index].let { payer ->
                     val isSelected =
                         ((selectedIndex == -1) and ((payerInput.payerId == payer.id) || payer.isFavorite)) || (selectedIndex == index)
-                    ListItemComponent(
+                    PayerListItemComponent(
                         icon = com.oborodulin.home.presentation.R.drawable.outline_house_black_36,
                         item = payer,
                         itemActions = listOf(

@@ -14,13 +14,16 @@ import java.util.*
         onDelete = ForeignKey.CASCADE
     )]
 )
-class ServiceActivityEntity(
+data class ServiceActivityEntity(
     @PrimaryKey val serviceActivityId: UUID = UUID.randomUUID(),
     val fromDate: OffsetDateTime,
     val toDate: OffsetDateTime? = null,
     val isActive: Boolean = true,
     @ColumnInfo(index = true) val payersServicesId: UUID
-) {
+) : BaseEntity() {
+
+    override fun id() = this.serviceActivityId
+
     companion object {
         const val TABLE_NAME = "service_activities"
 
@@ -44,9 +47,5 @@ class ServiceActivityEntity(
         if (serviceActivityId != other.serviceActivityId) return false
 
         return true
-    }
-
-    override fun hashCode(): Int {
-        return serviceActivityId.hashCode()
     }
 }

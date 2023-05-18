@@ -1,4 +1,4 @@
-package com.oborodulin.home.data.local.db
+package com.oborodulin.home.data.local
 
 import android.content.Context
 import android.database.sqlite.SQLiteConstraintException
@@ -6,6 +6,7 @@ import android.os.Build
 import androidx.test.filters.SmallTest
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
+import com.oborodulin.home.data.local.db.HomeDatabase
 import com.oborodulin.home.data.local.db.dao.MeterDao
 import com.oborodulin.home.data.local.db.dao.ServiceDao
 import com.oborodulin.home.data.local.db.entities.MeterEntity
@@ -14,6 +15,7 @@ import com.oborodulin.home.data.local.db.entities.ServiceEntity
 import com.oborodulin.home.data.local.db.entities.ServiceTlEntity
 import com.oborodulin.home.data.local.db.views.ServiceView
 import com.oborodulin.home.data.util.ServiceType
+import dagger.hilt.android.testing.HiltAndroidTest
 import kotlinx.coroutines.*
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.*
@@ -29,6 +31,7 @@ import java.util.*
  *
  * See [testing documentation](http://d.android.com/tools/testing).
  */
+@HiltAndroidTest
 @RunWith(RobolectricTestRunner::class)
 @Config(sdk = [Build.VERSION_CODES.P])
 @SmallTest
@@ -41,8 +44,8 @@ class ServiceDaoTest : HomeDatabaseTest() {
     @Before
     override fun setUp() {
         super.setUp()
-        serviceDao = serviceDao()
-        meterDao = meterDao()
+        serviceDao = db.serviceDao()
+        meterDao = db.meterDao()
     }
 
     @OptIn(ExperimentalCoroutinesApi::class)

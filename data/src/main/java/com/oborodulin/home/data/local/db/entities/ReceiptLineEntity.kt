@@ -41,7 +41,7 @@ import java.util.*
         deferred = true
     )]
 )
-class ReceiptLineEntity(
+data class ReceiptLineEntity(
     @PrimaryKey val receiptLineId: UUID = UUID.randomUUID(),
     val isServiceActive: Boolean = true,
     val isPromotionActive: Boolean = true,
@@ -55,7 +55,10 @@ class ReceiptLineEntity(
     @ColumnInfo(index = true) val ratesId: UUID,
     @ColumnInfo(index = true) val servicePromotionsId: UUID? = null,
     @ColumnInfo(index = true) val meterValuesId: UUID? = null
-) {
+) : BaseEntity() {
+
+    override fun id() = this.receiptLineId
+
     companion object {
         const val TABLE_NAME = "receipt_lines"
 
@@ -93,9 +96,5 @@ class ReceiptLineEntity(
         if (receiptLineId != other.receiptLineId) return false
 
         return true
-    }
-
-    override fun hashCode(): Int {
-        return receiptLineId.hashCode()
     }
 }

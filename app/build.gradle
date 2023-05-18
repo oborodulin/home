@@ -106,8 +106,8 @@ dependencies {
     implementation deps.okhttp3.loggingInterceptor
     implementation deps.retrofit2.converterGson
     implementation deps.retrofit2.retrofit
-    implementation deps.kotlinx.coroutinesAndroid
-    implementation deps.kotlinx.coroutinesCore
+    implementation deps.coroutines.android
+    implementation deps.coroutines.core
     implementation deps.recyclerview
     // Integration with activities
     implementation deps.activity.compose
@@ -132,7 +132,7 @@ dependencies {
     androidTestImplementation deps.test.truth
     androidTestImplementation deps.work.testing
     androidTestImplementation deps.dagger.testing
-    androidTestImplementation deps.kotlinx.coroutinesTest
+    androidTestImplementation deps.test.coroutines
     testImplementation deps.test.junit
     // UI Tests
     androidTestImplementation deps.compose.uiTestJunit4

@@ -12,11 +12,14 @@ import java.util.*
     tableName = AppSettingEntity.TABLE_NAME,
     indices = [Index(value = ["paramName"], unique = true)]
 )
-class AppSettingEntity(
+data class AppSettingEntity(
     @PrimaryKey val settingId: UUID = UUID.randomUUID(),
     val paramName: AppSettingParam,
     val paramValue: String = ""
-) {
+) : BaseEntity() {
+
+    override fun id() = this.settingId
+
     companion object {
         const val TABLE_NAME = "app_settings"
 
@@ -75,9 +78,5 @@ class AppSettingEntity(
         if (settingId != other.settingId || paramName != other.paramName) return false
 
         return true
-    }
-
-    override fun hashCode(): Int {
-        return settingId.hashCode()
     }
 }

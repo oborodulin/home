@@ -1,16 +1,18 @@
-package com.oborodulin.home.data.local.db
+package com.oborodulin.home.data.local
 
 import android.os.Build
 import androidx.test.filters.MediumTest
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
 import com.oborodulin.home.common.util.Constants
+import com.oborodulin.home.data.local.db.HomeDatabase
 import com.oborodulin.home.data.local.db.dao.PayerDao
 import com.oborodulin.home.data.local.db.dao.RateDao
 import com.oborodulin.home.data.local.db.dao.ReceiptDao
 import com.oborodulin.home.data.local.db.dao.ServiceDao
 import com.oborodulin.home.data.local.db.entities.*
 import com.oborodulin.home.data.util.ServiceType
+import dagger.hilt.android.testing.HiltAndroidTest
 import kotlinx.coroutines.*
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.*
@@ -34,6 +36,7 @@ import kotlin.time.Duration.Companion.milliseconds
  */
 private const val TAG = "Testing.db.RateDaoTest"
 
+@HiltAndroidTest
 @RunWith(RobolectricTestRunner::class)
 @Config(sdk = [Build.VERSION_CODES.P])
 @MediumTest
@@ -46,10 +49,10 @@ class RateDaoTest : HomeDatabaseTest() {
     @Before
     override fun setUp() {
         super.setUp()
-        rateDao = rateDao()
-        payerDao = payerDao()
-        serviceDao = serviceDao()
-        receiptDao = receiptDao()
+        rateDao = db.rateDao()
+        payerDao = db.payerDao()
+        serviceDao = db.serviceDao()
+        receiptDao = db.receiptDao()
     }
 
     @OptIn(ExperimentalCoroutinesApi::class)
@@ -725,7 +728,7 @@ class RateDaoTest : HomeDatabaseTest() {
                 ctx, payerId, passportDate, MeterEntity.DEF_COLD_WATER_INIT_VAL,
                 meterId = coldWaterMeter.meterId
             )
-            meterDao().update(updatedColdWaterMeter)
+            db.meterDao().update(updatedColdWaterMeter)
             println(updatedColdWaterMeter)
             val diff1i = meterVal1.subtract(MeterEntity.DEF_COLD_WATER_INIT_VAL)
             println(diff1i)

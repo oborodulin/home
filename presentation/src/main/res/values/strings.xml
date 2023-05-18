@@ -7,4 +7,7 @@
     <string name="nav_item_reporting">Квитанции</string>
     <!--дополнительная -->
     <string name="nav_item_payer">Плательщик</string>
+
+    <!--BUTTONS: -->
+    <string name="btn_pay_text">Оплатить</string>
 </resources>

@@ -26,7 +26,10 @@ data class MeterVerificationEntity(
     val endMeterValue: BigDecimal? = null,
     val isOk: Boolean = false,
     @ColumnInfo(index = true) var metersId: UUID,
-) {
+) : BaseEntity() {
+
+    override fun id() = this.meterVerificationId
+
     companion object {
         const val TABLE_NAME = "meter_verifications"
     }
@@ -39,9 +42,5 @@ data class MeterVerificationEntity(
         if (meterVerificationId != other.meterVerificationId) return false
 
         return true
-    }
-
-    override fun hashCode(): Int {
-        return meterVerificationId.hashCode()
     }
 }

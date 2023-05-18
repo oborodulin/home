@@ -4,7 +4,7 @@ import android.content.Context
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
 import com.oborodulin.home.accounting.domain.usecases.AccountingUseCases
-import com.oborodulin.home.accounting.domain.usecases.GetFavoritePayerUseCase
+import com.oborodulin.home.domain.usecases.GetFavoritePayerUseCase
 import com.oborodulin.home.accounting.ui.model.AccountingUi
 import com.oborodulin.home.accounting.ui.model.PayerUi
 import com.oborodulin.home.accounting.ui.model.converters.FavoritePayerConverter

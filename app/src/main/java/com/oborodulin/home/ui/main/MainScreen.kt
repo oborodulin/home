@@ -5,9 +5,8 @@ package com.oborodulin.home.ui.main
 import android.content.res.Configuration
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
@@ -43,7 +42,7 @@ fun MainScreen() {
     val bottomBarHeightPx = with(LocalDensity.current) {
         bottomBarHeight.roundToPx().toFloat()
     }
-    val bottomBarOffsetHeightPx = remember { mutableStateOf(0f) }
+    var bottomBarOffsetHeightPx by rememberSaveable { mutableStateOf(0f) }
     val nestedScrollConnection = remember {
         object : NestedScrollConnection {
             override fun onPreScroll(
@@ -51,9 +50,8 @@ fun MainScreen() {
                 source: NestedScrollSource,
             ): Offset {
                 val delta = available.y
-                val newOffset = bottomBarOffsetHeightPx.value + delta
-                bottomBarOffsetHeightPx.value =
-                    newOffset.coerceIn(-bottomBarHeightPx, 0f)
+                val newOffset = bottomBarOffsetHeightPx + delta
+                bottomBarOffsetHeightPx = newOffset.coerceIn(-bottomBarHeightPx, 0f)
                 return Offset.Zero
             }
         }
@@ -67,7 +65,7 @@ fun MainScreen() {
                         .offset {
                             IntOffset(
                                 x = 0,
-                                y = -bottomBarOffsetHeightPx.value.roundToInt()
+                                y = -bottomBarOffsetHeightPx.roundToInt()
                             )
                         },
                     appState

@@ -1,25 +1,41 @@
-package com.oborodulin.home.data.local.db
+package com.oborodulin.home.data.local
 
 import android.content.Context
+import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.test.core.app.ApplicationProvider
 import com.oborodulin.home.common.util.Utils
+import com.oborodulin.home.data.local.db.HomeDatabase
+import com.oborodulin.home.data.local.db.dao.*
+import dagger.hilt.android.testing.HiltAndroidRule
+import dagger.hilt.android.testing.HiltAndroidTest
 import org.junit.After
 import org.junit.Before
+import org.junit.Rule
 import java.io.IOException
 import java.time.OffsetDateTime
+import javax.inject.Inject
 
+@HiltAndroidTest
 open class HomeDatabaseTest {
-    protected val ctx: Context = ApplicationProvider.getApplicationContext()
+    @get:Rule
+    var hiltRule = HiltAndroidRule(this)
 
-    //getApplicationContext<App>()//: Context// = InstrumentationRegistry.getInstrumentation().targetContext
-    protected lateinit var db: HomeDatabase
+    @get:Rule
+    var instantTaskExecutorRule = InstantTaskExecutorRule()
+
+    protected val ctx: Context = ApplicationProvider.getApplicationContext()
     protected val currentDateTime: OffsetDateTime = OffsetDateTime.now()
     protected val fixCurrDateTime = Utils.toOffsetDateTime("2023-03-26T03:00:00.000+03:00")
 
+    //getApplicationContext<App>()//: Context// = InstrumentationRegistry.getInstrumentation().targetContext
+    @Inject
+    lateinit var db: HomeDatabase
+
     @Before
     open fun setUp() {
+        hiltRule.inject()
         //app.setLocationProvider(mockLocationProvider)
-        db = HomeDatabase.getTestInstance(this.ctx)
+        //db = HomeDatabase.getTestInstance(this.ctx)
     }
 
     @After
@@ -30,10 +46,4 @@ open class HomeDatabaseTest {
         //https://stackoverflow.com/questions/23293572/android-cannot-perform-this-operation-because-the-connection-pool-has-been-clos
         HomeDatabase.close()
     }
-
-    fun payerDao() = db.payerDao()
-    fun serviceDao() = db.serviceDao()
-    fun meterDao() = db.meterDao()
-    fun rateDao() = db.rateDao()
-    fun receiptDao() = db.receiptDao()
 }

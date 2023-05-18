@@ -44,6 +44,7 @@ buildscript {
                 logger                 : '2.2.0',
                 lottie                 : '5.2.0',
                 material               : '1.7.0',
+                mockito                : '4.1.0',
                 navigation             : '2.5.3',
                 nvi18n                 : '1.29',
                 okhttpLogging          : '5.0.0-alpha.11',
@@ -73,7 +74,7 @@ buildscript {
                       versionCode  : 1,
                       versionName  : "1.0"],
                 sdk: [compileVersion: 33,
-                      minVersion    : 28,
+                      minVersion    : 28, // also in resources/robolectric.properties
                       targetVersion : 33],
                 jvm: [target       : JavaVersion.VERSION_11,
                       compatibility: [source: JavaVersion.VERSION_11, target: JavaVersion.VERSION_11]],
@@ -104,11 +105,11 @@ buildscript {
                         uiPreview    : "androidx.compose.ui:ui-tooling-preview:$versions.composeUi",
                         // UI Tests
                         uiTestJunit4 : "androidx.compose.ui:ui-test-junit4:$versions.composeUiTest"],
-                dagger              : [hiltCompiler: "com.google.dagger:hilt-compiler:$versions.hilt",
-                                       compiler    : "com.google.dagger:hilt-android-compiler:$versions.hilt",
-                                       testing     : "com.google.dagger:hilt-android-testing:$versions.hilt",
-                                       gradlePlugin: "com.google.dagger:hilt-android-gradle-plugin:$versions.hilt",
-                                       hilt        : "com.google.dagger:hilt-android:$versions.hilt"],
+                dagger              : [hiltCompiler    : "com.google.dagger:hilt-compiler:$versions.hilt",
+                                       compiler        : "com.google.dagger:hilt-android-compiler:$versions.hilt",
+                                       testing         : "com.google.dagger:hilt-android-testing:$versions.hilt",
+                                       hiltGradlePlugin: "com.google.dagger:hilt-android-gradle-plugin:$versions.hilt",
+                                       hilt            : "com.google.dagger:hilt-android:$versions.hilt"],
                 i18n                : [nv: "com.neovisionaries:nv-i18n:$versions.nvi18n"],
                 glide               : [compiler: "com.github.bumptech.glide:compiler:$versions.glide",
                                        glide   : "com.github.bumptech.glide:glide:$versions.glide"],
@@ -118,9 +119,8 @@ buildscript {
                 jvm                 : [inject: "javax.inject:javax.inject:$versions.inject"],
                 kotlin              : [gradlePlugin: "org.jetbrains.kotlin:kotlin-gradle-plugin:$versions.kotlin",
                                        reflect     : "org.jetbrains.kotlin:kotlin-reflect:$versions.kotlinReflect"],
-                kotlinx             : [coroutinesAndroid: "org.jetbrains.kotlinx:kotlinx-coroutines-android:$versions.coroutines",
-                                       coroutinesCore   : "org.jetbrains.kotlinx:kotlinx-coroutines-core:$versions.coroutines",
-                                       coroutinesTest   : "org.jetbrains.kotlinx:kotlinx-coroutines-test:$versions.coroutines"],
+                coroutines          : [android: "org.jetbrains.kotlinx:kotlinx-coroutines-android:$versions.coroutines",
+                                       core   : "org.jetbrains.kotlinx:kotlinx-coroutines-core:$versions.coroutines"],
                 ktlint              : [gradle: "org.jlleitschuh.gradle:ktlint-gradle:$versions.ktlintGradle"],
                 lifecycle           : [runtimeKtx      : "androidx.lifecycle:lifecycle-runtime-ktx:$versions.lifecycleRuntime",
                                        extensions      : "androidx.lifecycle:lifecycle-extensions:$versions.lifecycle",
@@ -151,7 +151,9 @@ buildscript {
                 // Sweet Toast
                 TalhaFaki           : [composableSweetToast: "com.github.tfaki:ComposableSweetToast:$versions.composableSweetToast"],
                 test                : [junit          : "junit:junit:$versions.junit",
+                                       mockito        : "org.mockito.kotlin:mockito-kotlin:$versions.mockito",
                                        core           : "androidx.test:core:$versions.testCore",
+                                       coroutines     : "org.jetbrains.kotlinx:kotlinx-coroutines-test:$versions.coroutines",
                                        extJunit       : "androidx.test.ext:junit:$versions.extJunit",
                                        extJunitKtx    : "androidx.test.ext:junit-ktx:$versions.extJunit",
                                        runner         : "androidx.test:runner:$versions.testRunner",
@@ -181,7 +183,7 @@ buildscript {
         classpath "com.android.tools.build:gradle:$versions.gradle"
         classpath deps.kotlin.gradlePlugin
         classpath deps.navigation.safeArgsGradlePlugin
-        classpath deps.dagger.gradlePlugin
+        classpath deps.dagger.hiltGradlePlugin  //Hilt Gradle plugin
         classpath deps.ktlint.gradle
         classpath deps.spotlessPluginGradle
     }

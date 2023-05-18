@@ -16,7 +16,10 @@ data class ServiceEntity(
     var servicePos: Int? = null,
     val serviceType: ServiceType,
     val serviceMeterType: MeterType = MeterType.NONE
-) {
+) : BaseEntity() {
+
+    override fun id() = this.serviceId
+
     companion object {
         const val TABLE_NAME = "services"
 
@@ -115,10 +118,6 @@ data class ServiceEntity(
         if (serviceId != other.serviceId) return false
 
         return true
-    }
-
-    override fun hashCode(): Int {
-        return serviceId.hashCode()
     }
 
     override fun toString(): String {

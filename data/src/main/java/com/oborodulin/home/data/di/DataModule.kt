@@ -67,18 +67,8 @@ object DataModule {
     @Singleton
     @Provides
     fun providePayerDataSource(
-        payerDao: PayerDao,
-        @IoDispatcher dispatcher: CoroutineDispatcher,
-        payerEntityListToPayerListMapper: PayerEntityListToPayerListMapper,
-        payerEntityToPayerMapper: PayerEntityToPayerMapper,
-        payerToPayerEntityMapper: PayerToPayerEntityMapper
-    ): PayerDataSource =
-        PayerDataSourceImp(
-            payerDao, dispatcher,
-            payerEntityListToPayerListMapper,
-            payerEntityToPayerMapper,
-            payerToPayerEntityMapper
-        )
+        payerDao: PayerDao, @IoDispatcher dispatcher: CoroutineDispatcher
+    ): PayerDataSource = PayerDataSourceImp(payerDao, dispatcher)
 
     // REPOSITORIES:
     @Singleton
@@ -88,6 +78,16 @@ object DataModule {
 
     @Singleton
     @Provides
-    fun providePayersRepository(payerDataSource: PayerDataSource): PayersRepository =
-        PayersRepositoryImp(payerDataSource)
+    fun providePayersRepository(
+        payerDataSource: PayerDataSource,
+        payerEntityListToPayerListMapper: PayerEntityListToPayerListMapper,
+        payerEntityToPayerMapper: PayerEntityToPayerMapper,
+        payerToPayerEntityMapper: PayerToPayerEntityMapper
+    ): PayersRepository =
+        PayersRepositoryImp(
+            payerDataSource,
+            payerEntityListToPayerListMapper,
+            payerEntityToPayerMapper,
+            payerToPayerEntityMapper
+        )
 }

@@ -35,7 +35,10 @@ data class PayerServiceCrossRefEntity(
     // This may trigger full table scans whenever parent table is modified so you are highly advised to create an index that covers this column.
     @ColumnInfo(index = true) val payersId: UUID,
     @ColumnInfo(index = true) val servicesId: UUID
-) {
+) : BaseEntity() {
+
+    override fun id() = this.payerServiceId
+
     companion object {
         const val TABLE_NAME = "payers_services"
 

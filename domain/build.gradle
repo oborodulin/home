@@ -54,7 +54,7 @@ dependencies {
     // Desugaring
     //coreLibraryDesugaring deps.tools.desugar
 
-    implementation deps.kotlinx.coroutinesCore
+    implementation deps.coroutines.core
     implementation deps.jvm.inject
 
     implementation deps.retrofit2.retrofit
@@ -63,10 +63,28 @@ dependencies {
     implementation deps.androidx.appcompat
     implementation deps.google.material
 
-    // Testing dependencies
-    kaptAndroidTest deps.dagger.compiler
+    // Testing: Local
+    implementation deps.test.extJunitKtx
+    implementation deps.test.runner
+
     testImplementation deps.test.junit
+    testImplementation deps.test.robolectric
+    testImplementation deps.test.mockito
+    testImplementation deps.test.coroutines
+    testImplementation deps.coroutines.android
+    testImplementation deps.test.extJunit
+    testImplementation deps.test.core
+    testImplementation deps.test.truth
+    //testImplementation deps.test.hamcrest
+    testImplementation deps.dagger.testing
+    testImplementation deps.test.turbine
+    kaptTest deps.dagger.hiltCompiler
+
+    // Testing: Instrumental
+    /*
+    kaptAndroidTest deps.dagger.compiler
     androidTestImplementation deps.dagger.testing
     androidTestImplementation deps.test.extJunit
     androidTestImplementation deps.test.espressoCore
+     */
 }

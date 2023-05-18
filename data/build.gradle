@@ -55,6 +55,7 @@ android {
     }
     sourceSets {
         androidTest.assets.srcDirs += files("$projectDir/schemas".toString())
+        //test.java.srcDirs += files("$projectDir/schemas".toString())
     }
     testOptions {
         unitTests {
@@ -80,8 +81,8 @@ dependencies {
     implementation deps.hilt.navigationCompose
 
     implementation deps.jvm.inject
-    implementation deps.kotlinx.coroutinesAndroid
-    implementation deps.kotlinx.coroutinesCore
+    implementation deps.coroutines.android
+    implementation deps.coroutines.core
     // Desugaring
     //coreLibraryDesugaring deps.tools.desugar
     // Networking
@@ -91,13 +92,15 @@ dependencies {
     implementation deps.okhttp3.loggingInterceptor
 
     // Testing: Local
+    testImplementation deps.test.extJunitKtx
+    testImplementation deps.test.runner
+
     testImplementation deps.test.junit
     testImplementation deps.test.robolectric
-    testImplementation deps.kotlinx.coroutinesTest
-    testImplementation deps.kotlinx.coroutinesAndroid
-    testImplementation deps.test.extJunit
-    implementation deps.test.extJunitKtx
-    implementation deps.test.runner
+    testImplementation deps.test.mockito
+    testImplementation deps.test.coroutines
+    testImplementation deps.coroutines.android
+    testImplementation deps.test.archCore
     testImplementation deps.test.core
     testImplementation deps.test.truth
     //testImplementation deps.test.hamcrest
@@ -109,7 +112,7 @@ dependencies {
     /*
     kaptAndroidTest deps.dagger.hiltCompiler
     androidTestImplementation deps.dagger.testing
-    androidTestImplementation deps.kotlinx.coroutinesTest
+    androidTestImplementation deps.test.coroutines
     androidTestImplementation deps.test.espressoCore
     androidTestImplementation deps.test.hamcrest
     androidTestImplementation deps.test.turbine

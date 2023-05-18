@@ -7,8 +7,10 @@ import android.content.Context
 import android.content.res.Configuration
 import android.os.Build
 import android.os.Bundle
+import timber.log.Timber
 import java.util.Locale
 
+private const val TAG = "Common.Util.Locale"
 private val LOCALE_RU = Locale(Constants.LANGUAGE_RU)
 
 /**
@@ -18,6 +20,7 @@ private val LOCALE_RU = Locale(Constants.LANGUAGE_RU)
  */
 fun Application.setLocale(locale: Locale = LOCALE_RU) {
     setLocaleInternal(locale)
+    Timber.tag(TAG).i("Application locale set to '%s'", locale.language)
     registerActivityLifecycleCallbacks(ActivityLifecycleCallbacks(locale))
     registerComponentCallbacks(ApplicationCallbacks(this, locale))
 }

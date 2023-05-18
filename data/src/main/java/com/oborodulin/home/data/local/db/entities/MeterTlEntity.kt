@@ -22,7 +22,10 @@ data class MeterTlEntity(
     val meterMeasureUnit: String,
     val meterDesc: String? = null,
     @ColumnInfo(index = true) val metersId: UUID,
-) {
+) : BaseEntity() {
+
+    override fun id() = this.meterTlId
+
     companion object {
         const val TABLE_NAME = "meters_tl"
 
@@ -81,10 +84,6 @@ data class MeterTlEntity(
         if (meterTlId != other.meterTlId) return false
 
         return true
-    }
-
-    override fun hashCode(): Int {
-        return meterTlId.hashCode()
     }
 }
 

@@ -1,4 +1,4 @@
-package com.oborodulin.home.accounting.domain.usecases
+package com.oborodulin.home.domain.usecases
 
 import com.oborodulin.home.common.domain.usecases.UseCase
 import com.oborodulin.home.domain.model.Payer

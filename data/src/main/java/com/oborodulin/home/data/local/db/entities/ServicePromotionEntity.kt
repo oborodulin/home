@@ -20,14 +20,17 @@ import java.util.*
         onDelete = ForeignKey.CASCADE
     )]
 )
-class ServicePromotionEntity(
+data class ServicePromotionEntity(
     @PrimaryKey val servicePromotionId: UUID = UUID.randomUUID(),
     val paymentMonths: Int = 1, // период оплаты - кол-во месяцев в году
     val isPrevRate: Boolean = false, // считаем по предыдущему тарифу
     val isActive: Boolean = true,
     @ColumnInfo(index = true) val servicesId: UUID,
     @ColumnInfo(index = true) val payersServicesId: UUID? = null,
-) {
+) : BaseEntity() {
+
+    override fun id() = this.servicePromotionId
+
     companion object {
         const val TABLE_NAME = "service_promotions"
 
@@ -48,9 +51,5 @@ class ServicePromotionEntity(
         if (servicePromotionId != other.servicePromotionId) return false
 
         return true
-    }
-
-    override fun hashCode(): Int {
-        return servicePromotionId.hashCode()
     }
 }

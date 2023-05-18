@@ -28,8 +28,11 @@ data class MeterEntity(
     val passportDate: OffsetDateTime? = null,
     val initValue: BigDecimal? = null,
     val verificationPeriod: Int? = null,
-    @ColumnInfo(index = true) val payersId: UUID,
-) {
+    @ColumnInfo(index = true) val payersId: UUID
+) : BaseEntity() {
+
+    override fun id() = this.meterId
+
     companion object {
         const val TABLE_NAME = "meters"
 
@@ -135,10 +138,6 @@ data class MeterEntity(
         if (meterId != other.meterId) return false
 
         return true
-    }
-
-    override fun hashCode(): Int {
-        return meterId.hashCode()
     }
 
     override fun toString(): String {

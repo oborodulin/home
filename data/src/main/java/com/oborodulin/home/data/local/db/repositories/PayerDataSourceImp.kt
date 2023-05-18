@@ -2,12 +2,9 @@ package com.oborodulin.home.data.local.db.repositories
 
 import com.oborodulin.home.common.di.IoDispatcher
 import com.oborodulin.home.data.local.db.dao.PayerDao
-import com.oborodulin.home.data.local.db.mappers.PayerEntityListToPayerListMapper
-import com.oborodulin.home.data.local.db.mappers.PayerEntityToPayerMapper
-import com.oborodulin.home.data.local.db.mappers.PayerToPayerEntityMapper
-import com.oborodulin.home.domain.model.Payer
+import com.oborodulin.home.data.local.db.entities.PayerEntity
 import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.withContext
 import java.util.*
 import javax.inject.Inject
@@ -15,41 +12,35 @@ import javax.inject.Inject
 /**
  * Created by o.borodulin on 08.August.2022
  */
-@OptIn(kotlinx.coroutines.ExperimentalCoroutinesApi::class)
+@OptIn(ExperimentalCoroutinesApi::class)
 class PayerDataSourceImp @Inject constructor(
     private val payerDao: PayerDao,
-    @IoDispatcher private val dispatcher: CoroutineDispatcher,
-    private val payerEntityListToPayerListMapper: PayerEntityListToPayerListMapper,
-    private val payerEntityToPayerMapper: PayerEntityToPayerMapper,
-    private val payerToPayerEntityMapper: PayerToPayerEntityMapper
+    @IoDispatcher private val dispatcher: CoroutineDispatcher
 ) : PayerDataSource {
     override fun getPayers() = payerDao.findDistinctAll()
-        .map(payerEntityListToPayerListMapper::map)
 
-    override fun getPayer(payerId: UUID) =
-        payerDao.findDistinctById(payerId).map(payerEntityToPayerMapper::map)
+    override fun getPayer(payerId: UUID) = payerDao.findDistinctById(payerId)
 
-    override fun getFavoritePayer() =
-        payerDao.findDistinctFavorite().map(payerEntityToPayerMapper::map)
+    override fun getFavoritePayer() = payerDao.findDistinctFavorite()
 
-    override suspend fun savePayer(payer: Payer) = withContext(dispatcher) {
-        if (payer.id == null) {
-            payerDao.insert(payerToPayerEntityMapper.map(payer))
-        } else {
-            payerDao.update(payerToPayerEntityMapper.map(payer))
-        }
+    override suspend fun insertPayer(payer: PayerEntity) = withContext(dispatcher) {
+        payerDao.insert(payer)
     }
 
-    override suspend fun deletePayer(payer: Payer) = withContext(dispatcher) {
-        payerDao.delete(payerToPayerEntityMapper.map(payer))
+    override suspend fun updatePayer(payer: PayerEntity) = withContext(dispatcher) {
+        payerDao.update(payer)
+    }
+
+    override suspend fun deletePayer(payer: PayerEntity) = withContext(dispatcher) {
+        payerDao.delete(payer)
     }
 
     override suspend fun deletePayerById(payerId: UUID) = withContext(dispatcher) {
         payerDao.deleteById(payerId)
     }
 
-    override suspend fun deletePayers(payers: List<Payer>) = withContext(dispatcher) {
-        payerDao.delete(payers.map { payerToPayerEntityMapper.map(it) })
+    override suspend fun deletePayers(payers: List<PayerEntity>) = withContext(dispatcher) {
+        payerDao.delete(payers)
     }
 
     override suspend fun deletePayers() = withContext(dispatcher) {

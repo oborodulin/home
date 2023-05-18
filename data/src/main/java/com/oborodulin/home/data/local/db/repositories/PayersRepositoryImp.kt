@@ -1,27 +1,41 @@
 package com.oborodulin.home.data.local.db.repositories
 
+import com.oborodulin.home.data.local.db.mappers.PayerEntityListToPayerListMapper
+import com.oborodulin.home.data.local.db.mappers.PayerEntityToPayerMapper
+import com.oborodulin.home.data.local.db.mappers.PayerToPayerEntityMapper
 import com.oborodulin.home.domain.model.Payer
 import com.oborodulin.home.domain.repositories.PayersRepository
 import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.map
 import java.util.*
 import javax.inject.Inject
 
 class PayersRepositoryImp @Inject constructor(
-    private val payerDataSource: PayerDataSource
+    private val payerDataSource: PayerDataSource,
+    private val payerEntityListToPayerListMapper: PayerEntityListToPayerListMapper,
+    private val payerEntityToPayerMapper: PayerEntityToPayerMapper,
+    private val payerToPayerEntityMapper: PayerToPayerEntityMapper
 ) : PayersRepository {
     override fun getAll() = payerDataSource.getPayers()
+        .map(payerEntityListToPayerListMapper::map)
 
-    override fun get(payerId: UUID) = payerDataSource.getPayer(payerId)
+    override fun get(payerId: UUID) =
+        payerDataSource.getPayer(payerId).map(payerEntityToPayerMapper::map)
 
-    override fun getFavorite() = payerDataSource.getFavoritePayer()
+    override fun getFavorite() =
+        payerDataSource.getFavoritePayer().map(payerEntityToPayerMapper::map)
 
     override fun save(payer: Payer) = flow {
-        payerDataSource.savePayer(payer)
+        if (payer.id == null) {
+            payerDataSource.insertPayer(payerToPayerEntityMapper.map(payer))
+        } else {
+            payerDataSource.updatePayer(payerToPayerEntityMapper.map(payer))
+        }
         emit(payer)
     }
 
     override fun delete(payer: Payer) = flow {
-        payerDataSource.deletePayer(payer)
+        payerDataSource.deletePayer(payerToPayerEntityMapper.map(payer))
         this.emit(payer)
     }
 

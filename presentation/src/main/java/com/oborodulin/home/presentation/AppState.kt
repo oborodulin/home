@@ -4,6 +4,7 @@ import android.content.res.Resources
 import androidx.compose.material.ScaffoldState
 import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
@@ -26,7 +27,7 @@ fun rememberAppState(
     resources: Resources = LocalContext.current.resources,
     coroutineScope: CoroutineScope = rememberCoroutineScope(),
     appName: String = "",
-    actionBarSubtitle: MutableState<String> = remember { mutableStateOf("") }
+    actionBarSubtitle: MutableState<String> = rememberSaveable { mutableStateOf("") }
 ) =
     remember(
         accountingScaffoldState,

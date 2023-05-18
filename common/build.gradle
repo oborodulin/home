@@ -55,11 +55,12 @@ dependencies {
     kapt deps.dagger.compiler
     implementation deps.hilt.navigationCompose
 
-    implementation deps.kotlinx.coroutinesCore
+    implementation deps.coroutines.core
     implementation deps.jvm.inject
     implementation deps.kotlin.reflect
     // XML-parser
     implementation deps.xml.xmlpull
+    implementation deps.google.gson
     // Compose
     implementation deps.compose.ui
     implementation deps.compose.material

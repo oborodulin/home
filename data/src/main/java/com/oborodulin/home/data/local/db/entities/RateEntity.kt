@@ -25,7 +25,7 @@ import java.util.*
         onDelete = CASCADE
     )]
 )
-class RateEntity(
+data class RateEntity(
     @PrimaryKey val rateId: UUID = UUID.randomUUID(),
     val startDate: OffsetDateTime = OffsetDateTime.now(),
     val fromMeterValue: BigDecimal? = null,
@@ -35,7 +35,10 @@ class RateEntity(
     val isPrivileges: Boolean = false, // считаем по счётчику, но по льготному тарифу
     @ColumnInfo(index = true) val servicesId: UUID,
     @ColumnInfo(index = true) val payersServicesId: UUID? = null
-) {
+) : BaseEntity() {
+
+    override fun id() = this.rateId
+
     companion object {
         const val TABLE_NAME = "rates"
 
@@ -319,10 +322,6 @@ class RateEntity(
         if (rateId != other.rateId) return false
 
         return true
-    }
-
-    override fun hashCode(): Int {
-        return rateId.hashCode()
     }
 
     override fun toString(): String {

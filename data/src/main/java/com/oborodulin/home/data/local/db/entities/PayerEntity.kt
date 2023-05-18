@@ -6,12 +6,11 @@ import androidx.room.Index
 import androidx.room.PrimaryKey
 import com.oborodulin.home.data.R
 import com.oborodulin.home.data.util.Constants
-import com.oborodulin.home.data.util.MeterType
 import java.math.BigDecimal
 import java.util.*
 
 @Entity(tableName = PayerEntity.TABLE_NAME, indices = [Index(value = ["ercCode"], unique = true)])
-class PayerEntity(
+data class PayerEntity(
     @PrimaryKey val payerId: UUID = UUID.randomUUID(),
     val ercCode: String = "",
     val fullName: String = "",
@@ -22,8 +21,11 @@ class PayerEntity(
     val paymentDay: Int = Constants.DEF_PAYMENT_DAY,
     val personsNum: Int = Constants.DEF_PERSON_NUM,
     val isAlignByPaymentDay: Boolean = false,
-    val isFavorite: Boolean = false,
-) {
+    val isFavorite: Boolean = false
+) : BaseEntity() {
+
+    override fun id() = this.payerId
+
     companion object {
         const val TABLE_NAME = "payers"
 
@@ -103,10 +105,6 @@ class PayerEntity(
         if (payerId != other.payerId || ercCode != other.ercCode) return false
 
         return true
-    }
-
-    override fun hashCode(): Int {
-        return payerId.hashCode()
     }
 
     override fun toString(): String {

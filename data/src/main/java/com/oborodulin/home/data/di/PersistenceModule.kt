@@ -1,4 +1,4 @@
-package com.oborodulin.home.di
+package com.oborodulin.home.data.di
 
 import android.content.Context
 import com.google.gson.Gson
@@ -34,4 +34,8 @@ object PersistenceModule {
     @Singleton
     @Provides
     fun provideRateDao(db: HomeDatabase) = db.rateDao()
+
+    @Singleton
+    @Provides
+    fun provideReceiptDao(db: HomeDatabase) = db.receiptDao()
 }

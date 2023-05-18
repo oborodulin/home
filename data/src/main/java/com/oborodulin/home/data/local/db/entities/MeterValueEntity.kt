@@ -24,7 +24,10 @@ data class MeterValueEntity(
     val valueDate: OffsetDateTime = OffsetDateTime.now(),
     val meterValue: BigDecimal? = null,
     @ColumnInfo(index = true) var metersId: UUID,
-) {
+) : BaseEntity() {
+
+    override fun id() = this.meterValueId
+
     companion object {
         const val TABLE_NAME = "meter_values"
 
@@ -221,10 +224,6 @@ data class MeterValueEntity(
         if (meterValueId != other.meterValueId) return false
 
         return true
-    }
-
-    override fun hashCode(): Int {
-        return meterValueId.hashCode()
     }
 
     override fun toString(): String {

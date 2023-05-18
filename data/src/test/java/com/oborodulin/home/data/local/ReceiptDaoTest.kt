@@ -1,12 +1,14 @@
-package com.oborodulin.home.data.local.db
+package com.oborodulin.home.data.local
 
 import android.os.Build
 import androidx.test.filters.MediumTest
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
+import com.oborodulin.home.data.local.db.HomeDatabase
 import com.oborodulin.home.data.local.db.dao.PayerDao
 import com.oborodulin.home.data.local.db.dao.ReceiptDao
 import com.oborodulin.home.data.local.db.entities.*
+import dagger.hilt.android.testing.HiltAndroidTest
 import kotlinx.coroutines.*
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.*
@@ -22,6 +24,7 @@ import java.util.*
  *
  * See [testing documentation](http://d.android.com/tools/testing).
  */
+@HiltAndroidTest
 @RunWith(RobolectricTestRunner::class)
 @Config(sdk = [Build.VERSION_CODES.P])
 @MediumTest
@@ -32,8 +35,8 @@ class ReceiptDaoTest : HomeDatabaseTest() {
     @Before
     override fun setUp() {
         super.setUp()
-        payerDao = payerDao()
-        receiptDao = receiptDao()
+        receiptDao = db.receiptDao()
+        payerDao = db.payerDao()
     }
 
     @OptIn(ExperimentalCoroutinesApi::class)

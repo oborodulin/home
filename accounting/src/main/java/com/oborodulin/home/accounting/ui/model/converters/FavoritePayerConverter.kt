@@ -1,6 +1,6 @@
 package com.oborodulin.home.accounting.ui.model.converters
 
-import com.oborodulin.home.accounting.domain.usecases.GetFavoritePayerUseCase
+import com.oborodulin.home.domain.usecases.GetFavoritePayerUseCase
 import com.oborodulin.home.accounting.ui.model.AccountingUi
 import com.oborodulin.home.accounting.ui.model.mappers.PayerToPayerUiMapper
 import com.oborodulin.home.common.ui.state.CommonResultConverter

@@ -17,14 +17,17 @@ import java.util.*
         deferred = true
     )]
 )
-class ServiceTlEntity(
+data class ServiceTlEntity(
     @PrimaryKey val serviceTlId: UUID = UUID.randomUUID(),
     val serviceLocCode: String = Locale.getDefault().language,
     val serviceName: String = "",
     var serviceMeasureUnit: String? = null,
     val serviceDesc: String? = null,
     @ColumnInfo(index = true) val servicesId: UUID,
-) {
+) : BaseEntity() {
+
+    override fun id() = this.serviceTlId
+
     companion object {
         const val TABLE_NAME = "services_tl"
 
@@ -146,10 +149,6 @@ class ServiceTlEntity(
         if (serviceTlId != other.serviceTlId) return false
 
         return true
-    }
-
-    override fun hashCode(): Int {
-        return serviceTlId.hashCode()
     }
 }
 

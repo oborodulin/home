@@ -29,6 +29,7 @@
     <!--ЗАПОЛНИТЕЛИ (Compose Preview) -->
     <string name="preview_blank_title">Title</string>
     <string name="preview_blank_descr">Description</string>
+    <string name="preview_list_item_text">List Item Content</string>
     <string name="preview_blank_text_field_lbl">Field label</string>
     <string name="preview_blank_text_field_val">Text value</string>
     <string name="preview_blank_text_field_err">error message</string>

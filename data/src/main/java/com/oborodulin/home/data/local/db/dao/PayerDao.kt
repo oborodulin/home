@@ -25,6 +25,12 @@ interface PayerDao : BaseDao<PayerEntity> {
     @ExperimentalCoroutinesApi
     fun findDistinctById(id: UUID) = findById(id).distinctUntilChanged()
 
+    @Query("SELECT * FROM ${PayerEntity.TABLE_NAME} WHERE ercCode = :ercCode LIMIT 1")
+    fun findByErcCode(ercCode: String): Flow<PayerEntity>
+
+    @Query("SELECT EXISTS (SELECT * FROM ${PayerEntity.TABLE_NAME} WHERE ercCode = :ercCode LIMIT 1)")
+    fun existsByErcCode(ercCode: String): Boolean
+
     @Query("SELECT * FROM ${PayerEntity.TABLE_NAME} WHERE isFavorite = $DB_TRUE")
     fun findFavorite(): Flow<PayerEntity>
 

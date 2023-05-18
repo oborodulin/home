@@ -1,4 +1,4 @@
-package com.oborodulin.home.data.local.db
+package com.oborodulin.home.data.local
 
 import android.content.Context
 import android.database.sqlite.SQLiteConstraintException
@@ -7,12 +7,14 @@ import androidx.room.withTransaction
 import androidx.test.filters.MediumTest
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
+import com.oborodulin.home.data.local.db.HomeDatabase
 import com.oborodulin.home.data.local.db.dao.PayerDao
 import com.oborodulin.home.data.local.db.dao.ServiceDao
 import com.oborodulin.home.data.local.db.entities.PayerEntity
 import com.oborodulin.home.data.local.db.entities.PayerServiceCrossRefEntity
 import com.oborodulin.home.data.local.db.entities.ServiceEntity
 import com.oborodulin.home.data.local.db.entities.ServiceTlEntity
+import dagger.hilt.android.testing.HiltAndroidTest
 import kotlinx.coroutines.*
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.*
@@ -31,27 +33,20 @@ import java.util.concurrent.CountDownLatch
  * See [testing documentation](http://d.android.com/tools/testing).
  */
 //https://clintpauldev.com/room-testing-using-dagger-hilt/
-//@HiltAndroidTest
+@HiltAndroidTest
 @RunWith(RobolectricTestRunner::class)
 //@Config(constants = BuildConfig::class)
 @Config(sdk = [Build.VERSION_CODES.P]) // This config setting is the key to make things work
 @MediumTest
 class PayerDaoTest : HomeDatabaseTest() {
-    /*    @get:Rule
-        var hiltRule = HiltAndroidRule(this)
-
-        @get:Rule
-        var instantTaskExecutorRule = InstantTaskExecutorRule()
-
-     */
     private lateinit var payerDao: PayerDao
     private lateinit var serviceDao: ServiceDao
 
     @Before
     override fun setUp() {
         super.setUp()
-        payerDao = payerDao()
-        serviceDao = serviceDao()
+        payerDao = db.payerDao()
+        serviceDao = db.serviceDao()
     }
 
     @OptIn(ExperimentalCoroutinesApi::class)

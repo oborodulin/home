@@ -1,14 +1,16 @@
-package com.oborodulin.home.data.local.db
+package com.oborodulin.home.data.local
 
 import android.content.Context
 import android.os.Build
 import androidx.test.filters.MediumTest
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
+import com.oborodulin.home.data.local.db.HomeDatabase
 import com.oborodulin.home.data.local.db.dao.MeterDao
 import com.oborodulin.home.data.local.db.dao.PayerDao
 import com.oborodulin.home.data.local.db.entities.*
 import com.oborodulin.home.data.util.MeterType
+import dagger.hilt.android.testing.HiltAndroidTest
 import kotlinx.coroutines.*
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.*
@@ -29,6 +31,7 @@ import java.util.*
  */
 private const val TAG = "Testing.db.MeterDaoTest"
 
+@HiltAndroidTest
 @RunWith(RobolectricTestRunner::class)
 @Config(sdk = [Build.VERSION_CODES.P])
 @MediumTest
@@ -41,8 +44,8 @@ class MeterDaoTest : HomeDatabaseTest() {
     @Before
     override fun setUp() {
         super.setUp()
-        meterDao = meterDao()
-        payerDao = payerDao()
+        meterDao = db.meterDao()
+        payerDao = db.payerDao()
     }
 
     @OptIn(ExperimentalCoroutinesApi::class)

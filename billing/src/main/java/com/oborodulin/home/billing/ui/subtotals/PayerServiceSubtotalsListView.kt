@@ -24,6 +24,7 @@ import com.oborodulin.home.presentation.navigation.PayerInput
 import com.oborodulin.home.presentation.util.serviceIconId
 import com.oborodulin.home.servicing.R
 import com.oborodulin.home.billing.ui.model.ServiceSubtotalListItem
+import com.oborodulin.home.presentation.components.ServiceSubtotalListItemComponent
 import kotlinx.coroutines.flow.collectLatest
 import timber.log.Timber
 
@@ -79,7 +80,7 @@ fun PayerServiceSubtotalsList(
         ) {
             items(payerServiceSubtotals.size) { index ->
                 payerServiceSubtotals[index].let { payerServiceSubtotal ->
-                    ListItemComponent(
+                    ServiceSubtotalListItemComponent(
                         icon = serviceIconId(payerServiceSubtotal.serviceType),
                         item = payerServiceSubtotal,
                         itemActions = listOf(ComponentUiAction.PayListItem(

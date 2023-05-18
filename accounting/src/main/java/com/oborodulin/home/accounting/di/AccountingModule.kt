@@ -60,29 +60,25 @@ object AccountingModule {
     fun provideAccountingUseCases(
         configuration: UseCase.Configuration,
         payersRepository: PayersRepository,
-        metersRepository: MetersRepository
-    ): AccountingUseCases =
-        AccountingUseCases(
-            getFavoritePayerUseCase = GetFavoritePayerUseCase(
-                configuration,
-                payersRepository
-            ),
-        )
+        metersRepository: MetersRepository,
+        getFavoritePayerUseCase: GetFavoritePayerUseCase
+    ): AccountingUseCases = AccountingUseCases(getFavoritePayerUseCase = getFavoritePayerUseCase)
 
     @Singleton
     @Provides
     fun providePayerUseCases(
         configuration: UseCase.Configuration, payersRepository: PayersRepository,
-        ratesRepository: RatesRepository
+        ratesRepository: RatesRepository,
+        getPayerUseCase: GetPayerUseCase, savePayerUseCase: SavePayerUseCase,
+        deletePayerUseCase: DeletePayerUseCase, favoritePayerUseCase: FavoritePayerUseCase
     ): PayerUseCases =
         PayerUseCases(
-            getPayerUseCase = GetPayerUseCase(configuration, payersRepository),
+            getPayerUseCase = getPayerUseCase,
             getPayersUseCase = GetPayersUseCase(
                 configuration, payersRepository, ratesRepository
             ),
-            savePayerUseCase = SavePayerUseCase(configuration, payersRepository),
-            deletePayerUseCase = DeletePayerUseCase(configuration, payersRepository),
-            favoritePayerUseCase = FavoritePayerUseCase(configuration, payersRepository)
+            savePayerUseCase = savePayerUseCase,
+            deletePayerUseCase = deletePayerUseCase,
+            favoritePayerUseCase = favoritePayerUseCase
         )
-
 }
