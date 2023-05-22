@@ -29,8 +29,19 @@ android {
         jvmTarget = cfg.jvm.target
     }
 }
-
+//kotlin {
+//    sourceSets.all {
+//        languageSettings {
+//            languageVersion = "2.0"
+//        }
+//    }
+//}
 dependencies {
+
+    // Compose
+    def composeBom = platform(deps.compose.bom)
+    implementation composeBom
+    androidTestImplementation composeBom
 
     implementation deps.androidx.coreKtx
     implementation deps.androidx.appcompat
@@ -40,11 +51,11 @@ dependencies {
     implementation deps.lifecycle.viewmodelCompose
     implementation deps.google.gson
     implementation deps.navigation.compose
-    //debugImplementation deps.compose.uiTooling
+    //debugImplementation deps.compose.uiToolingBom
 
     // Testing dependencies
     testImplementation deps.test.junit
     androidTestImplementation deps.test.extJunit
     androidTestImplementation deps.test.espressoCore
-    androidTestImplementation deps.compose.uiTestJunit4
+    androidTestImplementation deps.test.uiJunit4Bom
 }

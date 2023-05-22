@@ -63,7 +63,13 @@ android {
         }
     }
 }
-
+//kotlin {
+//    sourceSets.all {
+//        languageSettings {
+//            languageVersion = "2.0"
+//        }
+//    }
+//}
 dependencies {
     implementation(project(':common'))
     implementation(project(':domain'))
@@ -71,10 +77,12 @@ dependencies {
     // Logging
     implementation deps.logging.timber
     implementation deps.logging.logger
+
     // Room
     kapt deps.room.compiler
     implementation deps.room.runtime
     implementation deps.room.ktx
+
     // Hilt
     implementation deps.dagger.hilt
     kapt deps.dagger.compiler
@@ -83,8 +91,10 @@ dependencies {
     implementation deps.jvm.inject
     implementation deps.coroutines.android
     implementation deps.coroutines.core
+
     // Desugaring
     //coreLibraryDesugaring deps.tools.desugar
+
     // Networking
     implementation deps.retrofit2.retrofit
     implementation deps.retrofit2.converterGson

@@ -13,7 +13,7 @@ import kotlinx.coroutines.flow.distinctUntilChanged
 import java.util.*
 
 @Dao
-interface RateDao : BaseDao<RateEntity> {
+interface RateDao { //  : BaseDao<RateEntity>
     // READS:
     @Query("SELECT * FROM ${RateEntity.TABLE_NAME}")
     fun findAll(): Flow<List<RateEntity>>
@@ -88,10 +88,32 @@ ORDER BY servicePos
     ): Flow<PayerTotalDebtView>
 
     // INSERTS:
+    @Insert(onConflict = OnConflictStrategy.ABORT)
+    suspend fun insert(rate: RateEntity)
+
+    @Insert(onConflict = OnConflictStrategy.ABORT)
+    suspend fun insert(vararg rates: RateEntity)
+
+    @Insert(onConflict = OnConflictStrategy.ABORT)
+    suspend fun insert(rates: List<RateEntity>)
 
     // UPDATES:
+    @Update
+    suspend fun update(rate: RateEntity)
+
+    @Update
+    suspend fun update(vararg rates: RateEntity)
 
     // DELETES:
+    @Delete
+    suspend fun delete(rate: RateEntity)
+
+    @Delete
+    suspend fun delete(vararg rates: RateEntity)
+
+    @Delete
+    suspend fun delete(rates: List<RateEntity>)
+
     @Query("DELETE FROM ${RateEntity.TABLE_NAME} WHERE rateId = :rateId")
     suspend fun deleteById(rateId: UUID)
 

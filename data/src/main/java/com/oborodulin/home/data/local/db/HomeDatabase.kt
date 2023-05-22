@@ -66,6 +66,7 @@ private val MIGRATION_4_5 = object : Migration(4, 5) {
 )
 @TypeConverters(HomeTypeConverters::class)
 abstract class HomeDatabase : RoomDatabase() {
+    abstract fun appSettingDao(): AppSettingDao
     abstract fun payerDao(): PayerDao
     abstract fun serviceDao(): ServiceDao
     abstract fun meterDao(): MeterDao

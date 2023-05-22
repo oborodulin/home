@@ -7,9 +7,9 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
@@ -31,7 +31,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.compose.ExperimentalLifecycleComposeApi
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.flowWithLifecycle
 import com.oborodulin.home.accounting.R
@@ -73,7 +72,7 @@ fun PayerScreen(
         HomeComposableTheme { //(darkTheme = true)
             ScaffoldComponent(
                 appState = appState,
-                scaffoldState = appState.payerScaffoldState,
+                //scaffoldState = appState.payerScaffoldState,
                 topBarTitleId = topBarTitleId,
                 topBarNavigationIcon = {
                     IconButton(onClick = { appState.backToBottomBarScreen() }) {
@@ -92,10 +91,7 @@ fun PayerScreen(
     }
 }
 
-@OptIn(
-    ExperimentalComposeUiApi::class, ExperimentalLifecycleComposeApi::class,
-    ExperimentalMaterialApi::class
-)
+@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun Payer(appState: AppState, viewModel: PayerViewModel, onSubmit: () -> Unit) {
     Timber.tag(TAG).d("Payer(...) called")
@@ -143,7 +139,7 @@ fun Payer(appState: AppState, viewModel: PayerViewModel, onSubmit: () -> Unit) {
             .padding(4.dp)
             .height(IntrinsicSize.Min)
             .clip(RoundedCornerShape(16.dp))
-            .border(2.dp, MaterialTheme.colors.primary, shape = RoundedCornerShape(16.dp))
+            .border(2.dp, MaterialTheme.colorScheme.primary, shape = RoundedCornerShape(16.dp))
             .verticalScroll(rememberScrollState()),
         verticalArrangement = Arrangement.Top,
         horizontalAlignment = Alignment.CenterHorizontally,

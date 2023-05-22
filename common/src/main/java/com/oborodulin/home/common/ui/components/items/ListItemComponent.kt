@@ -9,8 +9,9 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.layout.Arrangement.Top
 import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.Card
-import androidx.compose.material.Text
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -67,9 +68,9 @@ fun ListItemComponent(
             .background(background)
             .selectable(selected = selected, onClick = { if (onClick !== EMPTY) onClick(item) })
             .padding(horizontal = 4.dp, vertical = 4.dp),
-        //.background(color = MaterialTheme.colors.background)
+        //.background(color = MaterialTheme.colorScheme.background)
         //.clickable {}
-        elevation = 8.dp
+        elevation = CardDefaults.cardElevation(8.dp)
     ) {
         Row(
             Modifier
@@ -123,6 +124,7 @@ fun ListItemComponent(
                                 contentDescription = ""
                             )
                         }
+
                         is ComponentUiAction.DeleteListItem -> {
                             AlertDialogComponent(
                                 isShow = showDialogState.value,
@@ -142,6 +144,7 @@ fun ListItemComponent(
                                 contentDescription = ""
                             )
                         }
+
                         is ComponentUiAction.PayListItem -> {
                         }
                     }
@@ -167,7 +170,7 @@ fun PreviewListItemComponent() {
     ) {
         Text(
             text = stringResource(R.string.preview_list_item_text),
-            style = Typography.body1.copy(fontWeight = FontWeight.Bold)
+            style = Typography.bodyMedium.copy(fontWeight = FontWeight.Bold)
         )
     }
 }

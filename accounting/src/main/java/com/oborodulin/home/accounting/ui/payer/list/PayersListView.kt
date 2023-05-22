@@ -9,8 +9,8 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.selection.selectableGroup
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Text
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -169,7 +169,7 @@ fun PayersList(
     else {
         Text(
             text = stringResource(R.string.payer_list_empty_text),
-            style = MaterialTheme.typography.subtitle1,
+            style = MaterialTheme.typography.titleSmall,
             fontWeight = FontWeight.Bold
         )
     }
@@ -190,7 +190,7 @@ fun PayersAccounting(
         modifier = Modifier
             .fillMaxSize()
             .background(
-                MaterialTheme.colors.surface,
+                MaterialTheme.colorScheme.surface,
                 shape = RoundedCornerShape(20.dp)
             )
             .padding(horizontal = 4.dp),
@@ -201,11 +201,11 @@ fun PayersAccounting(
             modifier = Modifier
                 .padding(vertical = 4.dp)
                 .clip(RoundedCornerShape(16.dp))
-                //.background(MaterialTheme.colors.background, shape = RoundedCornerShape(20.dp))
+                //.background(MaterialTheme.colorScheme.background, shape = RoundedCornerShape(20.dp))
                 .weight(3.3f)
                 .border(
                     2.dp,
-                    MaterialTheme.colors.primary,
+                    MaterialTheme.colorScheme.primary,
                     shape = RoundedCornerShape(16.dp)
                 )
         ) {
@@ -266,7 +266,7 @@ fun PayersAccounting(
                 .weight(3.3f)
                 .border(
                     2.dp,
-                    MaterialTheme.colors.primary,
+                    MaterialTheme.colorScheme.primary,
                     shape = RoundedCornerShape(16.dp)
                 )
         ) {
@@ -284,7 +284,7 @@ fun PayersAccounting(
                 .weight(3.4f)
                 .border(
                     2.dp,
-                    MaterialTheme.colors.primary,
+                    MaterialTheme.colorScheme.primary,
                     shape = RoundedCornerShape(16.dp)
                 )
         ) {

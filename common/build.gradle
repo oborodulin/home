@@ -45,11 +45,18 @@ android {
         kotlinCompilerExtensionVersion versions.composeKotlinExt
     }
 }
-
+//kotlin {
+//    sourceSets.all {
+//        languageSettings {
+//            languageVersion = "2.0"
+//        }
+//    }
+//}
 dependencies {
     // Logging
     implementation deps.logging.timber
     implementation deps.logging.logger
+
     // Hilt
     implementation deps.dagger.hilt
     kapt deps.dagger.compiler
@@ -58,14 +65,20 @@ dependencies {
     implementation deps.coroutines.core
     implementation deps.jvm.inject
     implementation deps.kotlin.reflect
+
     // XML-parser
     implementation deps.xml.xmlpull
     implementation deps.google.gson
+
     // Compose
-    implementation deps.compose.ui
-    implementation deps.compose.material
-    implementation deps.compose.uiTooling
-    implementation deps.compose.uiPreview
+    def composeBom = platform(deps.compose.bom)
+    implementation composeBom
+    androidTestImplementation composeBom
+
+    implementation deps.compose.uiBom
+    implementation deps.compose.material3Bom
+    implementation deps.compose.uiToolingBom
+    implementation deps.compose.uiPreviewBom
     // Coil
     implementation deps.coil.compose
     // Lottie

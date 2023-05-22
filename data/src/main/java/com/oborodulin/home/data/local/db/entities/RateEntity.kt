@@ -1,7 +1,7 @@
 package com.oborodulin.home.data.local.db.entities
 
 import androidx.room.*
-import androidx.room.ForeignKey.CASCADE
+import androidx.room.ForeignKey
 import java.math.BigDecimal
 import java.time.OffsetDateTime
 import java.time.format.DateTimeFormatter
@@ -17,12 +17,12 @@ import java.util.*
         entity = ServiceEntity::class,
         parentColumns = arrayOf("serviceId"),
         childColumns = arrayOf("servicesId"),
-        onDelete = CASCADE
+        onDelete = ForeignKey.CASCADE
     ), ForeignKey(
         entity = PayerServiceCrossRefEntity::class,
         parentColumns = arrayOf("payerServiceId"),
         childColumns = arrayOf("payersServicesId"),
-        onDelete = CASCADE
+        onDelete = ForeignKey.CASCADE
     )]
 )
 data class RateEntity(

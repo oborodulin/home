@@ -8,7 +8,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material.*
+import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -21,7 +21,7 @@ import com.oborodulin.home.common.ui.theme.HomeComposableTheme
 import com.oborodulin.home.common.util.OnImeKeyAction
 import com.oborodulin.home.common.util.OnValueChange
 
-@OptIn(ExperimentalMaterialApi::class)
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ExposedDropdownMenuBoxComponent(
     modifier: Modifier,
@@ -85,8 +85,8 @@ fun ExposedDropdownMenuBoxComponent(
             if (errorMessage != null) {
                 Text(
                     text = errorMessage,
-                    color = MaterialTheme.colors.error,
-                    style = MaterialTheme.typography.caption,
+                    color = MaterialTheme.colorScheme.error,
+                    style = MaterialTheme.typography.titleSmall,
                     modifier = Modifier.padding(start = 16.dp)
                 )
             }
@@ -97,13 +97,12 @@ fun ExposedDropdownMenuBoxComponent(
         ) {
             listItems.forEach { selectedOption ->
                 // menu item
-                DropdownMenuItem(onClick = {
-                    fieldValue.value = selectedOption
-                    expanded = false
-                    onValueChange(selectedOption)
-                }) {
-                    Text(text = selectedOption)
-                }
+                DropdownMenuItem(text = { Text(text = selectedOption) },
+                    onClick = {
+                        fieldValue.value = selectedOption
+                        expanded = false
+                        onValueChange(selectedOption)
+                    })
             }
         }
     }

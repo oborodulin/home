@@ -20,18 +20,22 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
+import dagger.hilt.testing.TestInstallIn
 import kotlinx.coroutines.CoroutineDispatcher
 import javax.inject.Singleton
 
 @Module
-@InstallIn(SingletonComponent::class)
-object DataModule {
+@TestInstallIn(
+    components = [SingletonComponent::class],
+    replaces = [DataModule::class]
+)
+object TestDataModule {
     //Persistence
     @Singleton
     @Provides
     fun provideHomeDatabase(
         @ApplicationContext appContext: Context, jsonLogger: Gson
-    ): HomeDatabase = HomeDatabase.getInstance(appContext, jsonLogger)
+    ): HomeDatabase = HomeDatabase.getTestInstance(appContext, jsonLogger)
 
     @Singleton
     @Provides

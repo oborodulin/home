@@ -10,7 +10,8 @@ import kotlinx.coroutines.flow.distinctUntilChanged
 import java.util.*
 
 @Dao
-interface MeterDao : BaseDao<MeterEntity> {
+interface MeterDao {
+    // : BaseDao<MeterEntity>
     // READS:
     @Query("SELECT * FROM ${MeterView.VIEW_NAME} WHERE meterLocCode = :locale")
     fun findAll(locale: String? = Locale.getDefault().language): Flow<List<MeterView>>
@@ -95,6 +96,15 @@ ORDER BY servicePos, meterId, strftime(${Constants.DB_FRACT_SEC_TIME}, startMete
         findMeterValuePaymentByPayerId(payerId).distinctUntilChanged()
 
     // INSERTS:
+    @Insert(onConflict = OnConflictStrategy.ABORT)
+    suspend fun insert(meter: MeterEntity)
+
+    @Insert(onConflict = OnConflictStrategy.ABORT)
+    suspend fun insert(vararg meters: MeterEntity)
+
+    @Insert(onConflict = OnConflictStrategy.ABORT)
+    suspend fun insert(meters: List<MeterEntity>)
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insert(vararg textContent: MeterTlEntity)
 
@@ -112,6 +122,12 @@ ORDER BY servicePos, meterId, strftime(${Constants.DB_FRACT_SEC_TIME}, startMete
 
     // UPDATES:
     @Update
+    suspend fun update(meter: MeterEntity)
+
+    @Update
+    suspend fun update(vararg meters: MeterEntity)
+
+    @Update
     suspend fun update(vararg textContent: MeterTlEntity)
 
     @Transaction
@@ -127,6 +143,15 @@ ORDER BY servicePos, meterId, strftime(${Constants.DB_FRACT_SEC_TIME}, startMete
     suspend fun update(vararg meterVerifications: MeterVerificationEntity)
 
     // DELETES:
+    @Delete
+    suspend fun delete(meter: MeterEntity)
+
+    @Delete
+    suspend fun delete(vararg meters: MeterEntity)
+
+    @Delete
+    suspend fun delete(meters: List<MeterEntity>)
+
     @Query("DELETE FROM meters")
     suspend fun deleteAll()
 

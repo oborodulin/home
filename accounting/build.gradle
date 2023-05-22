@@ -54,6 +54,13 @@ android {
         kotlinCompilerExtensionVersion versions.composeKotlinExt
     }
 }
+//kotlin {
+//    sourceSets.all {
+//        languageSettings {
+//            languageVersion = "2.0"
+//        }
+//    }
+//}
 dependencies {
     implementation project(':common')
     implementation project(':data')
@@ -66,21 +73,29 @@ dependencies {
     // Logging
     implementation deps.logging.timber
     implementation deps.logging.logger
+
     // Room
     implementation deps.room.runtime
     kapt deps.room.compiler
     implementation deps.room.ktx
+
     // Compose
-    implementation deps.compose.ui
-    implementation deps.compose.material
-    implementation deps.compose.iconsCore
-    implementation deps.compose.iconsExtended
-    implementation deps.compose.uiTooling
-    implementation deps.compose.uiPreview
-    // Compose preview
+    def composeBom = platform(deps.compose.bom)
+    implementation composeBom
+    androidTestImplementation composeBom
+
+    implementation deps.compose.uiBom
+    // Material Design 3
+    implementation deps.compose.material3Bom
+    implementation deps.compose.iconsCoreBom
+    implementation deps.compose.iconsExtendedBom
+    // Android Studio Preview support
+    implementation deps.compose.uiPreviewBom
+    debugImplementation deps.compose.uiToolingBom
     debugImplementation deps.androidx.poolingcontainer
     // Compose Constraint Layout
     implementation deps.androidx.constraintlayoutCompose
+
     // Hilt
     implementation deps.dagger.hilt
     kapt deps.dagger.compiler
@@ -91,6 +106,7 @@ dependencies {
     implementation deps.TalhaFaki.composableSweetToast
     // Lottie
     implementation deps.lottie.compose
+
     // Network
     implementation deps.retrofit2.retrofit
     implementation deps.retrofit2.converterGson
@@ -106,11 +122,10 @@ dependencies {
     implementation deps.lifecycle.runtimeCompose
     implementation deps.google.gson
     implementation deps.navigation.compose
-    //debugImplementation deps.compose.uiTooling
 
     // Testing dependencies
     testImplementation deps.test.junit
     androidTestImplementation deps.test.extJunit
     androidTestImplementation deps.test.espressoCore
-    androidTestImplementation deps.compose.uiTestJunit4
+    androidTestImplementation deps.test.uiJunit4Bom
 }

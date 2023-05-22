@@ -7,7 +7,7 @@ import androidx.room.PrimaryKey
 import com.oborodulin.home.data.R
 import com.oborodulin.home.data.util.Constants
 import java.math.BigDecimal
-import java.util.*
+import java.util.UUID
 
 @Entity(tableName = PayerEntity.TABLE_NAME, indices = [Index(value = ["ercCode"], unique = true)])
 data class PayerEntity(

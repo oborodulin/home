@@ -2,9 +2,10 @@ package com.oborodulin.home.accounting.ui.model
 
 import com.oborodulin.home.common.ui.model.ListItemModel
 import com.oborodulin.home.data.util.Constants.DEF_PAYMENT_DAY
+import com.oborodulin.home.data.util.Constants.DEF_PERSON_NUM
 import java.math.BigDecimal
 import java.time.OffsetDateTime
-import java.util.*
+import java.util.UUID
 
 data class PayerListItem(
     val id: UUID,
@@ -13,7 +14,7 @@ data class PayerListItem(
     val totalArea: BigDecimal? = null,
     val livingSpace: BigDecimal? = null,
     val paymentDay: Int = DEF_PAYMENT_DAY,
-    val personsNum: Int = 1,
+    val personsNum: Int = DEF_PERSON_NUM,
     val isAlignByPaymentDay: Boolean = false,
     val isFavorite: Boolean = false,
     val fromPaymentDate: OffsetDateTime? = null,

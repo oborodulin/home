@@ -8,7 +8,7 @@ import kotlinx.coroutines.flow.distinctUntilChanged
 import java.util.*
 
 @Dao
-interface AppSettingDao : BaseDao<AppSettingEntity> {
+interface AppSettingDao { // : BaseDao<AppSettingEntity>
     // READS:
     @Query("SELECT * FROM ${AppSettingEntity.TABLE_NAME}")
     fun findAll(): Flow<List<AppSettingEntity>>
@@ -30,10 +30,32 @@ interface AppSettingDao : BaseDao<AppSettingEntity> {
         findByParamName(paramName).distinctUntilChanged()
 
     // INSERTS:
+    @Insert(onConflict = OnConflictStrategy.ABORT)
+    suspend fun insert(setting: AppSettingEntity)
+
+    @Insert(onConflict = OnConflictStrategy.ABORT)
+    suspend fun insert(vararg settings: AppSettingEntity)
+
+    @Insert(onConflict = OnConflictStrategy.ABORT)
+    suspend fun insert(settings: List<AppSettingEntity>)
 
     // UPDATES:
+    @Update
+    suspend fun update(setting: AppSettingEntity)
+
+    @Update
+    suspend fun update(vararg settings: AppSettingEntity)
 
     // DELETES:
+    @Delete
+    suspend fun delete(settings: AppSettingEntity)
+
+    @Delete
+    suspend fun delete(vararg settings: AppSettingEntity)
+
+    @Delete
+    suspend fun delete(settings: List<AppSettingEntity>)
+
     @Query("DELETE FROM ${AppSettingEntity.TABLE_NAME} WHERE settingId = :id")
     suspend fun deleteById(id: UUID)
 

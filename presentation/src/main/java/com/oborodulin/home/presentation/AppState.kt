@@ -1,8 +1,6 @@
 package com.oborodulin.home.presentation
 
 import android.content.res.Resources
-import androidx.compose.material.ScaffoldState
-import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.platform.LocalContext
@@ -20,8 +18,8 @@ private const val TAG = "Presentation.AppState"
 
 @Composable
 fun rememberAppState(
-    accountingScaffoldState: ScaffoldState = rememberScaffoldState(),
-    payerScaffoldState: ScaffoldState = rememberScaffoldState(),
+    //accountingScaffoldState: ScaffoldState = rememberScaffoldState(),
+    //payerScaffoldState: ScaffoldState = rememberScaffoldState(),
     commonNavController: NavHostController = rememberNavController(),
     navBarNavController: NavHostController = rememberNavController(),
     resources: Resources = LocalContext.current.resources,
@@ -30,8 +28,8 @@ fun rememberAppState(
     actionBarSubtitle: MutableState<String> = rememberSaveable { mutableStateOf("") }
 ) =
     remember(
-        accountingScaffoldState,
-        payerScaffoldState,
+        //accountingScaffoldState,
+        //payerScaffoldState,
         commonNavController,
         navBarNavController,
         resources,
@@ -39,8 +37,8 @@ fun rememberAppState(
         actionBarSubtitle
     ) {
         AppState(
-            accountingScaffoldState,
-            payerScaffoldState,
+            //accountingScaffoldState,
+            //payerScaffoldState,
             commonNavController,
             navBarNavController,
             appName,
@@ -53,8 +51,8 @@ fun rememberAppState(
  */
 @Stable
 class AppState(
-    val accountingScaffoldState: ScaffoldState,
-    val payerScaffoldState: ScaffoldState,
+    //val accountingScaffoldState: ScaffoldState,
+    //val payerScaffoldState: ScaffoldState,
     val commonNavController: NavHostController,
     val navBarNavController: NavHostController,
     val appName: String,

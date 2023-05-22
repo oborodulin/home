@@ -1,7 +1,7 @@
 package com.oborodulin.home.accounting.ui
 
-import androidx.compose.material.Icon
-import androidx.compose.material.IconButton
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Settings
@@ -67,7 +67,7 @@ fun AccountingScreen(
         HomeComposableTheme { //(darkTheme = true)
             ScaffoldComponent(
                 appState = appState,
-                scaffoldState = appState.accountingScaffoldState,
+                //scaffoldState = appState.accountingScaffoldState,
                 nestedScrollConnection = nestedScrollConnection,
                 topBarTitleId = com.oborodulin.home.presentation.R.string.nav_item_accounting,
                 topBarActions = {

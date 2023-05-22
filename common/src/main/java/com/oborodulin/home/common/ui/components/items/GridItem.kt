@@ -2,10 +2,15 @@ package com.oborodulin.home.common.ui.components.items
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Text
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment.Companion.TopCenter
 import androidx.compose.ui.Modifier
@@ -29,7 +34,7 @@ fun GridItem(posterPath: String, title: String, desc: String) {
         modifier = Modifier
             .fillMaxWidth()
             .clip(RoundedCornerShape(6.dp))
-            .background(color = MaterialTheme.colors.background)
+            .background(color = MaterialTheme.colorScheme.background)
             .padding(8.dp)
     ) {
         Column(
@@ -42,14 +47,13 @@ fun GridItem(posterPath: String, title: String, desc: String) {
                 text = title,
                 modifier = Modifier
                     .fillMaxWidth(),
-                style = MaterialTheme.typography.body1.copy(
+                style = MaterialTheme.typography.bodyMedium.copy(
                     color = Color.White,
                     fontWeight = FontWeight.Bold,
                     textAlign = TextAlign.Center
                 ),
                 maxLines = 2
             )
-
             if (desc.isNotEmpty()) {
                 Text(
                     modifier = Modifier
@@ -57,7 +61,7 @@ fun GridItem(posterPath: String, title: String, desc: String) {
                     text = desc,
                     maxLines = 2,
                     overflow = TextOverflow.Ellipsis,
-                    style = Typography.body2.copy(color = Color.White)
+                    style = Typography.bodySmall.copy(color = Color.White)
                 )
             }
             Spacer(Modifier.padding(8.dp))

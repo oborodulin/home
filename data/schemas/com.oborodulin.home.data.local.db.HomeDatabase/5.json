@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 5,
-    "identityHash": "041fbde72eae8ab7fdf16d2e5721b9d0",
+    "identityHash": "0fdbcc2dccfc6a697d9ace29bcbf8725",
     "entities": [
       {
         "tableName": "app_settings",
@@ -28,10 +28,10 @@
           }
         ],
         "primaryKey": {
+          "autoGenerate": false,
           "columnNames": [
             "settingId"
-          ],
-          "autoGenerate": false
+          ]
         },
         "indices": [
           {
@@ -118,10 +118,10 @@
           }
         ],
         "primaryKey": {
+          "autoGenerate": false,
           "columnNames": [
             "payerId"
-          ],
-          "autoGenerate": false
+          ]
         },
         "indices": [
           {
@@ -166,10 +166,10 @@
           }
         ],
         "primaryKey": {
+          "autoGenerate": false,
           "columnNames": [
             "serviceId"
-          ],
-          "autoGenerate": false
+          ]
         },
         "indices": [
           {
@@ -226,10 +226,10 @@
           }
         ],
         "primaryKey": {
+          "autoGenerate": false,
           "columnNames": [
             "serviceTlId"
-          ],
-          "autoGenerate": false
+          ]
         },
         "indices": [
           {
@@ -332,10 +332,10 @@
           }
         ],
         "primaryKey": {
+          "autoGenerate": false,
           "columnNames": [
             "payerServiceId"
-          ],
-          "autoGenerate": false
+          ]
         },
         "indices": [
           {
@@ -453,10 +453,10 @@
           }
         ],
         "primaryKey": {
+          "autoGenerate": false,
           "columnNames": [
             "rateId"
-          ],
-          "autoGenerate": false
+          ]
         },
         "indices": [
           {
@@ -553,10 +553,10 @@
           }
         ],
         "primaryKey": {
+          "autoGenerate": false,
           "columnNames": [
             "serviceActivityId"
-          ],
-          "autoGenerate": false
+          ]
         },
         "indices": [
           {
@@ -625,10 +625,10 @@
           }
         ],
         "primaryKey": {
+          "autoGenerate": false,
           "columnNames": [
             "servicePromotionId"
-          ],
-          "autoGenerate": false
+          ]
         },
         "indices": [
           {
@@ -729,10 +729,10 @@
           }
         ],
         "primaryKey": {
+          "autoGenerate": false,
           "columnNames": [
             "meterId"
-          ],
-          "autoGenerate": false
+          ]
         },
         "indices": [
           {
@@ -807,10 +807,10 @@
           }
         ],
         "primaryKey": {
+          "autoGenerate": false,
           "columnNames": [
             "meterTlId"
-          ],
-          "autoGenerate": false
+          ]
         },
         "indices": [
           {
@@ -877,10 +877,10 @@
           }
         ],
         "primaryKey": {
+          "autoGenerate": false,
           "columnNames": [
             "meterValueId"
-          ],
-          "autoGenerate": false
+          ]
         },
         "indices": [
           {
@@ -955,10 +955,10 @@
           }
         ],
         "primaryKey": {
+          "autoGenerate": false,
           "columnNames": [
             "meterVerificationId"
-          ],
-          "autoGenerate": false
+          ]
         },
         "indices": [
           {
@@ -1045,10 +1045,10 @@
           }
         ],
         "primaryKey": {
+          "autoGenerate": false,
           "columnNames": [
             "receiptId"
-          ],
-          "autoGenerate": false
+          ]
         },
         "indices": [
           {
@@ -1170,10 +1170,10 @@
           }
         ],
         "primaryKey": {
+          "autoGenerate": false,
           "columnNames": [
             "receiptLineId"
-          ],
-          "autoGenerate": false
+          ]
         },
         "indices": [
           {
@@ -1316,7 +1316,7 @@
       },
       {
         "viewName": "meter_value_payments_view",
-        "createSql": "CREATE VIEW `${VIEW_NAME}` AS SELECT mv.payerId, mv.payerServiceId, mv.meterId, mv.meterValueId, \n        mv.startMeterValue, mv.endMeterValue, \n        (mv.diffMeterValue / (CASE WHEN mv.diffMonths > 0 THEN mv.diffMonths ELSE 1 END)) AS diffMeterValue, \n        mv.isDerivedUnit, mv.derivedUnit, mv.measureUnit, \n        mv.fromPaymentDate, mv.toPaymentDate, \n        mv.diffMonths, mv.paymentMonth, mv.paymentYear, mv.meterLocCode, mv.servicePos\nFROM (SELECT cmv.payerId, cmv.payerServiceId, cmv.meterId, nmv.meterValueId, \n        cmv.meterValue AS startMeterValue, nmv.meterValue AS endMeterValue,\n        (CASE WHEN nmv.isDerivedUnit = 0 \n            THEN CASE WHEN nmv.meterValue >= cmv.meterValue \n                    THEN nmv.meterValue - cmv.meterValue\n                    ELSE (cmv.maxValue - cmv.meterValue) + nmv.meterValue\n                END \n            ELSE nmv.meterValue \n        END) AS diffMeterValue, \n        cmv.isDerivedUnit, cmv.derivedUnit, cmv.measureUnit, \n        cmv.paymentDate AS fromPaymentDate, nmv.paymentDate AS toPaymentDate, \n        (strftime('%Y', ifnull(nmv.paymentDate, datetime('now', 'localtime')), 'start of month', '-1 day') * 12 + \n            strftime('%m', ifnull(nmv.paymentDate, datetime('now', 'localtime')), 'start of month', '-1 day') -\n        strftime('%Y', cmv.paymentDate) * 12 - strftime('%m', cmv.paymentDate) +\n            (strftime('%d', ifnull(nmv.paymentDate, datetime('now', 'localtime')), '+1 day') = '01' OR \n            strftime('%d', ifnull(nmv.paymentDate, datetime('now', 'localtime'))) >= strftime('%d', cmv.paymentDate))) AS diffMonths,\n        nmv.paymentMonth, nmv.paymentYear, cmv.meterLocCode, cmv.servicePos \n    FROM meter_value_payment_periods_view cmv LEFT JOIN meter_value_payment_periods_view nmv\n        ON nmv.meterId = cmv.meterId\n            AND nmv.payerServiceId = cmv.payerServiceId\n            AND nmv.meterLocCode = cmv.meterLocCode\n            AND strftime('%Y-%m-%dT%H:%M:%f', nmv.paymentDate) = \n                (SELECT MIN(strftime('%Y-%m-%dT%H:%M:%f', mvp.paymentDate))\n                FROM meter_value_payment_periods_view mvp\n                WHERE mvp.meterId = nmv.meterId\n                    AND mvp.payerServiceId = nmv.payerServiceId\n                    AND mvp.meterLocCode = nmv.meterLocCode\n                    AND strftime('%Y-%m-%dT%H:%M:%f', mvp.paymentDate) > strftime('%Y-%m-%dT%H:%M:%f', cmv.paymentDate))) mv"
+        "createSql": "CREATE VIEW `${VIEW_NAME}` AS SELECT mv.payerId, mv.payerServiceId, mv.meterId, mv.meterValueId, \n        mv.startMeterValue, mv.endMeterValue, \n        (CASE WHEN mv.diffMonths > 1 \n            THEN CASE WHEN mv.isDerivedUnit = 0 \n                    THEN mv.diffMeterValue / mv.diffMonths\n                    ELSE (mv.endMeterValue + mv.startMeterValue) / 2.0 \n                END \n            ELSE mv.diffMeterValue\n        END) AS diffMeterValue, \n        mv.isDerivedUnit, mv.derivedUnit, mv.measureUnit, \n        mv.fromPaymentDate, mv.toPaymentDate, \n        mv.diffMonths, mv.paymentMonth, mv.paymentYear, mv.meterLocCode, mv.servicePos\nFROM (SELECT cmv.payerId, cmv.payerServiceId, cmv.meterId, nmv.meterValueId, \n        cmv.meterValue AS startMeterValue, nmv.meterValue AS endMeterValue,\n        (CASE WHEN nmv.isDerivedUnit = 0 \n            THEN CASE WHEN nmv.meterValue >= cmv.meterValue \n                    THEN nmv.meterValue - cmv.meterValue\n                    ELSE (cmv.maxValue - cmv.meterValue) + nmv.meterValue\n                END \n            ELSE nmv.meterValue\n        END) AS diffMeterValue, \n        cmv.isDerivedUnit, cmv.derivedUnit, cmv.measureUnit, \n        cmv.paymentDate AS fromPaymentDate, nmv.paymentDate AS toPaymentDate, \n        (strftime('%Y', ifnull(nmv.paymentDate, datetime('now', 'localtime')), 'start of month', '-1 day') * 12 + \n            strftime('%m', ifnull(nmv.paymentDate, datetime('now', 'localtime')), 'start of month', '-1 day') -\n        strftime('%Y', cmv.paymentDate) * 12 - strftime('%m', cmv.paymentDate) +\n            (strftime('%d', ifnull(nmv.paymentDate, datetime('now', 'localtime')), '+1 day') = '01' OR \n            strftime('%d', ifnull(nmv.paymentDate, datetime('now', 'localtime'))) >= strftime('%d', cmv.paymentDate))) AS diffMonths,\n        nmv.paymentMonth, nmv.paymentYear, cmv.meterLocCode, cmv.servicePos \n    FROM meter_value_payment_periods_view cmv LEFT JOIN meter_value_payment_periods_view nmv\n        ON nmv.meterId = cmv.meterId\n            AND nmv.payerServiceId = cmv.payerServiceId\n            AND nmv.meterLocCode = cmv.meterLocCode\n            AND strftime('%Y-%m-%dT%H:%M:%f', nmv.paymentDate) = \n                (SELECT MIN(strftime('%Y-%m-%dT%H:%M:%f', mvp.paymentDate))\n                FROM meter_value_payment_periods_view mvp\n                WHERE mvp.meterId = nmv.meterId\n                    AND mvp.payerServiceId = nmv.payerServiceId\n                    AND mvp.meterLocCode = nmv.meterLocCode\n                    AND strftime('%Y-%m-%dT%H:%M:%f', mvp.paymentDate) > strftime('%Y-%m-%dT%H:%M:%f', cmv.paymentDate))) mv"
       },
       {
         "viewName": "rate_payer_services_view",
@@ -1324,7 +1324,7 @@
       },
       {
         "viewName": "payer_meter_service_debts_view",
-        "createSql": "CREATE VIEW `${VIEW_NAME}` AS SELECT pms.payerId, pms.fromPaymentDate, pms.toPaymentDate, pms.fullMonths, \n    pms.serviceId, pms.payerServiceId, pms.servicePos, pms.serviceType, pms.serviceName, pms.serviceLocCode,  \n    pms.startMeterValue, pms.endMeterValue, pms.diffMeterValue, pms.measureUnit, pms.isMeterUses, \n    pms.debt AS serviceDebt, \n    printf('%02d.%d: ', pms.paymentMonth, pms.paymentYear) ||\n    (CASE WHEN pms.isDerivedUnit = 0\n            THEN printf('%.2f %s x %.2f %s = %.2f %s', pms.rateMeterValue / 100000.0, pms.measureUnit,\n                                                        pms.rateValue / 100000.0, pms.currencyCode, \n                                                        pms.debt / 100000.0, pms.currencyCode)                        \n            ELSE CASE pms.serviceType \n                    WHEN 'HEATING' THEN \n                        printf('%.5f %s x ', pms.rateMeterValue / 100000.0, pms.measureUnit) || \n                        (CASE WHEN pms.livingSpace IS NOT NULL \n                            THEN printf('%.2f %s x ', pms.livingSpace / 100000.0,  pms.livingSpaceMu) \n                            ELSE '' \n                        END) || \n                            printf('%.2f %s = %.2f %s', pms.rateValue / 100000.0, pms.currencyCode, pms.debt / 100000.0, pms.currencyCode)                        \n                    ELSE printf('%.2f %s', pms.debt / 100000.0, pms.currencyCode)\n                END\n    END) serviceDebtExpr\nFROM (SELECT psd.payerId, psd.meterId, psd.fromPaymentDate, psd.toPaymentDate, psd.fullMonths, \n        psd.paymentMonth, psd.paymentYear, psd.livingSpace,\n        psd.serviceId, psd.payerServiceId, psd.servicePos, psd.serviceType, psd.serviceName, psd.serviceLocCode, \n        psd.startMeterValue, psd.endMeterValue, psd.diffMeterValue, psd.measureUnit, psd.isDerivedUnit, psd.isMeterUses,        \n        psd.currRateMonths, psd.currRateStartDate, psd.rateValue, \n        psd.prevRateMonths, psd.prevRateStartDate, psd.prevRateValue,\n        psd.rateMeterValue,\n        ifnull(CASE WHEN psd.prevRateMonths > 0 \n                    THEN (psd.prevRateMonths - 1) * psd.rateMeterValue / 100000.0 * psd.prevRateValue + \n                    (psd.currRateMonths + 1) * psd.rateMeterValue / 100000.0 * psd.rateValue\n                    ELSE psd.debt \n                END, 0) AS debt,\n        psd.currencyCode, psd.livingSpaceMu\n    FROM (SELECT mvp.payerId, mvp.meterId, crp.livingSpace, mvp.fromPaymentDate, mvp.toPaymentDate, mvp.paymentMonth, mvp.paymentYear,\n            crp.serviceId, crp.payerServiceId, crp.servicePos, crp.serviceType, crp.serviceName, crp.serviceLocCode, \n            crp.startDate AS currRateStartDate, crp.rateValue, NULL AS nextRateStartDate,\n            mvp.startMeterValue, mvp.endMeterValue, \n            (CASE WHEN mvp.diffMeterValue <= ifnull(crp.toMeterValue, mvp.diffMeterValue)\n                    THEN mvp.diffMeterValue - ifnull(crp.fromMeterValue, 0)\n                ELSE ifnull(crp.toMeterValue, 0) - ifnull(crp.fromMeterValue, 0)\n            END) AS rateMeterValue,\n            mvp.diffMeterValue, mvp.measureUnit, mvp.isDerivedUnit,\n            (CASE WHEN mvp.isDerivedUnit = 0\n                THEN (CASE WHEN mvp.diffMeterValue <= ifnull(crp.toMeterValue, mvp.diffMeterValue)\n                            THEN mvp.diffMeterValue - ifnull(crp.fromMeterValue, 0)\n                        ELSE ifnull(crp.toMeterValue, 0) - ifnull(crp.fromMeterValue, 0)\n                    END) / 100000.0 * crp.rateValue\n                ELSE CASE crp.serviceType \n                        WHEN 'HEATING' \n                            THEN ifnull(crp.livingSpace / 100000.0, 1) * mvp.diffMeterValue / 100000.0 * crp.rateValue\n                        ELSE crp.rateValue\n                    END\n            END) AS debt,\n            mvp.diffMonths AS fullMonths, crp.isMeterUses,\n            (strftime('%Y', ifnull(mvp.toPaymentDate, datetime('now', 'localtime')), 'start of month', '-1 day') * 12 + \n                strftime('%m', ifnull(mvp.toPaymentDate, datetime('now', 'localtime')), 'start of month', '-1 day') -\n            strftime('%Y', crp.startDate) * 12 - strftime('%m', crp.startDate) +\n                (strftime('%d', ifnull(mvp.toPaymentDate, datetime('now', 'localtime')), '+1 day') = '01' OR \n                strftime('%d', ifnull(mvp.toPaymentDate, datetime('now', 'localtime'))) >= strftime('%d', crp.startDate))) AS currRateMonths,\n            (strftime('%Y', ifnull(crp.startDate, datetime('now', 'localtime')), 'start of month', '-1 day') * 12 + \n                strftime('%m', ifnull(crp.startDate, datetime('now', 'localtime')), 'start of month', '-1 day') -\n            strftime('%Y', mvp.fromPaymentDate) * 12 - strftime('%m', mvp.fromPaymentDate) +\n                (strftime('%d', ifnull(crp.startDate, datetime('now', 'localtime')), '+1 day') = '01' OR \n                strftime('%d', ifnull(crp.startDate, datetime('now', 'localtime'))) >= strftime('%d', mvp.fromPaymentDate))) AS prevRateMonths,\n            prp.startDate AS prevRateStartDate, prp.rateValue AS prevRateValue,\n            (SELECT COUNT(rv.receiptLineId) FROM receipts_view  rv\n                WHERE rv.payersId = mvp.payerId AND rv.receiptDate > mvp.fromPaymentDate AND rv.receiptDate <= mvp.toPaymentDate \n                    AND rv.meterValuesId = mvp.meterValueId AND rv.isLinePaid = 1) paidMonths,\n            (SELECT paramValue FROM app_settings WHERE paramName = 'CURRENCY_CODE') AS currencyCode,\n            (SELECT paramValue FROM app_settings WHERE paramName = 'LIVING_SPACE_MU') AS livingSpaceMu        \n        FROM meter_value_payments_view mvp LEFT JOIN rate_payer_services_view crp\n            ON crp.isMeterUses = 1 AND crp.payerId = mvp.payerId AND crp.payerServiceId = mvp.payerServiceId\n                AND crp.serviceLocCode = mvp.meterLocCode\n                AND ifnull(crp.fromMeterValue, mvp.diffMeterValue) <= mvp.diffMeterValue\n                AND strftime('%Y-%m-%d', crp.startDate) =\n                                                    (SELECT MAX(strftime('%Y-%m-%d', rsv.startDate)) \n                                                    FROM rate_payer_services_view rsv \n                                                    WHERE rsv.payerId = crp.payerId AND rsv.payerServiceId = crp.payerServiceId\n                                                        AND rsv.serviceLocCode = crp.serviceLocCode\n                                                        AND rsv.isMeterUses = 1\n                                                        AND ifnull(rsv.fromMeterValue, mvp.diffMeterValue) <= mvp.diffMeterValue\n                                                        AND strftime('%Y-%m-%dT%H:%M:%f', rsv.startDate) <= strftime('%Y-%m-%dT%H:%M:%f', mvp.toPaymentDate))\n            LEFT JOIN rate_payer_services_view prp\n                ON prp.isMeterUses = 1 AND prp.payerId = crp.payerId AND prp.payerServiceId = crp.payerServiceId\n                    AND prp.serviceLocCode = crp.serviceLocCode\n                    AND ifnull(prp.fromMeterValue, -1) = ifnull(crp.fromMeterValue, -1)\n                    AND mvp.diffMonths > 1 AND strftime('%Y-%m-%dT%H:%M:%f', crp.startDate) > strftime('%Y-%m-%dT%H:%M:%f', mvp.fromPaymentDate)\n                    AND strftime('%Y-%m-%d', prp.startDate) =\n                                                    (SELECT MAX(strftime('%Y-%m-%d', rsv.startDate)) \n                                                    FROM rate_payer_services_view rsv \n                                                    WHERE rsv.payerId = prp.payerId AND rsv.payerServiceId = prp.payerServiceId\n                                                        AND rsv.serviceLocCode = prp.serviceLocCode\n                                                        AND rsv.isMeterUses = 1\n                                                        AND ifnull(rsv.fromMeterValue, -1) = ifnull(prp.fromMeterValue, -1)\n                                                        AND mvp.diffMonths > 1 \n                                                        AND strftime('%Y-%m-%dT%H:%M:%f', crp.startDate) > strftime('%Y-%m-%dT%H:%M:%f', mvp.fromPaymentDate)\n                                                        AND strftime('%Y-%m-%dT%H:%M:%f', rsv.startDate) < strftime('%Y-%m-%dT%H:%M:%f', crp.startDate))\n            LEFT JOIN receipts_view rv ON rv.payersId = mvp.payerId AND rv.receiptDate > mvp.fromPaymentDate AND rv.receiptDate <= mvp.toPaymentDate \n                                                    AND rv.meterValuesId = mvp.meterValueId\n    WHERE mvp.toPaymentDate IS NOT NULL -- if last meter value\n        AND crp.serviceId IS NOT NULL -- if startDate > toPaymentDate \n        AND ifnull(rv.isLinePaid, 0) = 0) psd) pms"
+        "createSql": "CREATE VIEW `${VIEW_NAME}` AS SELECT pms.payerId, pms.fromPaymentDate, pms.toPaymentDate, pms.fullMonths, \n    pms.serviceId, pms.payerServiceId, pms.servicePos, pms.serviceType, pms.serviceName, pms.serviceLocCode,  \n    pms.startMeterValue, pms.endMeterValue, pms.diffMeterValue, pms.measureUnit, pms.isMeterUses, \n    pms.debt AS serviceDebt, \n    printf('%02d.%d: ', pms.paymentMonth, pms.paymentYear) ||\n    (CASE WHEN pms.isDerivedUnit = 0\n            THEN printf('%.2f %s x %.2f %s = %.2f %s', pms.rateMeterValue / 100000.0, pms.measureUnit,\n                                                        pms.rateValue / 100000.0, pms.currencyCode, \n                                                        pms.debt / 100000.0, pms.currencyCode)                        \n            ELSE CASE pms.serviceType \n                    WHEN 'HEATING' THEN \n                        printf('%.5f %s x ', pms.rateMeterValue / 100000.0, pms.measureUnit) || \n                        (CASE WHEN pms.livingSpace IS NOT NULL \n                            THEN printf('%.2f %s x ', pms.livingSpace / 100000.0,  pms.livingSpaceMu) \n                            ELSE '' \n                        END) || \n                            printf('%.2f %s = %.2f %s', pms.rateValue / 100000.0, pms.currencyCode, pms.debt / 100000.0, pms.currencyCode)                        \n                    ELSE printf('%.2f %s', pms.debt / 100000.0, pms.currencyCode)\n                END\n    END) serviceDebtExpr\nFROM (SELECT psd.payerId, psd.meterId, psd.fromPaymentDate, psd.toPaymentDate, psd.fullMonths, \n        psd.paymentMonth, psd.paymentYear, psd.livingSpace,\n        psd.serviceId, psd.payerServiceId, psd.servicePos, psd.serviceType, psd.serviceName, psd.serviceLocCode, \n        psd.startMeterValue, psd.endMeterValue, psd.diffMeterValue, psd.measureUnit, psd.isDerivedUnit, psd.isMeterUses,        \n        psd.currRateMonths, psd.currRateStartDate, psd.rateValue, \n        psd.prevRateMonths, psd.prevRateStartDate, psd.prevRateValue,\n        psd.rateMeterValue,\n        ifnull(CASE WHEN ifnull(psd.prevRateMonths, 0) > 0 \n                    THEN (psd.prevRateMonths - 1) * psd.rateMeterValue / 100000.0 * psd.prevRateValue + \n                        (psd.currRateMonths + 1) * psd.rateMeterValue / 100000.0 * psd.rateValue\n                    ELSE CASE WHEN ifnull(psd.fullMonths, 1) > 1\n                            THEN (psd.fullMonths - 1) * psd.debt\n                            ELSE psd.debt\n                        END\n                END, 0) AS debt,\n        psd.currencyCode, psd.livingSpaceMu\n    FROM (SELECT mvp.payerId, mvp.meterId, crp.livingSpace, mvp.fromPaymentDate, mvp.toPaymentDate, mvp.paymentMonth, mvp.paymentYear,\n            crp.serviceId, crp.payerServiceId, crp.servicePos, crp.serviceType, crp.serviceName, crp.serviceLocCode, \n            crp.startDate AS currRateStartDate, crp.rateValue, NULL AS nextRateStartDate,\n            mvp.startMeterValue, mvp.endMeterValue, \n            (CASE WHEN mvp.diffMeterValue <= ifnull(crp.toMeterValue, mvp.diffMeterValue)\n                    THEN mvp.diffMeterValue - ifnull(crp.fromMeterValue, 0)\n                ELSE ifnull(crp.toMeterValue, 0) - ifnull(crp.fromMeterValue, 0)\n            END) AS rateMeterValue,\n            mvp.diffMeterValue, mvp.measureUnit, mvp.isDerivedUnit,\n            (CASE WHEN mvp.isDerivedUnit = 0\n                THEN (CASE WHEN mvp.diffMeterValue <= ifnull(crp.toMeterValue, mvp.diffMeterValue)\n                            THEN mvp.diffMeterValue - ifnull(crp.fromMeterValue, 0)\n                        ELSE ifnull(crp.toMeterValue, 0) - ifnull(crp.fromMeterValue, 0)\n                    END) / 100000.0 * ifnull(crp.rateValue, 0) -- ifnull(rateValue...) if startDate > toPaymentDate\n                ELSE CASE ifnull(crp.serviceType, \"\") \n                        WHEN 'HEATING' \n                            THEN ifnull(crp.livingSpace / 100000.0, 1) * mvp.diffMeterValue / 100000.0 * ifnull(crp.rateValue, 0)\n                        ELSE ifnull(crp.rateValue, 0)\n                    END\n            END) AS debt,\n            mvp.diffMonths AS fullMonths, crp.isMeterUses,\n            (strftime('%Y', ifnull(mvp.toPaymentDate, datetime('now', 'localtime')), 'start of month', '-1 day') * 12 + \n                strftime('%m', ifnull(mvp.toPaymentDate, datetime('now', 'localtime')), 'start of month', '-1 day') -\n            strftime('%Y', crp.startDate) * 12 - strftime('%m', crp.startDate) +\n                (strftime('%d', ifnull(mvp.toPaymentDate, datetime('now', 'localtime')), '+1 day') = '01' OR \n                strftime('%d', ifnull(mvp.toPaymentDate, datetime('now', 'localtime'))) >= strftime('%d', crp.startDate))) AS currRateMonths,\n            (strftime('%Y', ifnull(crp.startDate, datetime('now', 'localtime')), 'start of month', '-1 day') * 12 + \n                strftime('%m', ifnull(crp.startDate, datetime('now', 'localtime')), 'start of month', '-1 day') -\n            strftime('%Y', mvp.fromPaymentDate) * 12 - strftime('%m', mvp.fromPaymentDate) +\n                (strftime('%d', ifnull(crp.startDate, datetime('now', 'localtime')), '+1 day') = '01' OR \n                strftime('%d', ifnull(crp.startDate, datetime('now', 'localtime'))) >= strftime('%d', mvp.fromPaymentDate))) AS prevRateMonths,\n            prp.startDate AS prevRateStartDate, prp.rateValue AS prevRateValue,\n            (SELECT COUNT(rv.receiptLineId) FROM receipts_view  rv\n                WHERE rv.payersId = mvp.payerId AND rv.receiptDate > mvp.fromPaymentDate AND rv.receiptDate <= mvp.toPaymentDate \n                    AND rv.meterValuesId = mvp.meterValueId AND rv.isLinePaid = 1) paidMonths,\n            (SELECT paramValue FROM app_settings WHERE paramName = 'CURRENCY_CODE') AS currencyCode,\n            (SELECT paramValue FROM app_settings WHERE paramName = 'LIVING_SPACE_MU') AS livingSpaceMu        \n        FROM meter_value_payments_view mvp LEFT JOIN rate_payer_services_view crp\n            ON crp.isMeterUses = 1 AND crp.payerId = mvp.payerId AND crp.payerServiceId = mvp.payerServiceId\n                AND crp.serviceLocCode = mvp.meterLocCode\n                AND ifnull(crp.fromMeterValue, mvp.diffMeterValue) <= mvp.diffMeterValue\n                AND strftime('%Y-%m-%d', crp.startDate) =\n                                                    (SELECT MAX(strftime('%Y-%m-%d', rsv.startDate)) \n                                                    FROM rate_payer_services_view rsv \n                                                    WHERE rsv.payerId = crp.payerId AND rsv.payerServiceId = crp.payerServiceId\n                                                        AND rsv.serviceLocCode = crp.serviceLocCode\n                                                        AND rsv.isMeterUses = 1\n                                                        AND ifnull(rsv.fromMeterValue, mvp.diffMeterValue) <= mvp.diffMeterValue\n                                                        AND strftime('%Y-%m-%dT%H:%M:%f', rsv.startDate) <= strftime('%Y-%m-%dT%H:%M:%f', mvp.toPaymentDate))\n            LEFT JOIN rate_payer_services_view prp\n                ON prp.isMeterUses = 1 AND prp.payerId = crp.payerId AND prp.payerServiceId = crp.payerServiceId\n                    AND prp.serviceLocCode = crp.serviceLocCode\n                    AND ifnull(prp.fromMeterValue, -1) = ifnull(crp.fromMeterValue, -1)\n                    AND mvp.diffMonths > 1 AND strftime('%Y-%m-%dT%H:%M:%f', crp.startDate) > strftime('%Y-%m-%dT%H:%M:%f', mvp.fromPaymentDate)\n                    AND strftime('%Y-%m-%d', prp.startDate) =\n                                                    (SELECT MAX(strftime('%Y-%m-%d', rsv.startDate)) \n                                                    FROM rate_payer_services_view rsv \n                                                    WHERE rsv.payerId = prp.payerId AND rsv.payerServiceId = prp.payerServiceId\n                                                        AND rsv.serviceLocCode = prp.serviceLocCode\n                                                        AND rsv.isMeterUses = 1\n                                                        AND ifnull(rsv.fromMeterValue, -1) = ifnull(prp.fromMeterValue, -1)\n                                                        AND mvp.diffMonths > 1 \n                                                        AND strftime('%Y-%m-%dT%H:%M:%f', crp.startDate) > strftime('%Y-%m-%dT%H:%M:%f', mvp.fromPaymentDate)\n                                                        AND strftime('%Y-%m-%dT%H:%M:%f', rsv.startDate) < strftime('%Y-%m-%dT%H:%M:%f', crp.startDate))\n            LEFT JOIN receipts_view rv ON rv.payersId = mvp.payerId AND rv.receiptDate > mvp.fromPaymentDate AND rv.receiptDate <= mvp.toPaymentDate \n                                                    AND rv.meterValuesId = mvp.meterValueId\n    WHERE mvp.toPaymentDate IS NOT NULL -- if last meter value\n        AND crp.serviceId IS NOT NULL -- if startDate > toPaymentDate \n        AND ifnull(rv.isLinePaid, 0) = 0) psd) pms"
       },
       {
         "viewName": "payer_service_debts_view",
@@ -1341,7 +1341,7 @@
     ],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '041fbde72eae8ab7fdf16d2e5721b9d0')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '0fdbcc2dccfc6a697d9ace29bcbf8725')"
     ]
   }
 }

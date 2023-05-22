@@ -46,7 +46,13 @@ android {
         kotlinCompilerExtensionVersion versions.composeKotlinExt
     }
 }
-
+//kotlin {
+//    sourceSets.all {
+//        languageSettings {
+//            languageVersion = "2.0"
+//        }
+//    }
+//}
 dependencies {
     implementation project(':common')
     implementation project(':data')
@@ -56,21 +62,28 @@ dependencies {
     // Logging
     implementation deps.logging.timber
     implementation deps.logging.logger
+
     // Room
     implementation deps.room.runtime
     kapt deps.room.compiler
     implementation deps.room.ktx
+
     // Compose
-    implementation deps.compose.ui
-    implementation deps.compose.material
-    implementation deps.compose.iconsCore
-    implementation deps.compose.iconsExtended
-    implementation deps.compose.uiTooling
-    implementation deps.compose.uiPreview
+    def composeBom = platform(deps.compose.bom)
+    implementation composeBom
+    androidTestImplementation composeBom
+
+    implementation deps.compose.uiBom
+    implementation deps.compose.material3Bom
+    implementation deps.compose.iconsCoreBom
+    implementation deps.compose.iconsExtendedBom
+    implementation deps.compose.uiToolingBom
+    implementation deps.compose.uiPreviewBom
     // Compose preview
     debugImplementation deps.androidx.poolingcontainer
     // Compose Constraint Layout
     implementation deps.androidx.constraintlayoutCompose
+
     // Hilt
     implementation deps.dagger.hilt
     kapt deps.dagger.compiler
@@ -95,11 +108,11 @@ dependencies {
     implementation deps.lifecycle.viewmodelCompose
     implementation deps.google.gson
     implementation deps.navigation.compose
-    //debugImplementation deps.compose.uiTooling
+    //debugImplementation deps.compose.uiToolingBom
 
     // Testing dependencies
     testImplementation deps.test.junit
     androidTestImplementation deps.test.extJunit
     androidTestImplementation deps.test.espressoCore
-    androidTestImplementation deps.compose.uiTestJunit4
+    androidTestImplementation deps.test.uiJunit4Bom
 }

@@ -1,7 +1,6 @@
 package com.oborodulin.home.data.local.db.dao
 
 import androidx.room.*
-import com.oborodulin.home.common.util.Constants
 import com.oborodulin.home.data.local.db.entities.*
 import com.oborodulin.home.data.util.Constants.DB_FALSE
 import com.oborodulin.home.data.util.Constants.DB_TRUE
@@ -11,7 +10,7 @@ import kotlinx.coroutines.flow.distinctUntilChanged
 import java.util.*
 
 @Dao
-interface PayerDao : BaseDao<PayerEntity> {
+interface PayerDao { //: BaseDao<PayerEntity>
     // READS:
     @Query("SELECT * FROM ${PayerEntity.TABLE_NAME} ORDER BY isFavorite DESC")
     fun findAll(): Flow<List<PayerEntity>>
@@ -42,6 +41,15 @@ interface PayerDao : BaseDao<PayerEntity> {
     fun findPayersWithServices(): Flow<List<PayerWithServices>>
 
     // INSERTS:
+    @Insert(onConflict = OnConflictStrategy.ABORT)
+    suspend fun insert(payer: PayerEntity)
+
+    @Insert(onConflict = OnConflictStrategy.ABORT)
+    suspend fun insert(vararg payers: PayerEntity)
+
+    @Insert(onConflict = OnConflictStrategy.ABORT)
+    suspend fun insert(payers: List<PayerEntity>)
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insert(vararg payerService: PayerServiceCrossRefEntity)
 
@@ -55,9 +63,24 @@ interface PayerDao : BaseDao<PayerEntity> {
 
     // UPDATES:
     @Update
+    suspend fun update(payer: PayerEntity)
+
+    @Update
+    suspend fun update(vararg payers: PayerEntity)
+
+    @Update
     suspend fun update(vararg payerService: PayerServiceCrossRefEntity)
 
     // DELETES:
+    @Delete
+    suspend fun delete(payer: PayerEntity)
+
+    @Delete
+    suspend fun delete(vararg payers: PayerEntity)
+
+    @Delete
+    suspend fun delete(payers: List<PayerEntity>)
+
     @Query("DELETE FROM ${PayerEntity.TABLE_NAME} WHERE payerId = :payerId")
     suspend fun deleteById(payerId: UUID)
 

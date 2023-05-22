@@ -5,8 +5,8 @@ import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.appcompat.app.AppCompatActivity
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Surface
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.tooling.preview.Preview
 import com.oborodulin.home.BuildConfig
@@ -28,7 +28,7 @@ class MainActivity : ComponentActivity() { //, PayerListFragment.Callbacks {
         Timber.tag(TAG).d("onCreate(Bundle?) called")
         setContent {
             HomeComposableTheme {
-                Surface(color = MaterialTheme.colors.background) {
+                Surface(color = MaterialTheme.colorScheme.background) {
                     MainScreen()
                 }
             }
@@ -110,7 +110,7 @@ class MainActivity : ComponentActivity() { //, PayerListFragment.Callbacks {
     @Composable
     fun DefaultPreview() {
         HomeComposableTheme {
-            Surface(color = MaterialTheme.colors.background) {
+            Surface(color = MaterialTheme.colorScheme.background) {
                 MainScreen()
             }
         }

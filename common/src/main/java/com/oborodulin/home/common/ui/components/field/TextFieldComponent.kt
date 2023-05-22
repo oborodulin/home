@@ -8,7 +8,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material.*
+import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -44,7 +44,7 @@ fun TextFieldComponent(
     },
     onValueChange: OnValueChange,
     onImeKeyAction: OnImeKeyAction,
-    colors: TextFieldColors = TextFieldDefaults.outlinedTextFieldColors()
+    colors: TextFieldColors = OutlinedTextFieldDefaults.colors()
 ) {
     Timber.tag(TAG).d("TextFieldComponent(...) called")
     var fieldValue by remember {
@@ -91,8 +91,8 @@ fun TextFieldComponent(
         if (errorMessage != null) {
             Text(
                 text = errorMessage,
-                color = MaterialTheme.colors.error,
-                style = MaterialTheme.typography.caption,
+                color = MaterialTheme.colorScheme.error,
+                style = MaterialTheme.typography.titleSmall,
                 modifier = Modifier.padding(start = 16.dp)
             )
         }

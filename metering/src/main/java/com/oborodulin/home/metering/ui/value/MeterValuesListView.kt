@@ -9,9 +9,10 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.selection.selectableGroup
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material.Card
-import androidx.compose.material.Divider
-import androidx.compose.material.Text
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.Divider
+import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
@@ -36,7 +37,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.compose.ExperimentalLifecycleComposeApi
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.flowWithLifecycle
 import androidx.navigation.NavController
@@ -62,7 +62,6 @@ import java.util.*
 
 private const val TAG = "Metering.ui.MeterValueView"
 
-@OptIn(ExperimentalLifecycleComposeApi::class)
 @Composable
 fun MeterValuesListView(
     viewModel: MeterValuesListViewModel,
@@ -86,6 +85,7 @@ fun MeterValuesListView(
                 Timber.tag(TAG).d("LaunchedEffect: MeterValuesListUiAction.Init")
                 viewModel.submitAction(MeterValuesListUiAction.Init)
             }
+
             else -> {
                 Timber.tag(TAG).d("LaunchedEffect: MeterValuesListUiAction.Load(%s)", payerId)
                 viewModel.submitAction(MeterValuesListUiAction.Load(payerId!!))
@@ -139,7 +139,7 @@ fun MeterValuesList(
                             .height(100.dp)
                             .clip(RoundedCornerShape(8.dp))
                             .padding(4.dp),
-                        elevation = 10.dp
+                        elevation = CardDefaults.cardElevation(10.dp)
                     )
                     {
                         Row(
@@ -158,7 +158,7 @@ fun MeterValuesList(
                                 Spacer(modifier = Modifier.height(4.dp))
                                 Text(
                                     text = meterValue.serviceName,
-                                    style = Typography.body1.copy(fontWeight = FontWeight.Bold),
+                                    style = Typography.bodyMedium.copy(fontWeight = FontWeight.Bold),
                                     maxLines = 2
                                 )
                             }
@@ -272,7 +272,7 @@ fun MeterValuesList(
     }
 }
 
-@OptIn(ExperimentalComposeUiApi::class, ExperimentalLifecycleComposeApi::class)
+@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun MeterValue(
     meterValueListItem: MeterValueListItem,

@@ -6,8 +6,8 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.Divider
-import androidx.compose.material.Text
+import androidx.compose.material3.Divider
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -87,7 +87,7 @@ fun PayerListItemComponent(
                     }
                     Text(
                         text = item.title,
-                        style = Typography.body1.copy(fontWeight = FontWeight.Bold),
+                        style = Typography.bodyMedium.copy(fontWeight = FontWeight.Bold),
                         maxLines = 2
                     )
                 }
@@ -114,7 +114,7 @@ fun PayerListItemComponent(
                     nf.maximumFractionDigits = 0
                     Text(
                         text = nf.format(it),
-                        style = Typography.body1.copy(
+                        style = Typography.bodyMedium.copy(
                             fontWeight = FontWeight.Bold, fontSize = 20.sp
                         )
                     )
@@ -129,7 +129,7 @@ fun PayerListItemComponent(
                                         FormatStyle.SHORT
                                     ).withLocale(Locale.getDefault()),
                                 ),
-                                style = Typography.body1.copy(fontSize = 12.sp)
+                                style = Typography.bodyMedium.copy(fontSize = 12.sp)
                             )
                             item.toDate?.let {
                                 Text(
@@ -138,7 +138,7 @@ fun PayerListItemComponent(
                                             FormatStyle.SHORT
                                         ).withLocale(Locale.getDefault())
                                     ),
-                                    style = Typography.body1.copy(fontSize = 12.sp)
+                                    style = Typography.bodyMedium.copy(fontSize = 12.sp)
                                 )
                             }
                         }

@@ -14,7 +14,7 @@ import kotlinx.coroutines.flow.distinctUntilChanged
 import java.util.*
 
 @Dao
-interface ServiceDao : BaseDao<ServiceEntity> {
+interface ServiceDao { // : BaseDao<ServiceEntity>
     // READS:
     @Query("SELECT * FROM ${ServiceView.VIEW_NAME} WHERE serviceLocCode = :locale ORDER BY servicePos")
     fun findAll(locale: String? = Locale.getDefault().language): Flow<List<ServiceView>>
@@ -61,6 +61,15 @@ interface ServiceDao : BaseDao<ServiceEntity> {
         findPayerServiceByMeterId(meterId).distinctUntilChanged()
 
     // INSERTS:
+    @Insert(onConflict = OnConflictStrategy.ABORT)
+    suspend fun insert(service: ServiceEntity)
+
+    @Insert(onConflict = OnConflictStrategy.ABORT)
+    suspend fun insert(vararg services: ServiceEntity)
+
+    @Insert(onConflict = OnConflictStrategy.ABORT)
+    suspend fun insert(services: List<ServiceEntity>)
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insert(vararg textContent: ServiceTlEntity)
 
@@ -74,6 +83,12 @@ interface ServiceDao : BaseDao<ServiceEntity> {
 
     // UPDATES:
     @Update
+    suspend fun update(service: ServiceEntity)
+
+    @Update
+    suspend fun update(vararg services: ServiceEntity)
+
+    @Update
     suspend fun update(vararg textContent: ServiceTlEntity)
 
     @Transaction
@@ -85,6 +100,15 @@ interface ServiceDao : BaseDao<ServiceEntity> {
     }
 
     // DELETES:
+    @Delete
+    suspend fun delete(service: ServiceEntity)
+
+    @Delete
+    suspend fun delete(vararg services: ServiceEntity)
+
+    @Delete
+    suspend fun delete(services: List<ServiceEntity>)
+
     @Query("DELETE FROM ${ServiceEntity.TABLE_NAME} WHERE serviceId = :serviceId")
     suspend fun deleteById(serviceId: UUID)
 
@@ -101,8 +125,10 @@ interface ServiceDao : BaseDao<ServiceEntity> {
     @Query("UPDATE ${ServiceEntity.TABLE_NAME} SET servicePos = servicePos + 1 WHERE servicePos >= :pos")
     suspend fun updatePos(pos: Int)
 
-    @Query("UPDATE ${PayerServiceCrossRefEntity.TABLE_NAME} SET isMeterOwner = ${Constants.DB_TRUE} " +
-            "WHERE payerServiceId = :payerServiceId AND isMeterOwner = ${Constants.DB_FALSE}")
+    @Query(
+        "UPDATE ${PayerServiceCrossRefEntity.TABLE_NAME} SET isMeterOwner = ${Constants.DB_TRUE} " +
+                "WHERE payerServiceId = :payerServiceId AND isMeterOwner = ${Constants.DB_FALSE}"
+    )
     suspend fun setPayerServiceMeterOwnerById(payerServiceId: UUID)
 
     @Query(

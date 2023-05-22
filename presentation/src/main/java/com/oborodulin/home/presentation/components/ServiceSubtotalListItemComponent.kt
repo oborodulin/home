@@ -6,7 +6,7 @@ import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.*
+import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -70,7 +70,7 @@ fun ServiceSubtotalListItemComponent(
                 Row {
                     Text(
                         text = item.title,
-                        style = Typography.body1.copy(fontWeight = FontWeight.Bold),
+                        style = Typography.bodyMedium.copy(fontWeight = FontWeight.Bold),
                         maxLines = 2
                     )
                 }
@@ -97,7 +97,7 @@ fun ServiceSubtotalListItemComponent(
                     nf.maximumFractionDigits = 0
                     Text(
                         text = nf.format(it),
-                        style = Typography.body1.copy(
+                        style = Typography.bodyMedium.copy(
                             fontWeight = FontWeight.Bold, fontSize = 20.sp
                         )
                     )
@@ -112,7 +112,7 @@ fun ServiceSubtotalListItemComponent(
                                         FormatStyle.SHORT
                                     ).withLocale(Locale.getDefault()),
                                 ),
-                                style = Typography.body1.copy(fontSize = 12.sp)
+                                style = Typography.bodyMedium.copy(fontSize = 12.sp)
                             )
                             item.toDate?.let {
                                 Text(
@@ -121,7 +121,7 @@ fun ServiceSubtotalListItemComponent(
                                             FormatStyle.SHORT
                                         ).withLocale(Locale.getDefault())
                                     ),
-                                    style = Typography.body1.copy(fontSize = 12.sp)
+                                    style = Typography.bodyMedium.copy(fontSize = 12.sp)
                                 )
                             }
                         }
@@ -146,10 +146,10 @@ fun ServiceSubtotalListItemComponent(
                                 shape = RoundedCornerShape(28.dp),
                                 contentPadding = PaddingValues(2.dp),
                                 colors = ButtonDefaults.buttonColors(
-                                    backgroundColor = MaterialTheme.colors.background,
-                                    contentColor = MaterialTheme.colors.primary
+                                    containerColor = MaterialTheme.colorScheme.background,
+                                    contentColor = MaterialTheme.colorScheme.primary
                                 ),
-                                border = BorderStroke(1.dp, MaterialTheme.colors.primary)
+                                border = BorderStroke(1.dp, MaterialTheme.colorScheme.primary)
                             ) {
                                 /*Icon(
                                     imageVector = imageVector,
@@ -167,7 +167,7 @@ fun ServiceSubtotalListItemComponent(
                                     text = stringResource(R.string.btn_pay_text),
                                     color = Color.Black,
                                     textAlign = TextAlign.Center,
-                                    style = Typography.body1.copy(fontSize = 12.sp),
+                                    style = Typography.bodyMedium.copy(fontSize = 12.sp),
                                     modifier = Modifier
                                         .weight(1f)
                                         //.offset(x = (-12).dp / 2) //default icon width = 24.dp
