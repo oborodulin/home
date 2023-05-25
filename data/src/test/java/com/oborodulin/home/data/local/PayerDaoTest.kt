@@ -26,6 +26,7 @@ import org.robolectric.annotation.Config
 import java.time.OffsetDateTime
 import java.util.*
 import java.util.concurrent.CountDownLatch
+import kotlin.time.Duration.Companion.milliseconds
 
 /**
  * Example local unit test, which will execute on the development machine (host).
@@ -189,7 +190,7 @@ class PayerDaoTest : HomeDatabaseTest() {
         // 2. ACT
         payerDao.deleteAll()
         // 2. ASSERT
-        payerDao.findDistinctAll().test {
+        payerDao.findDistinctAll().test(timeout = 5000.milliseconds) {
             assertThat(awaitItem()).isEmpty()
             cancel()
         }

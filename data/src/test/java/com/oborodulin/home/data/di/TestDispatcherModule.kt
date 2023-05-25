@@ -9,26 +9,33 @@ import dagger.Provides
 import dagger.hilt.components.SingletonComponent
 import dagger.hilt.testing.TestInstallIn
 import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.StandardTestDispatcher
+import kotlinx.coroutines.test.TestCoroutineScheduler
+import javax.inject.Singleton
 
-@OptIn(ExperimentalCoroutinesApi::class)
 @Module
 @TestInstallIn(
     components = [SingletonComponent::class],
     replaces = [DispatcherModule::class]
 )
 object TestDispatcherModule {
+    // Scheduler:
+    @Singleton
     @Provides
+    fun provideCoroutineScheduler(): TestCoroutineScheduler = TestCoroutineScheduler()
+
     @DefaultDispatcher
-    fun provideDefaultDispatcher(): CoroutineDispatcher =
-        StandardTestDispatcher() //Dispatchers.Unconfined
+    @Provides
+    fun provideDefaultDispatcher(scheduler: TestCoroutineScheduler): CoroutineDispatcher =
+        StandardTestDispatcher(scheduler) //Dispatchers.Unconfined
 
     @IoDispatcher
     @Provides
-    fun providesIoDispatcher(): CoroutineDispatcher = StandardTestDispatcher()
+    fun providesIoDispatcher(scheduler: TestCoroutineScheduler): CoroutineDispatcher =
+        StandardTestDispatcher(scheduler)
 
     @MainDispatcher
     @Provides
-    fun providesMainDispatcher(): CoroutineDispatcher = StandardTestDispatcher()
+    fun providesMainDispatcher(scheduler: TestCoroutineScheduler): CoroutineDispatcher =
+        StandardTestDispatcher(scheduler)
 }

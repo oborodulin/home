@@ -11,8 +11,9 @@ import javax.inject.Singleton
 
 @Module
 @InstallIn(SingletonComponent::class)
-object DomainModule {
-    // USE CASES (Payer):
+object UseCasesModule {
+    // USE CASES
+    // Payer:
     @Singleton
     @Provides
     fun provideGetPayerUseCase(

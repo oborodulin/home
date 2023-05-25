@@ -1,7 +1,8 @@
-package com.oborodulin.home.common.di
+package com.oborodulin.home.domain.di
 
-import com.google.gson.Gson
 import com.oborodulin.home.common.domain.usecases.UseCase
+import com.oborodulin.home.domain.repositories.PayersRepository
+import com.oborodulin.home.domain.usecases.*
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -11,12 +12,10 @@ import javax.inject.Singleton
 
 @Module
 @InstallIn(SingletonComponent::class)
-object CommonModule {
-    /**
-     * https://www.codegrepper.com/code-examples/javascript/android+object+to+json+string
-     */
+object UseCaseConfigurationModule {
+    // USE CASES
+    // Configuration:
     @Singleton
     @Provides
-    fun provideJsonLogger(): Gson = Gson()
-
+    fun provideUseCaseConfiguration(): UseCase.Configuration = UseCase.Configuration(Dispatchers.IO)
 }

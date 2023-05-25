@@ -16,10 +16,10 @@ class SavePayerUseCase(
     override fun process(request: Request): Flow<Response> {
         return payersRepository.save(request.payer)
             .map {
-                Response
+                Response(it)
             }.catch { throw UseCaseException.PayerSaveException(it) }
     }
 
     data class Request(val payer: Payer) : UseCase.Request
-    object Response : UseCase.Response
+    data class Response(val payer: Payer) : UseCase.Response
 }

@@ -1,5 +1,7 @@
 package com.oborodulin.home.data.usecases
 
+import androidx.test.filters.SmallTest
+import com.oborodulin.home.common.domain.entities.Result
 import com.oborodulin.home.common.domain.usecases.UseCase
 import com.oborodulin.home.common.domain.usecases.UseCaseException
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -8,21 +10,22 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.StandardTestDispatcher
+import kotlinx.coroutines.test.TestCoroutineScheduler
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
 import org.mockito.kotlin.mock
-import com.oborodulin.home.common.domain.entities.Result
 
-open class UseCaseTest {
+@SmallTest
+class UseCaseTest {
     @ExperimentalCoroutinesApi
-    protected val configuration = UseCase.Configuration(StandardTestDispatcher())
+    private val configuration =
+        UseCase.Configuration(StandardTestDispatcher(TestCoroutineScheduler()))
     private val request = mock<UseCase.Request>()
     private val response = mock<UseCase.Response>()
 
-    @ExperimentalCoroutinesApi
     private lateinit var useCase: UseCase<UseCase.Request, UseCase.Response>
 
     @ExperimentalCoroutinesApi
@@ -61,24 +64,24 @@ open class UseCaseTest {
         }
     }
 
-/*    @ExperimentalCoroutinesApi
-    @Test
-    fun testExecutePostException() {
-        useCase = object : UseCase<UseCase.Request, UseCase.Response>(configuration) {
-            override fun process(request: Request): Flow<Response> {
-                assertEquals(this@UseCaseTest.request, request)
-                return flow {
-                    throw UseCaseException.PostException(Throwable())
+    /*    @ExperimentalCoroutinesApi
+        @Test
+        fun testExecutePostException() {
+            useCase = object : UseCase<UseCase.Request, UseCase.Response>(configuration) {
+                override fun process(request: Request): Flow<Response> {
+                    assertEquals(this@UseCaseTest.request, request)
+                    return flow {
+                        throw UseCaseException.PostException(Throwable())
+                    }
                 }
-            }
 
+            }
+            runTest {
+                val result = useCase.execute(request).first()
+                assertTrue((result as Result.Error).exception is UseCaseException.PostException)
+            }
         }
-        runTest {
-            val result = useCase.execute(request).first()
-            assertTrue((result as Result.Error).exception is UseCaseException.PostException)
-        }
-    }
-*/
+    */
     @ExperimentalCoroutinesApi
     @Test
     fun testExecuteUnknownException() {

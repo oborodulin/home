@@ -1,6 +1,5 @@
-package com.oborodulin.home.di
+package com.oborodulin.home.data.di
 
-import com.oborodulin.home.BuildConfig
 import com.oborodulin.home.data.remote.NextflixService
 import com.oborodulin.home.domain.util.Constants.TMDB_BASE_URL
 import dagger.Module
