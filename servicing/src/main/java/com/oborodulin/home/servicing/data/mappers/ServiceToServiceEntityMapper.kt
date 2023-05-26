@@ -10,6 +10,6 @@ class ServiceToServiceEntityMapper : Mapper<Service, ServiceEntity> {
         serviceId = input.id ?: input.apply { id = UUID.randomUUID() }.id!!,
         servicePos = input.servicePos,
         serviceType = input.serviceType,
-        serviceMeterType = input.meterType
+        serviceMeterType = input.serviceMeterType
     )
 }

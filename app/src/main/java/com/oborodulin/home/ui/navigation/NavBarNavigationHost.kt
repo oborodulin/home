@@ -22,7 +22,7 @@ fun NavBarNavigationHost(
         appState.navBarNavController, startDestination = NavRoutes.Accounting.route
     ) {
         composable(NavRoutes.Accounting.route) {
-            // Payers; Meters values; Payments
+            // accounting: Payers; Meters values (metering); Payments: PayerServiceSubtotals and etc. (billing)
             Timber.tag(TAG)
                 .d("Navigation Graph: to AccountingScreen [route = '%s']", it.destination.route)
             AccountingScreen(
@@ -32,13 +32,13 @@ fun NavBarNavigationHost(
             ) //setFabOnClick = setFabOnClick
         }
         composable(route = NavRoutes.Billing.route, arguments = NavRoutes.Billing.arguments) {
-            // Services; Payer services; Rates; Rate promotions
+            // billing: [Payer Services, Services] (servicing); Rates; Rate promotions
             Timber.tag(TAG)
                 .d("Navigation Graph: to BillingScreen [route = '%s']", it.destination.route)
             //BillingScreen(navController)
         }
         composable(route = NavRoutes.Metering.route, arguments = NavRoutes.Metering.arguments) {
-            // Meters; Meter verifications
+            // metering: Meters; Meter values, Meter verifications
             Timber.tag(TAG)
                 .d("Navigation Graph: to MeteringScreen [route = '%s']", it.destination.route)
             //MeteringScreen(navController)
