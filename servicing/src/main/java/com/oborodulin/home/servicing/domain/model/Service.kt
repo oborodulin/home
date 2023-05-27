@@ -9,6 +9,7 @@ import java.util.UUID
 
 data class Service(
     var payerServiceId: UUID? = null,
+    var payerId: UUID? = null,
     var serviceTlId: UUID? = null,
     val servicePos: Int?,
     val serviceName: String = "",
@@ -16,6 +17,11 @@ data class Service(
     val serviceMeterType: MeterType = MeterType.NONE,
     val serviceMeasureUnit: String? = null,
     val serviceDesc: String? = null,
+    val fromMonth: Int? = null,
+    val fromYear: Int? = null,
+    val periodFromDate: OffsetDateTime? = null,
+    val periodToDate: OffsetDateTime? = null,
+    val isMeterOwner: Boolean? = null,
     var isPrivileges: Boolean? = null,
     var isAllocateRate: Boolean? = null,
     val fromPaymentDate: OffsetDateTime? = null,

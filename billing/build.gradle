@@ -59,8 +59,6 @@ dependencies {
     implementation project(':domain')
     implementation project(':presentation')
 
-    implementation project(':servicing')
-
     // Logging
     implementation deps.logging.timber
     implementation deps.logging.logger

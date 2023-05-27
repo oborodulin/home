@@ -14,12 +14,14 @@ import com.oborodulin.home.presentation.navigation.MainDestinations.ROUTE_HOME
 import com.oborodulin.home.presentation.navigation.MainDestinations.ROUTE_METERING
 import com.oborodulin.home.presentation.navigation.MainDestinations.ROUTE_PAYER
 import com.oborodulin.home.presentation.navigation.MainDestinations.ROUTE_REPORTING
+import com.oborodulin.home.presentation.navigation.MainDestinations.ROUTE_SERVICE
 import timber.log.Timber
-import java.util.*
+import java.util.UUID
 
 private const val TAG = "Presentation.NavRoutes"
 
 private const val ARG_PAYER_ID = "payerId"
+private const val ARG_SERVICE_ID = "serviceId"
 
 /**
  * Created by oborodulin on 12.December.2021
@@ -68,7 +70,7 @@ sealed class NavRoutes constructor(
         })
     ) {
         fun routeForPayer(payerInput: PayerInput? = null): String {
-            var route = when (payerInput) {
+            val route = when (payerInput) {
                 null -> baseRoute()
                 else -> String.format(ROUTE_PAYER, payerInput.payerId)
             }
@@ -82,6 +84,34 @@ sealed class NavRoutes constructor(
                 PayerInput(UUID.fromString(entry.arguments?.getString(ARG_PAYER_ID) ?: ""))
             Timber.tag(TAG).d("Payer - fromEntry(...): '%s'", payerInput)
             return payerInput
+        }
+    }
+
+    object Service : NavRoutes(
+        String.format(ROUTE_SERVICE, "{$ARG_SERVICE_ID}"),
+        R.drawable.outline_domain_black_24,
+        R.string.nav_item_service,
+        arguments = listOf(navArgument(ARG_SERVICE_ID) {
+            type = NavType.StringType
+            nullable = true
+            //defaultValue = null
+        })
+    ) {
+        fun routeForService(serviceInput: ServiceInput? = null): String {
+            val route = when (serviceInput) {
+                null -> baseRoute()
+                else -> String.format(ROUTE_SERVICE, serviceInput.serviceId)
+            }
+            //val route = String.format(ROUTE_SERVICE, payerId)
+            Timber.tag(TAG).d("Service - routeForService(...): '%s'", route)
+            return route
+        }
+
+        fun fromEntry(entry: NavBackStackEntry): ServiceInput {
+            val serviceInput =
+                ServiceInput(UUID.fromString(entry.arguments?.getString(ARG_SERVICE_ID) ?: ""))
+            Timber.tag(TAG).d("Service - fromEntry(...): '%s'", serviceInput)
+            return serviceInput
         }
     }
 

@@ -30,7 +30,7 @@ private const val TAG = "Accounting.ui.AccountingScreen"
 
 @Composable
 fun AccountingScreen(
-    viewModel: AccountingViewModelImp = hiltViewModel(),
+    viewModel: AccountingViewModelImpl = hiltViewModel(),
     appState: AppState,
     nestedScrollConnection: NestedScrollConnection,
     bottomBar: @Composable () -> Unit

@@ -4,12 +4,12 @@ import com.oborodulin.home.common.di.IoDispatcher
 import com.oborodulin.home.common.domain.usecases.UseCase
 import com.oborodulin.home.data.local.db.dao.ServiceDao
 import com.oborodulin.home.servicing.data.mappers.*
-import com.oborodulin.home.servicing.data.repositories.ServicesRepositoryImp
+import com.oborodulin.home.servicing.data.repositories.ServicesRepositoryImpl
 import com.oborodulin.home.servicing.data.repositories.ServicingDataSource
-import com.oborodulin.home.servicing.data.repositories.ServicingDataSourceImp
+import com.oborodulin.home.servicing.data.repositories.ServicingDataSourceImpl
 import com.oborodulin.home.servicing.domain.repositories.ServicesRepository
 import com.oborodulin.home.servicing.domain.usecases.GetServicesUseCase
-import com.oborodulin.home.servicing.domain.usecases.ServicingUseCases
+import com.oborodulin.home.servicing.domain.usecases.ServiceUseCases
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -68,7 +68,7 @@ object ServicingModule {
         serviceToServiceEntityMapper: ServiceToServiceEntityMapper,
         serviceToServiceTlEntityMapper: ServiceToServiceTlEntityMapper
     ): ServicingDataSource =
-        ServicingDataSourceImp(
+        ServicingDataSourceImpl(
             serviceDao,
             dispatcher,
             serviceViewListToServiceListMapper,
@@ -83,15 +83,15 @@ object ServicingModule {
     @Singleton
     @Provides
     fun provideServicesRepository(servicingDataSource: ServicingDataSource): ServicesRepository =
-        ServicesRepositoryImp(servicingDataSource)
+        ServicesRepositoryImpl(servicingDataSource)
 
     // USE CASES:
     @Singleton
     @Provides
     fun providePayerServiceUseCases(
         configuration: UseCase.Configuration, repository: ServicesRepository
-    ): ServicingUseCases =
-        ServicingUseCases(
+    ): ServiceUseCases =
+        ServiceUseCases(
             getServicesUseCase = GetServicesUseCase(
                 configuration,
                 repository

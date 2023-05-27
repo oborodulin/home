@@ -13,6 +13,6 @@ interface ServicesRepository {
     fun getPayerService(payerServiceId: UUID): Flow<Service>
     fun save(service: Service): Flow<Service>
     fun delete(service: Service): Flow<Service>
-    fun delete(serviceId: UUID): Flow<UUID>
+    fun deleteById(serviceId: UUID): Flow<UUID>
     suspend fun deleteAll()
 }

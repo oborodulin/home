@@ -7,7 +7,8 @@ import java.util.UUID
 
 data class PayerServiceUi(
     val id: UUID? = null,
-    var servicePos: Int? = null,
+    var payerId: UUID,
+    var serviceId: UUID,
     val serviceType: ServiceType,
     val serviceMeterType: MeterType = MeterType.NONE,
     val serviceName: String = "",

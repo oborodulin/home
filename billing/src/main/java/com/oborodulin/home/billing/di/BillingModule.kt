@@ -2,8 +2,8 @@ package com.oborodulin.home.billing.di
 
 import com.oborodulin.home.billing.data.mappers.*
 import com.oborodulin.home.billing.data.repositories.BillingDataSource
-import com.oborodulin.home.billing.data.repositories.BillingDataSourceImp
-import com.oborodulin.home.billing.data.repositories.RatesRepositoryImp
+import com.oborodulin.home.billing.data.repositories.BillingDataSourceImpl
+import com.oborodulin.home.billing.data.repositories.RatesRepositoryImpl
 import com.oborodulin.home.billing.domain.repositories.RatesRepository
 import com.oborodulin.home.billing.domain.usecases.BillingUseCases
 import com.oborodulin.home.billing.domain.usecases.GetPayerServiceSubtotalsUseCase
@@ -90,7 +90,7 @@ object BillingModule {
         payerTotalDebtViewListToPayerListMapper: PayerTotalDebtViewListToPayerListMapper,
         rateToRateEntityMapper: RateToRateEntityMapper
     ): BillingDataSource =
-        BillingDataSourceImp(
+        BillingDataSourceImpl(
             rateDao,
             dispatcher,
             rateEntityListToRateListMapper,
@@ -105,7 +105,7 @@ object BillingModule {
     @Singleton
     @Provides
     fun provideRatesRepository(billingDataSource: BillingDataSource): RatesRepository =
-        RatesRepositoryImp(billingDataSource)
+        RatesRepositoryImpl(billingDataSource)
 
     // USE CASES:
     @Singleton

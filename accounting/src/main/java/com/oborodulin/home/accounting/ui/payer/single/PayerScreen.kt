@@ -52,7 +52,7 @@ private const val TAG = "Accounting.ui.PayerScreen"
 @Composable
 fun PayerScreen(
     appState: AppState,
-    viewModel: PayerViewModelImp = hiltViewModel(),
+    viewModel: PayerViewModelImpl = hiltViewModel(),
     payerInput: PayerInput? = null
 ) {
     Timber.tag(TAG).d("PayerScreen(...) called: payerInput = %s", payerInput)
@@ -391,6 +391,6 @@ fun Payer(appState: AppState, viewModel: PayerViewModel, onSubmit: () -> Unit) {
 fun PreviewPayer() {
     Payer(
         appState = rememberAppState(),
-        viewModel = PayerViewModelImp.previewModel,
+        viewModel = PayerViewModelImpl.previewModel,
         onSubmit = {})
 }

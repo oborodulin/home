@@ -57,7 +57,7 @@ object DataModule {
         appSettingEntityToAppSettingMapper: AppSettingEntityToAppSettingMapper,
         appSettingToAppSettingEntityMapper: AppSettingToAppSettingEntityMapper
     ): AppSettingDataSource =
-        AppSettingDataSourceImp(
+        AppSettingDataSourceImpl(
             appSettingDao, dispatcher,
             appSettingEntityListToAppSettingListMapper,
             appSettingEntityToAppSettingMapper,
@@ -68,13 +68,13 @@ object DataModule {
     @Provides
     fun providePayerDataSource(
         payerDao: PayerDao, @IoDispatcher dispatcher: CoroutineDispatcher
-    ): PayerDataSource = PayerDataSourceImp(payerDao, dispatcher)
+    ): PayerDataSource = PayerDataSourceImpl(payerDao, dispatcher)
 
     // REPOSITORIES:
     @Singleton
     @Provides
     fun provideAppSettingsRepository(appSettingDataSource: AppSettingDataSource): AppSettingsRepository =
-        AppSettingsRepositoryImp(appSettingDataSource)
+        AppSettingsRepositoryImpl(appSettingDataSource)
 
     @Singleton
     @Provides
@@ -84,7 +84,7 @@ object DataModule {
         payerEntityToPayerMapper: PayerEntityToPayerMapper,
         payerToPayerEntityMapper: PayerToPayerEntityMapper
     ): PayersRepository =
-        PayersRepositoryImp(
+        PayersRepositoryImpl(
             payerDataSource,
             payerEntityListToPayerListMapper,
             payerEntityToPayerMapper,

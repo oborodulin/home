@@ -28,13 +28,13 @@ import com.oborodulin.home.accounting.ui.model.PayerListItem
 import com.oborodulin.home.billing.ui.subtotals.PayerServiceSubtotalsListUiAction
 import com.oborodulin.home.billing.ui.subtotals.PayerServiceSubtotalsListView
 import com.oborodulin.home.billing.ui.subtotals.PayerServiceSubtotalsListViewModel
-import com.oborodulin.home.billing.ui.subtotals.PayerServiceSubtotalsListViewModelImp
+import com.oborodulin.home.billing.ui.subtotals.PayerServiceSubtotalsListViewModelImpl
 import com.oborodulin.home.common.ui.ComponentUiAction
 import com.oborodulin.home.common.ui.state.CommonScreen
 import com.oborodulin.home.metering.ui.value.MeterValuesListUiAction
 import com.oborodulin.home.metering.ui.value.MeterValuesListView
 import com.oborodulin.home.metering.ui.value.MeterValuesListViewModel
-import com.oborodulin.home.metering.ui.value.MeterValuesListViewModelImp
+import com.oborodulin.home.metering.ui.value.MeterValuesListViewModelImpl
 import com.oborodulin.home.presentation.AppState
 import com.oborodulin.home.presentation.components.PayerListItemComponent
 import com.oborodulin.home.presentation.navigation.PayerInput
@@ -47,9 +47,9 @@ private const val TAG = "Accounting.ui.PayersListView"
 @Composable
 fun PayersListView(
     appState: AppState,
-    payersListViewModel: PayersListViewModelImp = hiltViewModel(),
-    payerServiceSubtotalsListViewModel: PayerServiceSubtotalsListViewModelImp = hiltViewModel(),
-    meterValuesListViewModel: MeterValuesListViewModelImp = hiltViewModel(),
+    payersListViewModel: PayersListViewModelImpl = hiltViewModel(),
+    payerServiceSubtotalsListViewModel: PayerServiceSubtotalsListViewModelImpl = hiltViewModel(),
+    meterValuesListViewModel: MeterValuesListViewModelImpl = hiltViewModel(),
     navController: NavController,
     payerInput: PayerInput
 ) {
@@ -132,40 +132,40 @@ fun PayersList(
             }
         }
     }
-/*
-        list.apply {
-            val error = when {
-                loadState.prepend is LoadState.Error -> loadState.prepend AS LoadState.Error
-                loadState.append is LoadState.Error -> loadState.append AS LoadState.Error
-                loadState.refresh is LoadState.Error -> loadState.refresh AS LoadState.Error
-                else -> null
-            }
+    /*
+            list.apply {
+                val error = when {
+                    loadState.prepend is LoadState.Error -> loadState.prepend AS LoadState.Error
+                    loadState.append is LoadState.Error -> loadState.append AS LoadState.Error
+                    loadState.refresh is LoadState.Error -> loadState.refresh AS LoadState.Error
+                    else -> null
+                }
 
-            val loading = when {
-                loadState.prepend is LoadState.Loading -> loadState.prepend AS LoadState.Loading
-                loadState.append is LoadState.Loading -> loadState.append AS LoadState.Loading
-                loadState.refresh is LoadState.Loading -> loadState.refresh AS LoadState.Loading
-                else -> null
-            }
+                val loading = when {
+                    loadState.prepend is LoadState.Loading -> loadState.prepend AS LoadState.Loading
+                    loadState.append is LoadState.Loading -> loadState.append AS LoadState.Loading
+                    loadState.refresh is LoadState.Loading -> loadState.refresh AS LoadState.Loading
+                    else -> null
+                }
 
-            if (loading != null) {
-                repeat((0..20).count()) {
-                    item {
-                        Box(
-                            modifier = Modifier
-                                .background(color = Color.DarkGray)
-                        ) {
-                            ShimmerAnimation()
+                if (loading != null) {
+                    repeat((0..20).count()) {
+                        item {
+                            Box(
+                                modifier = Modifier
+                                    .background(color = Color.DarkGray)
+                            ) {
+                                ShimmerAnimation()
+                            }
                         }
                     }
                 }
-            }
 
-            if (error != null) {
-                //TODO: add error handler
-                item { SweetError(message = error.error.localizedMessage ?: "Error") }
-            }
-        }*/
+                if (error != null) {
+                    //TODO: add error handler
+                    item { SweetError(message = error.error.localizedMessage ?: "Error") }
+                }
+            }*/
     else {
         Text(
             text = stringResource(R.string.payer_list_empty_text),
@@ -261,6 +261,24 @@ fun PayersAccounting(
         }
         Box(
             modifier = Modifier
+                .fillMaxWidth()
+                .padding(vertical = 4.dp)
+                .clip(RoundedCornerShape(16.dp))
+                .weight(3.4f)
+                .border(
+                    2.dp,
+                    MaterialTheme.colorScheme.primary,
+                    shape = RoundedCornerShape(16.dp)
+                )
+        ) {
+            MeterValuesListView(
+                viewModel = meterValuesListViewModel,
+                navController = navController,
+                payerInput = payerInput
+            )
+        }
+        Box(
+            modifier = Modifier
                 .padding(vertical = 4.dp)
                 .clip(RoundedCornerShape(16.dp))
                 .weight(3.3f)
@@ -275,25 +293,7 @@ fun PayersAccounting(
                 navController = navController,
                 payerInput = payerInput
             )
-        }
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(vertical = 4.dp)
-                .clip(RoundedCornerShape(16.dp))
-                .weight(3.4f)
-                .border(
-                    2.dp,
-                    MaterialTheme.colorScheme.primary,
-                    shape = RoundedCornerShape(16.dp)
-                )
-        ) {
             //Text(text = "Итого:")
-            MeterValuesListView(
-                viewModel = meterValuesListViewModel,
-                navController = navController,
-                payerInput = payerInput
-            )
         }
     }
 }
@@ -303,7 +303,7 @@ fun PayersAccounting(
 @Composable
 fun PreviewPayersAccounting() {
     PayersList(
-        payers = PayersListViewModelImp.previewList(LocalContext.current),
+        payers = PayersListViewModelImpl.previewList(LocalContext.current),
         payerInput = PayerInput(UUID.randomUUID()),
         onFavorite = {},
         onClick = {},

@@ -418,8 +418,8 @@ fun MeterValue(
 @Composable
 fun PreviewMeterValuesList() {
     MeterValuesList(
-        metersValues = MeterValuesListViewModelImp.previewMeterValueModel(LocalContext.current),
-        viewModel = MeterValuesListViewModelImp.previewModel(LocalContext.current),
+        metersValues = MeterValuesListViewModelImpl.previewMeterValueModel(LocalContext.current),
+        viewModel = MeterValuesListViewModelImpl.previewModel(LocalContext.current),
         payerId = null
     )
 }
@@ -430,6 +430,6 @@ fun PreviewMeterValuesList() {
 fun PreviewMeterValue() {
     MeterValue(
         meterValueListItem = MeterValueListItem(metersId = UUID.randomUUID()),
-        viewModel = MeterValuesListViewModelImp.previewModel(LocalContext.current)
+        viewModel = MeterValuesListViewModelImpl.previewModel(LocalContext.current)
     )
 }

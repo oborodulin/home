@@ -8,4 +8,5 @@ object MainDestinations {
     const val ROUTE_METERING = "metering"
     const val ROUTE_REPORTING = "reporting"
     const val ROUTE_PAYER = "payer/%s"
+    const val ROUTE_SERVICE = "service/%s"
 }

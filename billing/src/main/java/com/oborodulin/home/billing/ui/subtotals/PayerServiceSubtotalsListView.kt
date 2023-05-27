@@ -18,7 +18,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.oborodulin.home.common.ui.ComponentUiAction
-import com.oborodulin.home.common.ui.components.items.ListItemComponent
 import com.oborodulin.home.common.ui.state.CommonScreen
 import com.oborodulin.home.presentation.navigation.PayerInput
 import com.oborodulin.home.presentation.util.serviceIconId
@@ -114,6 +113,6 @@ fun PayerServiceSubtotalsList(
 @Composable
 fun PreviewPayerServiceSubtotalsList() {
     PayerServiceSubtotalsList(
-        payerServiceSubtotals = PayerServiceSubtotalsListViewModelImp.previewList(LocalContext.current)
+        payerServiceSubtotals = PayerServiceSubtotalsListViewModelImpl.previewList(LocalContext.current)
     ) {}
 }
