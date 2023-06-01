@@ -1,32 +1,55 @@
 package com.oborodulin.home.data.local.db.repositories
 
+import com.oborodulin.home.data.local.db.mappers.AppSettingMappers
+import com.oborodulin.home.data.local.db.repositories.sources.local.LocalAppSettingDataSource
 import com.oborodulin.home.domain.model.AppSetting
 import com.oborodulin.home.domain.repositories.AppSettingsRepository
 import kotlinx.coroutines.flow.flow
-import java.util.*
+import kotlinx.coroutines.flow.map
+import java.util.UUID
 import javax.inject.Inject
 
 class AppSettingsRepositoryImpl @Inject constructor(
-    private val appSettingDataSource: AppSettingDataSource
+    private val localAppSettingDataSource: LocalAppSettingDataSource,
+    private val mappers: AppSettingMappers
 ) : AppSettingsRepository {
-    override fun getAll() = appSettingDataSource.getAppSettings()
+    override fun getAll() =
+        localAppSettingDataSource.getAppSettings()
+            .map(mappers.appSettingEntityListToAppSettingListMapper::map)
 
-    override fun get(settingId: UUID) = appSettingDataSource.getAppSetting(settingId)
+    override fun get(settingId: UUID) =
+        localAppSettingDataSource.getAppSetting(settingId)
+            .map(mappers.appSettingEntityToAppSettingMapper::map)
 
     override fun save(setting: AppSetting) = flow {
-        appSettingDataSource.saveAppSetting(setting)
+        if (setting.id == null) {
+            localAppSettingDataSource.insertAppSetting(
+                mappers.appSettingToAppSettingEntityMapper.map(setting)
+            )
+        } else {
+            localAppSettingDataSource.updateAppSetting(
+                mappers.appSettingToAppSettingEntityMapper.map(setting)
+            )
+        }
         emit(setting)
     }
 
     override fun delete(setting: AppSetting) = flow {
-        appSettingDataSource.deleteAppSetting(setting)
+        localAppSettingDataSource.deleteAppSetting(mappers.appSettingToAppSettingEntityMapper.map(setting))
         this.emit(setting)
     }
 
     override fun deleteById(settingId: UUID) = flow {
-        appSettingDataSource.deleteAppSettingById(settingId)
+        localAppSettingDataSource.deleteAppSettingById(settingId)
         this.emit(settingId)
     }
 
-    override suspend fun deleteAll() = appSettingDataSource.deleteAppSettings()
+    override fun delete(settings: List<AppSetting>) = flow {
+        localAppSettingDataSource.deleteAppSettings(settings.map {
+            mappers.appSettingToAppSettingEntityMapper.map(it)
+        })
+        this.emit(settings)
+    }
+
+    override suspend fun deleteAll() = localAppSettingDataSource.deleteAppSettings()
 }

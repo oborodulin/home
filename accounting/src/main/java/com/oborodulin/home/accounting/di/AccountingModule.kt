@@ -5,11 +5,11 @@ import com.oborodulin.home.accounting.ui.model.converters.FavoritePayerConverter
 import com.oborodulin.home.accounting.ui.model.converters.PayerConverter
 import com.oborodulin.home.accounting.ui.model.converters.PayersListConverter
 import com.oborodulin.home.accounting.ui.model.mappers.*
-import com.oborodulin.home.billing.domain.repositories.RatesRepository
 import com.oborodulin.home.common.domain.usecases.UseCase
 import com.oborodulin.home.domain.repositories.PayersRepository
 import com.oborodulin.home.domain.usecases.*
 import com.oborodulin.home.metering.domain.repositories.MetersRepository
+import com.oborodulin.home.servicing.domain.repositories.RatesRepository
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -67,18 +67,17 @@ object AccountingModule {
     @Singleton
     @Provides
     fun providePayerUseCases(
-        configuration: UseCase.Configuration, payersRepository: PayersRepository,
-        ratesRepository: RatesRepository,
+        configuration: UseCase.Configuration,
+        payersRepository: PayersRepository, ratesRepository: RatesRepository,
         getPayerUseCase: GetPayerUseCase, savePayerUseCase: SavePayerUseCase,
         deletePayerUseCase: DeletePayerUseCase, favoritePayerUseCase: FavoritePayerUseCase
-    ): PayerUseCases =
-        PayerUseCases(
-            getPayerUseCase = getPayerUseCase,
-            getPayersUseCase = GetPayersUseCase(
-                configuration, payersRepository, ratesRepository
-            ),
-            savePayerUseCase = savePayerUseCase,
-            deletePayerUseCase = deletePayerUseCase,
-            favoritePayerUseCase = favoritePayerUseCase
-        )
+    ): PayerUseCases = PayerUseCases(
+        getPayerUseCase = getPayerUseCase,
+        getPayersUseCase = GetPayersUseCase(
+            configuration, payersRepository, ratesRepository
+        ),
+        savePayerUseCase = savePayerUseCase,
+        deletePayerUseCase = deletePayerUseCase,
+        favoritePayerUseCase = favoritePayerUseCase
+    )
 }

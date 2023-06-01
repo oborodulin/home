@@ -1,7 +1,7 @@
 package com.oborodulin.home.servicing.ui.model.converters
 
 import com.oborodulin.home.common.ui.state.CommonResultConverter
-import com.oborodulin.home.servicing.domain.usecases.GetServicesUseCase
+import com.oborodulin.home.servicing.domain.usecases.service.GetServicesUseCase
 import com.oborodulin.home.servicing.ui.model.ServiceListItem
 import com.oborodulin.home.servicing.ui.model.mappers.ServiceListToServiceListItemMapper
 

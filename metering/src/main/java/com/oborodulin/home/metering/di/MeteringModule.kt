@@ -4,8 +4,8 @@ import com.oborodulin.home.common.di.IoDispatcher
 import com.oborodulin.home.common.domain.usecases.UseCase
 import com.oborodulin.home.data.local.db.dao.MeterDao
 import com.oborodulin.home.metering.data.mappers.*
-import com.oborodulin.home.metering.data.repositories.MeteringDataSource
-import com.oborodulin.home.metering.data.repositories.MeteringDataSourceImpl
+import com.oborodulin.home.metering.data.repositories.sources.local.LocalMeteringDataSource
+import com.oborodulin.home.metering.data.sources.local.LocalMeteringDataSourceImpl
 import com.oborodulin.home.metering.data.repositories.MetersRepositoryImpl
 import com.oborodulin.home.metering.domain.repositories.MetersRepository
 import com.oborodulin.home.metering.domain.usecases.*
@@ -113,8 +113,8 @@ object MeteringModule {
         meterValueToMeterValueEntityMapper: MeterValueToMeterValueEntityMapper,
         meterToMeterEntityMapper: MeterToMeterEntityMapper,
         meterToMeterTlEntityMapper: MeterToMeterTlEntityMapper
-    ): MeteringDataSource =
-        MeteringDataSourceImpl(
+    ): LocalMeteringDataSource =
+        LocalMeteringDataSourceImpl(
             meterDao,
             dispatcher,
             meterViewToMeterListMapper,
@@ -129,8 +129,8 @@ object MeteringModule {
     // REPOSITORIES:
     @Singleton
     @Provides
-    fun provideMetersRepository(meteringDataSource: MeteringDataSource): MetersRepository =
-        MetersRepositoryImpl(meteringDataSource)
+    fun provideMetersRepository(localMeteringDataSource: LocalMeteringDataSource): MetersRepository =
+        MetersRepositoryImpl(localMeteringDataSource)
 
     // USE CASES:
     @Singleton

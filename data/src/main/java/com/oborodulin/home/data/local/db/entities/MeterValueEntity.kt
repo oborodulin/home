@@ -4,6 +4,7 @@ import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.PrimaryKey
+import com.oborodulin.home.common.data.entities.BaseEntity
 import java.math.BigDecimal
 import java.time.OffsetDateTime
 import java.time.format.DateTimeFormatter
@@ -25,8 +26,6 @@ data class MeterValueEntity(
     val meterValue: BigDecimal? = null,
     @ColumnInfo(index = true) var metersId: UUID,
 ) : BaseEntity() {
-
-    override fun id() = this.meterValueId
 
     companion object {
         const val TABLE_NAME = "meter_values"
@@ -216,19 +215,11 @@ data class MeterValueEntity(
         )
     }
 
-    override fun equals(other: Any?): Boolean {
-        if (this === other) return true
-        if (javaClass != other?.javaClass) return false
-
-        other as MeterValueEntity
-        if (meterValueId != other.meterValueId) return false
-
-        return true
-    }
+    override fun id() = this.meterValueId
 
     override fun toString(): String {
         val str = StringBuffer()
-        str.append("Meter value at ")
+        str.append("Meter value Entity at ")
             .append(DateTimeFormatter.ISO_LOCAL_DATE.format(valueDate))
             .append(": ").append(meterValue).append(" for  [metersId = ").append(metersId)
             .append("] meterValueId = ").append(meterValueId)

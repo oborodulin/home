@@ -1,9 +1,15 @@
 package com.oborodulin.home.data.local.db.entities
 
 import android.content.Context
-import androidx.room.*
+import androidx.room.ColumnInfo
+import androidx.room.Entity
+import androidx.room.ForeignKey
+import androidx.room.Index
+import androidx.room.PrimaryKey
+import com.oborodulin.home.common.data.entities.BaseEntity
 import com.oborodulin.home.data.util.MeterType
-import java.util.*
+import java.util.Locale
+import java.util.UUID
 
 @Entity(
     tableName = MeterTlEntity.TABLE_NAME,
@@ -23,8 +29,6 @@ data class MeterTlEntity(
     val meterDesc: String? = null,
     @ColumnInfo(index = true) val metersId: UUID,
 ) : BaseEntity() {
-
-    override fun id() = this.meterTlId
 
     companion object {
         const val TABLE_NAME = "meters_tl"
@@ -76,15 +80,7 @@ data class MeterTlEntity(
             }
     }
 
-    override fun equals(other: Any?): Boolean {
-        if (this === other) return true
-        if (javaClass != other?.javaClass) return false
-
-        other as MeterTlEntity
-        if (meterTlId != other.meterTlId) return false
-
-        return true
-    }
+    override fun id() = this.meterTlId
 }
 
 

@@ -2,30 +2,15 @@ package com.oborodulin.home.servicing.domain.model
 
 import com.oborodulin.home.data.util.MeterType
 import com.oborodulin.home.data.util.ServiceType
-import com.oborodulin.home.domain.model.DomainModel
-import java.math.BigDecimal
-import java.time.OffsetDateTime
+import com.oborodulin.home.common.domain.model.DomainModel
 import java.util.UUID
 
 data class Service(
-    var payerServiceId: UUID? = null,
-    var payerId: UUID? = null,
     var serviceTlId: UUID? = null,
     val servicePos: Int?,
     val serviceName: String = "",
     val serviceType: ServiceType,
     val serviceMeterType: MeterType = MeterType.NONE,
     val serviceMeasureUnit: String? = null,
-    val serviceDesc: String? = null,
-    val fromMonth: Int? = null,
-    val fromYear: Int? = null,
-    val periodFromDate: OffsetDateTime? = null,
-    val periodToDate: OffsetDateTime? = null,
-    val isMeterOwner: Boolean? = null,
-    var isPrivileges: Boolean? = null,
-    var isAllocateRate: Boolean? = null,
-    val fromPaymentDate: OffsetDateTime? = null,
-    val toPaymentDate: OffsetDateTime? = null,
-    val diffMeterValue: BigDecimal? = null,
-    val serviceDebt: BigDecimal? = null
+    val serviceDesc: String? = null
 ) : DomainModel()

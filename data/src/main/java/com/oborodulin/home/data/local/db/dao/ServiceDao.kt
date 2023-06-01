@@ -70,7 +70,7 @@ interface ServiceDao { // : BaseDao<ServiceEntity>
     @Insert(onConflict = OnConflictStrategy.ABORT)
     suspend fun insert(services: List<ServiceEntity>)
 
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    @Insert(onConflict = OnConflictStrategy.ABORT)
     suspend fun insert(vararg textContent: ServiceTlEntity)
 
     @Transaction

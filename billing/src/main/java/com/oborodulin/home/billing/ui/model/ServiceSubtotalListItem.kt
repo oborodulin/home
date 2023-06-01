@@ -4,7 +4,7 @@ import com.oborodulin.home.common.ui.model.ListItemModel
 import com.oborodulin.home.data.util.ServiceType
 import java.math.BigDecimal
 import java.time.OffsetDateTime
-import java.util.*
+import java.util.UUID
 
 data class ServiceSubtotalListItem(
     val id: UUID,

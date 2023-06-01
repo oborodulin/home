@@ -1,7 +1,7 @@
 package com.oborodulin.home.domain.model
 
+import com.oborodulin.home.common.domain.model.DomainModel
 import java.math.BigDecimal
-import java.time.OffsetDateTime
 
 data class Payer(
     val ercCode: String = "",
@@ -14,7 +14,4 @@ data class Payer(
     val personsNum: Int = 1,
     val isAlignByPaymentDay: Boolean = false,
     val isFavorite: Boolean = false,
-    var fromPaymentDate: OffsetDateTime? = null,
-    var toPaymentDate: OffsetDateTime? = null,
-    var totalDebt: BigDecimal = BigDecimal.ZERO
 ) : DomainModel()

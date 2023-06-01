@@ -1,7 +1,7 @@
 package com.oborodulin.home.data.local.fakes
 
 import com.oborodulin.home.data.local.db.dao.BaseDao
-import com.oborodulin.home.data.local.db.entities.BaseEntity
+import com.oborodulin.home.common.data.entities.BaseEntity
 import kotlinx.coroutines.delay
 import java.util.*
 

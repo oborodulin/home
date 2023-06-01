@@ -4,8 +4,9 @@ import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.PrimaryKey
+import com.oborodulin.home.common.data.entities.BaseEntity
 import java.math.BigDecimal
-import java.util.*
+import java.util.UUID
 
 @Entity(
     tableName = ReceiptLineEntity.TABLE_NAME,
@@ -57,8 +58,6 @@ data class ReceiptLineEntity(
     @ColumnInfo(index = true) val meterValuesId: UUID? = null
 ) : BaseEntity() {
 
-    override fun id() = this.receiptLineId
-
     companion object {
         const val TABLE_NAME = "receipt_lines"
 
@@ -88,13 +87,6 @@ data class ReceiptLineEntity(
         )
     }
 
-    override fun equals(other: Any?): Boolean {
-        if (this === other) return true
-        if (javaClass != other?.javaClass) return false
+    override fun id() = this.receiptLineId
 
-        other as ReceiptLineEntity
-        if (receiptLineId != other.receiptLineId) return false
-
-        return true
-    }
 }

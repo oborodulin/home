@@ -14,12 +14,12 @@ data class ReceiptWithLines(
         if (javaClass != other?.javaClass) return false
 
         other as ReceiptWithLines
-        if (receipt.receiptId != other.receipt.receiptId) return false
+        if (receipt.id() != other.receipt.id() || receipt.key() != other.receipt.key()) return false
 
         return true
     }
 
     override fun hashCode(): Int {
-        return receipt.receiptId.hashCode()
+        return receipt.hashCode()
     }
 }

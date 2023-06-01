@@ -101,7 +101,7 @@ interface PayerDao { //: BaseDao<PayerEntity>
     suspend fun clearFavoritesById(payerId: UUID)
 
     @Transaction
-    suspend fun favoriteById(payerId: UUID) {
+    suspend fun makeFavoriteById(payerId: UUID) {
         clearFavoritesById(payerId)
         setFavoriteById(payerId)
     }

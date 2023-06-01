@@ -7,12 +7,14 @@ import com.oborodulin.home.servicing.domain.model.Service
 class PayerServiceViewToServiceMapper(private val mapper: ServiceViewToServiceMapper) :
     Mapper<PayerServiceView, Service> {
     override fun map(input: PayerServiceView): Service {
-        val service = mapper.map(input.service)
-        with(service) {
-            payerServiceId = input.payerServiceId
-            isPrivileges = input.isPrivileges
-            isAllocateRate = input.isAllocateRate
-        }
-        return service
+        /*        val service = mapper.map(input.service)
+                with(service) {
+                    payerServiceId = input.payerServiceId
+                    isPrivileges = input.isPrivileges
+                    isAllocateRate = input.isAllocateRate
+                }
+                return service
+         */
     }
+
 }

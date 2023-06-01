@@ -12,7 +12,7 @@ class FavoritePayerUseCase(
 ) :
     UseCase<FavoritePayerUseCase.Request, FavoritePayerUseCase.Response>(configuration) {
     override fun process(request: Request): Flow<Response> {
-        return payersRepository.favoriteById(request.payerId)
+        return payersRepository.makeFavoriteById(request.payerId)
             .map {
                 Response
             }

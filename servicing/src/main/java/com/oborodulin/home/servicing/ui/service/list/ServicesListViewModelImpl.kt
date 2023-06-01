@@ -10,9 +10,9 @@ import com.oborodulin.home.data.util.MeterType
 import com.oborodulin.home.data.util.ServiceType
 import com.oborodulin.home.presentation.navigation.NavRoutes
 import com.oborodulin.home.presentation.navigation.ServiceInput
-import com.oborodulin.home.servicing.domain.usecases.DeleteServiceUseCase
-import com.oborodulin.home.servicing.domain.usecases.GetServicesUseCase
-import com.oborodulin.home.servicing.domain.usecases.ServiceUseCases
+import com.oborodulin.home.servicing.domain.usecases.service.DeleteServiceUseCase
+import com.oborodulin.home.servicing.domain.usecases.service.GetServicesUseCase
+import com.oborodulin.home.servicing.domain.usecases.service.ServiceUseCases
 import com.oborodulin.home.servicing.ui.model.ServiceListItem
 import com.oborodulin.home.servicing.ui.model.converters.ServicesListConverter
 import dagger.hilt.android.lifecycle.HiltViewModel

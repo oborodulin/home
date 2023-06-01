@@ -10,7 +10,6 @@ data class PayerServiceUi(
     var payerId: UUID,
     var serviceId: UUID,
     val serviceType: ServiceType,
-    val serviceMeterType: MeterType = MeterType.NONE,
     val serviceName: String = "",
     var serviceMeasureUnit: String? = null,
     val serviceDesc: String? = null,

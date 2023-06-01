@@ -1,11 +1,15 @@
 package com.oborodulin.home.data.local.db.entities
 
-import androidx.room.*
+import androidx.room.ColumnInfo
+import androidx.room.Entity
 import androidx.room.ForeignKey
+import androidx.room.Index
+import androidx.room.PrimaryKey
+import com.oborodulin.home.common.data.entities.BaseEntity
 import java.math.BigDecimal
 import java.time.OffsetDateTime
 import java.time.format.DateTimeFormatter
-import java.util.*
+import java.util.UUID
 
 @Entity(
     tableName = RateEntity.TABLE_NAME,
@@ -36,8 +40,6 @@ data class RateEntity(
     @ColumnInfo(index = true) val servicesId: UUID,
     @ColumnInfo(index = true) val payersServicesId: UUID? = null
 ) : BaseEntity() {
-
-    override fun id() = this.rateId
 
     companion object {
         const val TABLE_NAME = "rates"
@@ -314,21 +316,23 @@ data class RateEntity(
         )
     }
 
-    override fun equals(other: Any?): Boolean {
-        if (this === other) return true
-        if (javaClass != other?.javaClass) return false
+    override fun id() = this.rateId
 
-        other as RateEntity
-        if (rateId != other.rateId) return false
-
-        return true
+    override fun key(): Int {
+        var result = servicesId.hashCode()
+        payersServicesId?.let { result = result * 31 + payersServicesId.hashCode() }
+        result = result * 31 + startDate.hashCode()
+        fromMeterValue?.let { result = result * 31 + fromMeterValue.hashCode() }
+        result = result * 31 + isPerPerson.hashCode()
+        result = result * 31 + isPrivileges.hashCode()
+        return result
     }
 
     override fun toString(): String {
         val str = StringBuffer()
         if (payersServicesId != null) str.append("Payer Service")
         else str.append("Service")
-        str.append(" Rate from ")
+        str.append(" Rate Entity from ")
             .append(DateTimeFormatter.ISO_LOCAL_DATE.format(startDate))
             .append(": ").append(rateValue)
         fromMeterValue?.let {

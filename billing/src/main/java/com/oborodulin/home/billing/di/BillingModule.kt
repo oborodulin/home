@@ -1,15 +1,15 @@
 package com.oborodulin.home.billing.di
 
 import com.oborodulin.home.billing.data.mappers.*
-import com.oborodulin.home.billing.data.repositories.BillingDataSource
-import com.oborodulin.home.billing.data.repositories.BillingDataSourceImpl
-import com.oborodulin.home.billing.data.repositories.RatesRepositoryImpl
-import com.oborodulin.home.billing.domain.repositories.RatesRepository
+import com.oborodulin.home.billing.data.repositories.BillingRepositoryImpl
+import com.oborodulin.home.billing.data.repositories.sources.local.LocalBillingDataSource
+import com.oborodulin.home.billing.data.sources.local.LocalBillingDataSourceImpl
+import com.oborodulin.home.billing.domain.repositories.BillingRepository
 import com.oborodulin.home.billing.domain.usecases.BillingUseCases
 import com.oborodulin.home.billing.domain.usecases.GetPayerServiceSubtotalsUseCase
 import com.oborodulin.home.billing.ui.model.converters.ServiceSubtotalListConverter
-import com.oborodulin.home.billing.ui.model.mappers.ServiceListToServiceSubtotalListItemMapper
-import com.oborodulin.home.billing.ui.model.mappers.ServiceToServiceSubtotalListItemMapper
+import com.oborodulin.home.billing.ui.model.mappers.PayerServiceSubtotalListToServiceSubtotalListItemMapper
+import com.oborodulin.home.billing.ui.model.mappers.PayerServiceSubtotalToServiceSubtotalListItemMapper
 import com.oborodulin.home.common.di.IoDispatcher
 import com.oborodulin.home.common.domain.usecases.UseCase
 import com.oborodulin.home.data.local.db.dao.RateDao
@@ -27,96 +27,79 @@ object BillingModule {
     // DATA MAPPERS:
     @Singleton
     @Provides
-    fun provideRateEntityToRateMapper(): RateEntityToRateMapper =
-        RateEntityToRateMapper()
+    fun providePayerServiceSubtotalDebtViewToPayerServiceDebtMapper(): PayerServiceSubtotalDebtViewToPayerServiceDebtMapper =
+        PayerServiceSubtotalDebtViewToPayerServiceDebtMapper()
 
     @Singleton
     @Provides
-    fun provideRateEntityListToRateListMapper(mapper: RateEntityToRateMapper): RateEntityListToRateListMapper =
-        RateEntityListToRateListMapper(mapper = mapper)
+    fun providePayerServiceSubtotalDebtViewListToPayerServiceDebtListMapper(mapper: PayerServiceSubtotalDebtViewToPayerServiceDebtMapper): PayerServiceSubtotalDebtViewListToPayerServiceDebtListMapper =
+        PayerServiceSubtotalDebtViewListToPayerServiceDebtListMapper(mapper = mapper)
 
     @Singleton
     @Provides
-    fun provideRateToRateEntityMapper(): RateToRateEntityMapper =
-        RateToRateEntityMapper()
+    fun providePayerTotalDebtViewToPayerDebtMapper(): PayerTotalDebtViewToPayerDebtMapper =
+        PayerTotalDebtViewToPayerDebtMapper()
 
     @Singleton
     @Provides
-    fun providePayerServiceSubtotalDebtViewToServiceMapper(): PayerServiceSubtotalDebtViewToServiceMapper =
-        PayerServiceSubtotalDebtViewToServiceMapper()
+    fun providePayerTotalDebtViewListToPayerDebtListMapper(mapper: PayerTotalDebtViewToPayerDebtMapper): PayerTotalDebtViewListToPayerDebtListMapper =
+        PayerTotalDebtViewListToPayerDebtListMapper(mapper = mapper)
 
     @Singleton
     @Provides
-    fun providePayerServiceSubtotalDebtViewListToServiceListMapper(mapper: PayerServiceSubtotalDebtViewToServiceMapper): PayerServiceSubtotalDebtViewListToServiceListMapper =
-        PayerServiceSubtotalDebtViewListToServiceListMapper(mapper = mapper)
-
-    @Singleton
-    @Provides
-    fun providePayerTotalDebtViewToPayerMapper(): PayerTotalDebtViewToPayerMapper =
-        PayerTotalDebtViewToPayerMapper()
-
-    @Singleton
-    @Provides
-    fun providePayerTotalDebtViewListToPayerListMapper(mapper: PayerTotalDebtViewToPayerMapper): PayerTotalDebtViewListToPayerListMapper =
-        PayerTotalDebtViewListToPayerListMapper(mapper = mapper)
+    fun provideBillingMappers(
+        payerServiceSubtotalDebtViewListToPayerServiceDebtListMapper: PayerServiceSubtotalDebtViewListToPayerServiceDebtListMapper,
+        payerTotalDebtViewToPayerDebtMapper: PayerTotalDebtViewToPayerDebtMapper,
+        payerTotalDebtViewListToPayerDebtListMapper: PayerTotalDebtViewListToPayerDebtListMapper
+    ): BillingMappers = BillingMappers(
+        payerServiceSubtotalDebtViewListToPayerServiceDebtListMapper,
+        payerTotalDebtViewToPayerDebtMapper,
+        payerTotalDebtViewListToPayerDebtListMapper
+    )
 
     // UI MAPPERS:
     @Singleton
     @Provides
-    fun provideServiceToServiceSubtotalListItemMapper(): ServiceToServiceSubtotalListItemMapper =
-        ServiceToServiceSubtotalListItemMapper()
+    fun provideServiceToServiceSubtotalListItemMapper(): PayerServiceSubtotalToServiceSubtotalListItemMapper =
+        PayerServiceSubtotalToServiceSubtotalListItemMapper()
 
     @Singleton
     @Provides
-    fun provideServiceListToServiceSubtotalListItemMapper(mapper: ServiceToServiceSubtotalListItemMapper): ServiceListToServiceSubtotalListItemMapper =
-        ServiceListToServiceSubtotalListItemMapper(mapper = mapper)
+    fun provideServiceListToServiceSubtotalListItemMapper(mapper: PayerServiceSubtotalToServiceSubtotalListItemMapper): PayerServiceSubtotalListToServiceSubtotalListItemMapper =
+        PayerServiceSubtotalListToServiceSubtotalListItemMapper(
+            mapper = mapper
+        )
 
     // CONVERTERS:
     @Singleton
     @Provides
-    fun provideServiceSubtotalListConverter(mapper: ServiceListToServiceSubtotalListItemMapper): ServiceSubtotalListConverter =
+    fun provideServiceSubtotalListConverter(mapper: PayerServiceSubtotalListToServiceSubtotalListItemMapper): ServiceSubtotalListConverter =
         ServiceSubtotalListConverter(mapper = mapper)
 
     // DATA SOURCES:
     @Singleton
     @Provides
     fun provideBillingDataSourceImp(
-        rateDao: RateDao,
-        @IoDispatcher dispatcher: CoroutineDispatcher,
-        rateEntityListToRateListMapper: RateEntityListToRateListMapper,
-        rateEntityToRateMapper: RateEntityToRateMapper,
-        payerServiceSubtotalDebtViewListToServiceListMapper: PayerServiceSubtotalDebtViewListToServiceListMapper,
-        payerTotalDebtViewToPayerMapper: PayerTotalDebtViewToPayerMapper,
-        payerTotalDebtViewListToPayerListMapper: PayerTotalDebtViewListToPayerListMapper,
-        rateToRateEntityMapper: RateToRateEntityMapper
-    ): BillingDataSource =
-        BillingDataSourceImpl(
-            rateDao,
-            dispatcher,
-            rateEntityListToRateListMapper,
-            rateEntityToRateMapper,
-            payerServiceSubtotalDebtViewListToServiceListMapper,
-            payerTotalDebtViewToPayerMapper,
-            payerTotalDebtViewListToPayerListMapper,
-            rateToRateEntityMapper
-        )
+        rateDao: RateDao, @IoDispatcher dispatcher: CoroutineDispatcher
+    ): LocalBillingDataSource = LocalBillingDataSourceImpl(rateDao, dispatcher)
 
     // REPOSITORIES:
     @Singleton
     @Provides
-    fun provideRatesRepository(billingDataSource: BillingDataSource): RatesRepository =
-        RatesRepositoryImpl(billingDataSource)
+    fun provideBillingRepository(
+        localBillingDataSource: LocalBillingDataSource, mappers: BillingMappers
+    ): BillingRepository = BillingRepositoryImpl(localBillingDataSource, mappers)
 
     // USE CASES:
     @Singleton
     @Provides
     fun provideBillingUseCases(
-        configuration: UseCase.Configuration, repository: RatesRepository
-    ): BillingUseCases =
-        BillingUseCases(
-            getPayerServiceSubtotalsUseCase = GetPayerServiceSubtotalsUseCase(
-                configuration,
-                repository
-            )
+        configuration: UseCase.Configuration,
+        repository: BillingRepository
+    ): BillingUseCases = BillingUseCases(
+        getPayerServiceSubtotalsUseCase = GetPayerServiceSubtotalsUseCase(
+            configuration,
+            repository
         )
+    )
 }

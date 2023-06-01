@@ -1,9 +1,14 @@
 package com.oborodulin.home.data.local.db.entities
 
-import androidx.room.*
+import androidx.room.ColumnInfo
+import androidx.room.Entity
+import androidx.room.ForeignKey
+import androidx.room.Index
+import androidx.room.PrimaryKey
+import com.oborodulin.home.common.data.entities.BaseEntity
 import java.time.OffsetDateTime
 import java.time.format.DateTimeFormatter
-import java.util.*
+import java.util.UUID
 
 @Entity(
     tableName = PayerServiceCrossRefEntity.TABLE_NAME,
@@ -36,8 +41,6 @@ data class PayerServiceCrossRefEntity(
     @ColumnInfo(index = true) val payersId: UUID,
     @ColumnInfo(index = true) val servicesId: UUID
 ) : BaseEntity() {
-
-    override fun id() = this.payerServiceId
 
     companion object {
         const val TABLE_NAME = "payers_services"
@@ -73,23 +76,18 @@ data class PayerServiceCrossRefEntity(
         )
     }
 
-    override fun equals(other: Any?): Boolean {
-        if (this === other) return true
-        if (javaClass != other?.javaClass) return false
+    override fun id() = this.payerServiceId
 
-        other as PayerServiceCrossRefEntity
-        if (payerServiceId != other.payerServiceId) return false
-
-        return true
-    }
-
-    override fun hashCode(): Int {
-        return payerServiceId.hashCode()
+    override fun key(): Int {
+        var result = payersId.hashCode()
+        result = result * 31 + servicesId.hashCode()
+        result = result * 31 + isPrivileges.hashCode()
+        return result
     }
 
     override fun toString(): String {
         val str = StringBuffer()
-        str.append("Payer Service")
+        str.append("Payer Service Entity")
         fromYear?.let {
             str.append(" from Date: ").append(it).append("-").append(fromMonth).append("-01")
         }

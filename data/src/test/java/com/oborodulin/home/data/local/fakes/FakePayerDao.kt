@@ -97,7 +97,7 @@ class FakePayerDao : FakeBaseDao<PayerEntity>(), PayerDao {
             .forEach { it.copy(isFavorite = false) }
     }
 
-    override suspend fun favoriteById(payerId: UUID) {
+    override suspend fun makeFavoriteById(payerId: UUID) {
         clearFavoritesById(payerId)
         setFavoriteById(payerId)
     }

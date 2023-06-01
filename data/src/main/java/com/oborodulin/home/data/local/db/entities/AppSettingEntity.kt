@@ -4,9 +4,11 @@ import android.content.Context
 import androidx.room.Entity
 import androidx.room.Index
 import androidx.room.PrimaryKey
+import com.oborodulin.home.common.data.entities.BaseEntity
 import com.oborodulin.home.common.util.Utils.Companion.currencyCode
 import com.oborodulin.home.domain.util.AppSettingParam
-import java.util.*
+import java.util.Locale
+import java.util.UUID
 
 @Entity(
     tableName = AppSettingEntity.TABLE_NAME,
@@ -17,8 +19,6 @@ data class AppSettingEntity(
     val paramName: AppSettingParam,
     val paramValue: String = ""
 ) : BaseEntity() {
-
-    override fun id() = this.settingId
 
     companion object {
         const val TABLE_NAME = "app_settings"
@@ -70,13 +70,15 @@ data class AppSettingEntity(
         )
     }
 
-    override fun equals(other: Any?): Boolean {
-        if (this === other) return true
-        if (javaClass != other?.javaClass) return false
+    override fun id() = this.settingId
 
-        other as AppSettingEntity
-        if (settingId != other.settingId || paramName != other.paramName) return false
+    override fun key() = paramName.hashCode()
 
-        return true
+    override fun toString(): String {
+        val str = StringBuffer()
+        str.append("AppSetting Entity: ").append(paramName).append(" = ").append("'")
+            .append(paramValue)
+            .append("' settingId = ").append(settingId)
+        return str.toString()
     }
 }

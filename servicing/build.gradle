@@ -59,8 +59,6 @@ dependencies {
     implementation project(':domain')
     implementation project(':presentation')
 
-    implementation project(':billing')
-
     // Logging
     implementation deps.logging.timber
     implementation deps.logging.logger
@@ -112,9 +110,20 @@ dependencies {
     implementation deps.navigation.compose
     //debugImplementation deps.compose.uiToolingBom
 
-    // Testing dependencies
+    // Testing: Local
+    implementation deps.test.extJunitKtx
+    implementation deps.test.runner
+
     testImplementation deps.test.junit
-    androidTestImplementation deps.test.extJunit
-    androidTestImplementation deps.test.espressoCore
-    androidTestImplementation deps.test.uiJunit4Bom
+    testImplementation deps.test.robolectric
+    testImplementation deps.test.mockito
+    testImplementation deps.test.coroutines
+    testImplementation deps.coroutines.android
+    testImplementation deps.test.extJunit
+    testImplementation deps.test.core
+    testImplementation deps.test.truth
+    //testImplementation deps.test.hamcrest
+    testImplementation deps.dagger.testing
+    testImplementation deps.test.turbine
+    kaptTest deps.dagger.hiltCompiler
 }

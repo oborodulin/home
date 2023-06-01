@@ -1,6 +1,6 @@
 package com.oborodulin.home.accounting.domain.usecases
 
-import com.oborodulin.home.billing.domain.repositories.RatesRepository
+import com.oborodulin.home.servicing.domain.repositories.RatesRepository
 import com.oborodulin.home.common.domain.usecases.UseCase
 import com.oborodulin.home.domain.model.Payer
 import com.oborodulin.home.domain.repositories.PayersRepository
@@ -10,7 +10,7 @@ import kotlinx.coroutines.flow.combine
 class GetPayersUseCase(
     configuration: Configuration,
     private val payersRepository: PayersRepository,
-    private val ratesRepository: RatesRepository
+    private val ratesRepository: com.oborodulin.home.servicing.domain.repositories.RatesRepository
 ) : UseCase<GetPayersUseCase.Request, GetPayersUseCase.Response>(configuration) {
 
     override fun process(request: Request): Flow<Response> =

@@ -69,6 +69,7 @@ dependencies {
 
     implementation project(':metering')
     implementation project(':billing')
+    implementation project(':servicing')
 
     // Logging
     implementation deps.logging.timber

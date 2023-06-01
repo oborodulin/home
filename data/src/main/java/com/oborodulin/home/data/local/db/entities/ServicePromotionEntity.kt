@@ -4,6 +4,7 @@ import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.PrimaryKey
+import com.oborodulin.home.common.data.entities.BaseEntity
 import java.util.*
 
 @Entity(
@@ -29,8 +30,6 @@ data class ServicePromotionEntity(
     @ColumnInfo(index = true) val payersServicesId: UUID? = null,
 ) : BaseEntity() {
 
-    override fun id() = this.servicePromotionId
-
     companion object {
         const val TABLE_NAME = "service_promotions"
 
@@ -43,13 +42,5 @@ data class ServicePromotionEntity(
             )
     }
 
-    override fun equals(other: Any?): Boolean {
-        if (this === other) return true
-        if (javaClass != other?.javaClass) return false
-
-        other as ServicePromotionEntity
-        if (servicePromotionId != other.servicePromotionId) return false
-
-        return true
-    }
+    override fun id() = this.servicePromotionId
 }

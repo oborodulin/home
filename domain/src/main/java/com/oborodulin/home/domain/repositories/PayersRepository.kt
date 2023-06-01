@@ -11,6 +11,6 @@ interface PayersRepository {
     fun save(payer: Payer): Flow<Payer>
     fun delete(payer: Payer): Flow<Payer>
     fun deleteById(payerId: UUID): Flow<UUID>
-    fun favoriteById(payerId: UUID): Flow<UUID>
+    fun makeFavoriteById(payerId: UUID): Flow<UUID>
     suspend fun deleteAll()
 }

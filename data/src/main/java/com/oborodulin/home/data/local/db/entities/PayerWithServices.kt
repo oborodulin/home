@@ -23,12 +23,12 @@ data class PayerWithServices(
         if (javaClass != other?.javaClass) return false
 
         other as PayerWithServices
-        if (payer.payerId != other.payer.payerId) return false
+        if (payer.id() != other.payer.id() || payer.key() != other.payer.key()) return false
 
         return true
     }
 
     override fun hashCode(): Int {
-        return payer.payerId.hashCode()
+        return payer.hashCode()
     }
 }

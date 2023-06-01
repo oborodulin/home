@@ -3,9 +3,10 @@ package com.oborodulin.home.data.local.db.entities
 import androidx.room.Entity
 import androidx.room.Index
 import androidx.room.PrimaryKey
+import com.oborodulin.home.common.data.entities.BaseEntity
 import com.oborodulin.home.data.util.MeterType
 import com.oborodulin.home.data.util.ServiceType
-import java.util.*
+import java.util.UUID
 
 @Entity(
     tableName = ServiceEntity.TABLE_NAME,
@@ -17,8 +18,6 @@ data class ServiceEntity(
     val serviceType: ServiceType,
     val serviceMeterType: MeterType = MeterType.NONE
 ) : BaseEntity() {
-
-    override fun id() = this.serviceId
 
     companion object {
         const val TABLE_NAME = "services"
@@ -110,19 +109,13 @@ data class ServiceEntity(
             )
     }
 
-    override fun equals(other: Any?): Boolean {
-        if (this === other) return true
-        if (javaClass != other?.javaClass) return false
+    override fun id() = this.serviceId
 
-        other as ServiceEntity
-        if (serviceId != other.serviceId) return false
-
-        return true
-    }
+    override fun key() = serviceType.hashCode()
 
     override fun toString(): String {
         val str = StringBuffer()
-        str.append("Service '").append(serviceType).append("' №").append(servicePos)
+        str.append("Service Entity '").append(serviceType).append("' №").append(servicePos)
         if (serviceMeterType != MeterType.NONE) {
             str.append(" for Meter '").append(serviceMeterType).append("'")
         }

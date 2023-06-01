@@ -3,16 +3,23 @@ package com.oborodulin.home.servicing.domain.repositories
 import com.oborodulin.home.servicing.domain.model.PayerService
 import com.oborodulin.home.servicing.domain.model.Service
 import kotlinx.coroutines.flow.Flow
-import java.util.*
+import java.util.UUID
 
 interface ServicesRepository {
-    fun getAll(): Flow<List<Service>>
-    fun get(id: UUID): Flow<Service>
-    fun getMeterAllowed(): Flow<List<Service>>
+    // Services:
+    fun getAllServices(): Flow<List<Service>>
+    fun getService(id: UUID): Flow<Service>
+    fun getMeterAllowedServices(): Flow<List<Service>>
+    fun saveService(service: Service): Flow<Service>
+    fun deleteService(service: Service): Flow<Service>
+    fun deleteService(serviceId: UUID): Flow<UUID>
+    suspend fun deleteAllServices()
+
+    // Payer Services:
     fun getPayerServices(payerId: UUID): Flow<List<PayerService>>
-    fun getPayerService(payerServiceId: UUID): Flow<Service>
-    fun save(service: Service): Flow<Service>
-    fun delete(service: Service): Flow<Service>
-    fun deleteById(serviceId: UUID): Flow<UUID>
-    suspend fun deleteAll()
+    fun getPayerService(payerServiceId: UUID): Flow<PayerService>
+    fun savePayerService(payerService: PayerService): Flow<PayerService>
+    fun deletePayerService(payerService: PayerService): Flow<PayerService>
+    fun deletePayerService(payerServiceId: UUID): Flow<UUID>
+    suspend fun deleteAllPayerService(payerId: UUID)
 }

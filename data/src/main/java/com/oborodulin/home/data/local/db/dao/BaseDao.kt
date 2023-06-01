@@ -4,7 +4,7 @@ import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Update
-import com.oborodulin.home.data.local.db.entities.BaseEntity
+import com.oborodulin.home.common.data.entities.BaseEntity
 
 interface BaseDao<T : BaseEntity> {
     @Insert(onConflict = OnConflictStrategy.ABORT)

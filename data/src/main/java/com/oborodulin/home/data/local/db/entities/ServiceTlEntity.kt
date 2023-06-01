@@ -1,10 +1,16 @@
 package com.oborodulin.home.data.local.db.entities
 
 import android.content.Context
-import androidx.room.*
+import androidx.room.ColumnInfo
+import androidx.room.Entity
+import androidx.room.ForeignKey
+import androidx.room.Index
+import androidx.room.PrimaryKey
+import com.oborodulin.home.common.data.entities.BaseEntity
 import com.oborodulin.home.data.R
 import com.oborodulin.home.data.util.ServiceType
-import java.util.*
+import java.util.Locale
+import java.util.UUID
 
 @Entity(
     tableName = ServiceTlEntity.TABLE_NAME,
@@ -25,8 +31,6 @@ data class ServiceTlEntity(
     val serviceDesc: String? = null,
     @ColumnInfo(index = true) val servicesId: UUID,
 ) : BaseEntity() {
-
-    override fun id() = this.serviceTlId
 
     companion object {
         const val TABLE_NAME = "services_tl"
@@ -141,15 +145,7 @@ data class ServiceTlEntity(
             }
     }
 
-    override fun equals(other: Any?): Boolean {
-        if (this === other) return true
-        if (javaClass != other?.javaClass) return false
-
-        other as ServiceTlEntity
-        if (serviceTlId != other.serviceTlId) return false
-
-        return true
-    }
+    override fun id() = this.serviceTlId
 }
 
 

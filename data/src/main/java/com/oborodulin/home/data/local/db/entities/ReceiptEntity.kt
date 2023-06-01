@@ -1,10 +1,15 @@
 package com.oborodulin.home.data.local.db.entities
 
-import androidx.room.*
+import androidx.room.ColumnInfo
+import androidx.room.Entity
+import androidx.room.ForeignKey
+import androidx.room.Index
+import androidx.room.PrimaryKey
+import com.oborodulin.home.common.data.entities.BaseEntity
 import com.oborodulin.home.data.util.Constants.DEF_PERSON_NUM
 import java.math.BigDecimal
 import java.time.OffsetDateTime
-import java.util.*
+import java.util.UUID
 
 @Entity(
     tableName = ReceiptEntity.TABLE_NAME,
@@ -28,8 +33,6 @@ data class ReceiptEntity(
     val isReceiptPaid: Boolean = false,
     @ColumnInfo(index = true) val payersId: UUID,
 ) : BaseEntity() {
-
-    override fun id() = this.receiptId
 
     companion object {
         const val TABLE_NAME = "receipts"
@@ -74,13 +77,12 @@ data class ReceiptEntity(
             )
     }
 
-    override fun equals(other: Any?): Boolean {
-        if (this === other) return true
-        if (javaClass != other?.javaClass) return false
+    override fun id() = this.receiptId
 
-        other as ReceiptEntity
-        if (receiptId != other.receiptId) return false
-
-        return true
+    override fun key(): Int {
+        var result = payersId.hashCode()
+        result = result * 31 + receiptYear.hashCode()
+        result = result * 31 + receiptMonth.hashCode()
+        return result
     }
 }

@@ -4,6 +4,7 @@ import android.content.Context
 import androidx.room.Entity
 import androidx.room.Index
 import androidx.room.PrimaryKey
+import com.oborodulin.home.common.data.entities.BaseEntity
 import com.oborodulin.home.data.R
 import com.oborodulin.home.data.util.Constants
 import java.math.BigDecimal
@@ -23,8 +24,6 @@ data class PayerEntity(
     val isAlignByPaymentDay: Boolean = false,
     val isFavorite: Boolean = false
 ) : BaseEntity() {
-
-    override fun id() = this.payerId
 
     companion object {
         const val TABLE_NAME = "payers"
@@ -97,19 +96,13 @@ data class PayerEntity(
             )
     }
 
-    override fun equals(other: Any?): Boolean {
-        if (this === other) return true
-        if (javaClass != other?.javaClass) return false
+    override fun id() = this.payerId
 
-        other as PayerEntity
-        if (payerId != other.payerId || ercCode != other.ercCode) return false
-
-        return true
-    }
+    override fun key() = ercCode.hashCode()
 
     override fun toString(): String {
         val str = StringBuffer()
-        str.append("Payer ").append(ercCode).append(" '").append(fullName)
+        str.append("Payer Entity ").append(ercCode).append(" '").append(fullName)
             .append("' at address '").append(address).append("' for ").append(personsNum)
             .append(" person:")
         totalArea?.let { str.append(" totalArea: ").append(it).append(";") }

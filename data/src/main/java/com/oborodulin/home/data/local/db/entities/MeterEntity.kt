@@ -1,13 +1,18 @@
 package com.oborodulin.home.data.local.db.entities
 
 import android.content.Context
-import androidx.room.*
+import androidx.room.ColumnInfo
+import androidx.room.Entity
+import androidx.room.ForeignKey
+import androidx.room.Index
+import androidx.room.PrimaryKey
+import com.oborodulin.home.common.data.entities.BaseEntity
 import com.oborodulin.home.data.R
 import com.oborodulin.home.data.util.MeterType
 import java.math.BigDecimal
 import java.time.OffsetDateTime
 import java.time.format.DateTimeFormatter
-import java.util.*
+import java.util.UUID
 
 @Entity(
     tableName = MeterEntity.TABLE_NAME,
@@ -30,8 +35,6 @@ data class MeterEntity(
     val verificationPeriod: Int? = null,
     @ColumnInfo(index = true) val payersId: UUID
 ) : BaseEntity() {
-
-    override fun id() = this.meterId
 
     companion object {
         const val TABLE_NAME = "meters"
@@ -130,19 +133,19 @@ data class MeterEntity(
 
     }
 
-    override fun equals(other: Any?): Boolean {
-        if (this === other) return true
-        if (javaClass != other?.javaClass) return false
+    override fun id() = this.meterId
 
-        other as MeterEntity
-        if (meterId != other.meterId) return false
-
-        return true
+    override fun key(): Int {
+        var result = payersId.hashCode()
+        result = result * 31 + meterNum.hashCode()
+        result = result * 31 + meterType.hashCode()
+        passportDate?.let { result = result * 31 + passportDate.hashCode() }
+        return result
     }
 
     override fun toString(): String {
         val str = StringBuffer()
-        str.append("Meter '").append(meterType).append("' №").append(meterNum)
+        str.append("Meter Entity '").append(meterType).append("' №").append(meterNum)
             .append(" with max Value = '").append(maxValue).append("'")
         passportDate?.let {
             str.append(". Passport Date ").append(DateTimeFormatter.ISO_LOCAL_DATE.format(it))

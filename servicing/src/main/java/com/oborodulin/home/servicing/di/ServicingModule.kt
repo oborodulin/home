@@ -5,11 +5,14 @@ import com.oborodulin.home.common.domain.usecases.UseCase
 import com.oborodulin.home.data.local.db.dao.ServiceDao
 import com.oborodulin.home.servicing.data.mappers.*
 import com.oborodulin.home.servicing.data.repositories.ServicesRepositoryImpl
-import com.oborodulin.home.servicing.data.repositories.ServicingDataSource
-import com.oborodulin.home.servicing.data.repositories.ServicingDataSourceImpl
+import com.oborodulin.home.servicing.data.repositories.sources.local.LocalServiceDataSource
+import com.oborodulin.home.servicing.data.sources.local.LocalServiceDataSourceImpl
 import com.oborodulin.home.servicing.domain.repositories.ServicesRepository
-import com.oborodulin.home.servicing.domain.usecases.GetServicesUseCase
-import com.oborodulin.home.servicing.domain.usecases.ServiceUseCases
+import com.oborodulin.home.servicing.domain.usecases.service.DeleteServiceUseCase
+import com.oborodulin.home.servicing.domain.usecases.service.GetServiceUseCase
+import com.oborodulin.home.servicing.domain.usecases.service.GetServicesUseCase
+import com.oborodulin.home.servicing.domain.usecases.service.SaveServiceUseCase
+import com.oborodulin.home.servicing.domain.usecases.service.ServiceUseCases
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -21,6 +24,17 @@ import javax.inject.Singleton
 @InstallIn(SingletonComponent::class)
 object ServicingModule {
     // DATA MAPPERS:
+    // Services:
+    @Singleton
+    @Provides
+    fun provideServiceViewToServiceEntityMapper(): ServiceViewToServiceEntityMapper =
+        ServiceViewToServiceEntityMapper()
+
+    @Singleton
+    @Provides
+    fun provideServiceViewToServiceTlEntityMapper(): ServiceViewToServiceTlEntityMapper =
+        ServiceViewToServiceTlEntityMapper()
+
     @Singleton
     @Provides
     fun provideServiceViewToServiceMapper(): ServiceViewToServiceMapper =
@@ -33,6 +47,27 @@ object ServicingModule {
 
     @Singleton
     @Provides
+    fun provideServiceToServiceViewMapper(): ServiceToServiceViewMapper =
+        ServiceToServiceViewMapper()
+
+    @Singleton
+    @Provides
+    fun provideServiceViewMappers(
+        serviceViewListToServiceListMapper: ServiceViewListToServiceListMapper,
+        serviceViewToServiceMapper: ServiceViewToServiceMapper,
+        serviceToServiceViewMapper: ServiceToServiceViewMapper,
+        payerServiceViewToServiceMapper: PayerServiceViewToServiceMapper,
+        payerServiceViewListToPayerServiceListMapper: PayerServiceViewListToPayerServiceListMapper
+    ): ServiceViewMappers = ServiceViewMappers(
+        serviceViewListToServiceListMapper,
+        serviceViewToServiceMapper,
+        serviceToServiceViewMapper,
+        payerServiceViewToServiceMapper,
+        payerServiceViewListToPayerServiceListMapper
+    )
+
+    @Singleton
+    @Provides
     fun provideServiceToServiceEntityMapper(): ServiceToServiceEntityMapper =
         ServiceToServiceEntityMapper()
 
@@ -41,6 +76,17 @@ object ServicingModule {
     fun provideServiceToServiceTlEntityMapper(): ServiceToServiceTlEntityMapper =
         ServiceToServiceTlEntityMapper()
 
+    @Singleton
+    @Provides
+    fun provideServiceMappers(
+        serviceToServiceEntityMapper: ServiceToServiceEntityMapper,
+        serviceToServiceTlEntityMapper: ServiceToServiceTlEntityMapper
+    ): ServiceMappers = ServiceMappers(
+        serviceToServiceEntityMapper,
+        serviceToServiceTlEntityMapper
+    )
+
+    //Payer Services:
     @Singleton
     @Provides
     fun providePayerServiceViewToServiceMapper(mapper: ServiceViewToServiceMapper): PayerServiceViewToServiceMapper =
@@ -61,40 +107,38 @@ object ServicingModule {
     fun provideServicingDataSourceImp(
         serviceDao: ServiceDao,
         @IoDispatcher dispatcher: CoroutineDispatcher,
-        serviceViewListToServiceListMapper: ServiceViewListToServiceListMapper,
-        serviceViewToServiceMapper: ServiceViewToServiceMapper,
-        payerServiceViewToServiceMapper: PayerServiceViewToServiceMapper,
-        payerServiceViewListToPayerServiceListMapper: PayerServiceViewListToPayerServiceListMapper,
-        serviceToServiceEntityMapper: ServiceToServiceEntityMapper,
-        serviceToServiceTlEntityMapper: ServiceToServiceTlEntityMapper
-    ): ServicingDataSource =
-        ServicingDataSourceImpl(
+        serviceViewToServiceEntityMapper: ServiceViewToServiceEntityMapper,
+        serviceViewToServiceTlEntityMapper: ServiceViewToServiceTlEntityMapper
+    ): LocalServiceDataSource =
+        LocalServiceDataSourceImpl(
             serviceDao,
             dispatcher,
-            serviceViewListToServiceListMapper,
-            serviceViewToServiceMapper,
-            payerServiceViewToServiceMapper,
-            payerServiceViewListToPayerServiceListMapper,
-            serviceToServiceEntityMapper,
-            serviceToServiceTlEntityMapper
+            serviceViewToServiceEntityMapper,
+            serviceViewToServiceTlEntityMapper
         )
 
     // REPOSITORIES:
     @Singleton
     @Provides
-    fun provideServicesRepository(servicingDataSource: ServicingDataSource): ServicesRepository =
-        ServicesRepositoryImpl(servicingDataSource)
+    fun provideServicesRepository(
+        localServiceDataSource: LocalServiceDataSource,
+        serviceViewMappers: ServiceViewMappers,
+        serviceMappers: ServiceMappers
+    ): ServicesRepository = ServicesRepositoryImpl(
+        localServiceDataSource,
+        serviceViewMappers,
+        serviceMappers
+    )
 
     // USE CASES:
     @Singleton
     @Provides
     fun providePayerServiceUseCases(
         configuration: UseCase.Configuration, repository: ServicesRepository
-    ): ServiceUseCases =
-        ServiceUseCases(
-            getServicesUseCase = GetServicesUseCase(
-                configuration,
-                repository
-            )
-        )
+    ): ServiceUseCases = ServiceUseCases(
+        getServiceUseCase = GetServiceUseCase(configuration, repository),
+        getServicesUseCase = GetServicesUseCase(configuration, repository),
+        saveServiceUseCase = SaveServiceUseCase(configuration, repository),
+        deleteServiceUseCase = DeleteServiceUseCase(configuration, repository)
+    )
 }

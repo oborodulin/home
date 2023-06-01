@@ -1,7 +1,7 @@
 package com.oborodulin.home.metering.domain.model
 
 import com.oborodulin.home.data.util.MeterType
-import com.oborodulin.home.domain.model.DomainModel
+import com.oborodulin.home.common.domain.model.DomainModel
 import com.oborodulin.home.servicing.domain.model.Service
 import java.math.BigDecimal
 import java.time.OffsetDateTime
