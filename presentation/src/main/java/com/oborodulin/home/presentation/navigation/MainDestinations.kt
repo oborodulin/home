@@ -9,4 +9,5 @@ object MainDestinations {
     const val ROUTE_REPORTING = "reporting"
     const val ROUTE_PAYER = "payer/%s"
     const val ROUTE_SERVICE = "service/%s"
+    const val ROUTE_RATE = "rate/%s"
 }

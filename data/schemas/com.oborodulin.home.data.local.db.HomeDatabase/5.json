@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 5,
-    "identityHash": "0fdbcc2dccfc6a697d9ace29bcbf8725",
+    "identityHash": "b89ed996b87011ca49322c17e70a0223",
     "entities": [
       {
         "tableName": "app_settings",
@@ -395,7 +395,7 @@
       },
       {
         "tableName": "rates",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`rateId` TEXT NOT NULL, `startDate` TEXT NOT NULL, `fromMeterValue` INTEGER, `toMeterValue` INTEGER, `rateValue` INTEGER NOT NULL, `isPerPerson` INTEGER NOT NULL, `isPrivileges` INTEGER NOT NULL, `servicesId` TEXT NOT NULL, `payersServicesId` TEXT, PRIMARY KEY(`rateId`), FOREIGN KEY(`servicesId`) REFERENCES `services`(`serviceId`) ON UPDATE NO ACTION ON DELETE CASCADE , FOREIGN KEY(`payersServicesId`) REFERENCES `payers_services`(`payerServiceId`) ON UPDATE NO ACTION ON DELETE CASCADE )",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`rateId` TEXT NOT NULL, `startDate` TEXT NOT NULL, `fromMeterValue` INTEGER, `toMeterValue` INTEGER, `rateValue` INTEGER NOT NULL, `isPerPerson` INTEGER NOT NULL, `isPrivileges` INTEGER NOT NULL, `isSuspended` INTEGER NOT NULL, `servicesId` TEXT NOT NULL, `payersServicesId` TEXT, PRIMARY KEY(`rateId`), FOREIGN KEY(`servicesId`) REFERENCES `services`(`serviceId`) ON UPDATE NO ACTION ON DELETE CASCADE , FOREIGN KEY(`payersServicesId`) REFERENCES `payers_services`(`payerServiceId`) ON UPDATE NO ACTION ON DELETE CASCADE )",
         "fields": [
           {
             "fieldPath": "rateId",
@@ -440,6 +440,12 @@
             "notNull": true
           },
           {
+            "fieldPath": "isSuspended",
+            "columnName": "isSuspended",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
             "fieldPath": "servicesId",
             "columnName": "servicesId",
             "affinity": "TEXT",
@@ -460,7 +466,7 @@
         },
         "indices": [
           {
-            "name": "index_rates_servicesId_payersServicesId_startDate_fromMeterValue_isPerPerson_isPrivileges",
+            "name": "index_rates_servicesId_payersServicesId_startDate_fromMeterValue_isPerPerson_isPrivileges_isSuspended",
             "unique": true,
             "columnNames": [
               "servicesId",
@@ -468,10 +474,11 @@
               "startDate",
               "fromMeterValue",
               "isPerPerson",
-              "isPrivileges"
+              "isPrivileges",
+              "isSuspended"
             ],
             "orders": [],
-            "createSql": "CREATE UNIQUE INDEX IF NOT EXISTS `index_rates_servicesId_payersServicesId_startDate_fromMeterValue_isPerPerson_isPrivileges` ON `${TABLE_NAME}` (`servicesId`, `payersServicesId`, `startDate`, `fromMeterValue`, `isPerPerson`, `isPrivileges`)"
+            "createSql": "CREATE UNIQUE INDEX IF NOT EXISTS `index_rates_servicesId_payersServicesId_startDate_fromMeterValue_isPerPerson_isPrivileges_isSuspended` ON `${TABLE_NAME}` (`servicesId`, `payersServicesId`, `startDate`, `fromMeterValue`, `isPerPerson`, `isPrivileges`, `isSuspended`)"
           },
           {
             "name": "index_rates_servicesId",
@@ -1341,7 +1348,7 @@
     ],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '0fdbcc2dccfc6a697d9ace29bcbf8725')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'b89ed996b87011ca49322c17e70a0223')"
     ]
   }
 }

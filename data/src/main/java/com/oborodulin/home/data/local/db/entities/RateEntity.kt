@@ -14,7 +14,7 @@ import java.util.UUID
 @Entity(
     tableName = RateEntity.TABLE_NAME,
     indices = [Index(
-        value = ["servicesId", "payersServicesId", "startDate", "fromMeterValue", "isPerPerson", "isPrivileges"],
+        value = ["servicesId", "payersServicesId", "startDate", "fromMeterValue", "isPerPerson", "isPrivileges", "isSuspended"],
         unique = true
     )],
     foreignKeys = [ForeignKey(
@@ -37,6 +37,7 @@ data class RateEntity(
     val rateValue: BigDecimal,
     val isPerPerson: Boolean = false, // считаем по норме на 1 человека, но приоритет для тарифов по счётчику
     val isPrivileges: Boolean = false, // считаем по счётчику, но по льготному тарифу
+    val isSuspended: Boolean = false, // тариф приостановленной услуги
     @ColumnInfo(index = true) val servicesId: UUID,
     @ColumnInfo(index = true) val payersServicesId: UUID? = null
 ) : BaseEntity() {

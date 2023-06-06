@@ -4,9 +4,9 @@ import com.oborodulin.home.common.di.IoDispatcher
 import com.oborodulin.home.common.domain.usecases.UseCase
 import com.oborodulin.home.data.local.db.dao.MeterDao
 import com.oborodulin.home.metering.data.mappers.*
+import com.oborodulin.home.metering.data.repositories.MetersRepositoryImpl
 import com.oborodulin.home.metering.data.repositories.sources.local.LocalMeteringDataSource
 import com.oborodulin.home.metering.data.sources.local.LocalMeteringDataSourceImpl
-import com.oborodulin.home.metering.data.repositories.MetersRepositoryImpl
 import com.oborodulin.home.metering.domain.repositories.MetersRepository
 import com.oborodulin.home.metering.domain.usecases.*
 import com.oborodulin.home.metering.ui.model.converters.PrevServiceMeterValuesListConverter
@@ -73,6 +73,27 @@ object MeteringModule {
     fun provideMeterVerificationEntityListToMeterVerificationListMapper(mapper: MeterVerificationEntityToMeterVerificationMapper): MeterVerificationEntityListToMeterVerificationListMapper =
         MeterVerificationEntityListToMeterVerificationListMapper(mapper = mapper)
 
+    @Singleton
+    @Provides
+    fun provideMeterMappers(
+        meterViewToMeterListMapper: MeterViewToMeterListMapper,
+        meterViewToMeterMapper: MeterViewToMeterMapper,
+        meterValueEntityListToMeterValueListMapper: MeterValueEntityListToMeterValueListMapper,
+        meterVerificationEntityListToMeterVerificationListMapper: MeterVerificationEntityListToMeterVerificationListMapper,
+        meterValueToMeterValueEntityMapper: MeterValueToMeterValueEntityMapper,
+        meterToMeterEntityMapper: MeterToMeterEntityMapper,
+        meterToMeterTlEntityMapper: MeterToMeterTlEntityMapper
+    ): MeterMappers = MeterMappers(
+        meterViewToMeterListMapper,
+        meterViewToMeterMapper,
+        meterValueEntityListToMeterValueListMapper,
+        meterVerificationEntityListToMeterVerificationListMapper,
+        meterValueToMeterValueEntityMapper,
+        meterToMeterEntityMapper,
+        meterToMeterTlEntityMapper
+    )
+
+
     // UI MAPPERS:
     @Singleton
     @Provides
@@ -104,33 +125,15 @@ object MeteringModule {
     @Singleton
     @Provides
     fun provideMeteringDataSource(
-        meterDao: MeterDao,
-        @IoDispatcher dispatcher: CoroutineDispatcher,
-        meterViewToMeterListMapper: MeterViewToMeterListMapper,
-        meterViewToMeterMapper: MeterViewToMeterMapper,
-        meterValueEntityListToMeterValueListMapper: MeterValueEntityListToMeterValueListMapper,
-        meterVerificationEntityListToMeterVerificationListMapper: MeterVerificationEntityListToMeterVerificationListMapper,
-        meterValueToMeterValueEntityMapper: MeterValueToMeterValueEntityMapper,
-        meterToMeterEntityMapper: MeterToMeterEntityMapper,
-        meterToMeterTlEntityMapper: MeterToMeterTlEntityMapper
-    ): LocalMeteringDataSource =
-        LocalMeteringDataSourceImpl(
-            meterDao,
-            dispatcher,
-            meterViewToMeterListMapper,
-            meterViewToMeterMapper,
-            meterValueEntityListToMeterValueListMapper,
-            meterVerificationEntityListToMeterVerificationListMapper,
-            meterValueToMeterValueEntityMapper,
-            meterToMeterEntityMapper,
-            meterToMeterTlEntityMapper
-        )
+        meterDao: MeterDao, @IoDispatcher dispatcher: CoroutineDispatcher
+    ): LocalMeteringDataSource = LocalMeteringDataSourceImpl(meterDao, dispatcher)
 
     // REPOSITORIES:
     @Singleton
     @Provides
-    fun provideMetersRepository(localMeteringDataSource: LocalMeteringDataSource): MetersRepository =
-        MetersRepositoryImpl(localMeteringDataSource)
+    fun provideMetersRepository(
+        localMeteringDataSource: LocalMeteringDataSource, mappers: MeterMappers
+    ): MetersRepository = MetersRepositoryImpl(localMeteringDataSource, mappers)
 
     // USE CASES:
     @Singleton

@@ -21,5 +21,5 @@ interface ServicesRepository {
     fun savePayerService(payerService: PayerService): Flow<PayerService>
     fun deletePayerService(payerService: PayerService): Flow<PayerService>
     fun deletePayerService(payerServiceId: UUID): Flow<UUID>
-    suspend fun deleteAllPayerService(payerId: UUID)
+    suspend fun deleteAllPayerServices(payerId: UUID)
 }

@@ -90,6 +90,9 @@ interface PayerDao { //: BaseDao<PayerEntity>
     @Query("DELETE FROM ${PayerServiceCrossRefEntity.TABLE_NAME} WHERE payerServiceId = :payerServiceId")
     suspend fun deleteServiceById(payerServiceId: UUID)
 
+    @Query("DELETE FROM ${PayerServiceCrossRefEntity.TABLE_NAME} WHERE payersId = :payerId")
+    suspend fun deleteServicesByPayerId(payerId: UUID)
+
     @Query("DELETE FROM ${PayerEntity.TABLE_NAME}")
     suspend fun deleteAll()
 

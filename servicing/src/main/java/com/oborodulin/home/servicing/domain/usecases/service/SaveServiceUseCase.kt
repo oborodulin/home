@@ -17,7 +17,7 @@ class SaveServiceUseCase(
         return servicesRepository.saveService(request.service)
             .map {
                 Response(it)
-            }.catch { throw UseCaseException.PayerSaveException(it) }
+            }.catch { throw UseCaseException.ServiceSaveException(it) }
     }
 
     data class Request(val service: Service) : UseCase.Request

@@ -1,11 +1,15 @@
 package com.oborodulin.home.metering.data.mappers
 
-import com.oborodulin.home.data.local.db.entities.MeterValueEntity
-import com.oborodulin.home.data.local.db.entities.MeterVerificationEntity
-import com.oborodulin.home.metering.domain.model.Meter
-import java.util.*
-
-class MeterMapper {
+class MeterMappers(
+    val meterViewToMeterListMapper: MeterViewToMeterListMapper,
+    val meterViewToMeterMapper: MeterViewToMeterMapper,
+    val meterValueEntityListToMeterValueListMapper: MeterValueEntityListToMeterValueListMapper,
+    val meterVerificationEntityListToMeterVerificationListMapper: MeterVerificationEntityListToMeterVerificationListMapper,
+    val meterValueToMeterValueEntityMapper: MeterValueToMeterValueEntityMapper,
+    val meterToMeterEntityMapper: MeterToMeterEntityMapper,
+    val meterToMeterTlEntityMapper: MeterToMeterTlEntityMapper
+)
+/*{
 
     fun toMeterValueEntityList(meter: Meter) =
         meter.meterValues?.map {
@@ -29,3 +33,4 @@ class MeterMapper {
             )
         }
 }
+ */

@@ -11,7 +11,7 @@ data class PayerService(
     val fromYear: Int? = null,
     val periodFromDate: OffsetDateTime? = null,
     val periodToDate: OffsetDateTime? = null,
-    val isMeterOwner: Boolean? = null,
-    var isPrivileges: Boolean? = null,
-    var isAllocateRate: Boolean? = null,
+    val isMeterOwner: Boolean = false,
+    var isPrivileges: Boolean = false,
+    var isAllocateRate: Boolean = false
 ) : DomainModel()

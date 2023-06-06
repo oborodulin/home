@@ -13,6 +13,7 @@ import com.oborodulin.home.presentation.navigation.MainDestinations.ROUTE_BILLIN
 import com.oborodulin.home.presentation.navigation.MainDestinations.ROUTE_HOME
 import com.oborodulin.home.presentation.navigation.MainDestinations.ROUTE_METERING
 import com.oborodulin.home.presentation.navigation.MainDestinations.ROUTE_PAYER
+import com.oborodulin.home.presentation.navigation.MainDestinations.ROUTE_RATE
 import com.oborodulin.home.presentation.navigation.MainDestinations.ROUTE_REPORTING
 import com.oborodulin.home.presentation.navigation.MainDestinations.ROUTE_SERVICE
 import timber.log.Timber
@@ -22,6 +23,7 @@ private const val TAG = "Presentation.NavRoutes"
 
 private const val ARG_PAYER_ID = "payerId"
 private const val ARG_SERVICE_ID = "serviceId"
+private const val ARG_RATE_ID = "rateId"
 
 /**
  * Created by oborodulin on 12.December.2021
@@ -112,6 +114,34 @@ sealed class NavRoutes constructor(
                 ServiceInput(UUID.fromString(entry.arguments?.getString(ARG_SERVICE_ID) ?: ""))
             Timber.tag(TAG).d("Service - fromEntry(...): '%s'", serviceInput)
             return serviceInput
+        }
+    }
+
+    object Rate : NavRoutes(
+        String.format(ROUTE_RATE, "{$ARG_RATE_ID}"),
+        R.drawable.outline_domain_black_24,
+        R.string.nav_item_rate,
+        arguments = listOf(navArgument(ARG_RATE_ID) {
+            type = NavType.StringType
+            nullable = true
+            //defaultValue = null
+        })
+    ) {
+        fun routeForRate(rateInput: RateInput? = null): String {
+            val route = when (rateInput) {
+                null -> baseRoute()
+                else -> String.format(ROUTE_RATE, rateInput.rateId)
+            }
+            //val route = String.format(ROUTE_RATE, payerId)
+            Timber.tag(TAG).d("Rate - routeForRate(...): '%s'", route)
+            return route
+        }
+
+        fun fromEntry(entry: NavBackStackEntry): RateInput {
+            val rateInput =
+                RateInput(UUID.fromString(entry.arguments?.getString(ARG_RATE_ID) ?: ""))
+            Timber.tag(TAG).d("Rate - fromEntry(...): '%s'", rateInput)
+            return rateInput
         }
     }
 

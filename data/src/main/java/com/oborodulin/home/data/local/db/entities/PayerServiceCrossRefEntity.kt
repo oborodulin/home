@@ -12,7 +12,10 @@ import java.util.UUID
 
 @Entity(
     tableName = PayerServiceCrossRefEntity.TABLE_NAME,
-    indices = [Index(value = ["payersId", "servicesId", "isPrivileges"], unique = true)],
+    indices = [Index(
+        value = ["payersId", "servicesId", "isPrivileges"],
+        unique = true
+    )],
     foreignKeys = [ForeignKey(
         entity = PayerEntity::class,
         parentColumns = arrayOf("payerId"),

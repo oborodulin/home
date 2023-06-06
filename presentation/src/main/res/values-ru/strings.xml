@@ -8,6 +8,7 @@
     <!--дополнительная -->
     <string name="nav_item_payer">Плательщик</string>
     <string name="nav_item_service">Услуга</string>
+    <string name="nav_item_rate">Тариф</string>
 
     <!--BUTTONS: -->
     <string name="btn_pay_text">Оплатить</string>

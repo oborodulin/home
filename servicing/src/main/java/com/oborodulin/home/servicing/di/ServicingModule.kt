@@ -2,6 +2,7 @@ package com.oborodulin.home.servicing.di
 
 import com.oborodulin.home.common.di.IoDispatcher
 import com.oborodulin.home.common.domain.usecases.UseCase
+import com.oborodulin.home.data.local.db.dao.PayerDao
 import com.oborodulin.home.data.local.db.dao.ServiceDao
 import com.oborodulin.home.servicing.data.mappers.*
 import com.oborodulin.home.servicing.data.repositories.ServicesRepositoryImpl
@@ -52,22 +53,6 @@ object ServicingModule {
 
     @Singleton
     @Provides
-    fun provideServiceViewMappers(
-        serviceViewListToServiceListMapper: ServiceViewListToServiceListMapper,
-        serviceViewToServiceMapper: ServiceViewToServiceMapper,
-        serviceToServiceViewMapper: ServiceToServiceViewMapper,
-        payerServiceViewToServiceMapper: PayerServiceViewToServiceMapper,
-        payerServiceViewListToPayerServiceListMapper: PayerServiceViewListToPayerServiceListMapper
-    ): ServiceViewMappers = ServiceViewMappers(
-        serviceViewListToServiceListMapper,
-        serviceViewToServiceMapper,
-        serviceToServiceViewMapper,
-        payerServiceViewToServiceMapper,
-        payerServiceViewListToPayerServiceListMapper
-    )
-
-    @Singleton
-    @Provides
     fun provideServiceToServiceEntityMapper(): ServiceToServiceEntityMapper =
         ServiceToServiceEntityMapper()
 
@@ -79,9 +64,15 @@ object ServicingModule {
     @Singleton
     @Provides
     fun provideServiceMappers(
+        serviceViewListToServiceListMapper: ServiceViewListToServiceListMapper,
+        serviceViewToServiceMapper: ServiceViewToServiceMapper,
+        serviceToServiceViewMapper: ServiceToServiceViewMapper,
         serviceToServiceEntityMapper: ServiceToServiceEntityMapper,
         serviceToServiceTlEntityMapper: ServiceToServiceTlEntityMapper
     ): ServiceMappers = ServiceMappers(
+        serviceViewListToServiceListMapper,
+        serviceViewToServiceMapper,
+        serviceToServiceViewMapper,
         serviceToServiceEntityMapper,
         serviceToServiceTlEntityMapper
     )
@@ -89,14 +80,30 @@ object ServicingModule {
     //Payer Services:
     @Singleton
     @Provides
-    fun providePayerServiceViewToServiceMapper(mapper: ServiceViewToServiceMapper): PayerServiceViewToServiceMapper =
-        PayerServiceViewToServiceMapper(mapper = mapper)
+    fun providePayerServiceViewToServiceMapper(mapper: ServiceViewToServiceMapper): PayerServiceViewToPayerServiceMapper =
+        PayerServiceViewToPayerServiceMapper(mapper = mapper)
 
     @Singleton
     @Provides
-    fun providePayerServiceViewListToServiceListMapper(mapper: PayerServiceViewToServiceMapper): PayerServiceViewListToPayerServiceListMapper =
+    fun providePayerServiceViewListToServiceListMapper(mapper: PayerServiceViewToPayerServiceMapper): PayerServiceViewListToPayerServiceListMapper =
         PayerServiceViewListToPayerServiceListMapper(mapper = mapper)
 
+    @Singleton
+    @Provides
+    fun providePayerServiceToPayerServiceCrossRefEntityMapper(): PayerServiceToPayerServiceCrossRefEntityMapper =
+        PayerServiceToPayerServiceCrossRefEntityMapper()
+
+    @Singleton
+    @Provides
+    fun providePayerServiceMappers(
+        payerServiceViewToPayerServiceMapper: PayerServiceViewToPayerServiceMapper,
+        payerServiceViewListToPayerServiceListMapper: PayerServiceViewListToPayerServiceListMapper,
+        payerServiceToPayerServiceCrossRefEntityMapper: PayerServiceToPayerServiceCrossRefEntityMapper
+    ): PayerServiceMappers = PayerServiceMappers(
+        payerServiceViewToPayerServiceMapper,
+        payerServiceViewListToPayerServiceListMapper,
+        payerServiceToPayerServiceCrossRefEntityMapper
+    )
     // UI MAPPERS:
 
     // CONVERTERS:
@@ -105,30 +112,19 @@ object ServicingModule {
     @Singleton
     @Provides
     fun provideServicingDataSourceImp(
-        serviceDao: ServiceDao,
-        @IoDispatcher dispatcher: CoroutineDispatcher,
-        serviceViewToServiceEntityMapper: ServiceViewToServiceEntityMapper,
-        serviceViewToServiceTlEntityMapper: ServiceViewToServiceTlEntityMapper
-    ): LocalServiceDataSource =
-        LocalServiceDataSourceImpl(
-            serviceDao,
-            dispatcher,
-            serviceViewToServiceEntityMapper,
-            serviceViewToServiceTlEntityMapper
-        )
+        serviceDao: ServiceDao, payerDao: PayerDao,
+        @IoDispatcher dispatcher: CoroutineDispatcher
+    ): LocalServiceDataSource = LocalServiceDataSourceImpl(serviceDao, payerDao, dispatcher)
 
     // REPOSITORIES:
     @Singleton
     @Provides
     fun provideServicesRepository(
         localServiceDataSource: LocalServiceDataSource,
-        serviceViewMappers: ServiceViewMappers,
-        serviceMappers: ServiceMappers
-    ): ServicesRepository = ServicesRepositoryImpl(
-        localServiceDataSource,
-        serviceViewMappers,
-        serviceMappers
-    )
+        serviceMappers: ServiceMappers,
+        payerServiceMappers: PayerServiceMappers
+    ): ServicesRepository =
+        ServicesRepositoryImpl(localServiceDataSource, serviceMappers, payerServiceMappers)
 
     // USE CASES:
     @Singleton

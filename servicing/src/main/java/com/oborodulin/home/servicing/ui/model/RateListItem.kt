@@ -1,31 +1,28 @@
 package com.oborodulin.home.servicing.ui.model
 
 import com.oborodulin.home.common.ui.model.ListItemModel
-import com.oborodulin.home.data.util.Constants.DEF_PAYMENT_DAY
-import com.oborodulin.home.data.util.Constants.DEF_PERSON_NUM
 import java.math.BigDecimal
 import java.time.OffsetDateTime
+import java.time.format.DateTimeFormatter
+import java.time.format.FormatStyle
+import java.util.Locale
 import java.util.UUID
 
 data class RateListItem(
     val id: UUID,
-    val fullName: String = "",
-    val address: String = "",
-    val totalArea: BigDecimal? = null,
-    val livingSpace: BigDecimal? = null,
-    val paymentDay: Int = DEF_PAYMENT_DAY,
-    val personsNum: Int = DEF_PERSON_NUM,
-    val isAlignByPaymentDay: Boolean = false,
-    val isFavorite: Boolean = false,
-    val fromPaymentDate: OffsetDateTime? = null,
-    val toPaymentDate: OffsetDateTime? = null,
-    val totalDebt: BigDecimal? = null
+    val serviceId: UUID,
+    val payerServiceId: UUID? = null,
+    val startDate: OffsetDateTime,
+    val fromMeterValue: BigDecimal? = null,
+    val toMeterValue: BigDecimal? = null,
+    val rateValue: BigDecimal,
+    val isPerPerson: Boolean = false,
+    val isPrivileges: Boolean = false
 ) : ListItemModel(
     itemId = id,
-    title = fullName,
-    descr = address,
-    value = totalDebt,
-    fromDate = fromPaymentDate,
-    toDate = toPaymentDate,
-    isFavoriteMark = isFavorite
+    title = startDate.format(
+        DateTimeFormatter.ofLocalizedDate(FormatStyle.SHORT).withLocale(Locale.getDefault()),
+    ),
+    descr = if (fromMeterValue != null) "$fromMeterValue - $toMeterValue" else null,
+    value = rateValue
 )

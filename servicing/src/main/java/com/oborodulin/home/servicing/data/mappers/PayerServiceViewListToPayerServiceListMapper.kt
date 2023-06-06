@@ -1,12 +1,13 @@
 package com.oborodulin.home.servicing.data.mappers
 
-import com.oborodulin.home.common.mapping.ListMapper
+import com.oborodulin.home.common.mapping.ListMapperImpl
 import com.oborodulin.home.data.local.db.views.PayerServiceView
-import com.oborodulin.home.servicing.domain.model.PayerService1
+import com.oborodulin.home.servicing.domain.model.PayerService
 
-class PayerServiceViewListToPayerServiceListMapper(private val mapper: PayerServiceViewToServiceMapper) :
-    ListMapper<PayerServiceView, PayerService1> {
-    override fun map(input: List<PayerServiceView>): List<PayerService1> {
+class PayerServiceViewListToPayerServiceListMapper(val mapper: PayerServiceViewToPayerServiceMapper) :
+    ListMapperImpl<PayerServiceView, PayerService>(mapper)
+/*{
+    override fun map(input: List<PayerServiceView>): List<PayerService> {
         val payerService1s = mutableListOf<PayerService1>()
         input.forEach { psv ->
             val payerService1 = payerService1s.firstOrNull { ps -> ps.payer.id == psv.payersId } ?: PayerService1()
@@ -19,3 +20,5 @@ class PayerServiceViewListToPayerServiceListMapper(private val mapper: PayerServ
         return payerService1s
     }
 }
+
+ */

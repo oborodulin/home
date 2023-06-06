@@ -24,60 +24,103 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.oborodulin.home.accounting.R
-import com.oborodulin.home.accounting.ui.model.PayerListItem
-import com.oborodulin.home.billing.ui.subtotals.PayerServiceSubtotalsListUiAction
-import com.oborodulin.home.billing.ui.subtotals.PayerServiceSubtotalsListView
-import com.oborodulin.home.billing.ui.subtotals.PayerServiceSubtotalsListViewModel
-import com.oborodulin.home.billing.ui.subtotals.PayerServiceSubtotalsListViewModelImpl
+import com.oborodulin.home.accounting.ui.model.RateListItem
+import com.oborodulin.home.billing.ui.subtotals.RateServiceSubtotalsListUiAction
+import com.oborodulin.home.billing.ui.subtotals.RateServiceSubtotalsListView
+import com.oborodulin.home.billing.ui.subtotals.RateServiceSubtotalsListViewModel
 import com.oborodulin.home.common.ui.ComponentUiAction
+import com.oborodulin.home.common.ui.components.items.ListItemComponent
 import com.oborodulin.home.common.ui.state.CommonScreen
 import com.oborodulin.home.metering.ui.value.MeterValuesListUiAction
 import com.oborodulin.home.metering.ui.value.MeterValuesListView
 import com.oborodulin.home.metering.ui.value.MeterValuesListViewModel
-import com.oborodulin.home.metering.ui.value.MeterValuesListViewModelImpl
 import com.oborodulin.home.presentation.AppState
-import com.oborodulin.home.presentation.components.PayerListItemComponent
-import com.oborodulin.home.presentation.navigation.PayerInput
+import com.oborodulin.home.presentation.components.RateListItemComponent
+import com.oborodulin.home.presentation.navigation.RateInput
 import kotlinx.coroutines.flow.collectLatest
 import timber.log.Timber
 import java.util.*
 
-private const val TAG = "Accounting.ui.PayersListView"
+private const val TAG = "Servicing.ui.RatesListView"
 
 @Composable
-fun PayersListView(
+fun RatesListView(
     appState: AppState,
-    payersListViewModel: PayersListViewModelImpl = hiltViewModel(),
-    payerServiceSubtotalsListViewModel: PayerServiceSubtotalsListViewModelImpl = hiltViewModel(),
-    meterValuesListViewModel: MeterValuesListViewModelImpl = hiltViewModel(),
+    ratesListViewModel: RatesListViewModelImpl = hiltViewModel(),
     navController: NavController,
-    payerInput: PayerInput
+    rateInput: RateInput
 ) {
-    Timber.tag(TAG).d("PayersListView(...) called: payerInput = %s", payerInput)
+    Timber.tag(TAG).d("RatesListView(...) called: rateInput = %s", rateInput)
     LaunchedEffect(Unit) {
-        Timber.tag(TAG).d("PayersListView: LaunchedEffect() BEFORE collect ui state flow")
-        payersListViewModel.submitAction(PayersListUiAction.Load)
+        Timber.tag(TAG).d("RatesListView: LaunchedEffect() BEFORE collect ui state flow")
+        ratesListViewModel.submitAction(RatesListUiAction.Load)
     }
-    payersListViewModel.uiStateFlow.collectAsState().value.let { state ->
+    ratesListViewModel.uiStateFlow.collectAsState().value.let { state ->
         Timber.tag(TAG).d("Collect ui state flow: %s", state)
         CommonScreen(state = state) {
-            PayersAccounting(
-                payers = it,
+            RatesAccounting(
                 appState = appState,
-                payersListViewModel = payersListViewModel,
-                payerServiceSubtotalsListViewModel = payerServiceSubtotalsListViewModel,
-                meterValuesListViewModel = meterValuesListViewModel,
+                ratesListViewModel = ratesListViewModel,
                 navController = navController,
-                payerInput = payerInput
+                rateInput = rateInput
             )
+            RatesList(rates = it,
+                rateInput = rateInput,
+                onFavorite = { rate ->
+                    ratesListViewModel.handleActionJob(action = {
+                        ratesListViewModel.submitAction(
+                            RatesListUiAction.FavoriteRate(rate.id)
+                        )
+                    },
+                        afterAction = {
+                            meterValuesListViewModel.submitAction(
+                                MeterValuesListUiAction.Load(rate.id)
+                            )
+                        }
+                    )
+                },
+                onClick = { rate ->
+                    ratesListViewModel.setPrimaryObjectData(
+                        arrayListOf(
+                            rate.id.toString(),
+                            rate.fullName
+                        )
+                    )
+                    appState.actionBarSubtitle.value = rate.address
+                    with(rateServiceSubtotalsListViewModel) {
+                        setPrimaryObjectData(arrayListOf(rate.id.toString()))
+                        submitAction(RateServiceSubtotalsListUiAction.Load(rate.id))
+                    }
+                    with(meterValuesListViewModel) {
+                        clearInputFieldsStates()
+                        setPrimaryObjectData(arrayListOf(rate.id.toString()))
+                        submitAction(MeterValuesListUiAction.Load(rate.id))
+                    }
+                },
+                onEdit = { rate ->
+                    ratesListViewModel.submitAction(
+                        RatesListUiAction.EditRate(
+                            rate.id
+                        )
+                    )
+                }
+            ) { rate ->
+                ratesListViewModel.handleActionJob(action = {
+                    ratesListViewModel.submitAction(RatesListUiAction.DeleteRate(rate.id))
+                },
+                    afterAction = {
+                        meterValuesListViewModel.submitAction(MeterValuesListUiAction.Init)
+                    }
+                )
+            }
         }
     }
     LaunchedEffect(Unit) {
-        Timber.tag(TAG).d("PayersListView: LaunchedEffect() AFTER collect ui state flow")
-        payersListViewModel.singleEventFlow.collectLatest {
+        Timber.tag(TAG).d("RatesListView: LaunchedEffect() AFTER collect ui state flow")
+        ratesListViewModel.singleEventFlow.collectLatest {
             Timber.tag(TAG).d("Collect Latest UiSingleEvent: %s", it.javaClass.name)
             when (it) {
-                is PayersListUiSingleEvent.OpenPayerScreen -> {
+                is RatesListUiSingleEvent.OpenRateScreen -> {
                     navController.navigate(it.navRoute)
                 }
             }
@@ -86,17 +129,17 @@ fun PayersListView(
 }
 
 @Composable
-fun PayersList(
-    payers: List<PayerListItem>,
-    payerInput: PayerInput,
-    onFavorite: (PayerListItem) -> Unit,
-    onClick: (PayerListItem) -> Unit,
-    onEdit: (PayerListItem) -> Unit,
-    onDelete: (PayerListItem) -> Unit
+fun RatesList(
+    rates: List<RateListItem>,
+    rateInput: RateInput,
+    onFavorite: (RateListItem) -> Unit,
+    onClick: (RateListItem) -> Unit,
+    onEdit: (RateListItem) -> Unit,
+    onDelete: (RateListItem) -> Unit
 ) {
-    Timber.tag(TAG).d("PayersList(...) called: payerInput = %s", payerInput)
+    Timber.tag(TAG).d("RatesList(...) called: rateInput = %s", rateInput)
     var selectedIndex by remember { mutableStateOf(-1) } // by
-    if (payers.isNotEmpty()) {
+    if (rates.isNotEmpty()) {
         val listState = rememberLazyListState()
         LazyColumn(
             state = listState,
@@ -105,70 +148,35 @@ fun PayersList(
                 .padding(8.dp)
                 .focusable(enabled = true)
         ) {
-            items(payers.size) { index ->
-                payers[index].let { payer ->
+            items(rates.size) { index ->
+                rates[index].let { rate ->
                     val isSelected =
-                        ((selectedIndex == -1) and ((payerInput.payerId == payer.id) || payer.isFavorite)) || (selectedIndex == index)
-                    PayerListItemComponent(
+                        ((selectedIndex == -1) and ((rateInput.rateId == rate.id) || rate.isFavorite)) || (selectedIndex == index)
+                    ListItemComponent(
                         icon = com.oborodulin.home.presentation.R.drawable.outline_house_black_36,
-                        item = payer,
+                        item = rate,
                         itemActions = listOf(
-                            ComponentUiAction.EditListItem { onEdit(payer) },
+                            ComponentUiAction.EditListItem { onEdit(rate) },
                             ComponentUiAction.DeleteListItem(
                                 stringResource(
-                                    R.string.dlg_confirm_del_payer,
-                                    payer.fullName
+                                    R.string.dlg_confirm_del_rate,
+                                    rate.fullName
                                 )
-                            ) { onDelete(payer) }),
+                            ) { onDelete(rate) }),
                         selected = isSelected,
-                        background = (if (isSelected) Color.LightGray else Color.Transparent),
-                        onFavorite = { onFavorite(payer) },
+                        background = (if (isSelected) Color.LightGray else Color.Transparent)
                     ) {
                         //selectedIndex = if (selectedIndex != index) index else -1
                         if (selectedIndex != index) selectedIndex = index
-                        onClick(payer)
+                        onClick(rate)
                     }
                 }
             }
         }
     }
-    /*
-            list.apply {
-                val error = when {
-                    loadState.prepend is LoadState.Error -> loadState.prepend AS LoadState.Error
-                    loadState.append is LoadState.Error -> loadState.append AS LoadState.Error
-                    loadState.refresh is LoadState.Error -> loadState.refresh AS LoadState.Error
-                    else -> null
-                }
-
-                val loading = when {
-                    loadState.prepend is LoadState.Loading -> loadState.prepend AS LoadState.Loading
-                    loadState.append is LoadState.Loading -> loadState.append AS LoadState.Loading
-                    loadState.refresh is LoadState.Loading -> loadState.refresh AS LoadState.Loading
-                    else -> null
-                }
-
-                if (loading != null) {
-                    repeat((0..20).count()) {
-                        item {
-                            Box(
-                                modifier = Modifier
-                                    .background(color = Color.DarkGray)
-                            ) {
-                                ShimmerAnimation()
-                            }
-                        }
-                    }
-                }
-
-                if (error != null) {
-                    //TODO: add error handler
-                    item { SweetError(message = error.error.localizedMessage ?: "Error") }
-                }
-            }*/
     else {
         Text(
-            text = stringResource(R.string.payer_list_empty_text),
+            text = stringResource(R.string.rate_list_empty_text),
             style = MaterialTheme.typography.titleSmall,
             fontWeight = FontWeight.Bold
         )
@@ -176,16 +184,16 @@ fun PayersList(
 }
 
 @Composable
-fun PayersAccounting(
-    payers: List<PayerListItem>,
+fun RatesAccounting(
+    rates: List<RateListItem>,
     appState: AppState,
-    payersListViewModel: PayersListViewModel,
-    payerServiceSubtotalsListViewModel: PayerServiceSubtotalsListViewModel,
+    ratesListViewModel: RatesListViewModel,
+    rateServiceSubtotalsListViewModel: RateServiceSubtotalsListViewModel,
     meterValuesListViewModel: MeterValuesListViewModel,
     navController: NavController,
-    payerInput: PayerInput
+    rateInput: RateInput
 ) {
-    Timber.tag(TAG).d("PayersAccounting(...) called: payerInput = %s", payerInput)
+    Timber.tag(TAG).d("RatesAccounting(...) called: rateInput = %s", rateInput)
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -209,55 +217,7 @@ fun PayersAccounting(
                     shape = RoundedCornerShape(16.dp)
                 )
         ) {
-            PayersList(payers,
-                payerInput = payerInput,
-                onFavorite = { payer ->
-                    payersListViewModel.handleActionJob(action = {
-                        payersListViewModel.submitAction(
-                            PayersListUiAction.FavoritePayer(payer.id)
-                        )
-                    },
-                        afterAction = {
-                            meterValuesListViewModel.submitAction(
-                                MeterValuesListUiAction.Load(payer.id)
-                            )
-                        }
-                    )
-                },
-                onClick = { payer ->
-                    payersListViewModel.setPrimaryObjectData(
-                        arrayListOf(
-                            payer.id.toString(),
-                            payer.fullName
-                        )
-                    )
-                    appState.actionBarSubtitle.value = payer.address
-                    with(payerServiceSubtotalsListViewModel) {
-                        setPrimaryObjectData(arrayListOf(payer.id.toString()))
-                        submitAction(PayerServiceSubtotalsListUiAction.Load(payer.id))
-                    }
-                    with(meterValuesListViewModel) {
-                        clearInputFieldsStates()
-                        setPrimaryObjectData(arrayListOf(payer.id.toString()))
-                        submitAction(MeterValuesListUiAction.Load(payer.id))
-                    }
-                },
-                onEdit = { payer ->
-                    payersListViewModel.submitAction(
-                        PayersListUiAction.EditPayer(
-                            payer.id
-                        )
-                    )
-                }
-            ) { payer ->
-                payersListViewModel.handleActionJob(action = {
-                    payersListViewModel.submitAction(PayersListUiAction.DeletePayer(payer.id))
-                },
-                    afterAction = {
-                        meterValuesListViewModel.submitAction(MeterValuesListUiAction.Init)
-                    }
-                )
-            }
+
         }
         Box(
             modifier = Modifier
@@ -274,7 +234,7 @@ fun PayersAccounting(
             MeterValuesListView(
                 viewModel = meterValuesListViewModel,
                 navController = navController,
-                payerInput = payerInput
+                rateInput = rateInput
             )
         }
         Box(
@@ -288,10 +248,10 @@ fun PayersAccounting(
                     shape = RoundedCornerShape(16.dp)
                 )
         ) {
-            PayerServiceSubtotalsListView(
-                viewModel = payerServiceSubtotalsListViewModel,
+            RateServiceSubtotalsListView(
+                viewModel = rateServiceSubtotalsListViewModel,
                 navController = navController,
-                payerInput = payerInput
+                rateInput = rateInput
             )
             //Text(text = "Итого:")
         }
@@ -301,10 +261,10 @@ fun PayersAccounting(
 @Preview(name = "Night Mode", showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
 @Preview(name = "Day Mode", showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_NO)
 @Composable
-fun PreviewPayersAccounting() {
-    PayersList(
-        payers = PayersListViewModelImpl.previewList(LocalContext.current),
-        payerInput = PayerInput(UUID.randomUUID()),
+fun PreviewRatesList() {
+    RatesList(
+        rates = RatesListViewModelImpl.previewList(LocalContext.current),
+        rateInput = RateInput(UUID.randomUUID()),
         onFavorite = {},
         onClick = {},
         onEdit = {},
